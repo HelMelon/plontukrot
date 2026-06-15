@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../services/watering_service.dart';
+import '../../../../services/watering_service.dart';
 
 class WateringHistorySheet extends StatefulWidget {
   final String plantId;

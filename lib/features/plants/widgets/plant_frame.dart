@@ -18,15 +18,14 @@ class PlantFrameWidget extends StatelessWidget {
 
     return SizedBox(
       height: halfScreenHeight,
-      // 🛡️ РЕШЕНИЕ: Align сбрасывает принудительное растяжение от родительских виджетов
+
       child: Align(
-        alignment: Alignment.centerLeft, // Выравниваем рамку по левому краю
+        alignment: Alignment.centerLeft,
         child: AspectRatio(
           aspectRatio: 470 / 836,
           child: Stack(
             fit: StackFit.expand,
             children: [
-              /// 🌿 IMAGE (ВАЖНО: COVER)
               ClipPath(
                 clipper: PlantFrameClipper(),
                 child: SizedBox.expand(
@@ -40,12 +39,10 @@ class PlantFrameWidget extends StatelessWidget {
                 ),
               ),
 
-              /// 🖼 FRAME (ТОЛЬКО OVERLAY)
               Positioned.fill(
                 child: Image.asset('assets/images/frame.png', fit: BoxFit.fill),
               ),
 
-              /// 🌿 TEXT (ПРОПОРЦИОНАЛЬНОЕ ПОЗИЦИОНИРОВАНИЕ)
               Positioned.fill(
                 child: FractionallySizedBox(
                   widthFactor:

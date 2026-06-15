@@ -8,13 +8,16 @@ import '../../../services/fertilize_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/storage_service.dart';
-import '../widgets/update_plant_sheet.dart';
+import '../widgets/sheets/update_plant_sheet.dart';
 import '../../../services/note_service.dart';
 import '../../../services/watering_service.dart';
-import '../widgets/add_note_sheet.dart';
+import '../widgets/sheets/add_note_sheet.dart';
 import '../widgets/plant_notes_section.dart';
-import '../widgets/watering_history_sheet.dart';
-import '../widgets/fertilizing_history_sheet.dart';
+import '../widgets/sheets/watering_history_sheet.dart';
+import '../widgets/sheets/fertilizing_history_sheet.dart';
+import '../widgets/cards/plant_image_card.dart';
+import '../widgets/cards/info_card.dart';
+import '../widgets/cards/plant_info_card.dart';
 
 class PlantDetailsPage extends StatefulWidget {
   final QueryDocumentSnapshot plant;
@@ -192,7 +195,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
 
                     const SizedBox(height: 10),
 
-                    /// 🌿 FERTILIZER DROPDOWN
                     StreamBuilder(
                       stream: service.getFertilizers(),
                       builder: (context, snapshot) {
@@ -214,7 +216,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                               );
                             }),
 
-                            /// ➕ ADD NEW ITEM
                             const DropdownMenuItem(
                               value: 'add_new',
                               child: Text('+ Add new fertilizer'),
@@ -239,7 +240,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
 
                     const SizedBox(height: 20),
 
-                    /// SAVE
                     FilledButton(
                       onPressed: selectedFertilizerId == null
                           ? null
@@ -304,7 +304,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             surfaceTintColor: Colors.transparent,
-
             title: Text(
               data['nickname'] ?? 'Plant',
               style: const TextStyle(
@@ -312,7 +311,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             actions: [
               _TopAction(
                 icon: Icons.water_drop,
@@ -360,7 +358,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                   );
                 },
               ),
-            ],
+            ], // Конец списка actions
           ),
 
           body: LayoutBuilder(
@@ -382,7 +380,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                             children: [
                               Expanded(
                                 flex: 3, // 🔥 картинка меньше
-                                child: _PlantImageCard(
+                                child: PlantImageCard(
                                   imageUrl: hasImage ? imageUrl! : '',
                                   onTap: pickAndUploadImage,
                                   isUploading: isUploading,
@@ -393,7 +391,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
 
                               Expanded(
                                 flex: 5,
-                                child: _PlantInfoCard(
+                                child: PlantInfoCard(
                                   data: data,
                                   plantId: widget.plant.id,
                                 ),
@@ -403,7 +401,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                         /// 📱 MOBILE
                         : Column(
                             children: [
-                              _PlantImageCard(
+                              PlantImageCard(
                                 imageUrl: hasImage ? imageUrl! : '',
                                 onTap: pickAndUploadImage,
                                 isUploading: isUploading,
@@ -411,7 +409,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
 
                               const SizedBox(height: 24),
 
-                              _PlantInfoCard(
+                              PlantInfoCard(
                                 data: data,
                                 plantId: widget.plant.id,
                               ),
@@ -424,259 +422,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
           ),
         );
       },
-    );
-  }
-}
-
-class _PlantImageCard extends StatelessWidget {
-  final String imageUrl;
-  final VoidCallback onTap;
-  final bool isUploading;
-
-  const _PlantImageCard({
-    required this.imageUrl,
-    required this.onTap,
-    required this.isUploading,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: isUploading ? null : onTap,
-
-      child: AspectRatio(
-        aspectRatio: 4 / 5,
-
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(28),
-            color: AppColors.backgroundSecondary,
-            border: Border.all(color: AppColors.greenDeep),
-          ),
-
-          clipBehavior: Clip.antiAlias,
-
-          child: imageUrl.isEmpty
-              ? const Center(
-                  child: Icon(
-                    Icons.add_a_photo,
-                    size: 50,
-                    color: AppColors.accentLight,
-                  ),
-                )
-              : Image.network(imageUrl, fit: BoxFit.cover),
-        ),
-      ),
-    );
-  }
-}
-
-class _PlantInfoCard extends StatelessWidget {
-  final Map<String, dynamic> data;
-  final String plantId;
-
-  const _PlantInfoCard({required this.data, required this.plantId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-
-      decoration: BoxDecoration(
-        color: AppColors.backgroundSecondary,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.greenDeep),
-      ),
-
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-
-        children: [
-          Text(
-            data['name'] ?? 'Unnamed Plant',
-
-            style: const TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          Text(
-            'Name: ${data['nickname'] ?? 'Unnamed Plant'}',
-
-            style: const TextStyle(
-              fontStyle: FontStyle.italic,
-              fontSize: 24,
-              color: AppColors.heading,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          Row(
-            children: [
-              Expanded(
-                child: StreamBuilder<Map<String, dynamic>?>(
-                  stream: WateringService().watchLastWatering(plantId),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const _InfoCard(
-                        icon: Icons.water_drop,
-                        title: "Watering",
-                        value: 'Loading...',
-                      );
-                    }
-
-                    final data = snapshot.data;
-
-                    if (data == null) {
-                      return const _InfoCard(
-                        icon: Icons.water_drop,
-                        title: "Watering",
-                        value: 'No watering yet',
-                      );
-                    }
-
-                    final last = data['wateredAt'] as DateTime?;
-                    final next = data['nextWatering'] as DateTime?;
-
-                    String formatDate(DateTime? date) {
-                      if (date == null) return '—';
-                      return DateFormat('d MMM y').format(date);
-                    }
-
-                    final value =
-                        '''
-Last: ${formatDate(last)}
-Next: ${formatDate(next)}
-''';
-
-                    return _InfoCard(
-                      icon: Icons.water_drop,
-                      title: "Watering",
-                      value: value.trim(),
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (_) =>
-                              WateringHistorySheet(plantId: plantId),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-
-              SizedBox(width: 16),
-
-              Expanded(
-                child: StreamBuilder<List<Map<String, dynamic>>>(
-                  stream: FertilizeService().getFertilizingHistory(plantId),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const _InfoCard(
-                        icon: Icons.science,
-                        title: "Fertilizing",
-                        value: "Loading...",
-                      );
-                    }
-
-                    final items = snapshot.data!;
-
-                    if (items.isEmpty) {
-                      return const _InfoCard(
-                        icon: Icons.science,
-                        title: "Fertilizing",
-                        value: "No data",
-                      );
-                    }
-
-                    final last = items.first;
-
-                    final value =
-                        "${last['fertilizerName']}\n${DateFormat('d MMM y').format(last['appliedAt'])}";
-
-                    return _InfoCard(
-                      icon: Icons.science,
-                      title: "Fertilizing",
-                      value: value,
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (_) =>
-                              FertilizingHistorySheet(plantId: plantId),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 32),
-
-          const Text(
-            'Plant Journal',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.heading,
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          PlantNotesSection(plantId: plantId),
-        ],
-      ),
-    );
-  }
-}
-
-class _InfoCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String value;
-  final VoidCallback? onTap;
-
-  const _InfoCard({
-    required this.icon,
-    required this.title,
-    required this.value,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: AppColors.dark2,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, size: 28, color: AppColors.goldAccent),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: AppColors.heading,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(value, style: const TextStyle(color: AppColors.textSecondary)),
-          ],
-        ),
-      ),
     );
   }
 }

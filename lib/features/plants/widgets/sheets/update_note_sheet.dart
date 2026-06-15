@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../services/note_service.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../services/note_service.dart';
 
 class UpdateNoteSheet extends StatefulWidget {
   final String plantId;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../services/fertilize_service.dart';
+import '../../../../services/fertilize_service.dart';
 
 class FertilizingHistorySheet extends StatelessWidget {
   final String plantId;

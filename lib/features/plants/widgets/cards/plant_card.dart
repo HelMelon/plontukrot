@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../pages/plant_details_page.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../pages/plant_details_page.dart';
 
 // 🔠 Безопасное расширение для капитализации каждого слова
 extension CapitalizeString on String {

@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../services/note_service.dart';
-import 'update_note_sheet.dart';
+import 'sheets/update_note_sheet.dart';
 
 class PlantNoteTile extends StatefulWidget {
   final String plantId;
