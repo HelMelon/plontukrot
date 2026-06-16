@@ -34,13 +34,41 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
   final TextEditingController typeController = TextEditingController();
 
   String? selectedFertilizerId;
+  Future<ImageSource?> selectImageSource() async {
+    return showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: AppColors.dark2,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Галерея'),
+                onTap: () => Navigator.pop(context, ImageSource.gallery),
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Камера'),
+                onTap: () => Navigator.pop(context, ImageSource.camera),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   Future<void> pickAndUploadImage() async {
+    final source = await selectImageSource();
+    if (source == null) return;
     final picker = ImagePicker();
-
     final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
+      source: source,
       imageQuality: 80,
+      maxWidth: 1280,
+      maxHeight: 1280,
     );
 
     if (pickedFile == null) return;

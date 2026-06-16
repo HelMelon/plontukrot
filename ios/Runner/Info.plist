@@ -66,5 +66,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+    <string>Необходимо для фотографирования растений.</string>
+
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Необходимо для выбора фотографий растений.</string>
 </dict>
 </plist>
