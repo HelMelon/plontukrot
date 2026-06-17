@@ -42,3 +42,8 @@ jobs:
       - name: Build iOS (no codesign)
         # Команда сборки сама запустит pod install в правильный момент
         run: flutter build ios --debug --no-codesign
+      - name: Upload iOS Build Artifact
+        uses: actions/artifacts/upload@v4
+        with:
+          name: ios-debug-build
+          path: build/ios/iphoneos/Runner.app  # Путь, куда Flutter складывает собранное приложение
