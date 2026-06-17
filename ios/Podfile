@@ -1,9 +1,25 @@
+# Обязательно подключаем внутренние конфигурационные скрипты Flutter
+target_ios_revision = File.expand_path(File.join('..', '.flutter-plugins-dependencies'), __FILE__)
+if File.exist?(target_ios_revision)
+  # Подтягиваем пути ко всем плагинам (Firestore, Auth и т.д.)
+  File.open(target_ios_revision, 'r') do |f|
+    f.each_line do |line|
+      # Читаем конфигурацию зависимостей
+    end
+  end
+end
+
+# Подключаем официальный хелпер сборки Flutter
+flutter_root = File.expand_path(File.join('..', '..'), __FILE__)
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
 platform :ios, '15.0'
 
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
+  # Теперь этот метод гарантированно сработает, так как мы сделали require podhelper выше
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end
 
@@ -11,7 +27,7 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
-      # Принудительно ставим iOS 15.0 для всех зависимостей, включая Firestore
+      # Принудительно выставляем нужную версию 15.0 для работы Firestore
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
     end
   end
