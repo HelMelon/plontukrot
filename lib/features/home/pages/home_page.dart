@@ -7,6 +7,7 @@ import '../../../services/auth_service.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
 import '../../../services/plant_service.dart';
 import '../../plants/widgets/cards/plant_card.dart';
+import '../../plants/widgets/plant_search_delegate.dart';
 
 class HomePage extends StatelessWidget {
   final User user;
@@ -70,6 +71,46 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ],
+
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(64.0),
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              bottom: 12.0,
+            ),
+
+            child: GestureDetector(
+              onTap: () {
+                showSearch(
+                  context: context,
+                  delegate: PlantSearchDelegate(userId: user.uid),
+                );
+              },
+
+              child: AbsorbPointer(
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search plants...',
+                    hintStyle: const TextStyle(color: AppColors.textSecondary),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      color: AppColors.textSecondary,
+                    ),
+                    filled: true,
+                    fillColor: AppColors.heading.withOpacity(0.05),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
 
       floatingActionButton: FloatingActionButton(
