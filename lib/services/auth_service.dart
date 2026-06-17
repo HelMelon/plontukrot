@@ -23,30 +23,45 @@ class AuthService {
       return userCredential;
     }
 
-    final googleSignIn = GoogleSignIn.instance;
-
-    await googleSignIn.initialize();
-
-    final googleUser = await googleSignIn.authenticate();
-
-    final googleAuth = googleUser.authentication;
-
-    final credential = GoogleAuthProvider.credential(
-      idToken: googleAuth.idToken,
+    // 1. Объявляем переменную класса в самом верху (вне методов)
+    final GoogleSignIn _googleSignIn = GoogleSignIn(
+      scopes: [
+        'email',
+        'https://googleapis.com',
+      ],
     );
 
-    final userCredential = await _auth.signInWithCredential(credential);
+    // Ваш метод входа (замените старое содержимое на это)
+    Future<UserCredential?> signInWithGoogle() async {
+      // Больше никаких .instance, .initialize() и .authenticate()
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-    await FirestoreService().createUserDocument();
+      if (googleUser == null) {
+        return null; // Пользователь отменил вход
+      }
 
-    return userCredential;
-  }
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-  Future<void> signOut() async {
-    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
-      await GoogleSignIn.instance.signOut();
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await _auth.signInWithCredential(credential);
+
+      await FirestoreService().createUserDocument();
+
+      return userCredential;
     }
 
-    await _auth.signOut();
+    // Метод выхода
+    Future<void> signOut() async {
+      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+        // Используем объявленный выше экземпляр класса вместо .instance
+        await _googleSignIn.signOut();
+      }
+
+      await _auth.signOut();
+    }
+
   }
-}
