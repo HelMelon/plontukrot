@@ -51,7 +51,6 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
 
               children: [
-                // LOGO
                 SizedBox(
                   width: 280,
                   height: 280,
@@ -63,7 +62,6 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 42),
 
-                // TITLE
                 const Text(
                   'Plant Journal',
 
@@ -93,7 +91,6 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 54),
 
-                // GOOGLE BUTTON
                 SizedBox(
                   width: double.infinity,
                   height: 58,

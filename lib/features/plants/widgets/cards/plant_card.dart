@@ -4,19 +4,17 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../pages/plant_details_page.dart';
 
-// 🔠 Безопасное расширение для капитализации каждого слова
 extension CapitalizeString on String {
   String toTitleCase() {
     if (trim().isEmpty) return '';
 
-    return split(' ') // Разделяем строку на список слов по пробелам
-        .where((word) => word.isNotEmpty) // Убираем случайные двойные пробелы
+    return split(' ')
+        .where((word) => word.isNotEmpty)
         .map((word) {
-          if (word.length == 1)
-            return word.toUpperCase(); // Защита для слов из одной буквы
+          if (word.length == 1) return word.toUpperCase();
           return '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}';
         })
-        .join(' '); // Соединяем слова обратно через пробел
+        .join(' ');
   }
 }
 
@@ -32,7 +30,6 @@ class PlantCard extends StatelessWidget {
     final imageUrl = data['imageUrl'] as String?;
     final hasImage = imageUrl != null && imageUrl.isNotEmpty;
 
-    // 🏷️ Применяем капитализацию к именам при получении данных
     final name = (data['name'] as String? ?? 'Unnamed Plant').toTitleCase();
     final nickname = (data['nickname'] as String? ?? '').toTitleCase();
     final hasNickname = nickname.trim().isNotEmpty;
@@ -63,7 +60,6 @@ class PlantCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // 🔴 КРУГЛЫЙ АВАТАР БЕЗ НИЧЕГО
             SizedBox(
               width: 56,
               height: 56,

@@ -17,10 +17,8 @@ class PlantNotesSection extends StatefulWidget {
 class _PlantNotesSectionState extends State<PlantNotesSection> {
   bool showAll = false;
 
-  // 1. Инициализируем стрим один раз, чтобы избежать миганий экрана
   late final Stream<QuerySnapshot<Map<String, dynamic>>> _notesStream;
 
-  // 2. Храним ID заметки, у которой сейчас открыты кнопки
   String? _openedNoteId;
 
   @override
@@ -29,7 +27,6 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
     _notesStream = NoteService().notesStream(widget.plantId);
   }
 
-  // 3. Метод для управления тем, какая заметка сейчас открыта
   void _handleNoteOpen(String? noteId) {
     setState(() {
       _openedNoteId = noteId;
@@ -39,7 +36,7 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: _notesStream, // Используем сохраненный стрим
+      stream: _notesStream,
 
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -80,7 +77,6 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
         final visibleNotes = showAll ? docs : docs.take(3).toList();
 
         return Column(
-          // Возвращаем выравнивание СЛЕВА для всей секции заметок
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ...visibleNotes.map(
@@ -90,9 +86,9 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
                   plantId: widget.plantId,
                   noteId: doc.id,
                   data: doc.data(),
-                  // 4. Проверяем, открыта ли конкретно эта заметка
+
                   isOpened: _openedNoteId == doc.id,
-                  // 5. Колбэк сообщает родителю, если эту заметку свайпнули
+
                   onOpenChanged: (isOpen) {
                     _handleNoteOpen(isOpen ? doc.id : null);
                   },

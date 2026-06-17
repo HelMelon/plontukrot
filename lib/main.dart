@@ -24,7 +24,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
 
-      /// 🌿 GLOBAL BACKGROUND
       builder: (context, child) {
         return Container(
           decoration: const BoxDecoration(
@@ -33,7 +32,7 @@ class MyApp extends StatelessWidget {
 
               repeat: ImageRepeat.repeat,
 
-              fit: BoxFit.contain, // 🔥 ВАЖНО
+              fit: BoxFit.contain,
             ),
           ),
 
@@ -55,7 +54,6 @@ class AuthGate extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
 
       builder: (context, snapshot) {
-        // LOADING
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             backgroundColor: Colors.transparent,
@@ -63,12 +61,10 @@ class AuthGate extends StatelessWidget {
           );
         }
 
-        // USER LOGGED IN
         if (snapshot.hasData) {
           return HomePage(user: snapshot.data!);
         }
 
-        // USER NOT LOGGED IN
         return const LoginPage();
       },
     );

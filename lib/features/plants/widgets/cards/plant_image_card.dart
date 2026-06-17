@@ -6,15 +6,14 @@ class PlantImageCard extends StatelessWidget {
   final String? imageUrl;
   final VoidCallback onTap;
   final bool isUploading;
-  final double
-  aspectRatio; // Добавляем возможность управлять пропорциями снаружи
+  final double aspectRatio;
 
   const PlantImageCard({
     super.key,
     required this.imageUrl,
     required this.onTap,
     required this.isUploading,
-    this.aspectRatio = 1.0, // По умолчанию квадрат
+    this.aspectRatio = 1.0,
   });
 
   @override
@@ -22,7 +21,7 @@ class PlantImageCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AspectRatio(
-        aspectRatio: aspectRatio, // Используем переданную пропорцию
+        aspectRatio: aspectRatio,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: Stack(
@@ -32,13 +31,13 @@ class PlantImageCard extends StatelessWidget {
                 CachedNetworkImage(
                   imageUrl: imageUrl!,
                   fit: BoxFit.cover,
-                  alignment: Alignment.center, // Реальное фото строго по центру
+                  alignment: Alignment.center,
                   placeholder: (context, url) => const PlaceholderWithIcon(),
                   errorWidget: (context, url, error) =>
                       const PlaceholderWithIcon(),
                 )
               else
-                const PlaceholderWithIcon(), // Плейсхолдер выровнен по верху
+                const PlaceholderWithIcon(),
 
               if (isUploading)
                 Container(

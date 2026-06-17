@@ -22,7 +22,6 @@ class NoteService {
       'text': text,
       'createdAt': Timestamp.fromDate(now),
 
-      // для TTL в Firebase
       'expiresAt': Timestamp.fromDate(now.add(const Duration(days: 183))),
     });
   }

@@ -21,7 +21,6 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
   Future<void> addPlant() async {
     final name = nameController.text.trim();
     final nickname = nickNameController.text.trim();
-    final wateringFrequency = int.tryParse(wateringFrequencyController.text);
 
     if (name.isEmpty) {
       return;
@@ -64,7 +63,6 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
-              // HANDLE
               Center(
                 child: Container(
                   width: 50,
@@ -79,7 +77,6 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
 
               const SizedBox(height: 28),
 
-              // TITLE
               const Text(
                 'Add Plant',
 
@@ -107,7 +104,6 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
 
               const SizedBox(height: 28),
 
-              // NAME FIELD
               TextField(
                 controller: nameController,
 
@@ -149,7 +145,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
               ),
 
               const SizedBox(height: 18),
-              // NICKNAME FIELD
+
               TextField(
                 controller: nickNameController,
 
@@ -191,13 +187,12 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
               ),
 
               const SizedBox(height: 18),
-              //wateringFrequency FIELD
+
               TextField(
                 controller: wateringFrequencyController,
-                // 1. Показывает клавиатуру с цифрами (на телефонах)
+
                 keyboardType: TextInputType.number,
 
-                // 2. Жестко блокирует ввод любых символов, кроме цифр
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 style: const TextStyle(color: AppColors.textPrimary),
 
@@ -238,7 +233,6 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
 
               const SizedBox(height: 18),
 
-              // SAVE BUTTON
               SizedBox(
                 width: double.infinity,
                 height: 58,

@@ -10,8 +10,8 @@ class PlantNoteTile extends StatefulWidget {
   final String plantId;
   final String noteId;
   final Map<String, dynamic> data;
-  final bool isOpened; // Получаем состояние сверху
-  final ValueChanged<bool> onOpenChanged; // Уведомляем верхний виджет
+  final bool isOpened;
+  final ValueChanged<bool> onOpenChanged;
 
   const PlantNoteTile({
     super.key,
@@ -30,16 +30,13 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
   bool get isDesktop => kIsWeb;
 
   Future<void> _deleteNote(BuildContext context) async {
-    // 1. Показываем диалог подтверждения
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: AppColors.dark2, // Используем ваш цвет фона
+          backgroundColor: AppColors.dark2,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              20,
-            ), // Скругляем углы под стиль карточек
+            borderRadius: BorderRadius.circular(20),
           ),
           title: const Text(
             'Delete note?',
@@ -50,16 +47,14 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
             style: TextStyle(color: AppColors.textSecondary),
           ),
           actions: [
-            // Кнопка отмены
             TextButton(
-              onPressed: () =>
-                  Navigator.of(context).pop(false), // Возвращает false
+              onPressed: () => Navigator.of(context).pop(false),
               child: const Text(
                 'Cancel',
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
-            // Кнопка подтверждения удаления
+
             TextButton(
               onPressed: () =>
                   Navigator.of(context).pop(true), // Возвращает true

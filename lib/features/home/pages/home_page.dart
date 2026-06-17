@@ -23,10 +23,9 @@ class HomePage extends StatelessWidget {
         backgroundColor: AppColors.background,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        // 1. Отключаем принудительное центрирование
+
         centerTitle: false,
 
-        // 2. Оборачиваем Text в Align для точного позиционирования влево
         title: const Align(
           alignment: Alignment.centerLeft,
           child: Text(

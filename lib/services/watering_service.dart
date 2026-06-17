@@ -14,7 +14,6 @@ class WateringService {
     return _plantsCollection.doc(plantId).collection('watering');
   }
 
-  /// Добавить запись о поливе
   Future<void> addWatering({
     required String plantId,
     required DateTime wateredAt,
@@ -40,7 +39,6 @@ class WateringService {
     });
   }
 
-  /// История поливов
   Stream<List<Map<String, dynamic>>> getWateringHistory(String plantId) {
     return _wateringRef(
       plantId,
@@ -78,7 +76,6 @@ class WateringService {
         });
   }
 
-  /// Последний полив
   Future<Map<String, dynamic>?> getLastWatering(String plantId) async {
     final snapshot = await _wateringRef(
       plantId,
@@ -97,7 +94,6 @@ class WateringService {
     };
   }
 
-  /// Удалить запись
   Future<void> deleteWatering({
     required String plantId,
     required String wateringId,
@@ -105,7 +101,6 @@ class WateringService {
     await _wateringRef(plantId).doc(wateringId).delete();
   }
 
-  /// Обновить запись
   Future<void> updateWatering({
     required String plantId,
     required String wateringId,

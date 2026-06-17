@@ -29,10 +29,6 @@ class PlantsSection extends StatelessWidget {
           return name.contains(searchQuery) || nick.contains(searchQuery);
         }).toList();
 
-        // if (filtered.isEmpty) {
-        //   return const EmptyPlants();
-        // }
-
         return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

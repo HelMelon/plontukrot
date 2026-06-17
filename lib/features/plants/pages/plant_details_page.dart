@@ -9,14 +9,9 @@ import '../../../core/theme/app_colors.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/storage_service.dart';
 import '../widgets/sheets/update_plant_sheet.dart';
-import '../../../services/note_service.dart';
-import '../../../services/watering_service.dart';
 import '../widgets/sheets/add_note_sheet.dart';
-import '../widgets/plant_notes_section.dart';
 import '../widgets/sheets/watering_history_sheet.dart';
-import '../widgets/sheets/fertilizing_history_sheet.dart';
 import '../widgets/cards/plant_image_card.dart';
-import '../widgets/cards/info_card.dart';
 import '../widgets/cards/plant_info_card.dart';
 
 class PlantDetailsPage extends StatefulWidget {
@@ -203,7 +198,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
 
                     const SizedBox(height: 20),
 
-                    /// 📅 DATE
                     ListTile(
                       leading: const Icon(Icons.calendar_today),
                       title: Text(DateFormat('d MMM y').format(selectedDate)),
@@ -385,7 +379,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                   );
                 },
               ),
-            ], // Конец списка actions
+            ],
           ),
 
           body: LayoutBuilder(
@@ -401,7 +395,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
 
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min, // 🔥 ВАЖНО
+                      mainAxisSize: MainAxisSize.min,
 
                       children: [
                         if (isWide)
@@ -409,20 +403,17 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                flex:
-                                    3, // Возвращаем компактную ширину для картинки
+                                flex: 3,
                                 child: PlantImageCard(
                                   imageUrl: imageUrl,
                                   onTap: pickAndUploadImage,
                                   isUploading: isUploading,
-                                  aspectRatio:
-                                      0.75, // Картинка вытягивается В ВЫСОТУ (вертикальный формат)
+                                  aspectRatio: 0.75,
                                 ),
                               ),
                               const SizedBox(width: 20),
                               Expanded(
-                                flex:
-                                    5, // Текстовая карточка забирает остальное пространство
+                                flex: 5,
                                 child: PlantInfoCard(
                                   data: data,
                                   plantId: widget.plant.id,
@@ -438,8 +429,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                                 imageUrl: imageUrl,
                                 onTap: pickAndUploadImage,
                                 isUploading: isUploading,
-                                aspectRatio:
-                                    1.0, // На мобилках по-прежнему остается квадрат
+                                aspectRatio: 1.0,
                               ),
                               const SizedBox(height: 24),
                               PlantInfoCard(

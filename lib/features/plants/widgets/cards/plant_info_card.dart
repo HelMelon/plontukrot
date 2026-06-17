@@ -60,7 +60,7 @@ class PlantInfoCard extends StatelessWidget {
                       return InfoCard(
                         iconImg: Image.asset(
                           'assets/icons/watering.png',
-                          width: 50, // Задайте нужный размер
+                          width: 50,
                           height: 50,
                           fit: BoxFit.contain,
                         ),
@@ -75,7 +75,7 @@ class PlantInfoCard extends StatelessWidget {
                       return InfoCard(
                         iconImg: Image.asset(
                           'assets/icons/watering.png',
-                          width: 24, // Задайте нужный размер
+                          width: 24,
                           height: 24,
                           fit: BoxFit.contain,
                         ),

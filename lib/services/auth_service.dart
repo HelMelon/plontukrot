@@ -10,7 +10,6 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<UserCredential> signInWithGoogle() async {
-    // 🌐 WEB
     if (kIsWeb) {
       final provider = GoogleAuthProvider();
 
@@ -24,7 +23,6 @@ class AuthService {
       return userCredential;
     }
 
-    // 📱 ANDROID / iOS
     final googleSignIn = GoogleSignIn.instance;
 
     await googleSignIn.initialize();
@@ -45,7 +43,6 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    // Только mobile
     if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
       await GoogleSignIn.instance.signOut();
     }

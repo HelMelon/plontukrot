@@ -2,14 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../services/plant_service.dart';
-import '../pages/plant_details_page.dart'; // Скорректируй путь к PlantDetailsPage, если нужно
+import '../pages/plant_details_page.dart';
 
 class PlantSearchDelegate extends SearchDelegate {
   final String userId;
 
   PlantSearchDelegate({required this.userId});
 
-  // Настройка темы для экрана поиска под цвета твоего приложения
   @override
   ThemeData appBarTheme(BuildContext context) {
     return Theme.of(context).copyWith(
@@ -55,7 +54,6 @@ class PlantSearchDelegate extends SearchDelegate {
   Widget _buildSearchWithStream() {
     final cleanQuery = query.trim().toLowerCase();
 
-    // Если поисковая строка пустая, показываем подсказку и НЕ делаем фильтрацию
     if (cleanQuery.isEmpty) {
       return const ContainerWithBackground(
         child: Center(
@@ -89,12 +87,10 @@ class PlantSearchDelegate extends SearchDelegate {
           );
         }
 
-        // Жесткая фильтрация данных
         final filtered = snapshot.data!.docs.where((doc) {
           final data = doc.data() as Map<String, dynamic>?;
           if (data == null) return false;
 
-          // Извлекаем поля, безопасно приводя к строке нижнего регистра
           final String name = (data['name'] ?? '')
               .toString()
               .trim()
@@ -104,14 +100,11 @@ class PlantSearchDelegate extends SearchDelegate {
               .trim()
               .toLowerCase();
 
-          // Если оба поля пустые — этот документ битый, пропускаем его
           if (name.isEmpty && nickname.isEmpty) return false;
 
-          // Проверяем, содержит ли имя ИЛИ никнейм наш поисковый запрос
           return name.contains(cleanQuery) || nickname.contains(cleanQuery);
         }).toList();
 
-        // Если после фильтрации ничего не осталось
         if (filtered.isEmpty) {
           return const ContainerWithBackground(
             child: Center(
@@ -123,7 +116,6 @@ class PlantSearchDelegate extends SearchDelegate {
           );
         }
 
-        // Отрисовка списка результатов
         return ContainerWithBackground(
           child: ListView.builder(
             itemCount: filtered.length,
@@ -131,7 +123,6 @@ class PlantSearchDelegate extends SearchDelegate {
               final plantDoc = filtered[index];
               final data = plantDoc.data() as Map<String, dynamic>;
 
-              // Отображаем никнейм, а если его нет — имя (как в остальном твоем приложении)
               final displayName =
                   data['nickname'] ?? data['name'] ?? 'Unnamed Plant';
 

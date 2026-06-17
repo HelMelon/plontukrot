@@ -184,13 +184,12 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
               ),
 
               const SizedBox(height: 18),
-              //wateringFrequency FIELD
+
               TextField(
                 controller: wateringFrequencyController,
-                // 1. Показывает клавиатуру с цифрами (на телефонах)
+
                 keyboardType: TextInputType.number,
 
-                // 2. Жестко блокирует ввод любых символов, кроме цифр
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 style: const TextStyle(color: AppColors.textPrimary),
 

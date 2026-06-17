@@ -45,14 +45,9 @@ class PlantFrameWidget extends StatelessWidget {
 
               Positioned.fill(
                 child: FractionallySizedBox(
-                  widthFactor:
-                      0.7, // ↔️ Текст занимает 70% ширины рамки (не залезет на боковые узоры)
-                  heightFactor:
-                      0.08, // ↕️ Текст занимает ровно 8% от общей высоты рамки
-                  alignment: const Alignment(
-                    0.0,
-                    0.82,
-                  ), // 🎯 Точное смещение: 0.0 по центру, 0.82 — внизу на плашке
+                  widthFactor: 0.7,
+                  heightFactor: 0.08,
+                  alignment: const Alignment(0.0, 0.82),
                   child: Center(
                     child: AutoSizeText(
                       plantName,

@@ -5,10 +5,6 @@ class FertilizeService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final String uid = FirebaseAuth.instance.currentUser!.uid;
 
-  // ─────────────────────────────
-  // 🌿 FERTILIZERS CATALOG
-  // ─────────────────────────────
-
   CollectionReference<Map<String, dynamic>> get _fertilizersRef =>
       _db.collection('users').doc(uid).collection('fertilizers');
 
@@ -28,10 +24,6 @@ class FertilizeService {
   Stream<QuerySnapshot<Map<String, dynamic>>> getFertilizers() {
     return _fertilizersRef.orderBy('createdAt', descending: true).snapshots();
   }
-
-  // ─────────────────────────────
-  // 🌱 FERTILIZING HISTORY (per plant)
-  // ─────────────────────────────
 
   CollectionReference<Map<String, dynamic>> _fertilizingRef(String plantId) {
     return _db
