@@ -21,17 +21,14 @@ jobs:
           channel: stable
 
       - name: Install dependencies
+        # Этот шаг сгенерирует файлы для Xcode под капотом
         run: flutter pub get
 
-      - name: Clean iOS
-        run: flutter clean
-
       - name: Install CocoaPods
-        run: |
-          sudo gem install cocoapods
-          cd ios
-          pod install
-          cd ..
+          # Оставляем только установку утилиты, если она нужна.
+        # Переходить в папку ios и вызывать pod install вручную НЕ нужно.
+        run: sudo gem install cocoapods
 
       - name: Build iOS (no codesign)
+        # Команда сборки сама запустит pod install в правильный момент
         run: flutter build ios --debug --no-codesign
