@@ -323,7 +323,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
         final data = snapshot.data!.data() as Map<String, dynamic>;
 
         final imageUrl = data['imageUrl'] as String?;
-        final hasImage = imageUrl != null && imageUrl.isNotEmpty;
 
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -400,25 +399,30 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 1200),
 
-                    child: isWide
-                        /// 💻 WEB / TABLET
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min, // 🔥 ВАЖНО
 
+                      children: [
+                        if (isWide)
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                flex: 3, // 🔥 картинка меньше
+                                flex:
+                                    3, // Возвращаем компактную ширину для картинки
                                 child: PlantImageCard(
-                                  imageUrl: hasImage ? imageUrl! : '',
+                                  imageUrl: imageUrl,
                                   onTap: pickAndUploadImage,
                                   isUploading: isUploading,
+                                  aspectRatio:
+                                      0.75, // Картинка вытягивается В ВЫСОТУ (вертикальный формат)
                                 ),
                               ),
-
                               const SizedBox(width: 20),
-
                               Expanded(
-                                flex: 5,
+                                flex:
+                                    5, // Текстовая карточка забирает остальное пространство
                                 child: PlantInfoCard(
                                   data: data,
                                   plantId: widget.plant.id,
@@ -426,23 +430,26 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                               ),
                             ],
                           )
-                        /// 📱 MOBILE
-                        : Column(
+                        else
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               PlantImageCard(
-                                imageUrl: hasImage ? imageUrl! : '',
+                                imageUrl: imageUrl,
                                 onTap: pickAndUploadImage,
                                 isUploading: isUploading,
+                                aspectRatio:
+                                    1.0, // На мобилках по-прежнему остается квадрат
                               ),
-
                               const SizedBox(height: 24),
-
                               PlantInfoCard(
                                 data: data,
                                 plantId: widget.plant.id,
                               ),
                             ],
                           ),
+                      ],
+                    ),
                   ),
                 ),
               );
