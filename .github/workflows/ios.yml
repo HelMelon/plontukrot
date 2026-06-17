@@ -39,12 +39,13 @@ jobs:
         
         run: sudo gem install cocoapods
 
-      - name: Build iOS (no codesign)
-        
-        run: flutter build ios --debug --no-codesign
+      - name: Build iOS IPA (no codesign)
+        run: flutter build ipa --debug --no-codesign
+
       - name: Upload iOS Build Artifact
-        uses: actions/upload-artifact@v4 
+        uses: actions/upload-artifact@v4
         with:
-          name: ios-debug-build
-          path: build/ios/iphoneos/Runner.app 
+          name: ios-debug-ipa
+          path: build/ios/ipa/*.ipa
+
 
