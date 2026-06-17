@@ -20,10 +20,10 @@ jobs:
           channel: stable
 
       - name: Install dependencies
-        # Этот шаг сгенерирует файлы для Xcode под капотом
+        
         run: flutter pub get
 
-      # Вместо ручной установки cocoapods делаем обновление подов перед билдом
+
       - name: Update CocoaPods Dependencies
         run: |
           cd ios
@@ -35,15 +35,15 @@ jobs:
         run: flutter build ios --debug --no-codesign
 
       - name: Install CocoaPods
-          # Оставляем только установку утилиты, если она нужна.
-        # Переходить в папку ios и вызывать pod install вручную НЕ нужно.
+
+        
         run: sudo gem install cocoapods
 
       - name: Build iOS (no codesign)
-        # Команда сборки сама запустит pod install в правильный момент
+        
         run: flutter build ios --debug --no-codesign
       - name: Upload iOS Build Artifact
         uses: actions/artifacts/upload@v4
         with:
           name: ios-debug-build
-          path: build/ios/iphoneos/Runner.app  # Путь, куда Flutter складывает собранное приложение
+          path: build/ios/iphoneos/Runner.app  
