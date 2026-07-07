@@ -77,7 +77,6 @@ class PlantCard extends StatelessWidget {
                         },
                       )
                     : Container(
-                        // ✨ ИСПРАВЛЕНО: удален color, так как задан decoration с градиентом
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: LinearGradient(
@@ -97,10 +96,7 @@ class PlantCard extends StatelessWidget {
                       ),
               ),
             ),
-
             const SizedBox(width: 18),
-
-            // CONTENT
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,9 +128,7 @@ class PlantCard extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(width: 8),
-
             const Icon(
               Icons.chevron_right_rounded,
               color: AppColors.textSecondary,
