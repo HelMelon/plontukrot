@@ -9,50 +9,65 @@ import 'firestore_service.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Инициализируем GoogleSignIn как поле класса сверху, чтобы оно было доступно везде
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: [
-      'email',
-      'https://googleapis.com',
-    ],
-  );
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+
+  bool _initialized = false;
+
+  Future<void> _initializeGoogleSignIn() async {
+    if (_initialized) return;
+
+    await _googleSignIn.initialize();
+
+    _initialized = true;
+  }
 
   Future<UserCredential?> signInWithGoogle() async {
-    // Сценарий для WEB-версии
     if (kIsWeb) {
       final provider = GoogleAuthProvider();
+
       provider.addScope('email');
       provider.addScope('profile');
 
-      final userCredential = await _auth.signInWithPopup(provider);
+      final credential = await _auth.signInWithPopup(provider);
+
       await FirestoreService().createUserDocument();
-      return userCredential;
+
+      return credential;
     }
 
-    // Сценарий для мобильных платформ (Android / iOS)
-    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    await _initializeGoogleSignIn();
 
-    if (googleUser == null) {
-      return null; // Пользователь закрыл окно авторизации
-    }
+    final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
 
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
 
+    final idToken = googleAuth.idToken;
+
+    if (idToken == null) {
+      throw FirebaseAuthException(
+        code: 'google-id-token-null',
+        message: 'Google did not return an ID token.',
+      );
+    }
+
     final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
+      idToken: idToken,
     );
 
     final userCredential = await _auth.signInWithCredential(credential);
+
     await FirestoreService().createUserDocument();
+
     return userCredential;
   }
 
   Future<void> signOut() async {
     if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      await _initializeGoogleSignIn();
       await _googleSignIn.signOut();
     }
+
     await _auth.signOut();
   }
 }
