@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class InfoCard extends StatelessWidget {
-  final IconData? icon;
-  final Widget? iconImg;
+  final Widget? icon;
   final String title;
   final String value;
   final VoidCallback? onTap;
 
   const InfoCard({
+    super.key,
     this.icon,
-    this.iconImg,
     required this.title,
     required this.value,
     this.onTap,
@@ -21,7 +20,6 @@ class InfoCard extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
-
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
@@ -30,7 +28,7 @@ class InfoCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(icon, size: 28, color: AppColors.goldAccent),
+            icon ?? const SizedBox(),
             const SizedBox(height: 10),
             Text(
               title,
@@ -40,7 +38,10 @@ class InfoCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 6),
-            Text(value, style: const TextStyle(color: AppColors.textSecondary)),
+            Text(
+              value,
+              style: const TextStyle(color: AppColors.textSecondary),
+            ),
           ],
         ),
       ),

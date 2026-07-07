@@ -18,20 +18,16 @@ class PlantInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(24),
-
       decoration: BoxDecoration(
         color: AppColors.backgroundSecondary,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: AppColors.greenDeep),
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-
         children: [
           Text(
             data['name'] ?? 'Unnamed Plant',
-
             style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
@@ -40,16 +36,13 @@ class PlantInfoCard extends StatelessWidget {
           ),
           Text(
             'Name: ${data['nickname'] ?? 'Unnamed Plant'}',
-
             style: const TextStyle(
               fontStyle: FontStyle.italic,
               fontSize: 24,
               color: AppColors.heading,
             ),
           ),
-
           const SizedBox(height: 8),
-
           Row(
             children: [
               Expanded(
@@ -58,7 +51,7 @@ class PlantInfoCard extends StatelessWidget {
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return InfoCard(
-                        iconImg: Image.asset(
+                        icon: Image.asset(
                           'assets/icons/watering.png',
                           width: 50,
                           height: 50,
@@ -73,7 +66,7 @@ class PlantInfoCard extends StatelessWidget {
 
                     if (data == null) {
                       return InfoCard(
-                        iconImg: Image.asset(
+                        icon: Image.asset(
                           'assets/icons/watering.png',
                           width: 24,
                           height: 24,
@@ -92,14 +85,18 @@ class PlantInfoCard extends StatelessWidget {
                       return DateFormat('d MMM y').format(date);
                     }
 
-                    final value =
-                        '''
+                    final value = '''
 Last: ${formatDate(last)}
 Next: ${formatDate(next)}
 ''';
 
                     return InfoCard(
-                      icon: Icons.water_drop,
+                      icon: Image.asset(
+                        'assets/icons/watering.png',
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.contain,
+                      ),
                       title: "Watering",
                       value: value.trim(),
                       onTap: () {
@@ -114,16 +111,19 @@ Next: ${formatDate(next)}
                   },
                 ),
               ),
-
               SizedBox(width: 16),
-
               Expanded(
                 child: StreamBuilder<List<Map<String, dynamic>>>(
                   stream: FertilizeService().getFertilizingHistory(plantId),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return const InfoCard(
-                        icon: Icons.science,
+                      return InfoCard(
+                        icon: Image.asset(
+                          'assets/icons/fertilize.png',
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.contain,
+                        ),
                         title: "Fertilizing",
                         value: "Loading...",
                       );
@@ -132,8 +132,13 @@ Next: ${formatDate(next)}
                     final items = snapshot.data!;
 
                     if (items.isEmpty) {
-                      return const InfoCard(
-                        icon: Icons.science,
+                      return InfoCard(
+                        icon: Image.asset(
+                          'assets/icons/fertilize.png',
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.contain,
+                        ),
                         title: "Fertilizing",
                         value: "No data",
                       );
@@ -145,7 +150,12 @@ Next: ${formatDate(next)}
                         "${last['fertilizerName']}\n${DateFormat('d MMM y').format(last['appliedAt'])}";
 
                     return InfoCard(
-                      icon: Icons.science,
+                      icon: Image.asset(
+                        'assets/icons/fertilize.png',
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.contain,
+                      ),
                       title: "Fertilizing",
                       value: value,
                       onTap: () {
@@ -162,9 +172,7 @@ Next: ${formatDate(next)}
               ),
             ],
           ),
-
           const SizedBox(height: 32),
-
           const Text(
             'Plant Journal',
             style: TextStyle(
@@ -173,9 +181,7 @@ Next: ${formatDate(next)}
               color: AppColors.heading,
             ),
           ),
-
           const SizedBox(height: 12),
-
           PlantNotesSection(plantId: plantId),
         ],
       ),
