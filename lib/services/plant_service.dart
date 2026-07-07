@@ -6,10 +6,15 @@ class PlantService {
 
   final String uid = FirebaseAuth.instance.currentUser!.uid;
 
-  Future<void> addPlant({required String name, String nickname = ''}) async {
+  Future<void> addPlant({
+    required String name,
+    String nickname = '',
+    required int stage,
+  }) async {
     await _firestore.collection('users').doc(uid).collection('plants').add({
       'name': name,
       'nickname': nickname,
+      'stage': stage,
       'imageUrl': null,
       'wateringFrequency': null,
       'createdAt': FieldValue.serverTimestamp(),
@@ -37,12 +42,12 @@ class PlantService {
         .update({'imageUrl': imageUrl});
   }
 
-  Future<void> updatePlant({
-    required String plantId,
-    required String name,
-    required String nickname,
-    int? wateringFrequency,
-  }) async {
+  Future<void> updatePlant(
+      {required String plantId,
+      required String name,
+      required String nickname,
+      int? wateringFrequency,
+      required int stage}) async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
     await FirebaseFirestore.instance
@@ -54,6 +59,7 @@ class PlantService {
       'name': name,
       'nickname': nickname,
       'wateringFrequency': wateringFrequency,
+      'stage': stage
     });
   }
 }

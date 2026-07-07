@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../services/plant_service.dart';
 import 'package:flutter/services.dart';
+import '../plant_stage_selector.dart';
 
 class UpdatePlantSheet extends StatefulWidget {
   final String plantId;
@@ -24,6 +25,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   final wateringFrequencyController = TextEditingController();
 
   bool isLoading = false;
+  int selectedStage = 0;
 
   @override
   void initState() {
@@ -33,6 +35,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     nickNameController.text = widget.plant['nickname'] ?? '';
     wateringFrequencyController.text =
         (widget.plant['wateringFrequency'] ?? 0).toString();
+    selectedStage = widget.plant['stage'] ?? 1;
   }
 
   @override
@@ -59,6 +62,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
       name: name,
       nickname: nickname,
       wateringFrequency: wateringFrequency,
+      stage: selectedStage,
     );
 
     if (mounted) {
@@ -205,6 +209,24 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                     ),
                   ),
                 ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                'Growth stage',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 10),
+              PlantStageSelector(
+                selectedStage: selectedStage,
+                onChanged: (value) {
+                  setState(() {
+                    selectedStage = value;
+                  });
+                },
               ),
               const SizedBox(height: 18),
               SizedBox(

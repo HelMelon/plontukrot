@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../services/plant_service.dart';
 import 'package:flutter/services.dart';
+import '../plant_stage_selector.dart';
 
 class AddPlantSheet extends StatefulWidget {
   const AddPlantSheet({super.key});
@@ -17,6 +18,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
   final wateringFrequencyController = TextEditingController();
 
   bool isLoading = false;
+  int selectedStage = 0;
 
   Future<void> addPlant() async {
     final name = nameController.text.trim();
@@ -32,7 +34,11 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
       });
     }
 
-    await PlantService().addPlant(name: name, nickname: nickname);
+    await PlantService().addPlant(
+      name: name,
+      nickname: nickname,
+      stage: selectedStage,
+    );
 
     if (mounted) {
       Navigator.pop(context);
@@ -146,6 +152,24 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                     ),
                   ),
                 ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                'Growth stage',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 10),
+              PlantStageSelector(
+                selectedStage: selectedStage,
+                onChanged: (value) {
+                  setState(() {
+                    selectedStage = value;
+                  });
+                },
               ),
               const SizedBox(height: 18),
               TextField(

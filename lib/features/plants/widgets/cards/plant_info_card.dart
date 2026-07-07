@@ -7,15 +7,20 @@ import '../sheets/watering_history_sheet.dart';
 import '../../../../services/fertilize_service.dart';
 import '../plant_notes_section.dart';
 import '../sheets/fertilizing_history_sheet.dart';
+import '../cards/stage_info_card.dart';
 
 class PlantInfoCard extends StatelessWidget {
   final Map<String, dynamic> data;
   final String plantId;
 
   const PlantInfoCard({super.key, required this.data, required this.plantId});
-
   @override
   Widget build(BuildContext context) {
+    final stage = stageInfos.firstWhere(
+      (e) => e.value == data['stage'],
+      orElse: () => stageInfos.first,
+    );
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -42,6 +47,17 @@ class PlantInfoCard extends StatelessWidget {
               color: AppColors.heading,
             ),
           ),
+          const SizedBox(height: 8),
+          stage.value != 0
+              ? Text(
+                  'Stage: ${stage.title}',
+                  style: const TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 24,
+                    color: AppColors.heading,
+                  ),
+                )
+              : const SizedBox.shrink(),
           const SizedBox(height: 8),
           Row(
             children: [
