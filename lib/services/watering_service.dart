@@ -32,9 +32,8 @@ class WateringService {
 
     await _wateringRef(plantId).add({
       'wateredAt': Timestamp.fromDate(wateredAt),
-      'nextWatering': nextWatering != null
-          ? Timestamp.fromDate(nextWatering)
-          : null,
+      'nextWatering':
+          nextWatering != null ? Timestamp.fromDate(nextWatering) : null,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
@@ -63,17 +62,17 @@ class WateringService {
         .limit(1)
         .snapshots()
         .map((snapshot) {
-          if (snapshot.docs.isEmpty) return null;
+      if (snapshot.docs.isEmpty) return null;
 
-          final data = snapshot.docs.first.data();
+      final data = snapshot.docs.first.data();
 
-          return {
-            'wateredAt': (data['wateredAt'] as Timestamp).toDate(),
-            'nextWatering': data['nextWatering'] != null
-                ? (data['nextWatering'] as Timestamp).toDate()
-                : null,
-          };
-        });
+      return {
+        'wateredAt': (data['wateredAt'] as Timestamp).toDate(),
+        'nextWatering': data['nextWatering'] != null
+            ? (data['nextWatering'] as Timestamp).toDate()
+            : null,
+      };
+    });
   }
 
   Future<Map<String, dynamic>?> getLastWatering(String plantId) async {

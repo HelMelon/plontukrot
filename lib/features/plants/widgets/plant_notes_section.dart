@@ -37,7 +37,6 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: _notesStream,
-
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Center(
@@ -86,16 +85,13 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
                   plantId: widget.plantId,
                   noteId: doc.id,
                   data: doc.data(),
-
                   isOpened: _openedNoteId == doc.id,
-
                   onOpenChanged: (isOpen) {
                     _handleNoteOpen(isOpen ? doc.id : null);
                   },
                 ),
               ),
             ),
-
             if (docs.length > 3)
               TextButton(
                 onPressed: () {

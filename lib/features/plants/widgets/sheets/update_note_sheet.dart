@@ -63,7 +63,6 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
         color: AppColors.backgroundSecondary,
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
-
       child: Padding(
         padding: EdgeInsets.only(
           left: 22,
@@ -71,7 +70,6 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
           top: 22,
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -79,25 +77,19 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
               TextField(
                 controller: controller,
                 maxLines: 8,
-
                 style: const TextStyle(color: AppColors.textPrimary),
-
                 decoration: InputDecoration(
                   labelText: 'Edit note',
                   filled: true,
                   fillColor: AppColors.dark2,
                 ),
               ),
-
               const SizedBox(height: 20),
-
               SizedBox(
                 width: double.infinity,
                 height: 56,
-
                 child: ElevatedButton(
                   onPressed: isLoading ? null : save,
-
                   child: const Text('Save Changes'),
                 ),
               ),

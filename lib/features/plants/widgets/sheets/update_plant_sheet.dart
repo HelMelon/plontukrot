@@ -31,8 +31,8 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
 
     nameController.text = widget.plant['name'] ?? '';
     nickNameController.text = widget.plant['nickname'] ?? '';
-    wateringFrequencyController.text = (widget.plant['wateringFrequency'] ?? 0)
-        .toString();
+    wateringFrequencyController.text =
+        (widget.plant['wateringFrequency'] ?? 0).toString();
   }
 
   @override
@@ -95,9 +95,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 28),
-
               const Text(
                 'Update Plant',
                 style: TextStyle(
@@ -107,9 +105,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                   color: AppColors.heading,
                 ),
               ),
-
               const SizedBox(height: 10),
-
               const Text(
                 'Update an entry in your collection.',
                 style: TextStyle(
@@ -118,9 +114,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                   color: AppColors.textSecondary,
                 ),
               ),
-
               const SizedBox(height: 28),
-
               TextField(
                 controller: nameController,
                 style: const TextStyle(color: AppColors.textPrimary),
@@ -150,9 +144,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 18),
-
               TextField(
                 controller: nickNameController,
                 style: const TextStyle(color: AppColors.textPrimary),
@@ -182,44 +174,31 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 18),
-
               TextField(
                 controller: wateringFrequencyController,
-
                 keyboardType: TextInputType.number,
-
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 style: const TextStyle(color: AppColors.textPrimary),
-
                 decoration: InputDecoration(
                   labelText: 'Watering Frequency',
-
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
-
                   filled: true,
                   fillColor: AppColors.dark2,
-
                   prefixIcon: const Icon(
                     Icons.water_drop,
                     color: AppColors.accentLight,
                   ),
-
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: BorderSide.none,
                   ),
-
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-
                     borderSide: const BorderSide(color: AppColors.greenDeep),
                   ),
-
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-
                     borderSide: const BorderSide(
                       color: AppColors.goldAccent,
                       width: 1.5,
@@ -227,7 +206,6 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 18),
               SizedBox(
                 width: double.infinity,

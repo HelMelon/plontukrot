@@ -18,7 +18,6 @@ class PlantFrameWidget extends StatelessWidget {
 
     return SizedBox(
       height: halfScreenHeight,
-
       child: Align(
         alignment: Alignment.centerLeft,
         child: AspectRatio(
@@ -38,11 +37,9 @@ class PlantFrameWidget extends StatelessWidget {
                         ),
                 ),
               ),
-
               Positioned.fill(
                 child: Image.asset('assets/images/frame.png', fit: BoxFit.fill),
               ),
-
               Positioned.fill(
                 child: FractionallySizedBox(
                   widthFactor: 0.7,

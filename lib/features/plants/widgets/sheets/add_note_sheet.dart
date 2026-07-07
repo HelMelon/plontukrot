@@ -46,7 +46,6 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
         color: AppColors.backgroundSecondary,
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
-
       child: Padding(
         padding: EdgeInsets.only(
           left: 22,
@@ -54,12 +53,10 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
           top: 22,
           bottom: MediaQuery.of(context).viewInsets.bottom + 24,
         ),
-
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-
             children: [
               Center(
                 child: Container(
@@ -71,9 +68,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 28),
-
               const Text(
                 'Add Note',
                 style: TextStyle(
@@ -83,9 +78,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                   color: AppColors.heading,
                 ),
               ),
-
               const SizedBox(height: 10),
-
               const Text(
                 'Add a new journal entry for this plant.',
                 style: TextStyle(
@@ -94,25 +87,18 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                   color: AppColors.textSecondary,
                 ),
               ),
-
               const SizedBox(height: 28),
-
               TextField(
                 controller: noteController,
                 maxLines: 8,
                 autofocus: true,
-
                 style: const TextStyle(color: AppColors.textPrimary),
-
                 decoration: InputDecoration(
                   labelText: 'Journal entry',
                   alignLabelWithHint: true,
-
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
-
                   filled: true,
                   fillColor: AppColors.dark2,
-
                   prefixIcon: const Padding(
                     padding: EdgeInsets.only(bottom: 120),
                     child: Icon(
@@ -120,17 +106,14 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                       color: AppColors.accentLight,
                     ),
                   ),
-
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: BorderSide.none,
                   ),
-
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: const BorderSide(color: AppColors.greenDeep),
                   ),
-
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: const BorderSide(
@@ -140,26 +123,20 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 30),
-
               SizedBox(
                 width: double.infinity,
                 height: 58,
-
                 child: ElevatedButton(
                   onPressed: isLoading ? null : saveNote,
-
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.goldAccent,
                     foregroundColor: AppColors.dark1,
                     elevation: 0,
-
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-
                   child: isLoading
                       ? const SizedBox(
                           width: 22,

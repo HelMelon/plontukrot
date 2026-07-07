@@ -83,6 +83,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
         imageUrl: imageUrl,
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: AppColors.dark2,
@@ -123,23 +124,17 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                 'Add Fertilizer',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-
               const SizedBox(height: 12),
-
               TextField(
                 controller: nameController,
                 decoration: const InputDecoration(hintText: 'Name'),
               ),
-
               const SizedBox(height: 12),
-
               TextField(
                 controller: typeController,
                 decoration: const InputDecoration(hintText: 'Type'),
               ),
-
               const SizedBox(height: 16),
-
               FilledButton(
                 onPressed: () async {
                   final name = nameController.text.trim();
@@ -187,7 +182,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                   children: [
                     Container(width: 40, height: 4, color: Colors.grey),
                     const SizedBox(height: 16),
-
                     const Text(
                       'Add Fertilizing',
                       style: TextStyle(
@@ -195,9 +189,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     const SizedBox(height: 20),
-
                     ListTile(
                       leading: const Icon(Icons.calendar_today),
                       title: Text(DateFormat('d MMM y').format(selectedDate)),
@@ -214,9 +206,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                         }
                       },
                     ),
-
                     const SizedBox(height: 10),
-
                     StreamBuilder(
                       stream: service.getFertilizers(),
                       builder: (context, snapshot) {
@@ -237,7 +227,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                                 child: Text(doc['name']),
                               );
                             }),
-
                             const DropdownMenuItem(
                               value: 'add_new',
                               child: Text('+ Add new fertilizer'),
@@ -259,9 +248,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                         );
                       },
                     ),
-
                     const SizedBox(height: 20),
-
                     FilledButton(
                       onPressed: selectedFertilizerId == null
                           ? null
@@ -271,8 +258,8 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                                 fertilizerId: selectedFertilizerId!,
                                 appliedAt: selectedDate,
                               );
-
-                              if (mounted) Navigator.pop(context);
+                              if (!context.mounted) return;
+                              Navigator.pop(context);
                             },
                       child: const Text('Save'),
                     ),
@@ -293,6 +280,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
     super.dispose();
   }
 
+  @override
   Widget build(BuildContext context) {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -303,7 +291,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
           .collection('plants')
           .doc(widget.plant.id)
           .snapshots(),
-
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Scaffold(
@@ -320,7 +307,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
 
         return Scaffold(
           backgroundColor: Colors.transparent,
-
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -346,13 +332,11 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                   );
                 },
               ),
-
               _TopAction(
                 icon: Icons.science_outlined,
                 label: 'Fertilize',
                 onTap: () => _showFertilizeSheet(widget.plant.id),
               ),
-
               _TopAction(
                 icon: Icons.edit_rounded,
                 label: 'Edit',
@@ -366,7 +350,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                   );
                 },
               ),
-
               _TopAction(
                 icon: Icons.note_add_outlined,
                 label: 'Note',
@@ -381,22 +364,18 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               ),
             ],
           ),
-
           body: LayoutBuilder(
             builder: (context, constraints) {
               final isWide = constraints.maxWidth >= 700;
 
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
-
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 1200),
-
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
-
                       children: [
                         if (isWide)
                           Row(

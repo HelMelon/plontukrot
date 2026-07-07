@@ -12,7 +12,7 @@ class PlantInfoCard extends StatelessWidget {
   final Map<String, dynamic> data;
   final String plantId;
 
-  const PlantInfoCard({required this.data, required this.plantId});
+  const PlantInfoCard({super.key, required this.data, required this.plantId});
 
   @override
   Widget build(BuildContext context) {

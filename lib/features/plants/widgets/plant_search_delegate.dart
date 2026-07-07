@@ -18,7 +18,6 @@ class PlantSearchDelegate extends SearchDelegate {
         elevation: 0,
         iconTheme: IconThemeData(color: AppColors.heading),
       ),
-
       inputDecorationTheme: InputDecorationTheme(
         hintStyle: const TextStyle(
           color: AppColors.textSecondary,
@@ -29,8 +28,7 @@ class PlantSearchDelegate extends SearchDelegate {
           horizontal: 16,
         ),
         filled: true,
-        fillColor: AppColors.heading.withOpacity(0.05),
-
+        fillColor: AppColors.heading.withValues(alpha: 0.05),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -44,7 +42,6 @@ class PlantSearchDelegate extends SearchDelegate {
           borderSide: const BorderSide(color: AppColors.goldAccent, width: 1.5),
         ),
       ),
-
       textTheme: theme.textTheme.copyWith(
         titleLarge: const TextStyle(
           color: AppColors.heading,
@@ -52,7 +49,6 @@ class PlantSearchDelegate extends SearchDelegate {
           decorationThickness: 0,
         ),
       ),
-
       textSelectionTheme: const TextSelectionThemeData(
         cursorColor: AppColors.goldAccent,
         selectionColor: AppColors.goldAccent,
@@ -115,14 +111,10 @@ class PlantSearchDelegate extends SearchDelegate {
           final data = doc.data() as Map<String, dynamic>?;
           if (data == null) return false;
 
-          final String name = (data['name'] ?? '')
-              .toString()
-              .trim()
-              .toLowerCase();
-          final String nickname = (data['nickname'] ?? '')
-              .toString()
-              .trim()
-              .toLowerCase();
+          final String name =
+              (data['name'] ?? '').toString().trim().toLowerCase();
+          final String nickname =
+              (data['nickname'] ?? '').toString().trim().toLowerCase();
 
           if (cleanQuery.isEmpty) return true;
 
@@ -184,10 +176,10 @@ class PlantSearchDelegate extends SearchDelegate {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppColors.heading.withOpacity(0.04),
+                    color: AppColors.heading.withValues(alpha: 0.04),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: AppColors.heading.withOpacity(0.02),
+                      color: AppColors.heading.withValues(alpha: 0.02),
                       width: 1,
                     ),
                   ),
@@ -200,16 +192,14 @@ class PlantSearchDelegate extends SearchDelegate {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppColors.goldAccent.withOpacity(0.12),
+                        color: AppColors.goldAccent.withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                       ),
-
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: () {
-                          final String? imageUrl = data['imageUrl']
-                              ?.toString()
-                              .trim();
+                          final String? imageUrl =
+                              data['imageUrl']?.toString().trim();
 
                           if (imageUrl != null && imageUrl.isNotEmpty) {
                             return Image.network(
@@ -217,32 +207,29 @@ class PlantSearchDelegate extends SearchDelegate {
                               fit: BoxFit.cover,
                               width: 40,
                               height: 40,
-
                               errorBuilder: (context, error, stackTrace) =>
                                   const Icon(
-                                    Icons.local_florist,
-                                    color: AppColors.goldAccent,
-                                    size: 22,
-                                  ),
-
+                                Icons.local_florist,
+                                color: AppColors.goldAccent,
+                                size: 22,
+                              ),
                               loadingBuilder:
                                   (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Center(
-                                      child: SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                AppColors.goldAccent
-                                                    .withOpacity(0.5),
-                                              ),
-                                        ),
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        AppColors.goldAccent
+                                            .withValues(alpha: 0.5),
                                       ),
-                                    );
-                                  },
+                                    ),
+                                  ),
+                                );
+                              },
                             );
                           }
 
@@ -254,7 +241,6 @@ class PlantSearchDelegate extends SearchDelegate {
                         }(),
                       ),
                     ),
-
                     title: Text(
                       titleText,
                       style: const TextStyle(
@@ -313,20 +299,6 @@ class ContainerWithBackground extends StatelessWidget {
       width: double.infinity,
       height: double.infinity,
       child: child,
-    );
-  }
-}
-
-class _PlantImagePlaceholder extends StatelessWidget {
-  const _PlantImagePlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 40,
-      color: AppColors.heading.withOpacity(0.1),
-      child: const Icon(Icons.local_florist, color: AppColors.goldAccent),
     );
   }
 }

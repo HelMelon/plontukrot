@@ -24,9 +24,7 @@ class HomePage extends StatelessWidget {
         backgroundColor: AppColors.background,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-
         centerTitle: false,
-
         title: const Align(
           alignment: Alignment.centerLeft,
           child: Text(
@@ -37,7 +35,6 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ),
-
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -71,7 +68,6 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ],
-
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(64.0),
           child: Padding(
@@ -80,7 +76,6 @@ class HomePage extends StatelessWidget {
               right: 16.0,
               bottom: 12.0,
             ),
-
             child: GestureDetector(
               onTap: () {
                 showSearch(
@@ -88,7 +83,6 @@ class HomePage extends StatelessWidget {
                   delegate: PlantSearchDelegate(userId: user.uid),
                 );
               },
-
               child: AbsorbPointer(
                 child: TextField(
                   decoration: InputDecoration(
@@ -99,7 +93,7 @@ class HomePage extends StatelessWidget {
                       color: AppColors.textSecondary,
                     ),
                     filled: true,
-                    fillColor: AppColors.heading.withOpacity(0.05),
+                    fillColor: AppColors.heading.withValues(alpha: 0.05),
                     contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -112,7 +106,6 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
-
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.goldAccent,
         foregroundColor: AppColors.dark1,
@@ -149,8 +142,6 @@ class HomePage extends StatelessWidget {
             );
           }
 
-          final data = snapshot.data!.data() as Map<String, dynamic>;
-
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -164,9 +155,7 @@ class HomePage extends StatelessWidget {
                     color: AppColors.heading,
                   ),
                 ),
-
                 const SizedBox(height: 22),
-
                 StreamBuilder(
                   stream: PlantService().getPlants(),
                   builder: (context, plantSnapshot) {

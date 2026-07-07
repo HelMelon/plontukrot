@@ -51,9 +51,9 @@ class PlantService {
         .collection('plants')
         .doc(plantId)
         .update({
-          'name': name,
-          'nickname': nickname,
-          'wateringFrequency': wateringFrequency,
-        });
+      'name': name,
+      'nickname': nickname,
+      'wateringFrequency': wateringFrequency,
+    });
   }
 }

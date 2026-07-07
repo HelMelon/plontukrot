@@ -39,9 +39,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                         borderRadius: BorderRadius.circular(99),
                       ),
                     ),
-
                     const SizedBox(height: 20),
-
                     const Text(
                       'Add Watering',
                       style: TextStyle(
@@ -49,9 +47,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     const SizedBox(height: 20),
-
                     ListTile(
                       leading: const Icon(Icons.calendar_today),
                       title: Text(DateFormat('d MMMM y').format(selectedDate)),
@@ -70,9 +66,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                         }
                       },
                     ),
-
                     const SizedBox(height: 16),
-
                     Row(
                       children: [
                         OutlinedButton(
@@ -83,19 +77,15 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                           },
                           child: const Text('Today'),
                         ),
-
                         const Spacer(),
-
                         FilledButton(
                           onPressed: () async {
                             await _service.addWatering(
                               plantId: widget.plantId,
                               wateredAt: selectedDate,
                             );
-
-                            if (mounted) {
-                              Navigator.pop(sheetContext);
-                            }
+                            if (!context.mounted) return;
+                            Navigator.pop(sheetContext);
                           },
                           child: const Text('Save'),
                         ),
@@ -126,18 +116,14 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
               borderRadius: BorderRadius.circular(99),
             ),
           ),
-
           const SizedBox(height: 16),
-
           Row(
             children: [
               const Text(
                 'Watering History',
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
-
               const Spacer(),
-
               FilledButton.icon(
                 onPressed: _showAddWateringSheet,
                 icon: const Icon(Icons.add),
@@ -145,9 +131,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
               ),
             ],
           ),
-
           const SizedBox(height: 20),
-
           Expanded(
             child: StreamBuilder<List<Map<String, dynamic>>>(
               stream: _service.getWateringHistory(widget.plantId),
@@ -200,9 +184,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                               Icons.water_drop_rounded,
                               color: Theme.of(context).colorScheme.primary,
                             ),
-
                             const SizedBox(width: 12),
-
                             Expanded(
                               child: Text(
                                 DateFormat('d MMMM y').format(wateredAt),
@@ -212,7 +194,6 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                                 ),
                               ),
                             ),
-
                             if (_deleteModeWateringId == wateringId)
                               IconButton(
                                 icon: const Icon(Icons.delete_outline),

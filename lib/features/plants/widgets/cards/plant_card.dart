@@ -8,13 +8,10 @@ extension CapitalizeString on String {
   String toTitleCase() {
     if (trim().isEmpty) return '';
 
-    return split(' ')
-        .where((word) => word.isNotEmpty)
-        .map((word) {
-          if (word.length == 1) return word.toUpperCase();
-          return '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}';
-        })
-        .join(' ');
+    return split(' ').where((word) => word.isNotEmpty).map((word) {
+      if (word.length == 1) return word.toUpperCase();
+      return '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}';
+    }).join(' ');
   }
 }
 
@@ -51,7 +48,7 @@ class PlantCard extends StatelessWidget {
           border: Border.all(color: AppColors.greenDeep),
           boxShadow: [
             BoxShadow(
-              color: AppColors.dark1.withOpacity(0.25),
+              color: AppColors.dark1.withValues(alpha: 0.25),
               blurRadius: 18,
               offset: const Offset(0, 10),
             ),
@@ -66,7 +63,7 @@ class PlantCard extends StatelessWidget {
               child: ClipOval(
                 child: hasImage
                     ? Image.network(
-                        imageUrl!,
+                        imageUrl,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
@@ -108,7 +105,6 @@ class PlantCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 👑 ЗАГОЛОВОК (Теперь автоматически переносится)
                   Text(
                     hasNickname ? nickname : name,
                     overflow: TextOverflow.clip,
@@ -117,18 +113,14 @@ class PlantCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5,
                       color: AppColors.goldAccent,
-                      height:
-                          1.2, // ↕️ Небольшой межстрочный интервал, чтобы строки не слипались
+                      height: 1.2,
                     ),
                   ),
-
-                  // 🌿 ПОДЗАГОЛОВОК С ИМЕНЕМ (Показывается, только если есть никнейм)
                   if (hasNickname) ...[
                     const SizedBox(height: 4),
                     Text(
                       name,
-                      maxLines:
-                          2, // Ему тоже разрешим перенос на две строки, если имя длинное
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 15,

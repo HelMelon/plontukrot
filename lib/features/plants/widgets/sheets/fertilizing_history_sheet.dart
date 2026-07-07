@@ -19,14 +19,11 @@ class FertilizingHistorySheet extends StatelessWidget {
         children: [
           Container(width: 40, height: 4, color: Colors.grey),
           const SizedBox(height: 16),
-
           const Text(
             "Fertilizing history",
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-
           const SizedBox(height: 20),
-
           Expanded(
             child: StreamBuilder<List<Map<String, dynamic>>>(
               stream: service.getFertilizingHistory(plantId),

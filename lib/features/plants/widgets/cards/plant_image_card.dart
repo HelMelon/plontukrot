@@ -38,7 +38,6 @@ class PlantImageCard extends StatelessWidget {
                 )
               else
                 const PlaceholderWithIcon(),
-
               if (isUploading)
                 Container(
                   color: Colors.black45,

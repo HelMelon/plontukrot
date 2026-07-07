@@ -8,12 +8,13 @@ class PlantFrameClipper extends CustomClipper<Path> {
     final top = size.height * 0.122;
     final bottom = size.height * 0.138;
 
-    return Path()..addRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTRB(left, top, size.width - right, size.height - bottom),
-        const Radius.circular(16),
-      ),
-    );
+    return Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTRB(left, top, size.width - right, size.height - bottom),
+          const Radius.circular(16),
+        ),
+      );
   }
 
   @override

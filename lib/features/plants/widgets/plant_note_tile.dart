@@ -54,10 +54,8 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
-
             TextButton(
-              onPressed: () =>
-                  Navigator.of(context).pop(true), // Возвращает true
+              onPressed: () => Navigator.of(context).pop(true),
               child: const Text(
                 'Delete',
                 style: TextStyle(
@@ -71,7 +69,6 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
       },
     );
 
-    // 2. Если пользователь нажал "Delete" (confirmed == true), удаляем из базы
     if (confirmed == true && context.mounted) {
       await NoteService().deleteNote(
         plantId: widget.plantId,
@@ -104,7 +101,6 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
 
   @override
   Widget build(BuildContext context) {
-    // Используем widget.isOpened вместо локальной переменной
     final bool showActions = widget.isOpened;
 
     final noteBody = Container(
@@ -163,11 +159,10 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
 
     return GestureDetector(
       onHorizontalDragEnd: (details) {
-        // Свайп влево — просим родителя открыть именно ЭТУ заметку
         if (details.primaryVelocity! < 0) {
           widget.onOpenChanged(true);
         }
-        // Свайп вправо — просим закрыть
+
         if (details.primaryVelocity! > 0) {
           widget.onOpenChanged(false);
         }
@@ -197,16 +192,15 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
                       width: 44,
                       height: 44,
                       child: IconButton(
-                        onPressed: showActions
-                            ? () => _editNote(context)
-                            : null,
+                        onPressed:
+                            showActions ? () => _editNote(context) : null,
                         icon: const Icon(
                           Icons.edit_rounded,
                           color: Colors.amber,
                           size: 20,
                         ),
                         style: IconButton.styleFrom(
-                          backgroundColor: Colors.amber.withOpacity(0.15),
+                          backgroundColor: Colors.amber.withValues(alpha: 0.15),
                           padding: EdgeInsets.zero,
                         ),
                       ),
@@ -216,16 +210,16 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
                       width: 44,
                       height: 44,
                       child: IconButton(
-                        onPressed: showActions
-                            ? () => _deleteNote(context)
-                            : null,
+                        onPressed:
+                            showActions ? () => _deleteNote(context) : null,
                         icon: const Icon(
                           Icons.delete_outline_rounded,
                           color: Colors.redAccent,
                           size: 20,
                         ),
                         style: IconButton.styleFrom(
-                          backgroundColor: Colors.redAccent.withOpacity(0.15),
+                          backgroundColor:
+                              Colors.redAccent.withValues(alpha: 0.15),
                           padding: EdgeInsets.zero,
                         ),
                       ),

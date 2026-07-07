@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PlaceholderWithIcon extends StatelessWidget {
-  const PlaceholderWithIcon();
+  const PlaceholderWithIcon({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,6 @@ class PlaceholderWithIcon extends StatelessWidget {
             height: double.infinity,
           ),
         ),
-
         const Center(
           child: Icon(Icons.add_a_photo, color: Colors.white, size: 40.0),
         ),

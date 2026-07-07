@@ -23,23 +23,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-
       builder: (context, child) {
         return Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/images/background.png'),
-
               repeat: ImageRepeat.repeat,
-
               fit: BoxFit.contain,
             ),
           ),
-
           child: child,
         );
       },
-
       home: const AuthGate(),
     );
   }
@@ -52,7 +47,6 @@ class AuthGate extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
-
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(

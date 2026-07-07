@@ -43,9 +43,8 @@ class FertilizeService {
     await _fertilizingRef(plantId).add({
       'fertilizerId': fertilizerId,
       'appliedAt': Timestamp.fromDate(appliedAt),
-      'nextFertilizing': nextFertilizing != null
-          ? Timestamp.fromDate(nextFertilizing)
-          : null,
+      'nextFertilizing':
+          nextFertilizing != null ? Timestamp.fromDate(nextFertilizing) : null,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }

@@ -21,7 +21,6 @@ class NoteService {
     await _notesRef(plantId).add({
       'text': text,
       'createdAt': Timestamp.fromDate(now),
-
       'expiresAt': Timestamp.fromDate(now.add(const Duration(days: 183))),
     });
   }
