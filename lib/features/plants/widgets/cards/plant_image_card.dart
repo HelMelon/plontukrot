@@ -18,6 +18,8 @@ class PlantImageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasUrl = imageUrl != null && imageUrl!.isNotEmpty;
+
     return GestureDetector(
       onTap: onTap,
       child: AspectRatio(
@@ -27,17 +29,25 @@ class PlantImageCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              if (imageUrl != null && imageUrl!.isNotEmpty)
+              if (hasUrl)
                 CachedNetworkImage(
                   imageUrl: imageUrl!,
                   fit: BoxFit.cover,
                   alignment: Alignment.center,
-                  placeholder: (context, url) => const PlaceholderWithIcon(),
-                  errorWidget: (context, url, error) =>
-                      const PlaceholderWithIcon(),
+                  placeholder: (context, url) => const Align(
+                    alignment: Alignment.topCenter,
+                    child: PlaceholderWithIcon(),
+                  ),
+                  errorWidget: (context, url, error) => const Align(
+                    alignment: Alignment.topCenter,
+                    child: PlaceholderWithIcon(),
+                  ),
                 )
               else
-                const PlaceholderWithIcon(),
+                const Align(
+                  alignment: Alignment.topCenter,
+                  child: PlaceholderWithIcon(),
+                ),
               if (isUploading)
                 Container(
                   color: Colors.black45,
