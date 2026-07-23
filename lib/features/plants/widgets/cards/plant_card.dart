@@ -31,6 +31,12 @@ class PlantCard extends StatelessWidget {
     final nickname = (data['nickname'] as String? ?? '').toTitleCase();
     final hasNickname = nickname.trim().isNotEmpty;
 
+    final double screenWidth = MediaQuery.of(context).size.width;
+
+    final double mainFontSize = (screenWidth * 0.035).clamp(14.0, 20.0);
+
+    final double subFontSize = (screenWidth * 0.03).clamp(12.0, 16.0);
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -39,103 +45,105 @@ class PlantCard extends StatelessWidget {
         );
       },
       child: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.only(bottom: 18),
-        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: AppColors.backgroundSecondary,
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: AppColors.greenDeep),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+              color: AppColors.greenDeep.withValues(alpha: 0.3), width: 1),
           boxShadow: [
             BoxShadow(
-              color: AppColors.dark1.withValues(alpha: 0.25),
-              blurRadius: 18,
-              offset: const Offset(0, 10),
+              color: AppColors.dark1.withValues(alpha: 0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 56,
-              height: 56,
-              child: ClipOval(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AspectRatio(
+                aspectRatio: 1.0,
                 child: hasImage
-                    ? Image.network(
-                        imageUrl,
+                    ? FadeInImage(
+                        placeholder: const AssetImage(
+                            'assets/images/plant_placeholder.png'),
+                        image: NetworkImage(imageUrl),
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: AppColors.dark2,
-                            child: const Icon(
-                              Icons.eco,
-                              color: AppColors.accentLight,
-                              size: 26,
-                            ),
-                          );
+                        alignment: Alignment.center,
+                        fadeInDuration: const Duration(milliseconds: 300),
+                        fadeInCurve: Curves.easeIn,
+                        imageErrorBuilder: (context, error, stackTrace) {
+                          return const _PlantAssetPlaceholder();
+                        },
+                        placeholderErrorBuilder: (context, error, stackTrace) {
+                          return const _PlantAssetPlaceholder();
                         },
                       )
-                    : Container(
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppColors.goldAccent,
-                              AppColors.accentGreen,
-                            ],
+                    : const _PlantAssetPlaceholder(),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        hasNickname ? nickname : name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: mainFontSize,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.3,
+                          color: AppColors.goldAccent,
+                          height: 1.2,
+                        ),
+                      ),
+                      if (hasNickname) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: subFontSize,
+                            fontWeight: FontWeight.normal,
+                            color: AppColors.warmGray,
+                            height: 1.2,
                           ),
                         ),
-                        child: const Icon(
-                          Icons.eco,
-                          color: AppColors.accentLight,
-                          size: 26,
-                        ),
-                      ),
-              ),
-            ),
-            const SizedBox(width: 18),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    hasNickname ? nickname : name,
-                    overflow: TextOverflow.clip,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: -0.5,
-                      color: AppColors.goldAccent,
-                      height: 1.2,
-                    ),
+                      ],
+                    ],
                   ),
-                  if (hasNickname) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.warmGray,
-                      ),
-                    ),
-                  ],
-                ],
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: AppColors.textSecondary,
-              size: 28,
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class _PlantAssetPlaceholder extends StatelessWidget {
+  const _PlantAssetPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.backgroundSecondary,
+      child: Image.asset(
+        'assets/images/default-img.png',
+        fit: BoxFit.cover,
+        alignment: Alignment.topCenter,
+        errorBuilder: (context, error, stackTrace) {
+          return const Center(
+            child:
+                Icon(Icons.eco_rounded, color: AppColors.goldAccent, size: 40),
+          );
+        },
       ),
     );
   }

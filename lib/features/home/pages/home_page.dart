@@ -8,6 +8,8 @@ import '../../plants/widgets/sheets/add_plant_sheet.dart';
 import '../../../services/plant_service.dart';
 import '../../plants/widgets/cards/plant_card.dart';
 import '../../plants/widgets/plant_search_delegate.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends StatelessWidget {
   final User user;
@@ -25,14 +27,16 @@ class HomePage extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        title: const Align(
+        title: Align(
           alignment: Alignment.centerLeft,
-          child: Text(
-            'Plant Journal',
+          child: AutoSizeText(
+            'Plöntukrot',
+            minFontSize: 18,
+            maxFontSize: 36,
             style: TextStyle(
-              color: AppColors.heading,
-              fontWeight: FontWeight.bold,
-            ),
+                fontFamily: 'NordicStyle',
+                color: AppColors.heading,
+                fontSize: 36),
           ),
         ),
         actions: [
@@ -147,15 +151,6 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'My Plants',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.heading,
-                  ),
-                ),
-                const SizedBox(height: 22),
                 StreamBuilder(
                   stream: PlantService().getPlants(),
                   builder: (context, plantSnapshot) {
@@ -202,12 +197,34 @@ class HomePage extends StatelessWidget {
                     }
 
                     final plants = plantSnapshot.data!.docs;
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: plants.length,
-                      itemBuilder: (context, index) {
-                        return PlantCard(plant: plants[index]);
+
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                        final double screenWidth =
+                            MediaQuery.of(context).size.width;
+
+                        int crossAxisCount = 2;
+                        if (screenWidth >= 1000) {
+                          crossAxisCount = 6;
+                        } else if (screenWidth >= 600) {
+                          crossAxisCount = 4;
+                        }
+
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: plants.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 0.60,
+                          ),
+                          itemBuilder: (context, index) {
+                            return PlantCard(plant: plants[index]);
+                          },
+                        );
                       },
                     );
                   },
