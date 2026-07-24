@@ -76,7 +76,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                   ),
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 16),
               const Text(
                 'Add Plant',
                 style: TextStyle(
@@ -86,16 +86,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                   color: AppColors.heading,
                 ),
               ),
-              const SizedBox(height: 10),
-              const Text(
-                'Create a new entry for your collection.',
-                style: TextStyle(
-                  fontSize: 15,
-                  height: 1.5,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 16),
               TextField(
                 controller: nameController,
                 style: const TextStyle(color: AppColors.textPrimary),
@@ -130,12 +121,12 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                 controller: nickNameController,
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
-                  labelText: 'Plant nickname',
+                  labelText: 'Plant family',
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.dark2,
                   prefixIcon: const Icon(
-                    Icons.local_florist,
+                    Icons.family_restroom,
                     color: AppColors.accentLight,
                   ),
                   border: OutlineInputBorder(
@@ -160,7 +151,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                 controller: nickNameController,
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
-                  labelText: 'Plant family',
+                  labelText: 'Plant nickname',
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.dark2,

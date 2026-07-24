@@ -113,15 +113,6 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                   color: AppColors.heading,
                 ),
               ),
-              const SizedBox(height: 10),
-              const Text(
-                'Update an entry in your collection.',
-                style: TextStyle(
-                  fontSize: 15,
-                  height: 1.5,
-                  color: AppColors.textSecondary,
-                ),
-              ),
               const SizedBox(height: 28),
               TextField(
                 controller: nameController,
@@ -154,15 +145,15 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
               ),
               const SizedBox(height: 18),
               TextField(
-                controller: nickNameController,
+                controller: familyController,
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
-                  labelText: 'Plant nickname',
+                  labelText: 'Plant family',
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.dark2,
                   prefixIcon: const Icon(
-                    Icons.local_florist,
+                    Icons.family_restroom,
                     color: AppColors.accentLight,
                   ),
                   border: OutlineInputBorder(
@@ -184,10 +175,10 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
               ),
               const SizedBox(height: 18),
               TextField(
-                controller: familyController,
+                controller: nickNameController,
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
-                  labelText: 'Plant family',
+                  labelText: 'Plant nickname',
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.dark2,
