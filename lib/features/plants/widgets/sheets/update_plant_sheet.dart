@@ -23,6 +23,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   final nameController = TextEditingController();
   final nickNameController = TextEditingController();
   final wateringFrequencyController = TextEditingController();
+  final familyController = TextEditingController();
 
   bool isLoading = false;
   int selectedStage = 0;
@@ -36,6 +37,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     wateringFrequencyController.text =
         (widget.plant['wateringFrequency'] ?? 0).toString();
     selectedStage = widget.plant['stage'] ?? 1;
+    familyController.text = widget.plant['family'] ?? '';
   }
 
   @override
@@ -49,6 +51,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   Future<void> updatePlant() async {
     final name = nameController.text.trim();
     final nickname = nickNameController.text.trim();
+    final family = familyController.text.trim();
     final wateringFrequency = int.tryParse(wateringFrequencyController.text);
 
     if (name.isEmpty) return;
@@ -61,6 +64,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
       plantId: widget.plantId,
       name: name,
       nickname: nickname,
+      family: family,
       wateringFrequency: wateringFrequency,
       stage: selectedStage,
     );
@@ -154,6 +158,36 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
                   labelText: 'Plant nickname',
+                  labelStyle: const TextStyle(color: AppColors.textSecondary),
+                  filled: true,
+                  fillColor: AppColors.dark2,
+                  prefixIcon: const Icon(
+                    Icons.local_florist,
+                    color: AppColors.accentLight,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: const BorderSide(color: AppColors.greenDeep),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: const BorderSide(
+                      color: AppColors.goldAccent,
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              TextField(
+                controller: familyController,
+                style: const TextStyle(color: AppColors.textPrimary),
+                decoration: InputDecoration(
+                  labelText: 'Plant family',
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.dark2,

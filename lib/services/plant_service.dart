@@ -9,6 +9,7 @@ class PlantService {
   Future<void> addPlant({
     required String name,
     String nickname = '',
+    String family = '',
     required int stage,
   }) async {
     await _firestore.collection('users').doc(uid).collection('plants').add({
@@ -17,6 +18,7 @@ class PlantService {
       'stage': stage,
       'imageUrl': null,
       'wateringFrequency': null,
+      'family': family,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
@@ -46,6 +48,7 @@ class PlantService {
       {required String plantId,
       required String name,
       required String nickname,
+      required String family,
       int? wateringFrequency,
       required int stage}) async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
@@ -59,7 +62,8 @@ class PlantService {
       'name': name,
       'nickname': nickname,
       'wateringFrequency': wateringFrequency,
-      'stage': stage
+      'stage': stage,
+      'family': family
     });
   }
 }

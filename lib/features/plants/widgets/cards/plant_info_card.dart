@@ -48,6 +48,15 @@ class PlantInfoCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
+          Text(
+            'Семейство: ${data['family'] ?? 'Не известно'}',
+            style: const TextStyle(
+              fontStyle: FontStyle.italic,
+              fontSize: 24,
+              color: AppColors.heading,
+            ),
+          ),
+          const SizedBox(height: 8),
           stage.value != 0
               ? Text(
                   'Stage: ${stage.title}',

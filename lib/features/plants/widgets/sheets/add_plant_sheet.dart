@@ -15,6 +15,7 @@ class AddPlantSheet extends StatefulWidget {
 class _AddPlantSheetState extends State<AddPlantSheet> {
   final nameController = TextEditingController();
   final nickNameController = TextEditingController();
+  final familyController = TextEditingController();
   final wateringFrequencyController = TextEditingController();
 
   bool isLoading = false;
@@ -23,7 +24,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
   Future<void> addPlant() async {
     final name = nameController.text.trim();
     final nickname = nickNameController.text.trim();
-
+    final family = familyController.text.trim();
     if (name.isEmpty) {
       return;
     }
@@ -37,6 +38,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
     await PlantService().addPlant(
       name: name,
       nickname: nickname,
+      family: family,
       stage: selectedStage,
     );
 
@@ -129,6 +131,36 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
                   labelText: 'Plant nickname',
+                  labelStyle: const TextStyle(color: AppColors.textSecondary),
+                  filled: true,
+                  fillColor: AppColors.dark2,
+                  prefixIcon: const Icon(
+                    Icons.local_florist,
+                    color: AppColors.accentLight,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: const BorderSide(color: AppColors.greenDeep),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: const BorderSide(
+                      color: AppColors.goldAccent,
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              TextField(
+                controller: nickNameController,
+                style: const TextStyle(color: AppColors.textPrimary),
+                decoration: InputDecoration(
+                  labelText: 'Plant family',
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.dark2,
