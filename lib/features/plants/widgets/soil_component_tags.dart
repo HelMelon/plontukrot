@@ -3,19 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../models/component.dart';
 
-const List<String> kDefaultSoilComponents = [
-  'Perlite',
-  'Coco coir',
-  'Bark',
-  'Peat',
-  'Sand',
-  'Charcoal',
-  'Zeolite',
-  'Pumice',
-  'Worm castings',
-  'Vermiculite',
-];
-
 String formatParts(double parts) {
   if (parts == parts.roundToDouble()) {
     return parts.toInt().toString();

@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../models/catalog_component.dart';
 import '../../../../models/component.dart';
 import '../../../../models/soil.dart';
+import '../../../../services/component_service.dart';
 import '../../../../services/repotting_service.dart';
 import '../../../../services/soil_service.dart';
 import '../soil_component_tags.dart';
 import '../soil_composition_dialog.dart';
+import 'manage_components_sheet.dart';
 
 enum _SoilMode { saved, newMix }
 
@@ -23,15 +26,22 @@ class AddRepottingSheet extends StatefulWidget {
 class _AddRepottingSheetState extends State<AddRepottingSheet> {
   final _repottingService = RepottingService();
   final _soilService = SoilService();
+  final _componentService = ComponentService();
   final _mixNameController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now();
   _SoilMode _mode = _SoilMode.newMix;
   String? _selectedSoilId;
   List<SoilComponent> _components = [];
-  List<String> _availableComponents = List.from(kDefaultSoilComponents);
   bool _saveMix = false;
   bool _saving = false;
+  List<String> _catalogNames = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _componentService.ensureDefaultComponents();
+  }
 
   @override
   void dispose() {
@@ -63,6 +73,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
             controller: controller,
             autofocus: true,
             decoration: const InputDecoration(hintText: 'Component name'),
+            textCapitalization: TextCapitalization.sentences,
           ),
           actions: [
             TextButton(
@@ -77,13 +88,18 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
         );
       },
     );
+    controller.dispose();
 
     if (name == null || name.isEmpty) return;
 
+    final exists = _catalogNames.any(
+      (n) => n.toLowerCase() == name.toLowerCase(),
+    );
+    if (!exists) {
+      await _componentService.addComponent(name: name);
+    }
+
     setState(() {
-      if (!_availableComponents.contains(name)) {
-        _availableComponents = [..._availableComponents, name];
-      }
       if (!_components.any((c) => c.component == name)) {
         _components = [
           ..._components,
@@ -93,15 +109,36 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
     });
   }
 
+  Future<void> _openManageComponents() async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => ManageComponentsSheet(
+        onRenamed: (oldName, newName) {
+          setState(() {
+            _components = _components
+                .map(
+                  (c) => c.component == oldName
+                      ? SoilComponent(component: newName, parts: c.parts)
+                      : c,
+                )
+                .toList();
+          });
+        },
+        onDeleted: (name) {
+          setState(() {
+            _components =
+                _components.where((c) => c.component != name).toList();
+          });
+        },
+      ),
+    );
+  }
+
   void _applySavedSoil(Soil soil) {
     setState(() {
       _selectedSoilId = soil.id;
       _components = List.from(soil.components);
-      for (final c in soil.components) {
-        if (!_availableComponents.contains(c.component)) {
-          _availableComponents = [..._availableComponents, c.component];
-        }
-      }
     });
   }
 
@@ -216,7 +253,8 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: OutlinedButton(
-                  onPressed: () => setState(() => _selectedDate = DateTime.now()),
+                  onPressed: () =>
+                      setState(() => _selectedDate = DateTime.now()),
                   child: const Text('Today'),
                 ),
               ),
@@ -292,7 +330,8 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                                 .toList(),
                             onChanged: (value) {
                               if (value == null) return;
-                              final soil = soils.firstWhere((s) => s.id == value);
+                              final soil =
+                                  soils.firstWhere((s) => s.id == value);
                               _applySavedSoil(soil);
                             },
                           ),
@@ -309,11 +348,59 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                   },
                 ),
               if (_mode == _SoilMode.newMix) ...[
-                SoilComponentTags(
-                  availableComponents: _availableComponents,
-                  selected: _components,
-                  onChanged: (next) => setState(() => _components = next),
-                  onAddCustom: _addCustomComponent,
+                Row(
+                  children: [
+                    const Text(
+                      'Components',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const Spacer(),
+                    TextButton.icon(
+                      onPressed: _openManageComponents,
+                      icon: const Icon(Icons.edit_outlined, size: 18),
+                      label: const Text('Manage'),
+                    ),
+                  ],
+                ),
+                StreamBuilder<List<CatalogComponent>>(
+                  stream: _componentService.getComponents(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Text(snapshot.error.toString());
+                    }
+                    if (!snapshot.hasData) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+
+                    final catalog = snapshot.data!;
+                    _catalogNames = catalog.map((c) => c.name).toList();
+
+                    if (_catalogNames.isEmpty) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'No components yet. Add some to build a mix.',
+                            style: TextStyle(color: AppColors.textSecondary),
+                          ),
+                          TextButton(
+                            onPressed: _addCustomComponent,
+                            child: const Text('Add component'),
+                          ),
+                        ],
+                      );
+                    }
+
+                    return SoilComponentTags(
+                      availableComponents: _catalogNames,
+                      selected: _components,
+                      onChanged: (next) => setState(() => _components = next),
+                      onAddCustom: _addCustomComponent,
+                    );
+                  },
                 ),
                 const SizedBox(height: 8),
                 const Text(
