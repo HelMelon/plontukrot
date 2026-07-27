@@ -2,9 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
-import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../../services/fertilize_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/storage_service.dart';
@@ -12,6 +10,7 @@ import '../widgets/sheets/update_plant_sheet.dart';
 import '../widgets/sheets/add_note_sheet.dart';
 import '../widgets/sheets/watering_history_sheet.dart';
 import '../widgets/sheets/add_repotting_sheet.dart';
+import '../widgets/sheets/add_fertilizing_sheet.dart';
 import '../widgets/cards/plant_image_card.dart';
 import '../widgets/cards/plant_info_card.dart';
 
@@ -26,10 +25,7 @@ class PlantDetailsPage extends StatefulWidget {
 
 class _PlantDetailsPageState extends State<PlantDetailsPage> {
   bool isUploading = false;
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController typeController = TextEditingController();
 
-  String? selectedFertilizerId;
   Future<ImageSource?> selectImageSource() async {
     return showModalBottomSheet<ImageSource>(
       context: context,
@@ -99,188 +95,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
     }
   }
 
-  Future<void> _showAddFertilizerDialog(
-    BuildContext context,
-    void Function(void Function()) setModalState,
-  ) async {
-    final nameController = TextEditingController();
-    final typeController = TextEditingController();
-    final service = FertilizeService();
-
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx).viewInsets.bottom,
-            left: 16,
-            right: 16,
-            top: 16,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Add Fertilizer',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(hintText: 'Name'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: typeController,
-                decoration: const InputDecoration(hintText: 'Type'),
-              ),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: () async {
-                  final name = nameController.text.trim();
-                  final type = typeController.text.trim();
-
-                  if (name.isEmpty || type.isEmpty) return;
-
-                  final newId = await service.addFertilizer(
-                    name: name,
-                    type: type,
-                  );
-
-                  if (ctx.mounted) Navigator.pop(ctx);
-
-                  setModalState(() {
-                    selectedFertilizerId = newId;
-                  });
-                },
-                child: const Text('Add'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _showFertilizeSheet(String plantId) async {
-    DateTime selectedDate = DateTime.now();
-    String? selectedFertilizerId;
-
-    final service = FertilizeService();
-
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(width: 40, height: 4, color: Colors.grey),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Add Fertilizing',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    ListTile(
-                      leading: const Icon(Icons.calendar_today),
-                      title: Text(DateFormat('d MMM y').format(selectedDate)),
-                      onTap: () async {
-                        final picked = await showDatePicker(
-                          context: context,
-                          initialDate: selectedDate,
-                          firstDate: DateTime(2020),
-                          lastDate: DateTime.now(),
-                        );
-
-                        if (picked != null) {
-                          setModalState(() => selectedDate = picked);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    StreamBuilder(
-                      stream: service.getFertilizers(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return const CircularProgressIndicator();
-                        }
-
-                        final docs = snapshot.data!.docs;
-
-                        return DropdownButton<String>(
-                          value: selectedFertilizerId,
-                          hint: const Text('Select fertilizer'),
-                          isExpanded: true,
-                          items: [
-                            ...docs.map((doc) {
-                              return DropdownMenuItem(
-                                value: doc.id,
-                                child: Text(doc['name']),
-                              );
-                            }),
-                            const DropdownMenuItem(
-                              value: 'add_new',
-                              child: Text('+ Add new fertilizer'),
-                            ),
-                          ],
-                          onChanged: (value) async {
-                            if (value == 'add_new') {
-                              await _showAddFertilizerDialog(
-                                context,
-                                setModalState,
-                              );
-                              return;
-                            }
-
-                            setModalState(() {
-                              selectedFertilizerId = value;
-                            });
-                          },
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    FilledButton(
-                      onPressed: selectedFertilizerId == null
-                          ? null
-                          : () async {
-                              await service.addFertilizing(
-                                plantId: plantId,
-                                fertilizerId: selectedFertilizerId!,
-                                appliedAt: selectedDate,
-                              );
-                              if (!context.mounted) return;
-                              Navigator.pop(context);
-                            },
-                      child: const Text('Save'),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    nameController.dispose();
-    typeController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final uid = FirebaseAuth.instance.currentUser!.uid;
@@ -336,7 +150,14 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               _TopAction(
                 icon: Icons.science_outlined,
                 label: 'Fertilize',
-                onTap: () => _showFertilizeSheet(widget.plantId),
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (_) =>
+                        AddFertilizingSheet.forPlant(plantId: widget.plantId),
+                  );
+                },
               ),
               _TopAction(
                 icon: Icons.flaky,

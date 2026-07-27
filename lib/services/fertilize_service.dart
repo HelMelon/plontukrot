@@ -1,29 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../models/fertilizer.dart';
+import '../models/fertilizer_dose.dart';
+import '../models/fertilizer_ingredient.dart';
+import '../models/fertilizing_entry.dart';
+
 class FertilizeService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final String uid = FirebaseAuth.instance.currentUser!.uid;
+
+  String get uid => FirebaseAuth.instance.currentUser!.uid;
 
   CollectionReference<Map<String, dynamic>> get _fertilizersRef =>
       _db.collection('users').doc(uid).collection('fertilizers');
 
-  Future<String> addFertilizer({
-    required String name,
-    required String type,
-  }) async {
-    final doc = await _fertilizersRef.add({
-      'name': name,
-      'type': type,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-
-    return doc.id;
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> getFertilizers() {
-    return _fertilizersRef.orderBy('createdAt', descending: true).snapshots();
-  }
+  CollectionReference<Map<String, dynamic>> get _ingredientsRef =>
+      _db.collection('users').doc(uid).collection('fertilizerComponents');
 
   CollectionReference<Map<String, dynamic>> _fertilizingRef(String plantId) {
     return _db
@@ -34,10 +26,95 @@ class FertilizeService {
         .collection('fertilizing');
   }
 
+  // --- Ingredient catalog ---
+
+  Future<String> addIngredient({required String name}) async {
+    final doc = await _ingredientsRef.add({
+      'name': name.trim(),
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+    return doc.id;
+  }
+
+  Future<void> updateIngredient({
+    required String ingredientId,
+    required String name,
+  }) async {
+    await _ingredientsRef.doc(ingredientId).update({
+      'name': name.trim(),
+    });
+  }
+
+  Future<void> deleteIngredient(String ingredientId) async {
+    await _ingredientsRef.doc(ingredientId).delete();
+  }
+
+  Stream<List<FertilizerIngredient>> getIngredients() {
+    return _ingredientsRef.orderBy('name').snapshots().map(
+          (snapshot) =>
+              snapshot.docs.map(FertilizerIngredient.fromFirestore).toList(),
+        );
+  }
+
+  // --- Fertilizer catalog (named mixes) ---
+
+  Future<String> addFertilizer({
+    required String name,
+    String type = '',
+    int waterMl = 250,
+    List<FertilizerDose> components = const [],
+  }) async {
+    final doc = await _fertilizersRef.add({
+      'name': name.trim(),
+      'type': type.trim(),
+      'waterMl': normalizeWaterMl(waterMl),
+      'components': components.map((e) => e.toMap()).toList(),
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+
+    return doc.id;
+  }
+
+  Future<void> updateFertilizer({
+    required String fertilizerId,
+    required String name,
+    String type = '',
+    required int waterMl,
+    required List<FertilizerDose> components,
+  }) async {
+    await _fertilizersRef.doc(fertilizerId).update({
+      'name': name.trim(),
+      'type': type.trim(),
+      'waterMl': normalizeWaterMl(waterMl),
+      'components': components.map((e) => e.toMap()).toList(),
+    });
+  }
+
+  Future<void> deleteFertilizer(String fertilizerId) async {
+    await _fertilizersRef.doc(fertilizerId).delete();
+  }
+
+  Stream<List<Fertilizer>> getFertilizers() {
+    return _fertilizersRef.orderBy('createdAt', descending: true).snapshots().map(
+          (snapshot) => snapshot.docs.map(Fertilizer.fromFirestore).toList(),
+        );
+  }
+
+  Future<Fertilizer?> getFertilizer(String fertilizerId) async {
+    final doc = await _fertilizersRef.doc(fertilizerId).get();
+    if (!doc.exists || doc.data() == null) return null;
+    return Fertilizer.fromMap(doc.id, doc.data()!);
+  }
+
+  // --- Plant fertilizing history ---
+
   Future<void> addFertilizing({
     required String plantId,
-    required String fertilizerId,
     required DateTime appliedAt,
+    required List<FertilizerDose> components,
+    required int waterMl,
+    String? fertilizerId,
+    String? fertilizerName,
     DateTime? nextFertilizing,
   }) async {
     final plantRef =
@@ -46,7 +123,10 @@ class FertilizeService {
     final lastFertilizedAt = plant.data()?['lastFertilizedAt'] as Timestamp?;
 
     await _fertilizingRef(plantId).add({
-      'fertilizerId': fertilizerId,
+      if (fertilizerId != null) 'fertilizerId': fertilizerId,
+      if (fertilizerName != null) 'fertilizerName': fertilizerName,
+      'waterMl': normalizeWaterMl(waterMl),
+      'components': components.map((e) => e.toMap()).toList(),
       'appliedAt': Timestamp.fromDate(appliedAt),
       'nextFertilizing':
           nextFertilizing != null ? Timestamp.fromDate(nextFertilizing) : null,
@@ -62,31 +142,31 @@ class FertilizeService {
     }
   }
 
-  Stream<List<Map<String, dynamic>>> getFertilizingHistory(String plantId) {
-    return _fertilizingRef(
-      plantId,
-    ).orderBy('appliedAt', descending: true).snapshots().asyncMap((
-      snapshot,
-    ) async {
+  Stream<List<FertilizingEntry>> getFertilizingHistory(String plantId) {
+    return _fertilizingRef(plantId)
+        .orderBy('appliedAt', descending: true)
+        .snapshots()
+        .asyncMap((snapshot) async {
       final fertilizersSnap = await _fertilizersRef.get();
-
       final fertilizerMap = {
         for (var doc in fertilizersSnap.docs)
-          doc.id: doc.data()['name'] as String,
+          doc.id: doc.data()['name'] as String? ?? 'Unknown',
       };
 
       return snapshot.docs.map((doc) {
         final data = doc.data();
+        final fertilizerId = data['fertilizerId'] as String?;
+        final storedName = data['fertilizerName'] as String?;
+        final resolvedName = storedName ??
+            (fertilizerId != null
+                ? fertilizerMap[fertilizerId] ?? 'Unknown'
+                : 'Custom mix');
 
-        return {
-          'id': doc.id,
-          'fertilizerId': data['fertilizerId'],
-          'fertilizerName': fertilizerMap[data['fertilizerId']] ?? 'Unknown',
-          'appliedAt': (data['appliedAt'] as Timestamp).toDate(),
-          'nextFertilizing': data['nextFertilizing'] != null
-              ? (data['nextFertilizing'] as Timestamp).toDate()
-              : null,
-        };
+        return FertilizingEntry.fromFirestoreData(
+          id: doc.id,
+          data: data,
+          fertilizerName: resolvedName,
+        );
       }).toList();
     });
   }

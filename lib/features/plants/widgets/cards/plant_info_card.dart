@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../models/fertilizing_entry.dart';
 import '../../../../models/repotting_entry.dart';
 import '../../../../models/stage_info.dart';
 import '../../../../services/fertilize_service.dart';
@@ -89,25 +90,27 @@ class PlantInfoCard extends StatelessWidget {
                 child: StreamBuilder<Map<String, dynamic>?>(
                   stream: WateringService().watchLastWatering(plantId),
                   builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
+                    void openHistory() {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (_) =>
+                            WateringHistorySheet(plantId: plantId),
+                      );
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting &&
+                        !snapshot.hasData) {
                       return InfoCard(
                         icon: _icon('assets/icons/watering.png'),
                         title: 'Watering',
                         value: 'Loading...',
+                        onTap: openHistory,
                       );
                     }
 
                     final watering = snapshot.data;
-
-                    if (watering == null) {
-                      return InfoCard(
-                        icon: _icon('assets/icons/watering.png'),
-                        title: 'Watering',
-                        value: 'No data',
-                      );
-                    }
-
-                    final last = watering['wateredAt'] as DateTime?;
+                    final last = watering?['wateredAt'] as DateTime?;
                     final value = last == null
                         ? 'No data'
                         : DateFormat('d MMM y').format(last);
@@ -116,57 +119,44 @@ class PlantInfoCard extends StatelessWidget {
                       icon: _icon('assets/icons/watering.png'),
                       title: 'Watering',
                       value: value,
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (_) =>
-                              WateringHistorySheet(plantId: plantId),
-                        );
-                      },
+                      onTap: openHistory,
                     );
                   },
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: StreamBuilder<List<Map<String, dynamic>>>(
+                child: StreamBuilder<List<FertilizingEntry>>(
                   stream: FertilizeService().getFertilizingHistory(plantId),
                   builder: (context, snapshot) {
+                    void openHistory() {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (_) =>
+                            FertilizingHistorySheet(plantId: plantId),
+                      );
+                    }
+
                     if (!snapshot.hasData) {
                       return InfoCard(
                         icon: _icon('assets/icons/fertilize.png'),
                         title: 'Fertilizing',
                         value: 'Loading...',
+                        onTap: openHistory,
                       );
                     }
 
                     final items = snapshot.data!;
-
-                    if (items.isEmpty) {
-                      return InfoCard(
-                        icon: _icon('assets/icons/fertilize.png'),
-                        title: 'Fertilizing',
-                        value: 'No data',
-                      );
-                    }
-
-                    final last = items.first;
-                    final value = DateFormat('d MMM y')
-                        .format(last['appliedAt'] as DateTime);
+                    final value = items.isEmpty
+                        ? 'No data'
+                        : DateFormat('d MMM y').format(items.first.appliedAt);
 
                     return InfoCard(
                       icon: _icon('assets/icons/fertilize.png'),
                       title: 'Fertilizing',
                       value: value,
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (_) =>
-                              FertilizingHistorySheet(plantId: plantId),
-                        );
-                      },
+                      onTap: openHistory,
                     );
                   },
                 ),
@@ -176,48 +166,35 @@ class PlantInfoCard extends StatelessWidget {
                 child: StreamBuilder<RepottingEntry?>(
                   stream: RepottingService().watchLastRepotting(plantId),
                   builder: (context, snapshot) {
+                    void openHistory() {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (_) =>
+                            RepottingHistorySheet(plantId: plantId),
+                      );
+                    }
+
                     if (!snapshot.hasData &&
                         snapshot.connectionState == ConnectionState.waiting) {
                       return InfoCard(
                         icon: _icon('assets/icons/potting.png'),
                         title: 'Repotting',
                         value: 'Loading...',
+                        onTap: openHistory,
                       );
                     }
 
                     final last = snapshot.data;
-
-                    if (last == null) {
-                      return InfoCard(
-                        icon: _icon('assets/icons/potting.png'),
-                        title: 'Repotting',
-                        value: 'No data',
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (_) =>
-                                RepottingHistorySheet(plantId: plantId),
-                          );
-                        },
-                      );
-                    }
-
-                    final value =
-                        DateFormat('d MMM y').format(last.repottedAt);
+                    final value = last == null
+                        ? 'No data'
+                        : DateFormat('d MMM y').format(last.repottedAt);
 
                     return InfoCard(
                       icon: _icon('assets/icons/potting.png'),
                       title: 'Repotting',
                       value: value,
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (_) =>
-                              RepottingHistorySheet(plantId: plantId),
-                        );
-                      },
+                      onTap: openHistory,
                     );
                   },
                 ),

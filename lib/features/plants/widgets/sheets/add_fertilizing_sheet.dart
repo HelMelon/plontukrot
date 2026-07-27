@@ -2,46 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../models/catalog_component.dart';
-import '../../../../models/component.dart';
-import '../../../../models/soil.dart';
-import '../../../../services/component_service.dart';
-import '../../../../services/repotting_service.dart';
-import '../../../../services/soil_service.dart';
-import '../soil_component_tags.dart';
-import '../soil_composition_dialog.dart';
-import 'manage_components_sheet.dart';
+import '../../../../models/fertilizer.dart';
+import '../../../../models/fertilizer_dose.dart';
+import '../../../../models/fertilizer_ingredient.dart';
+import '../../../../services/fertilize_service.dart';
+import '../fertilizer_component_tags.dart';
+import '../fertilizer_composition_dialog.dart';
+import 'manage_fertilizer_ingredients_sheet.dart';
 
-enum _SoilMode { saved, newMix }
+enum _FertilizerMode { saved, newMix }
 
-class AddRepottingSheet extends StatefulWidget {
-  final String plantId;
+class AddFertilizingSheet extends StatefulWidget {
+  final List<String> plantIds;
+  final String title;
 
-  const AddRepottingSheet({super.key, required this.plantId});
+  const AddFertilizingSheet({
+    super.key,
+    required this.plantIds,
+    this.title = 'Add Fertilizing',
+  });
+
+  factory AddFertilizingSheet.forPlant({
+    Key? key,
+    required String plantId,
+  }) {
+    return AddFertilizingSheet(key: key, plantIds: [plantId]);
+  }
 
   @override
-  State<AddRepottingSheet> createState() => _AddRepottingSheetState();
+  State<AddFertilizingSheet> createState() => _AddFertilizingSheetState();
 }
 
-class _AddRepottingSheetState extends State<AddRepottingSheet> {
-  final _repottingService = RepottingService();
-  final _soilService = SoilService();
-  final _componentService = ComponentService();
+class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
+  final _service = FertilizeService();
   final _mixNameController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now();
-  _SoilMode _mode = _SoilMode.newMix;
-  String? _selectedSoilId;
-  List<SoilComponent> _components = [];
+  _FertilizerMode _mode = _FertilizerMode.saved;
+  String? _selectedFertilizerId;
+  List<FertilizerDose> _components = [];
+  int _waterMl = 250;
   bool _saveMix = false;
   bool _saving = false;
   List<String> _catalogNames = const [];
-
-  @override
-  void initState() {
-    super.initState();
-    _componentService.ensureDefaultComponents();
-  }
 
   @override
   void dispose() {
@@ -61,18 +64,18 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
     }
   }
 
-  Future<void> _addCustomComponent() async {
+  Future<void> _addCustomIngredient() async {
     final controller = TextEditingController();
     final name = await showDialog<String>(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppColors.backgroundSecondary,
-          title: const Text('Add component'),
+          title: const Text('Add ingredient'),
           content: TextField(
             controller: controller,
             autofocus: true,
-            decoration: const InputDecoration(hintText: 'Component name'),
+            decoration: const InputDecoration(hintText: 'Ingredient name'),
             textCapitalization: TextCapitalization.sentences,
           ),
           actions: [
@@ -96,30 +99,44 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
       (n) => n.toLowerCase() == name.toLowerCase(),
     );
     if (!exists) {
-      await _componentService.addComponent(name: name);
+      await _service.addIngredient(name: name);
     }
 
+    if (!mounted) return;
+
+    final dose = await showFertilizerDoseDialog(
+      context: context,
+      component: name,
+    );
+    if (dose == null || dose.amount < 0) return;
+
     setState(() {
-      if (!_components.any((c) => c.component == name)) {
-        _components = [
-          ..._components,
-          SoilComponent(component: name, parts: 1),
-        ];
+      final next = List<FertilizerDose>.from(_components);
+      final index = next.indexWhere((c) => c.component == name);
+      if (index >= 0) {
+        next[index] = dose;
+      } else {
+        next.add(dose);
       }
+      _components = next;
     });
   }
 
-  Future<void> _openManageComponents() async {
+  Future<void> _openManageIngredients() async {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) => ManageComponentsSheet(
+      builder: (_) => ManageFertilizerIngredientsSheet(
         onRenamed: (oldName, newName) {
           setState(() {
             _components = _components
                 .map(
                   (c) => c.component == oldName
-                      ? SoilComponent(component: newName, parts: c.parts)
+                      ? FertilizerDose(
+                          component: newName,
+                          amount: c.amount,
+                          unit: c.unit,
+                        )
                       : c,
                 )
                 .toList();
@@ -135,42 +152,75 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
     );
   }
 
-  void _applySavedSoil(Soil soil) {
+  void _applySavedFertilizer(Fertilizer fertilizer) {
     setState(() {
-      _selectedSoilId = soil.id;
-      _components = List.from(soil.components);
+      _selectedFertilizerId = fertilizer.id;
+      _components = List.from(fertilizer.components);
+      _waterMl = fertilizer.waterMl;
     });
   }
 
-  Future<void> _showSelectedComposition(List<Soil> soils) async {
-    List<SoilComponent> components;
+  Future<void> _showSelectedComposition(List<Fertilizer> fertilizers) async {
+    List<FertilizerDose> components;
     String title;
+    int waterMl;
 
-    if (_mode == _SoilMode.saved && _selectedSoilId != null) {
-      final soil = soils.firstWhere(
-        (s) => s.id == _selectedSoilId,
-        orElse: () => Soil(id: '', name: 'Soil', components: _components),
+    if (_mode == _FertilizerMode.saved && _selectedFertilizerId != null) {
+      final fertilizer = fertilizers.firstWhere(
+        (f) => f.id == _selectedFertilizerId,
+        orElse: () => Fertilizer(
+          id: '',
+          name: 'Fertilizer',
+          waterMl: _waterMl,
+          components: _components,
+        ),
       );
-      components = soil.components;
-      title = soil.name.isEmpty ? 'Soil composition' : soil.name;
+      components = fertilizer.components;
+      waterMl = fertilizer.waterMl;
+      title = fertilizer.name.isEmpty ? 'Composition' : fertilizer.name;
     } else {
       components = _components;
+      waterMl = _waterMl;
       title = _saveMix && _mixNameController.text.trim().isNotEmpty
           ? _mixNameController.text.trim()
           : 'Custom mix';
     }
 
-    await showSoilCompositionDialog(
+    await showFertilizerCompositionDialog(
       context: context,
       title: title,
       components: components,
+      waterMl: waterMl,
+    );
+  }
+
+  Widget _waterVolumePicker({bool enabled = true}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Water volume',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        SegmentedButton<int>(
+          segments: [
+            for (final ml in kWaterVolumesMl)
+              ButtonSegment(value: ml, label: Text('${ml}ml')),
+          ],
+          selected: {_waterMl},
+          onSelectionChanged: enabled
+              ? (value) => setState(() => _waterMl = value.first)
+              : null,
+        ),
+      ],
     );
   }
 
   bool get _canSave {
     if (_saving) return false;
-    if (_mode == _SoilMode.saved) {
-      return _selectedSoilId != null && _components.isNotEmpty;
+    if (_mode == _FertilizerMode.saved) {
+      return _selectedFertilizerId != null;
     }
     if (_components.isEmpty) return false;
     if (_saveMix && _mixNameController.text.trim().isEmpty) return false;
@@ -183,33 +233,48 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
     setState(() => _saving = true);
 
     try {
-      String? soilId = _mode == _SoilMode.saved ? _selectedSoilId : null;
-      String? soilName;
+      String? fertilizerId =
+          _mode == _FertilizerMode.saved ? _selectedFertilizerId : null;
+      String? fertilizerName;
+      var components = _components;
+      var waterMl = _waterMl;
 
-      if (_mode == _SoilMode.saved && soilId != null) {
-        final soil = await _soilService.getSoil(soilId);
-        soilName = soil?.name;
+      if (_mode == _FertilizerMode.saved && fertilizerId != null) {
+        final fertilizer = await _service.getFertilizer(fertilizerId);
+        fertilizerName = fertilizer?.name;
+        if (fertilizer != null) {
+          components = fertilizer.components;
+          waterMl = fertilizer.waterMl;
+        }
       }
 
-      if (_mode == _SoilMode.newMix && _saveMix) {
+      if (_mode == _FertilizerMode.newMix && _saveMix) {
         final name = _mixNameController.text.trim();
-        soilId = await _soilService.addSoil(
+        fertilizerId = await _service.addFertilizer(
           name: name,
+          waterMl: _waterMl,
           components: _components,
         );
-        soilName = name;
+        fertilizerName = name;
+      } else if (_mode == _FertilizerMode.newMix) {
+        fertilizerName = 'Custom mix';
       }
 
-      await _repottingService.addRepotting(
-        plantId: widget.plantId,
-        repottedAt: _selectedDate,
-        components: _components,
-        soilId: soilId,
-        soilName: soilName,
+      await Future.wait(
+        widget.plantIds.map(
+          (plantId) => _service.addFertilizing(
+            plantId: plantId,
+            appliedAt: _selectedDate,
+            components: components,
+            waterMl: waterMl,
+            fertilizerId: fertilizerId,
+            fertilizerName: fertilizerName,
+          ),
+        ),
       );
 
       if (!mounted) return;
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -239,9 +304,9 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Add Repotting',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              Text(
+                widget.title,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
               ListTile(
@@ -259,15 +324,15 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                 ),
               ),
               const SizedBox(height: 16),
-              SegmentedButton<_SoilMode>(
+              SegmentedButton<_FertilizerMode>(
                 segments: const [
                   ButtonSegment(
-                    value: _SoilMode.saved,
-                    label: Text('Saved soil'),
+                    value: _FertilizerMode.saved,
+                    label: Text('Saved'),
                     icon: Icon(Icons.bookmark_outline),
                   ),
                   ButtonSegment(
-                    value: _SoilMode.newMix,
+                    value: _FertilizerMode.newMix,
                     label: Text('New mix'),
                     icon: Icon(Icons.science_outlined),
                   ),
@@ -276,36 +341,36 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                 onSelectionChanged: (value) {
                   setState(() {
                     _mode = value.first;
-                    if (_mode == _SoilMode.newMix) {
-                      _selectedSoilId = null;
+                    if (_mode == _FertilizerMode.newMix) {
+                      _selectedFertilizerId = null;
                       _saveMix = false;
                     }
                   });
                 },
               ),
               const SizedBox(height: 16),
-              if (_mode == _SoilMode.saved)
-                StreamBuilder<List<Soil>>(
-                  stream: _soilService.getSoils(),
+              if (_mode == _FertilizerMode.saved)
+                StreamBuilder<List<Fertilizer>>(
+                  stream: _service.getFertilizers(),
                   builder: (context, snapshot) {
-                    final soils = snapshot.data ?? const <Soil>[];
+                    final fertilizers = snapshot.data ?? const <Fertilizer>[];
 
                     if (snapshot.connectionState == ConnectionState.waiting &&
                         !snapshot.hasData) {
                       return const Center(child: CircularProgressIndicator());
                     }
 
-                    if (soils.isEmpty) {
+                    if (fertilizers.isEmpty) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'No saved soils yet. Create a new mix.',
+                            'No saved fertilizers yet. Create a new mix.',
                             style: TextStyle(color: AppColors.textSecondary),
                           ),
                           TextButton(
                             onPressed: () {
-                              setState(() => _mode = _SoilMode.newMix);
+                              setState(() => _mode = _FertilizerMode.newMix);
                             },
                             child: const Text('Switch to New mix'),
                           ),
@@ -313,57 +378,78 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                       );
                     }
 
-                    return Row(
+                    return Column(
                       children: [
-                        Expanded(
-                          child: DropdownButton<String>(
-                            value: _selectedSoilId,
-                            hint: const Text('Select soil'),
-                            isExpanded: true,
-                            items: soils
-                                .map(
-                                  (soil) => DropdownMenuItem(
-                                    value: soil.id,
-                                    child: Text(soil.name),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (value) {
-                              if (value == null) return;
-                              final soil =
-                                  soils.firstWhere((s) => s.id == value);
-                              _applySavedSoil(soil);
-                            },
+                        Row(
+                          children: [
+                            Expanded(
+                              child: DropdownButton<String>(
+                                value: _selectedFertilizerId,
+                                hint: const Text('Select fertilizer'),
+                                isExpanded: true,
+                                items: fertilizers
+                                    .map(
+                                      (f) => DropdownMenuItem(
+                                        value: f.id,
+                                        child: Text(
+                                          '${f.name} · ${f.waterMl}ml',
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: (value) {
+                                  if (value == null) return;
+                                  final fertilizer = fertilizers
+                                      .firstWhere((f) => f.id == value);
+                                  _applySavedFertilizer(fertilizer);
+                                },
+                              ),
+                            ),
+                            IconButton(
+                              tooltip: 'View composition',
+                              onPressed: _selectedFertilizerId == null
+                                  ? null
+                                  : () =>
+                                      _showSelectedComposition(fertilizers),
+                              icon: const Icon(Icons.info_outline),
+                            ),
+                          ],
+                        ),
+                        if (_selectedFertilizerId != null) ...[
+                          const SizedBox(height: 12),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Mix water volume: ${_waterMl}ml',
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          tooltip: 'View composition',
-                          onPressed: _selectedSoilId == null
-                              ? null
-                              : () => _showSelectedComposition(soils),
-                          icon: const Icon(Icons.info_outline),
-                        ),
+                        ],
                       ],
                     );
                   },
                 ),
-              if (_mode == _SoilMode.newMix) ...[
+              if (_mode == _FertilizerMode.newMix) ...[
+                _waterVolumePicker(),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     const Text(
-                      'Components',
+                      'Ingredients',
                       style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                     const Spacer(),
                     TextButton.icon(
-                      onPressed: _openManageComponents,
+                      onPressed: _openManageIngredients,
                       icon: const Icon(Icons.edit_outlined, size: 18),
                       label: const Text('Manage'),
                     ),
                   ],
                 ),
-                StreamBuilder<List<CatalogComponent>>(
-                  stream: _componentService.getComponents(),
+                StreamBuilder<List<FertilizerIngredient>>(
+                  stream: _service.getIngredients(),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       return Text(snapshot.error.toString());
@@ -378,17 +464,17 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                     final catalog = snapshot.data!;
                     _catalogNames = catalog.map((c) => c.name).toList();
 
-                    return SoilComponentTags(
+                    return FertilizerComponentTags(
                       availableComponents: _catalogNames,
                       selected: _components,
                       onChanged: (next) => setState(() => _components = next),
-                      onAddCustom: _addCustomComponent,
+                      onAddCustom: _addCustomIngredient,
                     );
                   },
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Tap: +1 part · Long press: ½ part (again removes)',
+                  'Tap an ingredient to set amount (g or ml)',
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
@@ -409,7 +495,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                     controller: _mixNameController,
                     decoration: const InputDecoration(
                       labelText: 'Mix name',
-                      hintText: 'e.g. Aroid mix',
+                      hintText: 'e.g. Grow formula',
                     ),
                     onChanged: (_) => setState(() {}),
                   ),

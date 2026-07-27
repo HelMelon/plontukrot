@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../models/plant.dart';
 import '../../../services/auth_service.dart';
-import '../../../services/fertilize_service.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
+import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/watering_service.dart';
 import '../../plants/widgets/cards/plant_card.dart';
@@ -259,167 +259,16 @@ class _HomePageState extends State<HomePage> {
     if (mounted) _exitSelectionMode();
   }
 
-  Future<String?> _showAddFertilizerDialog() async {
-    final nameController = TextEditingController();
-    final typeController = TextEditingController();
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add fertilizer'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              autofocus: true,
-              decoration: const InputDecoration(labelText: 'Name'),
-            ),
-            TextField(
-              controller: typeController,
-              decoration: const InputDecoration(labelText: 'Type'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              final name = nameController.text.trim();
-              final type = typeController.text.trim();
-              if (name.isEmpty || type.isEmpty) return;
-
-              final id = await FertilizeService().addFertilizer(
-                name: name,
-                type: type,
-              );
-              if (context.mounted) Navigator.pop(context, id);
-            },
-            child: const Text('Add'),
-          ),
-        ],
-      ),
-    );
-    nameController.dispose();
-    typeController.dispose();
-    return result;
-  }
-
   Future<void> _showFertilizingSheet() async {
-    var selectedDate = DateTime.now();
-    String? selectedFertilizerId;
-    final service = FertilizeService();
-
-    await showModalBottomSheet(
+    final applied = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setModalState) => SafeArea(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              20,
-              20,
-              20,
-              MediaQuery.of(context).viewInsets.bottom + 20,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Fertilize selected plants',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.calendar_today),
-                  title: Text(
-                    '${selectedDate.day}.${selectedDate.month}.${selectedDate.year}',
-                  ),
-                  onTap: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      initialDate: selectedDate,
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime.now(),
-                    );
-                    if (date != null) {
-                      setModalState(() => selectedDate = date);
-                    }
-                  },
-                ),
-                StreamBuilder(
-                  stream: service.getFertilizers(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const CircularProgressIndicator();
-                    }
-
-                    final fertilizers = snapshot.data!.docs;
-                    return DropdownButtonFormField<String>(
-                      initialValue: selectedFertilizerId,
-                      isExpanded: true,
-                      decoration:
-                          const InputDecoration(labelText: 'Fertilizer'),
-                      items: fertilizers
-                          .map(
-                            (fertilizer) => DropdownMenuItem(
-                              value: fertilizer.id,
-                              child: Text(fertilizer.data()['name'] as String),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        setModalState(() => selectedFertilizerId = value);
-                      },
-                    );
-                  },
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    onPressed: () async {
-                      final fertilizerId = await _showAddFertilizerDialog();
-                      if (fertilizerId != null) {
-                        setModalState(
-                          () => selectedFertilizerId = fertilizerId,
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add fertilizer'),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: selectedFertilizerId == null
-                        ? null
-                        : () async {
-                            await Future.wait(
-                              _selectedPlantIds.map(
-                                (plantId) => service.addFertilizing(
-                                  plantId: plantId,
-                                  fertilizerId: selectedFertilizerId!,
-                                  appliedAt: selectedDate,
-                                ),
-                              ),
-                            );
-                            if (sheetContext.mounted) {
-                              Navigator.pop(sheetContext);
-                            }
-                            if (mounted) _exitSelectionMode();
-                          },
-                    child: const Text('Save'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      builder: (_) => AddFertilizingSheet(
+        plantIds: _selectedPlantIds.toList(),
+        title: 'Fertilize selected plants',
       ),
     );
+    if (applied == true && mounted) _exitSelectionMode();
   }
 
   Future<void> _deletePlants() async {
