@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -41,9 +42,9 @@ class PlantCard extends StatelessWidget {
 
     final double screenWidth = MediaQuery.of(context).size.width;
 
-    final double mainFontSize = (screenWidth * 0.035).clamp(14.0, 20.0);
+    final double mainFontSize = (screenWidth * 0.06).clamp(22.0, 32.0);
 
-    final double subFontSize = (screenWidth * 0.03).clamp(12.0, 16.0);
+    final double subFontSize = (screenWidth * 0.05).clamp(20.0, 26.0);
 
     return GestureDetector(
       onTap: onTap ??
@@ -107,10 +108,11 @@ class PlantCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          AutoSizeText(
                             hasNickname ? nickname : name,
-                            maxLines: 2,
+                            maxLines: 1,
                             overflow: TextOverflow.ellipsis,
+                            minFontSize: 16,
                             style: TextStyle(
                               fontSize: mainFontSize,
                               fontWeight: FontWeight.bold,
@@ -121,10 +123,11 @@ class PlantCard extends StatelessWidget {
                           ),
                           if (hasNickname) ...[
                             const SizedBox(height: 4),
-                            Text(
+                            AutoSizeText(
                               name,
-                              maxLines: 2,
+                              maxLines: 1,
                               overflow: TextOverflow.ellipsis,
+                              minFontSize: 14,
                               style: TextStyle(
                                 fontSize: subFontSize,
                                 fontWeight: FontWeight.normal,
