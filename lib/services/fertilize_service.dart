@@ -40,6 +40,11 @@ class FertilizeService {
     required DateTime appliedAt,
     DateTime? nextFertilizing,
   }) async {
+    final plantRef =
+        _db.collection('users').doc(uid).collection('plants').doc(plantId);
+    final plant = await plantRef.get();
+    final lastFertilizedAt = plant.data()?['lastFertilizedAt'] as Timestamp?;
+
     await _fertilizingRef(plantId).add({
       'fertilizerId': fertilizerId,
       'appliedAt': Timestamp.fromDate(appliedAt),
@@ -47,6 +52,14 @@ class FertilizeService {
           nextFertilizing != null ? Timestamp.fromDate(nextFertilizing) : null,
       'createdAt': FieldValue.serverTimestamp(),
     });
+
+    if (lastFertilizedAt == null ||
+        appliedAt.isAfter(lastFertilizedAt.toDate())) {
+      await plantRef.update({
+        'lastFertilizedAt': Timestamp.fromDate(appliedAt),
+        'careHistoryMigrated': true,
+      });
+    }
   }
 
   Stream<List<Map<String, dynamic>>> getFertilizingHistory(String plantId) {

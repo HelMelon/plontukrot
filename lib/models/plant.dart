@@ -11,6 +11,9 @@ class Plant {
   final String? imageUrl;
   final int? wateringFrequency;
   final DateTime? createdAt;
+  final DateTime? lastWateredAt;
+  final DateTime? lastFertilizedAt;
+  final bool careHistoryMigrated;
 
   const Plant({
     required this.id,
@@ -21,6 +24,9 @@ class Plant {
     this.imageUrl,
     this.wateringFrequency,
     this.createdAt,
+    this.lastWateredAt,
+    this.lastFertilizedAt,
+    this.careHistoryMigrated = false,
   });
 
   factory Plant.fromMap(String id, Map<String, dynamic> data) {
@@ -33,6 +39,9 @@ class Plant {
       imageUrl: data['imageUrl'] as String?,
       wateringFrequency: data['wateringFrequency'] as int?,
       createdAt: readTimestamp(data['createdAt']),
+      lastWateredAt: readTimestamp(data['lastWateredAt']),
+      lastFertilizedAt: readTimestamp(data['lastFertilizedAt']),
+      careHistoryMigrated: data['careHistoryMigrated'] as bool? ?? false,
     );
   }
 
@@ -56,6 +65,11 @@ class Plant {
       'imageUrl': imageUrl,
       'wateringFrequency': wateringFrequency,
       if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
+      if (lastWateredAt != null)
+        'lastWateredAt': Timestamp.fromDate(lastWateredAt!),
+      if (lastFertilizedAt != null)
+        'lastFertilizedAt': Timestamp.fromDate(lastFertilizedAt!),
+      'careHistoryMigrated': careHistoryMigrated,
     };
   }
 }

@@ -22,6 +22,7 @@ class PlantService {
       'wateringFrequency': null,
       'family': family,
       'createdAt': FieldValue.serverTimestamp(),
+      'careHistoryMigrated': true,
     });
   }
 
@@ -33,6 +34,45 @@ class PlantService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs.map(Plant.fromFirestore).toList());
+  }
+
+  Future<void> migrateCareDates(Iterable<Plant> plants) async {
+    final plantsToMigrate = plants.where(
+      (plant) => !plant.careHistoryMigrated,
+    );
+
+    await Future.wait(plantsToMigrate.map((plant) async {
+      final plantRef = _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('plants')
+          .doc(plant.id);
+      final results = await Future.wait([
+        plantRef
+            .collection('watering')
+            .orderBy('wateredAt', descending: true)
+            .limit(1)
+            .get(),
+        plantRef
+            .collection('fertilizing')
+            .orderBy('appliedAt', descending: true)
+            .limit(1)
+            .get(),
+      ]);
+      final watering = results[0];
+      final fertilizing = results[1];
+      final updates = <String, dynamic>{'careHistoryMigrated': true};
+
+      if (watering.docs.isNotEmpty) {
+        updates['lastWateredAt'] = watering.docs.first.data()['wateredAt'];
+      }
+      if (fertilizing.docs.isNotEmpty) {
+        updates['lastFertilizedAt'] =
+            fertilizing.docs.first.data()['appliedAt'];
+      }
+
+      await plantRef.update(updates);
+    }));
   }
 
   Future<void> updatePlantImage({

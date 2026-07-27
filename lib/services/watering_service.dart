@@ -29,6 +29,7 @@ class WateringService {
     if (frequency != null && frequency > 0) {
       nextWatering = wateredAt.add(Duration(days: frequency));
     }
+    final lastWateredAt = plantData?['lastWateredAt'] as Timestamp?;
 
     await _wateringRef(plantId).add({
       'wateredAt': Timestamp.fromDate(wateredAt),
@@ -36,6 +37,13 @@ class WateringService {
           nextWatering != null ? Timestamp.fromDate(nextWatering) : null,
       'createdAt': FieldValue.serverTimestamp(),
     });
+
+    if (lastWateredAt == null || wateredAt.isAfter(lastWateredAt.toDate())) {
+      await _plantsCollection.doc(plantId).update({
+        'lastWateredAt': Timestamp.fromDate(wateredAt),
+        'careHistoryMigrated': true,
+      });
+    }
   }
 
   Stream<List<Map<String, dynamic>>> getWateringHistory(String plantId) {
