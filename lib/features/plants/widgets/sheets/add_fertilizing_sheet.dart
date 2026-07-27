@@ -6,8 +6,8 @@ import '../../../../models/fertilizer.dart';
 import '../../../../models/fertilizer_dose.dart';
 import '../../../../models/fertilizer_ingredient.dart';
 import '../../../../services/fertilize_service.dart';
-import '../fertilizer_component_tags.dart';
-import '../fertilizer_composition_dialog.dart';
+import '../tags/fertilizer_component_tags.dart';
+import '../dialogs/fertilizer_composition_dialog.dart';
 import 'manage_fertilizer_ingredients_sheet.dart';
 
 enum _FertilizerMode { saved, newMix }

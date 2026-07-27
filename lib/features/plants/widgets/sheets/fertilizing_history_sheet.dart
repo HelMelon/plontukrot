@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../models/fertilizing_entry.dart';
 import '../../../../services/fertilize_service.dart';
-import '../fertilizer_composition_dialog.dart';
+import '../dialogs/fertilizer_composition_dialog.dart';
 import 'add_fertilizing_sheet.dart';
 
 class FertilizingHistorySheet extends StatefulWidget {

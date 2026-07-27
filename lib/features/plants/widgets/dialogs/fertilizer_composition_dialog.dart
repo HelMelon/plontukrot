@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../models/fertilizer_dose.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../models/fertilizer_dose.dart';
 
 Future<void> showFertilizerCompositionDialog({
   required BuildContext context,

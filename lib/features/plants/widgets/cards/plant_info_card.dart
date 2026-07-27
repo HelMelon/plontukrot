@@ -8,7 +8,7 @@ import '../../../../models/stage_info.dart';
 import '../../../../services/fertilize_service.dart';
 import '../../../../services/repotting_service.dart';
 import '../../../../services/watering_service.dart';
-import '../plant_notes_section.dart';
+import '../notes/plant_notes_section.dart';
 import '../sheets/fertilizing_history_sheet.dart';
 import '../sheets/repotting_history_sheet.dart';
 import '../sheets/watering_history_sheet.dart';

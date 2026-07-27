@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../models/component.dart';
-import 'soil_component_tags.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../models/component.dart';
+import '../tags/soil_component_tags.dart';
 
 Future<void> showSoilCompositionDialog({
   required BuildContext context,

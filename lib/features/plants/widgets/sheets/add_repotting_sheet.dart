@@ -8,8 +8,8 @@ import '../../../../models/soil.dart';
 import '../../../../services/component_service.dart';
 import '../../../../services/repotting_service.dart';
 import '../../../../services/soil_service.dart';
-import '../soil_component_tags.dart';
-import '../soil_composition_dialog.dart';
+import '../tags/soil_component_tags.dart';
+import '../dialogs/soil_composition_dialog.dart';
 import 'manage_components_sheet.dart';
 
 enum _SoilMode { saved, newMix }

@@ -13,7 +13,7 @@ import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/watering_service.dart';
 import '../../plants/widgets/cards/plant_card.dart';
-import '../../plants/widgets/plant_search_delegate.dart';
+import '../../plants/widgets/search/plant_search_delegate.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
 enum _PlantSortField {

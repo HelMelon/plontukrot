@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../models/repotting_entry.dart';
 import '../../../../services/repotting_service.dart';
-import '../soil_composition_dialog.dart';
+import '../dialogs/soil_composition_dialog.dart';
 import 'add_repotting_sheet.dart';
 
 class RepottingHistorySheet extends StatefulWidget {

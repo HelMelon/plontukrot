@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../models/plant.dart';
-import '../../../services/plant_service.dart';
-import '../pages/plant_details_page.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../models/plant.dart';
+import '../../../../services/plant_service.dart';
+import '../../pages/plant_details_page.dart';
 
 class PlantSearchDelegate extends SearchDelegate {
   final String userId;

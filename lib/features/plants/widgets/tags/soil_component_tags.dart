@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../models/component.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../models/component.dart';
 
 String formatParts(double parts) {
   if (parts == parts.roundToDouble()) {

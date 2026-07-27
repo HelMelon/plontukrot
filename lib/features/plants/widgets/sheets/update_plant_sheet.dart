@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../services/plant_service.dart';
 import 'package:flutter/services.dart';
-import '../plant_stage_selector.dart';
+import '../selectors/plant_stage_selector.dart';
 
 class UpdatePlantSheet extends StatefulWidget {
   final String plantId;
