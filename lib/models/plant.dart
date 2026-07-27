@@ -13,6 +13,7 @@ class Plant {
   final DateTime? createdAt;
   final DateTime? lastWateredAt;
   final DateTime? lastFertilizedAt;
+  final DateTime? lastRepottedAt;
   final bool careHistoryMigrated;
 
   const Plant({
@@ -26,6 +27,7 @@ class Plant {
     this.createdAt,
     this.lastWateredAt,
     this.lastFertilizedAt,
+    this.lastRepottedAt,
     this.careHistoryMigrated = false,
   });
 
@@ -41,6 +43,7 @@ class Plant {
       createdAt: readTimestamp(data['createdAt']),
       lastWateredAt: readTimestamp(data['lastWateredAt']),
       lastFertilizedAt: readTimestamp(data['lastFertilizedAt']),
+      lastRepottedAt: readTimestamp(data['lastRepottedAt']),
       careHistoryMigrated: data['careHistoryMigrated'] as bool? ?? false,
     );
   }
@@ -69,6 +72,8 @@ class Plant {
         'lastWateredAt': Timestamp.fromDate(lastWateredAt!),
       if (lastFertilizedAt != null)
         'lastFertilizedAt': Timestamp.fromDate(lastFertilizedAt!),
+      if (lastRepottedAt != null)
+        'lastRepottedAt': Timestamp.fromDate(lastRepottedAt!),
       'careHistoryMigrated': careHistoryMigrated,
     };
   }

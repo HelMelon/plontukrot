@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
-import 'info_card.dart';
-import '../../../../services/watering_service.dart';
 import 'package:intl/intl.dart';
-import '../sheets/watering_history_sheet.dart';
+
+import '../../../../core/theme/app_colors.dart';
+import '../../../../models/repotting_entry.dart';
+import '../../../../models/stage_info.dart';
 import '../../../../services/fertilize_service.dart';
+import '../../../../services/repotting_service.dart';
+import '../../../../services/watering_service.dart';
 import '../plant_notes_section.dart';
 import '../sheets/fertilizing_history_sheet.dart';
-import '../../../../models/stage_info.dart';
+import '../sheets/repotting_history_sheet.dart';
+import '../sheets/watering_history_sheet.dart';
+import 'info_card.dart';
 
 class PlantInfoCard extends StatelessWidget {
   final Map<String, dynamic> data;
   final String plantId;
 
   const PlantInfoCard({super.key, required this.data, required this.plantId});
+
+  static Widget _icon(String asset) {
+    return Image.asset(
+      asset,
+      width: 32,
+      height: 32,
+      fit: BoxFit.contain,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final stage = stageInfos.firstWhere(
@@ -67,8 +81,9 @@ class PlantInfoCard extends StatelessWidget {
                   ),
                 )
               : const SizedBox.shrink(),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: StreamBuilder<Map<String, dynamic>?>(
@@ -76,54 +91,31 @@ class PlantInfoCard extends StatelessWidget {
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return InfoCard(
-                        icon: Image.asset(
-                          'assets/icons/watering.png',
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.contain,
-                        ),
-                        title: "Watering",
+                        icon: _icon('assets/icons/watering.png'),
+                        title: 'Watering',
                         value: 'Loading...',
                       );
                     }
 
-                    final data = snapshot.data;
+                    final watering = snapshot.data;
 
-                    if (data == null) {
+                    if (watering == null) {
                       return InfoCard(
-                        icon: Image.asset(
-                          'assets/icons/watering.png',
-                          width: 24,
-                          height: 24,
-                          fit: BoxFit.contain,
-                        ),
-                        title: "Watering",
-                        value: 'No watering yet',
+                        icon: _icon('assets/icons/watering.png'),
+                        title: 'Watering',
+                        value: 'No data',
                       );
                     }
 
-                    final last = data['wateredAt'] as DateTime?;
-                    final next = data['nextWatering'] as DateTime?;
-
-                    String formatDate(DateTime? date) {
-                      if (date == null) return '—';
-                      return DateFormat('d MMM y').format(date);
-                    }
-
-                    final value = '''
-Last: ${formatDate(last)}
-Next: ${formatDate(next)}
-''';
+                    final last = watering['wateredAt'] as DateTime?;
+                    final value = last == null
+                        ? 'No data'
+                        : DateFormat('d MMM y').format(last);
 
                     return InfoCard(
-                      icon: Image.asset(
-                        'assets/icons/watering.png',
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.contain,
-                      ),
-                      title: "Watering",
-                      value: value.trim(),
+                      icon: _icon('assets/icons/watering.png'),
+                      title: 'Watering',
+                      value: value,
                       onTap: () {
                         showModalBottomSheet(
                           context: context,
@@ -136,21 +128,16 @@ Next: ${formatDate(next)}
                   },
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 8),
               Expanded(
                 child: StreamBuilder<List<Map<String, dynamic>>>(
                   stream: FertilizeService().getFertilizingHistory(plantId),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return InfoCard(
-                        icon: Image.asset(
-                          'assets/icons/fertilize.png',
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.contain,
-                        ),
-                        title: "Fertilizing",
-                        value: "Loading...",
+                        icon: _icon('assets/icons/fertilize.png'),
+                        title: 'Fertilizing',
+                        value: 'Loading...',
                       );
                     }
 
@@ -158,30 +145,19 @@ Next: ${formatDate(next)}
 
                     if (items.isEmpty) {
                       return InfoCard(
-                        icon: Image.asset(
-                          'assets/icons/fertilize.png',
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.contain,
-                        ),
-                        title: "Fertilizing",
-                        value: "No data",
+                        icon: _icon('assets/icons/fertilize.png'),
+                        title: 'Fertilizing',
+                        value: 'No data',
                       );
                     }
 
                     final last = items.first;
-
-                    final value =
-                        "${last['fertilizerName']}\n${DateFormat('d MMM y').format(last['appliedAt'])}";
+                    final value = DateFormat('d MMM y')
+                        .format(last['appliedAt'] as DateTime);
 
                     return InfoCard(
-                      icon: Image.asset(
-                        'assets/icons/fertilize.png',
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.contain,
-                      ),
-                      title: "Fertilizing",
+                      icon: _icon('assets/icons/fertilize.png'),
+                      title: 'Fertilizing',
                       value: value,
                       onTap: () {
                         showModalBottomSheet(
@@ -189,6 +165,57 @@ Next: ${formatDate(next)}
                           isScrollControlled: true,
                           builder: (_) =>
                               FertilizingHistorySheet(plantId: plantId),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: StreamBuilder<RepottingEntry?>(
+                  stream: RepottingService().watchLastRepotting(plantId),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData &&
+                        snapshot.connectionState == ConnectionState.waiting) {
+                      return InfoCard(
+                        icon: _icon('assets/icons/potting.png'),
+                        title: 'Repotting',
+                        value: 'Loading...',
+                      );
+                    }
+
+                    final last = snapshot.data;
+
+                    if (last == null) {
+                      return InfoCard(
+                        icon: _icon('assets/icons/potting.png'),
+                        title: 'Repotting',
+                        value: 'No data',
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (_) =>
+                                RepottingHistorySheet(plantId: plantId),
+                          );
+                        },
+                      );
+                    }
+
+                    final value =
+                        DateFormat('d MMM y').format(last.repottedAt);
+
+                    return InfoCard(
+                      icon: _icon('assets/icons/potting.png'),
+                      title: 'Repotting',
+                      value: value,
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (_) =>
+                              RepottingHistorySheet(plantId: plantId),
                         );
                       },
                     );

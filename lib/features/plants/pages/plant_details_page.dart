@@ -11,6 +11,7 @@ import '../../../services/storage_service.dart';
 import '../widgets/sheets/update_plant_sheet.dart';
 import '../widgets/sheets/add_note_sheet.dart';
 import '../widgets/sheets/watering_history_sheet.dart';
+import '../widgets/sheets/add_repotting_sheet.dart';
 import '../widgets/cards/plant_image_card.dart';
 import '../widgets/cards/plant_info_card.dart';
 
@@ -336,6 +337,18 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                 icon: Icons.science_outlined,
                 label: 'Fertilize',
                 onTap: () => _showFertilizeSheet(widget.plantId),
+              ),
+              _TopAction(
+                icon: Icons.flaky,
+                label: 'Repot',
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (_) =>
+                        AddRepottingSheet(plantId: widget.plantId),
+                  );
+                },
               ),
               _TopAction(
                 icon: Icons.edit_rounded,
