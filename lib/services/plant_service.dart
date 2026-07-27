@@ -70,4 +70,40 @@ class PlantService {
       'family': family,
     });
   }
+
+  Future<void> updatePlantsFamily({
+    required Iterable<String> plantIds,
+    required String family,
+  }) async {
+    final batch = _firestore.batch();
+
+    for (final plantId in plantIds) {
+      batch.update(
+        _firestore
+            .collection('users')
+            .doc(uid)
+            .collection('plants')
+            .doc(plantId),
+        {'family': family},
+      );
+    }
+
+    await batch.commit();
+  }
+
+  Future<void> deletePlants(Iterable<String> plantIds) async {
+    final batch = _firestore.batch();
+
+    for (final plantId in plantIds) {
+      batch.delete(
+        _firestore
+            .collection('users')
+            .doc(uid)
+            .collection('plants')
+            .doc(plantId),
+      );
+    }
+
+    await batch.commit();
+  }
 }
