@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../models/plant.dart';
 import '../../pages/plant_details_page.dart';
 
 extension CapitalizeString on String {
@@ -16,19 +16,18 @@ extension CapitalizeString on String {
 }
 
 class PlantCard extends StatelessWidget {
-  final QueryDocumentSnapshot plant;
+  final Plant plant;
 
   const PlantCard({super.key, required this.plant});
 
   @override
   Widget build(BuildContext context) {
-    final data = plant.data() as Map<String, dynamic>;
-
-    final imageUrl = data['imageUrl'] as String?;
+    final imageUrl = plant.imageUrl;
     final hasImage = imageUrl != null && imageUrl.isNotEmpty;
 
-    final name = (data['name'] as String? ?? 'Unnamed Plant').toTitleCase();
-    final nickname = (data['nickname'] as String? ?? '').toTitleCase();
+    final name =
+        (plant.name.isEmpty ? 'Unnamed Plant' : plant.name).toTitleCase();
+    final nickname = plant.nickname.toTitleCase();
     final hasNickname = nickname.trim().isNotEmpty;
 
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -41,7 +40,7 @@ class PlantCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => PlantDetailsPage(plant: plant)),
+          MaterialPageRoute(builder: (_) => PlantDetailsPage(plantId: plant.id)),
         );
       },
       child: Container(

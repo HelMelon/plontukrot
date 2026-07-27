@@ -3,13 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../models/plant.dart';
 import '../../../services/auth_service.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
 import '../../../services/plant_service.dart';
 import '../../plants/widgets/cards/plant_card.dart';
 import '../../plants/widgets/plant_search_delegate.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends StatelessWidget {
   final User user;
@@ -151,7 +151,7 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                StreamBuilder(
+                StreamBuilder<List<Plant>>(
                   stream: PlantService().getPlants(),
                   builder: (context, plantSnapshot) {
                     if (plantSnapshot.connectionState ==
@@ -166,8 +166,7 @@ class HomePage extends StatelessWidget {
                       );
                     }
 
-                    if (!plantSnapshot.hasData ||
-                        plantSnapshot.data!.docs.isEmpty) {
+                    if (!plantSnapshot.hasData || plantSnapshot.data!.isEmpty) {
                       return Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(34),
@@ -196,7 +195,7 @@ class HomePage extends StatelessWidget {
                       );
                     }
 
-                    final plants = plantSnapshot.data!.docs;
+                    final plants = plantSnapshot.data!;
 
                     return LayoutBuilder(
                       builder: (context, constraints) {

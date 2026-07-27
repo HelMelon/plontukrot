@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../../models/plant.dart';
 import '../widgets/cards/plant_card.dart';
 import '../../../services/plant_service.dart';
 
@@ -9,20 +11,18 @@ class PlantsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
+    return StreamBuilder<List<Plant>>(
       stream: PlantService().getPlants(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const CircularProgressIndicator();
         }
 
-        final plants = snapshot.data!.docs;
+        final plants = snapshot.data!;
 
-        final filtered = plants.where((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-
-          final name = (data['name'] ?? '').toString().toLowerCase();
-          final nick = (data['nickname'] ?? '').toString().toLowerCase();
+        final filtered = plants.where((plant) {
+          final name = plant.name.toLowerCase();
+          final nick = plant.nickname.toLowerCase();
 
           if (searchQuery.isEmpty) return true;
 

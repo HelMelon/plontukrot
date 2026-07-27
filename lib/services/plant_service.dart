@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../models/plant.dart';
+
 class PlantService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -23,13 +25,14 @@ class PlantService {
     });
   }
 
-  Stream<QuerySnapshot> getPlants() {
+  Stream<List<Plant>> getPlants() {
     return _firestore
         .collection('users')
         .doc(uid)
         .collection('plants')
         .orderBy('createdAt', descending: true)
-        .snapshots();
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map(Plant.fromFirestore).toList());
   }
 
   Future<void> updatePlantImage({
@@ -44,13 +47,14 @@ class PlantService {
         .update({'imageUrl': imageUrl});
   }
 
-  Future<void> updatePlant(
-      {required String plantId,
-      required String name,
-      required String nickname,
-      required String family,
-      int? wateringFrequency,
-      required int stage}) async {
+  Future<void> updatePlant({
+    required String plantId,
+    required String name,
+    required String nickname,
+    required String family,
+    int? wateringFrequency,
+    required int stage,
+  }) async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
     await FirebaseFirestore.instance
@@ -63,7 +67,7 @@ class PlantService {
       'nickname': nickname,
       'wateringFrequency': wateringFrequency,
       'stage': stage,
-      'family': family
+      'family': family,
     });
   }
 }

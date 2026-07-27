@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'cards/stage_info_card.dart';
+import '../../../models/stage_info.dart';
 
 class PlantStageSelector extends StatelessWidget {
   final int selectedStage;

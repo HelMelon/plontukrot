@@ -15,9 +15,9 @@ import '../widgets/cards/plant_image_card.dart';
 import '../widgets/cards/plant_info_card.dart';
 
 class PlantDetailsPage extends StatefulWidget {
-  final QueryDocumentSnapshot plant;
+  final String plantId;
 
-  const PlantDetailsPage({super.key, required this.plant});
+  const PlantDetailsPage({super.key, required this.plantId});
 
   @override
   State<PlantDetailsPage> createState() => _PlantDetailsPageState();
@@ -75,11 +75,11 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
 
       final imageUrl = await StorageService().uploadPlantImageWeb(
         imageBytes: imageBytes,
-        plantId: widget.plant.id,
+        plantId: widget.plantId,
       );
 
       await PlantService().updatePlantImage(
-        plantId: widget.plant.id,
+        plantId: widget.plantId,
         imageUrl: imageUrl,
       );
     } catch (e) {
@@ -289,7 +289,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
           .collection('users')
           .doc(uid)
           .collection('plants')
-          .doc(widget.plant.id)
+          .doc(widget.plantId)
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
@@ -328,14 +328,14 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
                     builder: (_) =>
-                        WateringHistorySheet(plantId: widget.plant.id),
+                        WateringHistorySheet(plantId: widget.plantId),
                   );
                 },
               ),
               _TopAction(
                 icon: Icons.science_outlined,
                 label: 'Fertilize',
-                onTap: () => _showFertilizeSheet(widget.plant.id),
+                onTap: () => _showFertilizeSheet(widget.plantId),
               ),
               _TopAction(
                 icon: Icons.edit_rounded,
@@ -346,7 +346,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
                     builder: (_) =>
-                        UpdatePlantSheet(plantId: widget.plant.id, plant: data),
+                        UpdatePlantSheet(plantId: widget.plantId, plant: data),
                   );
                 },
               ),
@@ -358,7 +358,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                     context: context,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
-                    builder: (_) => AddNoteSheet(plantId: widget.plant.id),
+                    builder: (_) => AddNoteSheet(plantId: widget.plantId),
                   );
                 },
               ),
@@ -395,7 +395,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                                 flex: 5,
                                 child: PlantInfoCard(
                                   data: data,
-                                  plantId: widget.plant.id,
+                                  plantId: widget.plantId,
                                 ),
                               ),
                             ],
@@ -413,7 +413,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                               const SizedBox(height: 24),
                               PlantInfoCard(
                                 data: data,
-                                plantId: widget.plant.id,
+                                plantId: widget.plantId,
                               ),
                             ],
                           ),

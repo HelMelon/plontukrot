@@ -7,7 +7,7 @@ import '../sheets/watering_history_sheet.dart';
 import '../../../../services/fertilize_service.dart';
 import '../plant_notes_section.dart';
 import '../sheets/fertilizing_history_sheet.dart';
-import '../cards/stage_info_card.dart';
+import '../../../../models/stage_info.dart';
 
 class PlantInfoCard extends StatelessWidget {
   final Map<String, dynamic> data;

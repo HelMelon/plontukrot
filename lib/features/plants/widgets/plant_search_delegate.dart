@@ -1,6 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
 import '../../../core/theme/app_colors.dart';
+import '../../../models/plant.dart';
 import '../../../services/plant_service.dart';
 import '../pages/plant_details_page.dart';
 
@@ -85,7 +86,7 @@ class PlantSearchDelegate extends SearchDelegate {
   Widget _buildSearchWithStream() {
     final cleanQuery = query.trim().toLowerCase();
 
-    return StreamBuilder<QuerySnapshot>(
+    return StreamBuilder<List<Plant>>(
       stream: PlantService().getPlants(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -96,7 +97,7 @@ class PlantSearchDelegate extends SearchDelegate {
           );
         }
 
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return const ContainerWithBackground(
             child: Center(
               child: Text(
@@ -107,14 +108,9 @@ class PlantSearchDelegate extends SearchDelegate {
           );
         }
 
-        final filtered = snapshot.data!.docs.where((doc) {
-          final data = doc.data() as Map<String, dynamic>?;
-          if (data == null) return false;
-
-          final String name =
-              (data['name'] ?? '').toString().trim().toLowerCase();
-          final String nickname =
-              (data['nickname'] ?? '').toString().trim().toLowerCase();
+        final filtered = snapshot.data!.where((plant) {
+          final name = plant.name.trim().toLowerCase();
+          final nickname = plant.nickname.trim().toLowerCase();
 
           if (cleanQuery.isEmpty) return true;
 
@@ -136,8 +132,7 @@ class PlantSearchDelegate extends SearchDelegate {
           child: ListView.builder(
             itemCount: filtered.length,
             itemBuilder: (context, index) {
-              final plantDoc = filtered[index];
-              final data = plantDoc.data() as Map<String, dynamic>;
+              final plant = filtered[index];
 
               String capitalizeWords(String text) {
                 if (text.isEmpty) return '';
@@ -152,10 +147,10 @@ class PlantSearchDelegate extends SearchDelegate {
               }
 
               final String nickname = capitalizeWords(
-                (data['nickname'] ?? '').toString().trim(),
+                plant.nickname.trim(),
               );
               final String name = capitalizeWords(
-                (data['name'] ?? '').toString().trim(),
+                plant.name.trim(),
               );
 
               final String titleText;
@@ -199,7 +194,7 @@ class PlantSearchDelegate extends SearchDelegate {
                         borderRadius: BorderRadius.circular(20),
                         child: () {
                           final String? imageUrl =
-                              data['imageUrl']?.toString().trim();
+                              plant.imageUrl?.trim();
 
                           if (imageUrl != null && imageUrl.isNotEmpty) {
                             return Image.network(
@@ -272,7 +267,7 @@ class PlantSearchDelegate extends SearchDelegate {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              PlantDetailsPage(plant: plantDoc),
+                              PlantDetailsPage(plantId: plant.id),
                         ),
                       );
                     },
