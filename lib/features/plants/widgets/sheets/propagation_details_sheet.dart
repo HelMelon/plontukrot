@@ -61,6 +61,56 @@ class PropagationDetailsSheet extends StatelessWidget {
     );
   }
 
+  Future<void> _confirmDeleteStage(
+    BuildContext context,
+    Propagation current,
+    PropagationStageEntry entry,
+  ) async {
+    final entryId = entry.id;
+    if (entryId == null) return;
+
+    final isStart = entry.stage <= 1;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.backgroundSecondary,
+          title: Text(
+            isStart ? 'Удалить партию?' : 'Удалить стадию?',
+          ),
+          content: Text(
+            isStart
+                ? 'Удаление стадии «Старт» удалит всю партию размножения и все остальные стадии.'
+                : 'Будет удалена только эта запись стадии. Остальные останутся.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Отмена'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Удалить'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    await PropagationService().deleteStageEntry(
+      propagationId: current.id,
+      entryId: entryId,
+      stage: entry.stage,
+    );
+
+    if (!context.mounted) return;
+    if (isStart) {
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final service = PropagationService();
@@ -76,9 +126,17 @@ class PropagationDetailsSheet extends StatelessWidget {
       child: StreamBuilder<Propagation?>(
         stream: service.watchPropagation(propagation.id),
         builder: (context, snapshot) {
-          final current = snapshot.data ?? propagation;
-          final stage = _stageInfo(current.stage);
-          final isActive = current.isActive;
+          final current = snapshot.data;
+          if (snapshot.hasData && current == null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (context.mounted) Navigator.pop(context);
+            });
+            return const SizedBox(height: 120);
+          }
+
+          final shown = current ?? propagation;
+          final stage = _stageInfo(shown.stage);
+          final isActive = shown.isActive;
 
           return Padding(
             padding: const EdgeInsets.fromLTRB(22, 22, 22, 24),
@@ -97,7 +155,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  current.parentPlantName,
+                  shown.parentPlantName,
                   style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
@@ -107,8 +165,8 @@ class PropagationDetailsSheet extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   isActive
-                      ? '${current.quantityAlive} ${current.method.pluralLabel} · ${current.method.label}'
-                      : '${current.method.label} · ${current.status.label}',
+                      ? '${shown.quantityAlive} ${shown.method.pluralLabel} · ${shown.method.label}'
+                      : '${shown.method.label} · ${shown.status.label}',
                   style: const TextStyle(
                     fontSize: 16,
                     color: AppColors.textSecondary,
@@ -117,22 +175,22 @@ class PropagationDetailsSheet extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   isActive
-                      ? '${stage.title} · ${_daysLabel(current.daysSinceStart)} · с ${DateFormat('d MMM y').format(current.startedAt)}'
-                      : '${stage.title} · с ${DateFormat('d MMM y').format(current.startedAt)}',
+                      ? '${stage.title} · ${_daysLabel(shown.daysSinceStart)} · с ${DateFormat('d MMM y').format(shown.startedAt)}'
+                      : '${stage.title} · с ${DateFormat('d MMM y').format(shown.startedAt)}',
                   style: const TextStyle(
                     fontSize: 15,
                     color: AppColors.accentLight,
                   ),
                 ),
-                if (current.soldQuantity > 0 || current.lostQuantity > 0) ...[
+                if (shown.soldQuantity > 0 || shown.lostQuantity > 0) ...[
                   const SizedBox(height: 4),
                   Text(
                     [
-                      if (current.soldQuantity > 0)
-                        'Продано: ${current.soldQuantity}',
-                      if (current.lostQuantity > 0)
-                        'Погибло: ${current.lostQuantity}',
-                      'из ${current.quantity}',
+                      if (shown.soldQuantity > 0)
+                        'Продано: ${shown.soldQuantity}',
+                      if (shown.lostQuantity > 0)
+                        'Погибло: ${shown.lostQuantity}',
+                      'из ${shown.quantity}',
                     ].join(' · '),
                     style: const TextStyle(
                       fontSize: 14,
@@ -152,7 +210,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                 const SizedBox(height: 12),
                 Expanded(
                   child: StreamBuilder<List<PropagationStageEntry>>(
-                    stream: service.watchStageHistory(current.id),
+                    stream: service.watchStageHistory(shown.id),
                     builder: (context, historySnapshot) {
                       if (!historySnapshot.hasData) {
                         return const Center(
@@ -205,6 +263,19 @@ class PropagationDetailsSheet extends StatelessWidget {
                                         fontSize: 13,
                                       ),
                                     ),
+                                    IconButton(
+                                      tooltip: 'Удалить',
+                                      visualDensity: VisualDensity.compact,
+                                      onPressed: () => _confirmDeleteStage(
+                                        context,
+                                        shown,
+                                        entry,
+                                      ),
+                                      icon: const Icon(
+                                        Icons.delete_outline,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 if (entry.quantityAlive != null) ...[
@@ -242,7 +313,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: () => _openChangeStage(context, current),
+                      onPressed: () => _openChangeStage(context, shown),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.goldAccent,
                         foregroundColor: AppColors.dark1,
@@ -265,7 +336,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                          onPressed: () => _openSell(context, current),
+                          onPressed: () => _openSell(context, shown),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.goldAccent,
                             side: const BorderSide(color: AppColors.goldAccent),
@@ -280,7 +351,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                       const SizedBox(width: 10),
                       Expanded(
                         child: OutlinedButton(
-                          onPressed: () => _openLose(context, current),
+                          onPressed: () => _openLose(context, shown),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.textSecondary,
                             side: const BorderSide(color: AppColors.greenDeep),

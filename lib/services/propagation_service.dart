@@ -319,4 +319,37 @@ class PropagationService {
     batch.delete(_propagationsRef.doc(propagationId));
     await batch.commit();
   }
+
+  /// Deletes a stage-history entry.
+  /// Start (stage 1) removes the whole propagation batch.
+  /// Later stages remove only that entry and sync current stage.
+  Future<void> deleteStageEntry({
+    required String propagationId,
+    required String entryId,
+    required int stage,
+  }) async {
+    if (stage <= 1) {
+      await deletePropagation(propagationId);
+      return;
+    }
+
+    final historyRef = _stageHistoryRef(propagationId);
+    await historyRef.doc(entryId).delete();
+
+    final remaining = await historyRef.orderBy('changedAt', descending: true).get();
+    if (remaining.docs.isEmpty) {
+      await deletePropagation(propagationId);
+      return;
+    }
+
+    final latest = PropagationStageEntry.fromFirestore(remaining.docs.first);
+    final updates = <String, dynamic>{
+      'stage': latest.stage,
+    };
+    if (latest.quantityAlive != null) {
+      updates['quantityAlive'] = latest.quantityAlive;
+    }
+
+    await _propagationsRef.doc(propagationId).update(updates);
+  }
 }
