@@ -59,8 +59,10 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 42),
                 const Text(
-                  'Дневник растений',
+                  'SKÖRD',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
+                    fontFamily: 'NordicStyle',
                     fontSize: 38,
                     fontWeight: FontWeight.bold,
                     letterSpacing: -1,
@@ -69,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  'Следите за растениями,\nполивом и ростом',
+                  'Журнал борьбы за свет и влагу. Всходы — не гарантия. Только наблюдение.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
@@ -108,16 +110,6 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(18),
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 28),
-                Text(
-                  'Данные надёжно хранятся в Firebase',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 13,
-                    letterSpacing: 0.3,
-                    color: AppColors.warmGray,
                   ),
                 ),
               ],

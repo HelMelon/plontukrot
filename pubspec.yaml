@@ -46,6 +46,8 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/splash-screen/
+    - assets/images/wizard-image/
     - assets/icons/
 
 flutter_launcher_icons:
