@@ -52,6 +52,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
   late List<SoilComponent> _components;
   bool _saveMix = false;
   bool _saving = false;
+  bool _slowReleaseFertilizer = false;
   List<String> _catalogNames = const [];
 
   @override
@@ -63,6 +64,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
     if (entry != null) {
       _selectedDate = entry.repottedAt;
       _components = List.from(entry.components);
+      _slowReleaseFertilizer = entry.slowReleaseFertilizer;
       if (entry.soilId != null) {
         _mode = _SoilMode.saved;
         _selectedSoilId = entry.soilId;
@@ -74,6 +76,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
       _selectedDate = DateTime.now();
       _mode = _SoilMode.newMix;
       _components = [];
+      _slowReleaseFertilizer = false;
     }
   }
 
@@ -227,6 +230,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
           components: components,
           soilId: soilId,
           soilName: soilName,
+          slowReleaseFertilizer: _slowReleaseFertilizer,
         );
       } else {
         await _repottingService.addRepotting(
@@ -235,6 +239,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
           components: components,
           soilId: soilId,
           soilName: soilName,
+          slowReleaseFertilizer: _slowReleaseFertilizer,
         );
       }
 
@@ -451,6 +456,20 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                     onChanged: (_) => setState(() {}),
                   ),
               ],
+              const SizedBox(height: 12),
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                value: _slowReleaseFertilizer,
+                onChanged: (value) {
+                  setState(() => _slowReleaseFertilizer = value ?? false);
+                },
+                title: const Text('Пролонгированное удобрение в грунт'),
+                subtitle: const Text(
+                  'Вносилось ли при пересадке',
+                  style: TextStyle(fontSize: 12),
+                ),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
               const SizedBox(height: 20),
               FilledButton(
                 onPressed: _canSave ? _save : null,

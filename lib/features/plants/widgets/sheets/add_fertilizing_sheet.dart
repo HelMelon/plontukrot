@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/prompt_text_dialog.dart';
 import '../../../../models/fertilizer.dart';
+import '../../../../models/fertilizer_application_method.dart';
 import '../../../../models/fertilizer_dose.dart';
 import '../../../../models/fertilizer_ingredient.dart';
 import '../../../../models/fertilizing_entry.dart';
@@ -11,6 +12,7 @@ import '../../../../services/fertilize_service.dart';
 import '../tags/fertilizer_component_tags.dart';
 import '../dialogs/fertilizer_composition_dialog.dart';
 import 'manage_fertilizer_ingredients_sheet.dart';
+import 'manage_fertilizers_sheet.dart';
 
 enum _FertilizerMode { saved, newMix }
 
@@ -61,6 +63,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
   String? _selectedFertilizerId;
   late List<FertilizerDose> _components;
   late int _waterMl;
+  late FertilizerApplicationMethod _applicationMethod;
   bool _saveMix = false;
   bool _saving = false;
   List<String> _catalogNames = const [];
@@ -73,6 +76,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
       _selectedDate = entry.appliedAt;
       _components = List.from(entry.components);
       _waterMl = entry.waterMl;
+      _applicationMethod = entry.applicationMethod;
       if (entry.fertilizerId != null) {
         _mode = _FertilizerMode.saved;
         _selectedFertilizerId = entry.fertilizerId;
@@ -85,6 +89,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
       _mode = _FertilizerMode.saved;
       _components = [];
       _waterMl = 250;
+      _applicationMethod = FertilizerApplicationMethod.root;
     }
   }
 
@@ -168,6 +173,23 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
             _components =
                 _components.where((c) => c.component != name).toList();
           });
+        },
+      ),
+    );
+  }
+
+  Future<void> _openManageFertilizers() async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => ManageFertilizersSheet(
+        onDeleted: (fertilizerId) {
+          if (_selectedFertilizerId == fertilizerId) {
+            setState(() {
+              _selectedFertilizerId = null;
+              _components = [];
+            });
+          }
         },
       ),
     );
@@ -279,6 +301,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
         final name = _mixNameController.text.trim();
         fertilizerId = await _service.addFertilizer(
           name: name,
+          kind: FertilizerKind.mix,
           waterMl: _waterMl,
           components: _components,
         );
@@ -295,6 +318,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
           appliedAt: _selectedDate,
           components: components,
           waterMl: waterMl,
+          applicationMethod: _applicationMethod,
           fertilizerId: fertilizerId,
           fertilizerName: fertilizerName,
         );
@@ -306,6 +330,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
               appliedAt: _selectedDate,
               components: components,
               waterMl: waterMl,
+              applicationMethod: _applicationMethod,
               fertilizerId: fertilizerId,
               fertilizerName: fertilizerName,
             ),
@@ -364,6 +389,28 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                 ),
               ),
               const SizedBox(height: 16),
+              const Text(
+                'Способ внесения',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 8),
+              SegmentedButton<FertilizerApplicationMethod>(
+                segments: const [
+                  ButtonSegment(
+                    value: FertilizerApplicationMethod.root,
+                    label: Text('Корневое'),
+                  ),
+                  ButtonSegment(
+                    value: FertilizerApplicationMethod.foliar,
+                    label: Text('Внекорневое'),
+                  ),
+                ],
+                selected: {_applicationMethod},
+                onSelectionChanged: (value) {
+                  setState(() => _applicationMethod = value.first);
+                },
+              ),
+              const SizedBox(height: 16),
               SegmentedButton<_FertilizerMode>(
                 segments: const [
                   ButtonSegment(
@@ -400,83 +447,103 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                       return const Center(child: CircularProgressIndicator());
                     }
 
-                    if (fertilizers.isEmpty) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'No saved fertilizers yet. Create a new mix.',
-                            style: TextStyle(color: AppColors.textSecondary),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              setState(() => _mode = _FertilizerMode.newMix);
-                            },
-                            child: const Text('Switch to New mix'),
-                          ),
-                        ],
-                      );
-                    }
-
                     return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            Expanded(
-                              child: DropdownButton<String>(
-                                value: fertilizers.any(
-                                  (f) => f.id == _selectedFertilizerId,
-                                )
-                                    ? _selectedFertilizerId
-                                    : null,
-                                hint: Text(
-                                  _selectedFertilizerId != null &&
-                                          widget.entry != null
-                                      ? widget.entry!.fertilizerName
-                                      : 'Select fertilizer',
-                                ),
-                                isExpanded: true,
-                                items: fertilizers
-                                    .map(
-                                      (f) => DropdownMenuItem(
-                                        value: f.id,
-                                        child: Text(
-                                          '${f.name} · ${f.waterMl}ml',
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
-                                onChanged: (value) {
-                                  if (value == null) return;
-                                  final fertilizer = fertilizers
-                                      .firstWhere((f) => f.id == value);
-                                  _applySavedFertilizer(fertilizer);
-                                },
-                              ),
+                            const Text(
+                              'Catalog',
+                              style: TextStyle(fontWeight: FontWeight.w600),
                             ),
-                            IconButton(
-                              tooltip: 'View composition',
-                              onPressed: _selectedFertilizerId == null &&
-                                      _components.isEmpty
-                                  ? null
-                                  : () =>
-                                      _showSelectedComposition(fertilizers),
-                              icon: const Icon(Icons.info_outline),
+                            const Spacer(),
+                            TextButton.icon(
+                              onPressed: _openManageFertilizers,
+                              icon: const Icon(Icons.edit_outlined, size: 18),
+                              label: const Text('Manage'),
                             ),
                           ],
                         ),
-                        if (_selectedFertilizerId != null ||
-                            _components.isNotEmpty) ...[
-                          const SizedBox(height: 12),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Mix water volume: ${_waterMl}ml',
-                              style: const TextStyle(
-                                color: AppColors.textSecondary,
+                        if (fertilizers.isEmpty)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Пока нет удобрений. Добавьте готовое или сохраните микс.',
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  setState(
+                                    () => _mode = _FertilizerMode.newMix,
+                                  );
+                                },
+                                child: const Text('Switch to New mix'),
+                              ),
+                            ],
+                          )
+                        else ...[
+                          Row(
+                            children: [
+                              Expanded(
+                                child: DropdownButton<String>(
+                                  value: fertilizers.any(
+                                    (f) => f.id == _selectedFertilizerId,
+                                  )
+                                      ? _selectedFertilizerId
+                                      : null,
+                                  hint: Text(
+                                    _selectedFertilizerId != null &&
+                                            widget.entry != null
+                                        ? widget.entry!.fertilizerName
+                                        : 'Select fertilizer',
+                                  ),
+                                  isExpanded: true,
+                                  items: fertilizers
+                                      .map(
+                                        (f) => DropdownMenuItem(
+                                          value: f.id,
+                                          child: Text(
+                                            '${f.name} · ${f.kind.label} · ${f.waterMl}ml',
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                  onChanged: (value) {
+                                    if (value == null) return;
+                                    final fertilizer = fertilizers
+                                        .firstWhere((f) => f.id == value);
+                                    _applySavedFertilizer(fertilizer);
+                                  },
+                                ),
+                              ),
+                              IconButton(
+                                tooltip: 'View composition',
+                                onPressed: _selectedFertilizerId == null &&
+                                        _components.isEmpty
+                                    ? null
+                                    : () =>
+                                        _showSelectedComposition(fertilizers),
+                                icon: const Icon(Icons.info_outline),
+                              ),
+                            ],
+                          ),
+                          if (_selectedFertilizerId != null ||
+                              _components.isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Mix water volume: ${_waterMl}ml',
+                                style: const TextStyle(
+                                  color: AppColors.textSecondary,
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ],
                       ],
                     );

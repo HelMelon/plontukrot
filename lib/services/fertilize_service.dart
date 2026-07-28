@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/fertilizer.dart';
+import '../models/fertilizer_application_method.dart';
 import '../models/fertilizer_dose.dart';
 import '../models/fertilizer_ingredient.dart';
 import '../models/fertilizing_entry.dart';
@@ -61,13 +62,13 @@ class FertilizeService {
 
   Future<String> addFertilizer({
     required String name,
-    String type = '',
+    FertilizerKind kind = FertilizerKind.mix,
     int waterMl = 250,
     List<FertilizerDose> components = const [],
   }) async {
     final doc = await _fertilizersRef.add({
       'name': name.trim(),
-      'type': type.trim(),
+      'kind': kind.code,
       'waterMl': normalizeWaterMl(waterMl),
       'components': components.map((e) => e.toMap()).toList(),
       'createdAt': FieldValue.serverTimestamp(),
@@ -79,15 +80,16 @@ class FertilizeService {
   Future<void> updateFertilizer({
     required String fertilizerId,
     required String name,
-    String type = '',
+    required FertilizerKind kind,
     required int waterMl,
     required List<FertilizerDose> components,
   }) async {
     await _fertilizersRef.doc(fertilizerId).update({
       'name': name.trim(),
-      'type': type.trim(),
+      'kind': kind.code,
       'waterMl': normalizeWaterMl(waterMl),
       'components': components.map((e) => e.toMap()).toList(),
+      'type': FieldValue.delete(),
     });
   }
 
@@ -132,6 +134,7 @@ class FertilizeService {
     required DateTime appliedAt,
     required List<FertilizerDose> components,
     required int waterMl,
+    required FertilizerApplicationMethod applicationMethod,
     String? fertilizerId,
     String? fertilizerName,
     DateTime? nextFertilizing,
@@ -146,6 +149,7 @@ class FertilizeService {
       'waterMl': normalizeWaterMl(waterMl),
       'components': components.map((e) => e.toMap()).toList(),
       'appliedAt': Timestamp.fromDate(appliedAt),
+      'applicationMethod': applicationMethod.code,
       'nextFertilizing':
           nextFertilizing != null ? Timestamp.fromDate(nextFertilizing) : null,
       'createdAt': FieldValue.serverTimestamp(),
@@ -171,6 +175,7 @@ class FertilizeService {
     required DateTime appliedAt,
     required List<FertilizerDose> components,
     required int waterMl,
+    required FertilizerApplicationMethod applicationMethod,
     String? fertilizerId,
     String? fertilizerName,
     DateTime? nextFertilizing,
@@ -181,6 +186,7 @@ class FertilizeService {
       'waterMl': normalizeWaterMl(waterMl),
       'components': components.map((e) => e.toMap()).toList(),
       'appliedAt': Timestamp.fromDate(appliedAt),
+      'applicationMethod': applicationMethod.code,
       'nextFertilizing':
           nextFertilizing != null ? Timestamp.fromDate(nextFertilizing) : null,
     });

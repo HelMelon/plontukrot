@@ -1,3 +1,4 @@
+import 'fertilizer_application_method.dart';
 import 'fertilizer_dose.dart';
 import 'firestore_helpers.dart';
 
@@ -9,6 +10,7 @@ class FertilizingEntry {
   final DateTime? nextFertilizing;
   final int waterMl;
   final List<FertilizerDose> components;
+  final FertilizerApplicationMethod applicationMethod;
 
   const FertilizingEntry({
     required this.id,
@@ -18,6 +20,7 @@ class FertilizingEntry {
     this.nextFertilizing,
     this.waterMl = 250,
     this.components = const [],
+    this.applicationMethod = FertilizerApplicationMethod.root,
   });
 
   factory FertilizingEntry.fromMap(String id, Map<String, dynamic> data) {
@@ -37,6 +40,9 @@ class FertilizingEntry {
               .map((item) => FertilizerDose.fromMap(item as Map<String, dynamic>))
               .toList()
           : const [],
+      applicationMethod: FertilizerApplicationMethod.fromCode(
+        data['applicationMethod'] as String?,
+      ),
     );
   }
 
@@ -59,6 +65,9 @@ class FertilizingEntry {
               .map((item) => FertilizerDose.fromMap(item as Map<String, dynamic>))
               .toList()
           : const [],
+      applicationMethod: FertilizerApplicationMethod.fromCode(
+        data['applicationMethod'] as String?,
+      ),
     );
   }
 }

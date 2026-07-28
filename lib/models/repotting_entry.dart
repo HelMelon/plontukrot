@@ -9,6 +9,7 @@ class RepottingEntry {
   final String? soilId;
   final String? soilName;
   final List<SoilComponent> components;
+  final bool slowReleaseFertilizer;
 
   const RepottingEntry({
     this.id,
@@ -16,6 +17,7 @@ class RepottingEntry {
     this.soilId,
     this.soilName,
     this.components = const [],
+    this.slowReleaseFertilizer = false,
   });
 
   factory RepottingEntry.fromMap(String? id, Map<String, dynamic> data) {
@@ -31,6 +33,7 @@ class RepottingEntry {
               .map((item) => SoilComponent.fromMap(item as Map<String, dynamic>))
               .toList()
           : const [],
+      slowReleaseFertilizer: data['slowReleaseFertilizer'] as bool? ?? false,
     );
   }
 
@@ -47,6 +50,7 @@ class RepottingEntry {
       if (soilId != null) 'soilId': soilId,
       if (soilName != null) 'soilName': soilName,
       'components': components.map((e) => e.toMap()).toList(),
+      'slowReleaseFertilizer': slowReleaseFertilizer,
     };
   }
 }

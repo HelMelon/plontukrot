@@ -160,8 +160,7 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    DateFormat('d MMMM y')
-                                        .format(item.appliedAt),
+                                    '${item.applicationMethod.label} · ${DateFormat('d MMMM y').format(item.appliedAt)}',
                                   ),
                                 ],
                               ),

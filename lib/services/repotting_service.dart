@@ -37,6 +37,7 @@ class RepottingService {
     required List<SoilComponent> components,
     String? soilId,
     String? soilName,
+    bool slowReleaseFertilizer = false,
   }) async {
     final plantDoc = await _plantsCollection.doc(plantId).get();
     final plantData = plantDoc.data();
@@ -48,6 +49,7 @@ class RepottingService {
       if (soilId != null) 'soilId': soilId,
       if (soilName != null) 'soilName': soilName,
       'components': components.map((e) => e.toMap()).toList(),
+      'slowReleaseFertilizer': slowReleaseFertilizer,
     });
 
     if (lastRepottedAt == null || repottedAt.isAfter(lastRepottedAt.toDate())) {
@@ -94,12 +96,14 @@ class RepottingService {
     required List<SoilComponent> components,
     String? soilId,
     String? soilName,
+    bool slowReleaseFertilizer = false,
   }) async {
     await _repottingRef(plantId).doc(repottingId).update({
       'repottedAt': Timestamp.fromDate(repottedAt),
       'soilId': soilId ?? FieldValue.delete(),
       'soilName': soilName ?? FieldValue.delete(),
       'components': components.map((e) => e.toMap()).toList(),
+      'slowReleaseFertilizer': slowReleaseFertilizer,
     });
 
     await _syncLastRepottedAt(plantId);

@@ -172,6 +172,18 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                                           .onSurfaceVariant,
                                     ),
                                   ),
+                                  if (item.slowReleaseFertilizer) ...[
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Пролонгированное удобрение',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),
