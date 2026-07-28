@@ -115,6 +115,44 @@ class WateringService {
     };
   }
 
+  DateTime _startOfDay(DateTime date) =>
+      DateTime(date.year, date.month, date.day);
+
+  Future<bool> hasWateringOnDay({
+    required String plantId,
+    required DateTime day,
+  }) async {
+    final start = _startOfDay(day);
+    final end = start.add(const Duration(days: 1));
+
+    final snapshot = await _wateringRef(plantId)
+        .where('wateredAt', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+        .where('wateredAt', isLessThan: Timestamp.fromDate(end))
+        .limit(1)
+        .get();
+
+    return snapshot.docs.isNotEmpty;
+  }
+
+  /// After fertilizing on [fertilizedAt], add watering on the same day unless
+  /// the plant was already watered the day before (or already on that day).
+  Future<void> addWateringIfMissingBeforeFertilizing({
+    required String plantId,
+    required DateTime fertilizedAt,
+  }) async {
+    final fertDay = _startOfDay(fertilizedAt);
+    final dayBefore = fertDay.subtract(const Duration(days: 1));
+
+    if (await hasWateringOnDay(plantId: plantId, day: dayBefore)) {
+      return;
+    }
+    if (await hasWateringOnDay(plantId: plantId, day: fertDay)) {
+      return;
+    }
+
+    await addWatering(plantId: plantId, wateredAt: fertDay);
+  }
+
   Future<void> deleteWatering({
     required String plantId,
     required String wateringId,

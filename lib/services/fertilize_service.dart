@@ -5,6 +5,7 @@ import '../models/fertilizer.dart';
 import '../models/fertilizer_dose.dart';
 import '../models/fertilizer_ingredient.dart';
 import '../models/fertilizing_entry.dart';
+import 'watering_service.dart';
 
 class FertilizeService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -157,6 +158,11 @@ class FertilizeService {
         'careHistoryMigrated': true,
       });
     }
+
+    await WateringService().addWateringIfMissingBeforeFertilizing(
+      plantId: plantId,
+      fertilizedAt: appliedAt,
+    );
   }
 
   Future<void> updateFertilizing({

@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -19,6 +18,7 @@ extension CapitalizeString on String {
 class PlantCard extends StatelessWidget {
   final Plant plant;
   final bool isSelected;
+  final bool preferNameAsTitle;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
@@ -26,9 +26,13 @@ class PlantCard extends StatelessWidget {
     super.key,
     required this.plant,
     this.isSelected = false,
+    this.preferNameAsTitle = false,
     this.onTap,
     this.onLongPress,
   });
+
+  static const double _mainFontSize = 15;
+  static const double _subFontSize = 13;
 
   @override
   Widget build(BuildContext context) {
@@ -39,12 +43,11 @@ class PlantCard extends StatelessWidget {
         (plant.name.isEmpty ? 'Unnamed Plant' : plant.name).toTitleCase();
     final nickname = plant.nickname.toTitleCase();
     final hasNickname = nickname.trim().isNotEmpty;
-
-    final double screenWidth = MediaQuery.of(context).size.width;
-
-    final double mainFontSize = (screenWidth * 0.06).clamp(22.0, 32.0);
-
-    final double subFontSize = (screenWidth * 0.05).clamp(20.0, 26.0);
+    final showNameOnTop = preferNameAsTitle || !hasNickname;
+    final title = showNameOnTop ? name : nickname;
+    final subtitle = showNameOnTop
+        ? (hasNickname ? nickname : null)
+        : name;
 
     return GestureDetector(
       onTap: onTap ??
@@ -108,28 +111,26 @@ class PlantCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          AutoSizeText(
-                            hasNickname ? nickname : name,
-                            maxLines: 1,
+                          Text(
+                            title,
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            minFontSize: 16,
-                            style: TextStyle(
-                              fontSize: mainFontSize,
+                            style: const TextStyle(
+                              fontSize: _mainFontSize,
                               fontWeight: FontWeight.bold,
                               letterSpacing: -0.3,
                               color: AppColors.goldAccent,
                               height: 1.2,
                             ),
                           ),
-                          if (hasNickname) ...[
+                          if (subtitle != null) ...[
                             const SizedBox(height: 4),
-                            AutoSizeText(
-                              name,
-                              maxLines: 1,
+                            Text(
+                              subtitle,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              minFontSize: 14,
-                              style: TextStyle(
-                                fontSize: subFontSize,
+                              style: const TextStyle(
+                                fontSize: _subFontSize,
                                 fontWeight: FontWeight.normal,
                                 color: AppColors.warmGray,
                                 height: 1.2,

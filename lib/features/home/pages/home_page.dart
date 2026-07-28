@@ -97,9 +97,9 @@ class _HomePageState extends State<HomePage> {
   String get _sortLabel => switch (_sortField) {
         _PlantSortField.name => 'Name',
         _PlantSortField.nickname => 'Nickname',
-        _PlantSortField.lastWateredAt => 'Last watering',
-        _PlantSortField.lastFertilizedAt => 'Last fertilizing',
-        _PlantSortField.createdAt => 'Date added',
+        _PlantSortField.lastWateredAt => 'Watering',
+        _PlantSortField.lastFertilizedAt => 'Fertilizing',
+        _PlantSortField.createdAt => 'Date',
         _PlantSortField.family => 'Family',
       };
 
@@ -176,15 +176,102 @@ class _HomePageState extends State<HomePage> {
     return groups;
   }
 
-  void _toggleLetterGroup(String letter) {
+  Map<String, List<Plant>> _groupPlantsByFamily(Iterable<Plant> plants) {
+    final groups = <String, List<Plant>>{};
+
+    for (final plant in plants) {
+      final family = plant.family.trim();
+      final key = family.isEmpty ? 'Без семейства' : family;
+      groups.putIfAbsent(key, () => []).add(plant);
+    }
+
+    final entries = groups.entries.toList()
+      ..sort((a, b) {
+        if (a.key == 'Без семейства') return 1;
+        if (b.key == 'Без семейства') return -1;
+        final comparison =
+            a.key.toLowerCase().compareTo(b.key.toLowerCase());
+        return _sortAscending ? comparison : -comparison;
+      });
+
+    return Map.fromEntries(entries);
+  }
+
+  void _toggleGroup(String key) {
     setState(() {
-      if (!_collapsedLetterGroups.add(letter)) {
-        _collapsedLetterGroups.remove(letter);
+      if (!_collapsedLetterGroups.add(key)) {
+        _collapsedLetterGroups.remove(key);
       }
     });
   }
 
+  Widget _buildGroupedPlants(
+    Map<String, List<Plant>> groups,
+    int crossAxisCount,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: groups.entries.map((entry) {
+        final isCollapsed = _collapsedLetterGroups.contains(entry.key);
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => _toggleGroup(entry.key),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 8,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          entry.key,
+                          style: const TextStyle(
+                            color: AppColors.heading,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${entry.value.length}',
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        isCollapsed
+                            ? Icons.keyboard_arrow_down
+                            : Icons.keyboard_arrow_up,
+                        color: AppColors.heading,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (!isCollapsed)
+                _buildPlantGrid(
+                  entry.value,
+                  crossAxisCount,
+                ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
   Widget _buildPlantGrid(List<Plant> plants, int crossAxisCount) {
+    final preferNameAsTitle = _sortField == _PlantSortField.name ||
+        _sortField == _PlantSortField.family;
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -200,6 +287,7 @@ class _HomePageState extends State<HomePage> {
         return PlantCard(
           plant: plant,
           isSelected: _selectedPlantIds.contains(plant.id),
+          preferNameAsTitle: preferNameAsTitle,
           onTap:
               _isSelectionMode ? () => _togglePlantSelection(plant.id) : null,
           onLongPress: () => _togglePlantSelection(plant.id),
@@ -571,100 +659,133 @@ class _HomePageState extends State<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 if (!_isSelectionMode)
-                                  Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
-                                    alignment: WrapAlignment.end,
+                                  Row(
                                     children: [
-                                      FilterChip(
-                                        selected: _filterPropagatingOnly,
-                                        label: const Text('С размножением'),
-                                        avatar: Icon(
-                                          Icons.spa_outlined,
-                                          size: 18,
-                                          color: _filterPropagatingOnly
-                                              ? AppColors.dark1
-                                              : AppColors.accentLight,
-                                        ),
-                                        selectedColor: AppColors.goldAccent,
-                                        checkmarkColor: AppColors.dark1,
-                                        labelStyle: TextStyle(
-                                          color: _filterPropagatingOnly
-                                              ? AppColors.dark1
-                                              : AppColors.textPrimary,
-                                        ),
-                                        backgroundColor:
-                                            AppColors.backgroundSecondary,
-                                        side: BorderSide(
-                                          color: _filterPropagatingOnly
-                                              ? AppColors.goldAccent
-                                              : AppColors.greenDeep,
-                                        ),
-                                        onSelected: (selected) {
-                                          setState(() {
-                                            _filterPropagatingOnly = selected;
-                                          });
-                                        },
-                                      ),
-                                      PopupMenuButton<_PlantSortField>(
-                                        tooltip: 'Sort plants',
-                                        onSelected: _setSortField,
-                                        itemBuilder: (context) =>
-                                            _PlantSortField.values
-                                                .map(
-                                                  (field) => PopupMenuItem(
-                                                    value: field,
-                                                    child: Row(
-                                                      children: [
-                                                        if (_sortField == field)
-                                                          Icon(
-                                                            _sortAscending
-                                                                ? Icons
-                                                                    .arrow_upward
-                                                                : Icons
-                                                                    .arrow_downward,
-                                                            size: 18,
-                                                          )
-                                                        else
-                                                          const SizedBox(
-                                                              width: 18),
-                                                        const SizedBox(
-                                                            width: 8),
-                                                        Text(
-                                                          switch (field) {
-                                                            _PlantSortField
-                                                                  .name =>
-                                                              'Name',
-                                                            _PlantSortField
-                                                                  .nickname =>
-                                                              'Nickname',
-                                                            _PlantSortField
-                                                                  .lastWateredAt =>
-                                                              'Last watering',
-                                                            _PlantSortField
-                                                                  .lastFertilizedAt =>
-                                                              'Last fertilizing',
-                                                            _PlantSortField
-                                                                  .createdAt =>
-                                                              'Date added',
-                                                            _PlantSortField
-                                                                  .family =>
-                                                              'Family',
-                                                          },
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                )
-                                                .toList(),
-                                        child: Chip(
-                                          avatar: Icon(
-                                            _sortAscending
-                                                ? Icons.arrow_upward
-                                                : Icons.arrow_downward,
-                                            size: 18,
+                                      Flexible(
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: FilterChip(
+                                            selected: _filterPropagatingOnly,
+                                            visualDensity:
+                                                VisualDensity.compact,
+                                            materialTapTargetSize:
+                                                MaterialTapTargetSize
+                                                    .shrinkWrap,
+                                            label: const Text(
+                                              'Размножение',
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            avatar: Icon(
+                                              Icons.spa_outlined,
+                                              size: 16,
+                                              color: _filterPropagatingOnly
+                                                  ? AppColors.dark1
+                                                  : AppColors.accentLight,
+                                            ),
+                                            selectedColor:
+                                                AppColors.goldAccent,
+                                            checkmarkColor: AppColors.dark1,
+                                            labelStyle: TextStyle(
+                                              fontSize: 13,
+                                              color: _filterPropagatingOnly
+                                                  ? AppColors.dark1
+                                                  : AppColors.textPrimary,
+                                            ),
+                                            backgroundColor:
+                                                AppColors.backgroundSecondary,
+                                            side: BorderSide(
+                                              color: _filterPropagatingOnly
+                                                  ? AppColors.goldAccent
+                                                  : AppColors.greenDeep,
+                                            ),
+                                            onSelected: (selected) {
+                                              setState(() {
+                                                _filterPropagatingOnly =
+                                                    selected;
+                                              });
+                                            },
                                           ),
-                                          label: Text('Sort: $_sortLabel'),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Flexible(
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child:
+                                              PopupMenuButton<_PlantSortField>(
+                                            tooltip: 'Sort plants',
+                                            onSelected: _setSortField,
+                                            itemBuilder: (context) =>
+                                                _PlantSortField.values
+                                                    .map(
+                                                      (field) => PopupMenuItem(
+                                                        value: field,
+                                                        child: Row(
+                                                          children: [
+                                                            if (_sortField ==
+                                                                field)
+                                                              Icon(
+                                                                _sortAscending
+                                                                    ? Icons
+                                                                        .arrow_upward
+                                                                    : Icons
+                                                                        .arrow_downward,
+                                                                size: 18,
+                                                              )
+                                                            else
+                                                              const SizedBox(
+                                                                  width: 18),
+                                                            const SizedBox(
+                                                                width: 8),
+                                                            Text(
+                                                              switch (field) {
+                                                                _PlantSortField
+                                                                      .name =>
+                                                                  'Name',
+                                                                _PlantSortField
+                                                                      .nickname =>
+                                                                  'Nickname',
+                                                                _PlantSortField
+                                                                      .lastWateredAt =>
+                                                                  'Last watering',
+                                                                _PlantSortField
+                                                                      .lastFertilizedAt =>
+                                                                  'Last fertilizing',
+                                                                _PlantSortField
+                                                                      .createdAt =>
+                                                                  'Date added',
+                                                                _PlantSortField
+                                                                      .family =>
+                                                                  'Family',
+                                                              },
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    )
+                                                    .toList(),
+                                            child: Chip(
+                                              visualDensity:
+                                                  VisualDensity.compact,
+                                              materialTapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                              avatar: Icon(
+                                                _sortAscending
+                                                    ? Icons.arrow_upward
+                                                    : Icons.arrow_downward,
+                                                size: 16,
+                                              ),
+                                              label: Text(
+                                                _sortLabel,
+                                                overflow:
+                                                    TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -692,70 +813,15 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   )
                                 else if (_sortField == _PlantSortField.name)
-                                  ..._groupPlantsByLetter(
-                                    sortedPlants,
-                                  ).entries.map((entry) {
-                                    final isCollapsed = _collapsedLetterGroups
-                                        .contains(entry.key);
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 20),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          InkWell(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            onTap: () =>
-                                                _toggleLetterGroup(entry.key),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 4,
-                                                vertical: 8,
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Text(
-                                                    entry.key,
-                                                    style: const TextStyle(
-                                                      color: AppColors.heading,
-                                                      fontSize: 24,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Text(
-                                                    '${entry.value.length}',
-                                                    style: const TextStyle(
-                                                      color: AppColors
-                                                          .textSecondary,
-                                                    ),
-                                                  ),
-                                                  const Spacer(),
-                                                  Icon(
-                                                    isCollapsed
-                                                        ? Icons
-                                                            .keyboard_arrow_down
-                                                        : Icons
-                                                            .keyboard_arrow_up,
-                                                    color: AppColors.heading,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          if (!isCollapsed)
-                                            _buildPlantGrid(
-                                              entry.value,
-                                              crossAxisCount,
-                                            ),
-                                        ],
-                                      ),
-                                    );
-                                  })
+                                  _buildGroupedPlants(
+                                    _groupPlantsByLetter(sortedPlants),
+                                    crossAxisCount,
+                                  )
+                                else if (_sortField == _PlantSortField.family)
+                                  _buildGroupedPlants(
+                                    _groupPlantsByFamily(sortedPlants),
+                                    crossAxisCount,
+                                  )
                                 else
                                   _buildPlantGrid(
                                     sortedPlants,
