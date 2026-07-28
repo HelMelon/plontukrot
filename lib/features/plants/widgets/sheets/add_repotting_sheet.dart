@@ -101,9 +101,9 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
   Future<void> _addCustomComponent() async {
     final name = await showPromptTextDialog(
       context: context,
-      title: 'Add component',
-      hintText: 'Component name',
-      confirmLabel: 'Add',
+      title: 'Добавить компонент',
+      hintText: 'Название компонента',
+      confirmLabel: 'Добавить',
     );
 
     if (name == null || name.isEmpty) return;
@@ -165,15 +165,15 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
     if (_mode == _SoilMode.saved && _selectedSoilId != null) {
       final soil = soils.firstWhere(
         (s) => s.id == _selectedSoilId,
-        orElse: () => Soil(id: '', name: 'Soil', components: _components),
+        orElse: () => Soil(id: '', name: 'Грунт', components: _components),
       );
       components = soil.components;
-      title = soil.name.isEmpty ? 'Soil composition' : soil.name;
+      title = soil.name.isEmpty ? 'Состав грунта' : soil.name;
     } else {
       components = _components;
       title = _saveMix && _mixNameController.text.trim().isNotEmpty
           ? _mixNameController.text.trim()
-          : 'Custom mix';
+          : 'Свой микс';
     }
 
     await showSoilCompositionDialog(
@@ -275,7 +275,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
               ),
               const SizedBox(height: 16),
               Text(
-                widget.isEditing ? 'Edit Repotting' : 'Add Repotting',
+                widget.isEditing ? 'Изменить пересадку' : 'Добавить пересадку',
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
@@ -290,7 +290,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                 child: OutlinedButton(
                   onPressed: () =>
                       setState(() => _selectedDate = DateTime.now()),
-                  child: const Text('Today'),
+                  child: const Text('Сегодня'),
                 ),
               ),
               const SizedBox(height: 16),
@@ -298,12 +298,12 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                 segments: const [
                   ButtonSegment(
                     value: _SoilMode.saved,
-                    label: Text('Saved soil'),
+                    label: Text('Сохранённые'),
                     icon: Icon(Icons.bookmark_outline),
                   ),
                   ButtonSegment(
                     value: _SoilMode.newMix,
-                    label: Text('New mix'),
+                    label: Text('Новый микс'),
                     icon: Icon(Icons.science_outlined),
                   ),
                 ],
@@ -335,14 +335,14 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'No saved soils yet. Create a new mix.',
+                            'Пока нет сохранённых грунтов. Создайте новый микс.',
                             style: TextStyle(color: AppColors.textSecondary),
                           ),
                           TextButton(
                             onPressed: () {
                               setState(() => _mode = _SoilMode.newMix);
                             },
-                            child: const Text('Switch to New mix'),
+                            child: const Text('Перейти к «Новый микс»'),
                           ),
                         ],
                       );
@@ -357,8 +357,8 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                                 : null,
                             hint: Text(
                               _selectedSoilId != null && widget.entry != null
-                                  ? (widget.entry!.soilName ?? 'Select soil')
-                                  : 'Select soil',
+                                  ? (widget.entry!.soilName ?? 'Выберите грунт')
+                                  : 'Выберите грунт',
                             ),
                             isExpanded: true,
                             items: soils
@@ -378,7 +378,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                           ),
                         ),
                         IconButton(
-                          tooltip: 'View composition',
+                          tooltip: 'Посмотреть состав',
                           onPressed: _selectedSoilId == null &&
                                   _components.isEmpty
                               ? null
@@ -393,14 +393,14 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                 Row(
                   children: [
                     const Text(
-                      'Components',
+                      'Компоненты',
                       style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                     const Spacer(),
                     TextButton.icon(
                       onPressed: _openManageComponents,
                       icon: const Icon(Icons.edit_outlined, size: 18),
-                      label: const Text('Manage'),
+                      label: const Text('Управление'),
                     ),
                   ],
                 ),
@@ -430,7 +430,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Tap: +1 part · Long press: ½ part (again removes)',
+                  'Нажатие: +1 часть · Долгое нажатие: ½ части (ещё раз — убрать)',
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
@@ -443,15 +443,15 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                   onChanged: (value) {
                     setState(() => _saveMix = value ?? false);
                   },
-                  title: const Text('Save this mix'),
+                  title: const Text('Сохранить этот микс'),
                   controlAffinity: ListTileControlAffinity.leading,
                 ),
                 if (_saveMix)
                   TextField(
                     controller: _mixNameController,
                     decoration: const InputDecoration(
-                      labelText: 'Mix name',
-                      hintText: 'e.g. Aroid mix',
+                      labelText: 'Название микса',
+                      hintText: 'напр. Микс для ароидов',
                     ),
                     onChanged: (_) => setState(() {}),
                   ),
@@ -479,7 +479,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Save'),
+                    : const Text('Сохранить'),
               ),
             ],
           ),

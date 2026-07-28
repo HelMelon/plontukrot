@@ -43,7 +43,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      isEditing ? 'Edit Watering' : 'Add Watering',
+                      isEditing ? 'Изменить полив' : 'Добавить полив',
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -77,7 +77,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                               selectedDate = DateTime.now();
                             });
                           },
-                          child: const Text('Today'),
+                          child: const Text('Сегодня'),
                         ),
                         const Spacer(),
                         FilledButton(
@@ -97,7 +97,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                             if (!context.mounted) return;
                             Navigator.pop(sheetContext);
                           },
-                          child: const Text('Save'),
+                          child: const Text('Сохранить'),
                         ),
                       ],
                     ),
@@ -116,16 +116,16 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Delete watering'),
-          content: const Text('Delete this record?'),
+          title: const Text('Удалить полив'),
+          content: const Text('Удалить эту запись?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: const Text('Отмена'),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Delete'),
+              child: const Text('Удалить'),
             ),
           ],
         );
@@ -159,14 +159,14 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
           Row(
             children: [
               const Text(
-                'Watering History',
+                'История полива',
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
               FilledButton.icon(
                 onPressed: () => _showWateringEditor(),
                 icon: const Icon(Icons.add),
-                label: const Text('Add watering'),
+                label: const Text('Добавить полив'),
               ),
             ],
           ),
@@ -187,7 +187,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
 
                 if (items.isEmpty) {
                   return const Center(
-                    child: Text('No watering records yet 🌱'),
+                    child: Text('Пока нет записей о поливе 🌱'),
                   );
                 }
 
@@ -224,7 +224,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                             ),
                           ),
                           IconButton(
-                            tooltip: 'Edit',
+                            tooltip: 'Изменить',
                             icon: const Icon(Icons.edit_outlined),
                             onPressed: () => _showWateringEditor(
                               wateringId: wateringId,
@@ -232,7 +232,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                             ),
                           ),
                           IconButton(
-                            tooltip: 'Delete',
+                            tooltip: 'Удалить',
                             icon: const Icon(Icons.delete_outline),
                             onPressed: () => _confirmDelete(wateringId),
                           ),

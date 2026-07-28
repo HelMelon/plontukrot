@@ -99,7 +99,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Add Plant',
+                'Добавить растение',
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
@@ -115,7 +115,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                   if (nameError != null) setState(() => nameError = null);
                 },
                 decoration: InputDecoration(
-                  labelText: 'Plant name',
+                  labelText: 'Название',
                   errorText: nameError,
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
@@ -146,7 +146,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                 controller: familyController,
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
-                  labelText: 'Plant family',
+                  labelText: 'Семейство',
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.dark2,
@@ -176,7 +176,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                 controller: nickNameController,
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
-                  labelText: 'Plant nickname',
+                  labelText: 'Прозвище',
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.dark2,
@@ -203,7 +203,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
               ),
               const SizedBox(height: 18),
               const Text(
-                'Growth stage',
+                'Стадия роста',
                 style: TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 14,
@@ -226,7 +226,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
-                  labelText: 'Watering Frequency',
+                  labelText: 'Частота полива',
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.dark2,
@@ -275,7 +275,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                           ),
                         )
                       : const Text(
-                          'Save Plant',
+                          'Сохранить',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,

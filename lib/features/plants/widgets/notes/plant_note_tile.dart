@@ -39,25 +39,25 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
             borderRadius: BorderRadius.circular(20),
           ),
           title: const Text(
-            'Delete note?',
+            'Удалить заметку?',
             style: TextStyle(color: AppColors.textPrimary),
           ),
           content: const Text(
-            'Are you sure you want to permanently delete this note? This action cannot be undone.',
+            'Вы уверены, что хотите навсегда удалить эту заметку? Это действие нельзя отменить.',
             style: TextStyle(color: AppColors.textSecondary),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: const Text(
-                'Cancel',
+                'Отмена',
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               child: const Text(
-                'Delete',
+                'Удалить',
                 style: TextStyle(
                   color: Colors.redAccent,
                   fontWeight: FontWeight.bold,

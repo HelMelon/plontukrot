@@ -42,16 +42,16 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Delete repotting'),
-          content: const Text('Delete this record?'),
+          title: const Text('Удалить пересадку'),
+          content: const Text('Удалить эту запись?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: const Text('Отмена'),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Delete'),
+              child: const Text('Удалить'),
             ),
           ],
         );
@@ -85,14 +85,14 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
           Row(
             children: [
               const Text(
-                'Repotting History',
+                'История пересадок',
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
               FilledButton.icon(
                 onPressed: _showAddSheet,
                 icon: const Icon(Icons.add),
-                label: const Text('Add'),
+                label: const Text('Добавить'),
               ),
             ],
           ),
@@ -113,7 +113,7 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
 
                 if (items.isEmpty) {
                   return const Center(
-                    child: Text('No repotting records yet'),
+                    child: Text('Пока нет записей о пересадке'),
                   );
                 }
 
@@ -125,7 +125,7 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                     final repottingId = item.id!;
                     final title = (item.soilName?.isNotEmpty == true)
                         ? item.soilName!
-                        : 'Custom mix';
+                        : 'Свой микс';
 
                     return InkWell(
                       borderRadius: BorderRadius.circular(16),
@@ -188,12 +188,12 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                               ),
                             ),
                             IconButton(
-                              tooltip: 'Edit',
+                              tooltip: 'Изменить',
                               icon: const Icon(Icons.edit_outlined),
                               onPressed: () => _showEditSheet(item),
                             ),
                             IconButton(
-                              tooltip: 'Delete',
+                              tooltip: 'Удалить',
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () => _confirmDelete(repottingId),
                             ),

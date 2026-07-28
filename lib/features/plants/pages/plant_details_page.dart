@@ -86,7 +86,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
         SnackBar(
           backgroundColor: AppColors.dark2,
           content: Text(
-            'Upload error: $e',
+            'Ошибка загрузки: $e',
             style: const TextStyle(color: AppColors.textPrimary),
           ),
         ),
@@ -128,7 +128,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
             elevation: 0,
             surfaceTintColor: Colors.transparent,
             title: Text(
-              data['nickname'] ?? 'Plant',
+              data['nickname'] ?? 'Растение',
               style: const TextStyle(
                 color: AppColors.heading,
                 fontWeight: FontWeight.bold,
@@ -137,7 +137,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
             actions: [
               _TopAction(
                 icon: Icons.water_drop,
-                label: 'Water',
+                label: 'Полив',
                 onTap: () {
                   showModalBottomSheet(
                     context: context,
@@ -150,7 +150,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               ),
               _TopAction(
                 icon: Icons.science_outlined,
-                label: 'Fertilize',
+                label: 'Подкормка',
                 onTap: () {
                   showModalBottomSheet(
                     context: context,
@@ -162,7 +162,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               ),
               _TopAction(
                 icon: Icons.flaky,
-                label: 'Repot',
+                label: 'Пересадка',
                 onTap: () {
                   showModalBottomSheet(
                     context: context,
@@ -174,7 +174,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               ),
               _TopAction(
                 icon: Icons.spa_outlined,
-                label: 'Propagate',
+                label: 'Размножение',
                 onTap: () {
                   showModalBottomSheet(
                     context: context,
@@ -183,7 +183,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                     builder: (_) => AddPropagationSheet(
                       parentPlantId: widget.plantId,
                       parentPlantName:
-                          data['name'] as String? ?? 'Unnamed Plant',
+                          data['name'] as String? ?? 'Без названия',
                       parentPlantFamily: data['family'] as String? ?? '',
                     ),
                   );
@@ -191,7 +191,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               ),
               _TopAction(
                 icon: Icons.edit_rounded,
-                label: 'Edit',
+                label: 'Изменить',
                 onTap: () {
                   showModalBottomSheet(
                     context: context,
@@ -204,7 +204,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               ),
               _TopAction(
                 icon: Icons.note_add_outlined,
-                label: 'Note',
+                label: 'Заметка',
                 onTap: () {
                   showModalBottomSheet(
                     context: context,

@@ -43,16 +43,16 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Delete fertilizing'),
-          content: const Text('Delete this record?'),
+          title: const Text('Удалить подкормку'),
+          content: const Text('Удалить эту запись?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: const Text('Отмена'),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Delete'),
+              child: const Text('Удалить'),
             ),
           ],
         );
@@ -86,14 +86,14 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
           Row(
             children: [
               const Text(
-                'Fertilizing history',
+                'История подкормок',
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
               FilledButton.icon(
                 onPressed: _showAddSheet,
                 icon: const Icon(Icons.add),
-                label: const Text('Add'),
+                label: const Text('Добавить'),
               ),
             ],
           ),
@@ -113,7 +113,7 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                 final items = snapshot.data!;
 
                 if (items.isEmpty) {
-                  return const Center(child: Text('No fertilizing yet'));
+                  return const Center(child: Text('Пока нет подкормок'));
                 }
 
                 return ListView.separated(
@@ -166,12 +166,12 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                               ),
                             ),
                             IconButton(
-                              tooltip: 'Edit',
+                              tooltip: 'Изменить',
                               icon: const Icon(Icons.edit_outlined),
                               onPressed: () => _showEditSheet(item),
                             ),
                             IconButton(
-                              tooltip: 'Delete',
+                              tooltip: 'Удалить',
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () => _confirmDelete(item),
                             ),

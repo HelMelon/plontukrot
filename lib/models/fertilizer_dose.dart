@@ -44,7 +44,7 @@ class FertilizerDose {
     };
   }
 
-  String get unitLabel => unit == FertilizerDoseUnit.ml ? 'ml' : 'g';
+  String get unitLabel => unit == FertilizerDoseUnit.ml ? 'мл' : 'г';
 
   String get label {
     final value = amount == amount.roundToDouble()

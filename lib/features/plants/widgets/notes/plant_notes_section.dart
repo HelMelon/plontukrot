@@ -41,7 +41,7 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
         if (snapshot.hasError) {
           return Center(
             child: Text(
-              'Error: ${snapshot.error}',
+              'Ошибка: ${snapshot.error}',
               style: const TextStyle(color: Colors.red),
             ),
           );
@@ -67,7 +67,7 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Text(
-              'No notes yet',
+              'Заметок пока нет',
               style: TextStyle(color: AppColors.textSecondary),
             ),
           );
@@ -100,7 +100,7 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
                   });
                 },
                 child: Text(
-                  showAll ? 'Show less' : 'Show more',
+                  showAll ? 'Свернуть' : 'Показать ещё',
                   style: const TextStyle(
                     color: AppColors.goldAccent,
                     fontWeight: FontWeight.w600,

@@ -48,7 +48,7 @@ class PlantInfoCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            data['name'] ?? 'Unnamed Plant',
+            data['name'] ?? 'Без названия',
             style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
@@ -56,7 +56,7 @@ class PlantInfoCard extends StatelessWidget {
             ),
           ),
           Text(
-            'Name: ${data['nickname'] ?? 'Unnamed Plant'}',
+            'Прозвище: ${data['nickname'] ?? 'Без названия'}',
             style: const TextStyle(
               fontStyle: FontStyle.italic,
               fontSize: 24,
@@ -75,7 +75,7 @@ class PlantInfoCard extends StatelessWidget {
           const SizedBox(height: 8),
           stage.value != 0
               ? Text(
-                  'Stage: ${stage.title}',
+                  'Стадия: ${stage.title}',
                   style: const TextStyle(
                     fontStyle: FontStyle.italic,
                     fontSize: 24,
@@ -104,8 +104,8 @@ class PlantInfoCard extends StatelessWidget {
                         !snapshot.hasData) {
                       return InfoCard(
                         icon: _icon('assets/icons/watering.png'),
-                        title: 'Watering',
-                        value: 'Loading...',
+                        title: 'Полив',
+                        value: 'Загрузка...',
                         onTap: openHistory,
                       );
                     }
@@ -113,12 +113,12 @@ class PlantInfoCard extends StatelessWidget {
                     final watering = snapshot.data;
                     final last = watering?['wateredAt'] as DateTime?;
                     final value = last == null
-                        ? 'No data'
+                        ? 'Нет данных'
                         : DateFormat('d MMM y').format(last);
 
                     return InfoCard(
                       icon: _icon('assets/icons/watering.png'),
-                      title: 'Watering',
+                      title: 'Полив',
                       value: value,
                       onTap: openHistory,
                     );
@@ -142,20 +142,20 @@ class PlantInfoCard extends StatelessWidget {
                     if (!snapshot.hasData) {
                       return InfoCard(
                         icon: _icon('assets/icons/fertilize.png'),
-                        title: 'Fertilizing',
-                        value: 'Loading...',
+                        title: 'Подкормка',
+                        value: 'Загрузка...',
                         onTap: openHistory,
                       );
                     }
 
                     final items = snapshot.data!;
                     final value = items.isEmpty
-                        ? 'No data'
+                        ? 'Нет данных'
                         : DateFormat('d MMM y').format(items.first.appliedAt);
 
                     return InfoCard(
                       icon: _icon('assets/icons/fertilize.png'),
-                      title: 'Fertilizing',
+                      title: 'Подкормка',
                       value: value,
                       onTap: openHistory,
                     );
@@ -180,20 +180,20 @@ class PlantInfoCard extends StatelessWidget {
                         snapshot.connectionState == ConnectionState.waiting) {
                       return InfoCard(
                         icon: _icon('assets/icons/potting.png'),
-                        title: 'Repotting',
-                        value: 'Loading...',
+                        title: 'Пересадка',
+                        value: 'Загрузка...',
                         onTap: openHistory,
                       );
                     }
 
                     final last = snapshot.data;
                     final value = last == null
-                        ? 'No data'
+                        ? 'Нет данных'
                         : DateFormat('d MMM y').format(last.repottedAt);
 
                     return InfoCard(
                       icon: _icon('assets/icons/potting.png'),
-                      title: 'Repotting',
+                      title: 'Пересадка',
                       value: value,
                       onTap: openHistory,
                     );
@@ -205,12 +205,12 @@ class PlantInfoCard extends StatelessWidget {
           const SizedBox(height: 32),
           PlantPropagationsSection(
             plantId: plantId,
-            plantName: data['name'] as String? ?? 'Unnamed Plant',
+            plantName: data['name'] as String? ?? 'Без названия',
             plantFamily: data['family'] as String? ?? '',
           ),
           const SizedBox(height: 32),
           const Text(
-            'Plant Journal',
+            'Журнал',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,

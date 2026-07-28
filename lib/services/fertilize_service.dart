@@ -202,7 +202,7 @@ class FertilizeService {
       final fertilizersSnap = await _fertilizersRef.get();
       final fertilizerMap = {
         for (var doc in fertilizersSnap.docs)
-          doc.id: doc.data()['name'] as String? ?? 'Unknown',
+          doc.id: doc.data()['name'] as String? ?? 'Неизвестно',
       };
 
       return snapshot.docs.map((doc) {
@@ -211,8 +211,8 @@ class FertilizeService {
         final storedName = data['fertilizerName'] as String?;
         final resolvedName = storedName ??
             (fertilizerId != null
-                ? fertilizerMap[fertilizerId] ?? 'Unknown'
-                : 'Custom mix');
+                ? fertilizerMap[fertilizerId] ?? 'Неизвестно'
+                : 'Свой микс');
 
         return FertilizingEntry.fromFirestoreData(
           id: doc.id,

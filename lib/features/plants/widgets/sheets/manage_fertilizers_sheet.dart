@@ -26,7 +26,7 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
       context: context,
       builder: (_) => const _FertilizerFormDialog(
         title: 'Готовое удобрение',
-        confirmLabel: 'Add',
+        confirmLabel: 'Добавить',
         initialKind: FertilizerKind.purchased,
       ),
     );
@@ -44,8 +44,8 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
     final result = await showDialog<_FertilizerFormResult>(
       context: context,
       builder: (_) => _FertilizerFormDialog(
-        title: 'Edit fertilizer',
-        confirmLabel: 'Save',
+        title: 'Изменить удобрение',
+        confirmLabel: 'Сохранить',
         initialName: fertilizer.name,
         initialKind: fertilizer.kind,
         initialWaterMl: fertilizer.waterMl,
@@ -69,18 +69,18 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppColors.backgroundSecondary,
-          title: const Text('Delete fertilizer'),
+          title: const Text('Удалить удобрение'),
           content: Text(
-            'Delete "${fertilizer.name}" from your catalog?',
+            'Удалить «${fertilizer.name}» из каталога?',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: const Text('Отмена'),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Delete'),
+              child: const Text('Удалить'),
             ),
           ],
         );
@@ -113,7 +113,7 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
               children: [
                 const Expanded(
                   child: Text(
-                    'Fertilizers',
+                    'Удобрения',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -128,7 +128,7 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Миксы сохраняются из New mix. Вид можно менять: готовое ↔ микс.',
+                'Миксы сохраняются из «Новый микс». Вид можно менять: готовое ↔ микс.',
                 style: TextStyle(
                   fontSize: 12,
                   color: AppColors.textSecondary,
@@ -151,7 +151,7 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
                   final items = snapshot.data!;
                   if (items.isEmpty) {
                     return const Center(
-                      child: Text('No fertilizers yet'),
+                      child: Text('Пока нет удобрений'),
                     );
                   }
 
@@ -170,7 +170,7 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
                         subtitle: Text(
                           [
                             item.kind.label,
-                            '${item.waterMl}ml',
+                            '${item.waterMl} мл',
                             if (doseLabel != null) doseLabel,
                           ].join(' · '),
                           maxLines: 2,
@@ -180,12 +180,12 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              tooltip: 'Edit',
+                              tooltip: 'Изменить',
                               icon: const Icon(Icons.edit_outlined),
                               onPressed: () => _edit(item),
                             ),
                             IconButton(
-                              tooltip: 'Delete',
+                              tooltip: 'Удалить',
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () => _delete(item),
                             ),
@@ -345,7 +345,7 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
               },
               decoration: InputDecoration(
                 labelText: 'Название',
-                hintText: isPurchased ? 'e.g. Pokon Universal' : 'Mix name',
+                hintText: isPurchased ? 'напр. Pokon Universal' : 'Название микса',
                 errorText: _nameError,
               ),
             ),
@@ -380,7 +380,7 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
             SegmentedButton<int>(
               segments: [
                 for (final ml in kWaterVolumesMl)
-                  ButtonSegment(value: ml, label: Text('${ml}ml')),
+                  ButtonSegment(value: ml, label: Text('$ml мл')),
               ],
               selected: {_waterMl},
               onSelectionChanged: (value) {
@@ -393,11 +393,11 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
                 segments: const [
                   ButtonSegment(
                     value: FertilizerDoseUnit.g,
-                    label: Text('g'),
+                    label: Text('г'),
                   ),
                   ButtonSegment(
                     value: FertilizerDoseUnit.ml,
-                    label: Text('ml'),
+                    label: Text('мл'),
                   ),
                 ],
                 selected: {_doseUnit},
@@ -416,9 +416,9 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
                 ],
                 decoration: InputDecoration(
                   labelText: isPurchased
-                      ? 'Доза на ${_waterMl}ml (необязательно)'
+                      ? 'Доза на $_waterMl мл (необязательно)'
                       : 'Доза (необязательно)',
-                  hintText: 'e.g. 2',
+                  hintText: 'напр. 2',
                 ),
               ),
             ] else ...[
@@ -437,7 +437,7 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const Text('Отмена'),
         ),
         FilledButton(
           onPressed: _submit,

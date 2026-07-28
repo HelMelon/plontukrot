@@ -30,20 +30,20 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
       context: context,
       title: title,
       initial: initial,
-      hintText: 'Component name',
-      confirmLabel: 'Save',
+      hintText: 'Название компонента',
+      confirmLabel: 'Сохранить',
     );
   }
 
   Future<void> _add() async {
-    final name = await _promptName(title: 'Add component');
+    final name = await _promptName(title: 'Добавить компонент');
     if (name == null) return;
     await _service.addComponent(name: name);
   }
 
   Future<void> _edit(CatalogComponent component) async {
     final name = await _promptName(
-      title: 'Edit component',
+      title: 'Изменить компонент',
       initial: component.name,
     );
     if (name == null || name == component.name) return;
@@ -60,16 +60,16 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppColors.backgroundSecondary,
-          title: const Text('Delete component'),
-          content: Text('Delete "${component.name}" from your catalog?'),
+          title: const Text('Удалить компонент'),
+          content: Text('Удалить «${component.name}» из каталога?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: const Text('Отмена'),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Delete'),
+              child: const Text('Удалить'),
             ),
           ],
         );
@@ -101,14 +101,14 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
             Row(
               children: [
                 const Text(
-                  'Soil components',
+                  'Компоненты грунта',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 FilledButton.icon(
                   onPressed: _add,
                   icon: const Icon(Icons.add),
-                  label: const Text('Add'),
+                  label: const Text('Добавить'),
                 ),
               ],
             ),
@@ -128,7 +128,7 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
                   final items = snapshot.data!;
                   if (items.isEmpty) {
                     return const Center(
-                      child: Text('No components yet'),
+                      child: Text('Пока нет компонентов'),
                     );
                   }
 
@@ -144,12 +144,12 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              tooltip: 'Edit',
+                              tooltip: 'Изменить',
                               icon: const Icon(Icons.edit_outlined),
                               onPressed: () => _edit(item),
                             ),
                             IconButton(
-                              tooltip: 'Delete',
+                              tooltip: 'Удалить',
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () => _delete(item),
                             ),

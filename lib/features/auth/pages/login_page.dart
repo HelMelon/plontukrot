@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
         SnackBar(
           backgroundColor: AppColors.dark2,
           content: Text(
-            'Login error: $e',
+            'Ошибка входа: $e',
             style: const TextStyle(color: AppColors.textPrimary),
           ),
         ),
@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 42),
                 const Text(
-                  'Plant Journal',
+                  'Дневник растений',
                   style: TextStyle(
                     fontSize: 38,
                     fontWeight: FontWeight.bold,
@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  'Track your plants,\nwatering and growth',
+                  'Следите за растениями,\nполивом и ростом',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
@@ -94,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                           )
                         : const Icon(Icons.login),
                     label: Text(
-                      isLoading ? 'Signing in...' : 'Continue with Google',
+                      isLoading ? 'Вход...' : 'Войти через Google',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -112,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 28),
                 Text(
-                  'Your data is securely stored in Firebase',
+                  'Данные надёжно хранятся в Firebase',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 13,

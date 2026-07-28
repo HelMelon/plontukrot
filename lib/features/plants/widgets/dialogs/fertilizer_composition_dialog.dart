@@ -16,7 +16,7 @@ Future<void> showFertilizerCompositionDialog({
         backgroundColor: AppColors.backgroundSecondary,
         title: Text(title),
         content: components.isEmpty && waterMl == null
-            ? const Text('No components')
+            ? const Text('Нет компонентов')
             : Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,7 +25,7 @@ Future<void> showFertilizerCompositionDialog({
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Text(
-                        'Water: ${waterMl}ml',
+                        'Вода: $waterMl мл',
                         style: const TextStyle(
                           color: AppColors.heading,
                           fontWeight: FontWeight.w600,
@@ -33,7 +33,7 @@ Future<void> showFertilizerCompositionDialog({
                       ),
                     ),
                   if (components.isEmpty)
-                    const Text('No components')
+                    const Text('Нет компонентов')
                   else
                     ...components.map(
                       (c) => Padding(
@@ -49,7 +49,7 @@ Future<void> showFertilizerCompositionDialog({
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('Закрыть'),
           ),
         ],
       );

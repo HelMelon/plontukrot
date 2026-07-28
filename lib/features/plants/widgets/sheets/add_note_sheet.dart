@@ -84,7 +84,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
               ),
               const SizedBox(height: 28),
               const Text(
-                'Add Note',
+                'Добавить заметку',
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
@@ -94,7 +94,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
               ),
               const SizedBox(height: 10),
               const Text(
-                'Add a new journal entry for this plant.',
+                'Добавьте новую запись в журнал для этого растения.',
                 style: TextStyle(
                   fontSize: 15,
                   height: 1.5,
@@ -108,7 +108,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                 autofocus: true,
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
-                  labelText: 'Journal entry',
+                  labelText: 'Запись в журнале',
                   alignLabelWithHint: true,
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
@@ -161,7 +161,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                           ),
                         )
                       : const Text(
-                          'Save Note',
+                          'Сохранить заметку',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,

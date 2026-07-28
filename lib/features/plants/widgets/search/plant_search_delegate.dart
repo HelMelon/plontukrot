@@ -11,6 +11,9 @@ class PlantSearchDelegate extends SearchDelegate {
   PlantSearchDelegate({required this.userId});
 
   @override
+  String get searchFieldLabel => 'Поиск растений...';
+
+  @override
   ThemeData appBarTheme(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return theme.copyWith(
@@ -101,7 +104,7 @@ class PlantSearchDelegate extends SearchDelegate {
           return const ContainerWithBackground(
             child: Center(
               child: Text(
-                'No plants found in your journal',
+                'В журнале нет растений',
                 style: TextStyle(color: AppColors.textPrimary),
               ),
             ),
@@ -121,7 +124,7 @@ class PlantSearchDelegate extends SearchDelegate {
           return const ContainerWithBackground(
             child: Center(
               child: Text(
-                'No matches found',
+                'Ничего не найдено',
                 style: TextStyle(color: AppColors.textPrimary),
               ),
             ),
@@ -160,7 +163,7 @@ class PlantSearchDelegate extends SearchDelegate {
                 titleText = nickname;
                 subtitleText = name.isNotEmpty ? '($name)' : null;
               } else {
-                titleText = name.isNotEmpty ? name : 'Unnamed Plant';
+                titleText = name.isNotEmpty ? name : 'Без названия';
                 subtitleText = null;
               }
 

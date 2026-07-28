@@ -32,20 +32,20 @@ class _ManageFertilizerIngredientsSheetState
       context: context,
       title: title,
       initial: initial,
-      hintText: 'Ingredient name',
-      confirmLabel: 'Save',
+      hintText: 'Название ингредиента',
+      confirmLabel: 'Сохранить',
     );
   }
 
   Future<void> _add() async {
-    final name = await _promptName(title: 'Add ingredient');
+    final name = await _promptName(title: 'Добавить ингредиент');
     if (name == null) return;
     await _service.addIngredient(name: name);
   }
 
   Future<void> _edit(FertilizerIngredient ingredient) async {
     final name = await _promptName(
-      title: 'Edit ingredient',
+      title: 'Изменить ингредиент',
       initial: ingredient.name,
     );
     if (name == null || name == ingredient.name) return;
@@ -62,16 +62,16 @@ class _ManageFertilizerIngredientsSheetState
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppColors.backgroundSecondary,
-          title: const Text('Delete ingredient'),
-          content: Text('Delete "${ingredient.name}" from your catalog?'),
+          title: const Text('Удалить ингредиент'),
+          content: Text('Удалить «${ingredient.name}» из каталога?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: const Text('Отмена'),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Delete'),
+              child: const Text('Удалить'),
             ),
           ],
         );
@@ -103,14 +103,14 @@ class _ManageFertilizerIngredientsSheetState
             Row(
               children: [
                 const Text(
-                  'Fertilizer ingredients',
+                  'Ингредиенты удобрений',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 FilledButton.icon(
                   onPressed: _add,
                   icon: const Icon(Icons.add),
-                  label: const Text('Add'),
+                  label: const Text('Добавить'),
                 ),
               ],
             ),
@@ -129,7 +129,7 @@ class _ManageFertilizerIngredientsSheetState
 
                   final items = snapshot.data!;
                   if (items.isEmpty) {
-                    return const Center(child: Text('No ingredients yet'));
+                    return const Center(child: Text('Пока нет ингредиентов'));
                   }
 
                   return ListView.separated(
@@ -144,12 +144,12 @@ class _ManageFertilizerIngredientsSheetState
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              tooltip: 'Edit',
+                              tooltip: 'Изменить',
                               icon: const Icon(Icons.edit_outlined),
                               onPressed: () => _edit(item),
                             ),
                             IconButton(
-                              tooltip: 'Delete',
+                              tooltip: 'Удалить',
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () => _delete(item),
                             ),

@@ -95,12 +95,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   String get _sortLabel => switch (_sortField) {
-        _PlantSortField.name => 'Name',
-        _PlantSortField.nickname => 'Nickname',
-        _PlantSortField.lastWateredAt => 'Watering',
-        _PlantSortField.lastFertilizedAt => 'Fertilizing',
-        _PlantSortField.createdAt => 'Date',
-        _PlantSortField.family => 'Family',
+        _PlantSortField.name => 'Название',
+        _PlantSortField.nickname => 'Прозвище',
+        _PlantSortField.lastWateredAt => 'Полив',
+        _PlantSortField.lastFertilizedAt => 'Подкормка',
+        _PlantSortField.createdAt => 'Дата',
+        _PlantSortField.family => 'Семейство',
       };
 
   List<Plant> _sortPlants(Iterable<Plant> plants) {
@@ -299,9 +299,9 @@ class _HomePageState extends State<HomePage> {
   Future<void> _updateFamily() async {
     final family = await showPromptTextDialog(
       context: context,
-      title: 'Change plant family',
-      labelText: 'Family',
-      confirmLabel: 'Save',
+      title: 'Изменить семейство',
+      labelText: 'Семейство',
+      confirmLabel: 'Сохранить',
       allowEmpty: true,
     );
 
@@ -341,7 +341,7 @@ class _HomePageState extends State<HomePage> {
       isScrollControlled: true,
       builder: (_) => AddFertilizingSheet(
         plantIds: _selectedPlantIds.toList(),
-        title: 'Fertilize selected plants',
+        title: 'Подкормить выбранные растения',
       ),
     );
     if (applied == true && mounted) _exitSelectionMode();
@@ -351,18 +351,18 @@ class _HomePageState extends State<HomePage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete selected plants?'),
+        title: const Text('Удалить выбранные растения?'),
         content: Text(
-          'This permanently deletes ${_selectedPlantIds.length} plant(s).',
+          'Это навсегда удалит ${_selectedPlantIds.length} растение(й).',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text('Отмена'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: const Text('Удалить'),
           ),
         ],
       ),
@@ -380,30 +380,30 @@ class _HomePageState extends State<HomePage> {
         onPressed: _exitSelectionMode,
         icon: const Icon(Icons.close),
       ),
-      title: Text('${_selectedPlantIds.length} selected'),
+      title: Text('Выбрано: ${_selectedPlantIds.length}'),
       actions: [
         IconButton(
-          tooltip: 'Select all',
+          tooltip: 'Выбрать все',
           onPressed: _selectAll,
           icon: const Icon(Icons.select_all),
         ),
         IconButton(
-          tooltip: 'Change family',
+          tooltip: 'Изменить семейство',
           onPressed: _updateFamily,
           icon: const Icon(Icons.family_restroom_outlined),
         ),
         IconButton(
-          tooltip: 'Water',
+          tooltip: 'Полив',
           onPressed: _addWatering,
           icon: const Icon(Icons.water_drop_outlined),
         ),
         IconButton(
-          tooltip: 'Fertilize',
+          tooltip: 'Подкормка',
           onPressed: _showFertilizingSheet,
           icon: const Icon(Icons.science_outlined),
         ),
         IconButton(
-          tooltip: 'Delete',
+          tooltip: 'Удалить',
           onPressed: _deletePlants,
           icon: const Icon(Icons.delete_outline),
         ),
@@ -508,7 +508,7 @@ class _HomePageState extends State<HomePage> {
                     child: AbsorbPointer(
                       child: TextField(
                         decoration: InputDecoration(
-                          hintText: 'Search plants...',
+                          hintText: 'Поиск растений...',
                           hintStyle:
                               const TextStyle(color: AppColors.textSecondary),
                           prefixIcon: const Icon(
@@ -563,7 +563,7 @@ class _HomePageState extends State<HomePage> {
           if (!snapshot.hasData || !snapshot.data!.exists) {
             return const Center(
               child: Text(
-                'No user data',
+                'Нет данных пользователя',
                 style: TextStyle(color: AppColors.textPrimary),
               ),
             );
@@ -607,7 +607,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             SizedBox(height: 12),
                             Text(
-                              'No plants added yet',
+                              'Растения ещё не добавлены',
                               style: TextStyle(
                                 color: AppColors.textSecondary,
                                 fontSize: 16,
@@ -713,7 +713,7 @@ class _HomePageState extends State<HomePage> {
                                           alignment: Alignment.centerRight,
                                           child:
                                               PopupMenuButton<_PlantSortField>(
-                                            tooltip: 'Sort plants',
+                                            tooltip: 'Сортировка',
                                             onSelected: _setSortField,
                                             itemBuilder: (context) =>
                                                 _PlantSortField.values
@@ -741,22 +741,22 @@ class _HomePageState extends State<HomePage> {
                                                               switch (field) {
                                                                 _PlantSortField
                                                                       .name =>
-                                                                  'Name',
+                                                                  'Название',
                                                                 _PlantSortField
                                                                       .nickname =>
-                                                                  'Nickname',
+                                                                  'Прозвище',
                                                                 _PlantSortField
                                                                       .lastWateredAt =>
-                                                                  'Last watering',
+                                                                  'Последний полив',
                                                                 _PlantSortField
                                                                       .lastFertilizedAt =>
-                                                                  'Last fertilizing',
+                                                                  'Последняя подкормка',
                                                                 _PlantSortField
                                                                       .createdAt =>
-                                                                  'Date added',
+                                                                  'Дата добавления',
                                                                 _PlantSortField
                                                                       .family =>
-                                                                  'Family',
+                                                                  'Семейство',
                                                               },
                                                             ),
                                                           ],

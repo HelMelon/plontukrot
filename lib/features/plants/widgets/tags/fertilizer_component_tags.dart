@@ -90,11 +90,11 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
             segments: const [
               ButtonSegment(
                 value: FertilizerDoseUnit.g,
-                label: Text('g'),
+                label: Text('г'),
               ),
               ButtonSegment(
                 value: FertilizerDoseUnit.ml,
-                label: Text('ml'),
+                label: Text('мл'),
               ),
             ],
             selected: {_unit},
@@ -116,8 +116,8 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
             onSubmitted: (_) => _save(),
             decoration: InputDecoration(
               labelText:
-                  _unit == FertilizerDoseUnit.ml ? 'Milliliters' : 'Grams',
-              hintText: 'e.g. 2',
+                  _unit == FertilizerDoseUnit.ml ? 'Миллилитры' : 'Граммы',
+              hintText: 'напр. 2',
               errorText: _errorText,
             ),
           ),
@@ -134,15 +134,15 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
                 unit: _unit,
               ),
             ),
-            child: const Text('Remove'),
+            child: const Text('Убрать'),
           ),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const Text('Отмена'),
         ),
         FilledButton(
           onPressed: _save,
-          child: const Text('Save'),
+          child: const Text('Сохранить'),
         ),
       ],
     );
@@ -210,7 +210,7 @@ class FertilizerComponentTags extends StatelessWidget {
           children: [
             Icon(Icons.add, size: 16, color: AppColors.heading),
             SizedBox(width: 4),
-            Text('Add', style: TextStyle(color: AppColors.heading)),
+            Text('Добавить', style: TextStyle(color: AppColors.heading)),
           ],
         ),
       ),

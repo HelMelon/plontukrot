@@ -118,7 +118,7 @@ class SoilComponentTags extends StatelessWidget {
                   Icon(Icons.add, size: 16, color: AppColors.heading),
                   SizedBox(width: 4),
                   Text(
-                    'Add',
+                    'Добавить',
                     style: TextStyle(color: AppColors.heading),
                   ),
                 ],

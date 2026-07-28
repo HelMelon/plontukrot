@@ -13,12 +13,12 @@ class StageInfo {
 const stageInfos = [
   StageInfo(
     value: 0,
-    title: "🌱 Unknown",
+    title: "🌱 Неизвестно",
     checklist: [],
   ),
   StageInfo(
     value: 1,
-    title: "🌱 Start",
+    title: "🌱 Старт",
     checklist: [
       "Клубень без корней",
       "Лист с небольшой ризомой",
@@ -28,7 +28,7 @@ const stageInfos = [
   ),
   StageInfo(
     value: 2,
-    title: "🌿 Kiddo",
+    title: "🌿 Малыш",
     checklist: [
       "1–2 настоящих листа",
       "Корневая только формируется",
@@ -37,7 +37,7 @@ const stageInfos = [
   ),
   StageInfo(
     value: 3,
-    title: "🌳 Juvenile",
+    title: "🌳 Ювенильное",
     checklist: [
       "3–5 листьев",
       "Хорошая корневая",
@@ -46,7 +46,7 @@ const stageInfos = [
   ),
   StageInfo(
     value: 4,
-    title: "🌴 Mature",
+    title: "🌴 Взрослое",
     checklist: [
       "Полностью сформированное растение",
       "Регулярно выпускает новые листья",

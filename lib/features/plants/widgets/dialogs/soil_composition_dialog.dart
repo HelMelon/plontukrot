@@ -16,7 +16,7 @@ Future<void> showSoilCompositionDialog({
         backgroundColor: AppColors.backgroundSecondary,
         title: Text(title),
         content: components.isEmpty
-            ? const Text('No components')
+            ? const Text('Нет компонентов')
             : Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,7 +25,7 @@ Future<void> showSoilCompositionDialog({
                       (c) => Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         child: Text(
-                          '${c.component} — ${formatParts(c.parts)} parts',
+                          '${c.component} — ${formatParts(c.parts)} части',
                           style: const TextStyle(color: AppColors.textPrimary),
                         ),
                       ),
@@ -35,7 +35,7 @@ Future<void> showSoilCompositionDialog({
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('Закрыть'),
           ),
         ],
       );

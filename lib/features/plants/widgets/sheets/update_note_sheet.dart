@@ -93,7 +93,7 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
                 maxLines: 8,
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
-                  labelText: 'Edit note',
+                  labelText: 'Изменить заметку',
                   filled: true,
                   fillColor: AppColors.dark2,
                 ),
@@ -104,7 +104,7 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
                 height: 56,
                 child: ElevatedButton(
                   onPressed: isLoading ? null : save,
-                  child: const Text('Save Changes'),
+                  child: const Text('Сохранить изменения'),
                 ),
               ),
             ],

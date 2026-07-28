@@ -40,7 +40,7 @@ class PlantCard extends StatelessWidget {
     final hasImage = imageUrl != null && imageUrl.isNotEmpty;
 
     final name =
-        (plant.name.isEmpty ? 'Unnamed Plant' : plant.name).toTitleCase();
+        (plant.name.isEmpty ? 'Без названия' : plant.name).toTitleCase();
     final nickname = plant.nickname.toTitleCase();
     final hasNickname = nickname.trim().isNotEmpty;
     final showNameOnTop = preferNameAsTitle || !hasNickname;
