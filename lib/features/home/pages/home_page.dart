@@ -11,9 +11,11 @@ import '../../../services/auth_service.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
 import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
 import '../../../services/plant_service.dart';
+import '../../../services/propagation_service.dart';
 import '../../../services/watering_service.dart';
 import '../../plants/widgets/cards/plant_card.dart';
 import '../../plants/widgets/search/plant_search_delegate.dart';
+import '../../propagations/pages/propagations_page.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
 enum _PlantSortField {
@@ -43,6 +45,7 @@ class _HomePageState extends State<HomePage> {
   _PlantSortField _sortField = _PlantSortField.createdAt;
   bool _sortAscending = false;
   bool _careMigrationStarted = false;
+  bool _filterPropagatingOnly = false;
 
   @override
   void initState() {
@@ -365,6 +368,20 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               actions: [
+                IconButton(
+                  tooltip: 'Размножение',
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const PropagationsPage(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.spa_outlined,
+                    color: AppColors.accentLight,
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: Row(
@@ -534,146 +551,234 @@ class _HomePageState extends State<HomePage> {
                       _careMigrationStarted = true;
                       unawaited(PlantService().migrateCareDates(plants));
                     }
-                    final sortedPlants = _sortPlants(plants);
-                    _visiblePlantIds
-                      ..clear()
-                      ..addAll(sortedPlants.map((plant) => plant.id));
 
-                    return LayoutBuilder(
-                      builder: (context, constraints) {
-                        final double screenWidth =
-                            MediaQuery.of(context).size.width;
+                    return StreamBuilder<Set<String>>(
+                      stream:
+                          PropagationService().watchActiveParentPlantIds(),
+                      builder: (context, propagatingSnapshot) {
+                        final propagatingIds =
+                            propagatingSnapshot.data ?? const <String>{};
+                        final filteredPlants = _filterPropagatingOnly
+                            ? plants
+                                .where(
+                                  (plant) => propagatingIds.contains(plant.id),
+                                )
+                                .toList()
+                            : plants;
+                        final sortedPlants = _sortPlants(filteredPlants);
+                        _visiblePlantIds
+                          ..clear()
+                          ..addAll(sortedPlants.map((plant) => plant.id));
 
-                        int crossAxisCount = 2;
-                        if (screenWidth >= 1000) {
-                          crossAxisCount = 6;
-                        } else if (screenWidth >= 600) {
-                          crossAxisCount = 4;
-                        }
+                        return LayoutBuilder(
+                          builder: (context, constraints) {
+                            final double screenWidth =
+                                MediaQuery.of(context).size.width;
 
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (!_isSelectionMode)
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: PopupMenuButton<_PlantSortField>(
-                                  tooltip: 'Sort plants',
-                                  onSelected: _setSortField,
-                                  itemBuilder: (context) => _PlantSortField
-                                      .values
-                                      .map(
-                                        (field) => PopupMenuItem(
-                                          value: field,
-                                          child: Row(
-                                            children: [
-                                              if (_sortField == field)
-                                                Icon(
-                                                  _sortAscending
-                                                      ? Icons.arrow_upward
-                                                      : Icons.arrow_downward,
-                                                  size: 18,
-                                                )
-                                              else
-                                                const SizedBox(width: 18),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                switch (field) {
-                                                  _PlantSortField.name =>
-                                                    'Name',
-                                                  _PlantSortField.nickname =>
-                                                    'Nickname',
-                                                  _PlantSortField
-                                                        .lastWateredAt =>
-                                                    'Last watering',
-                                                  _PlantSortField
-                                                        .lastFertilizedAt =>
-                                                    'Last fertilizing',
-                                                  _PlantSortField.createdAt =>
-                                                    'Date added',
-                                                  _PlantSortField.family =>
-                                                    'Family',
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                      .toList(),
-                                  child: Chip(
-                                    avatar: Icon(
-                                      _sortAscending
-                                          ? Icons.arrow_upward
-                                          : Icons.arrow_downward,
-                                      size: 18,
-                                    ),
-                                    label: Text('Sort: $_sortLabel'),
-                                  ),
-                                ),
-                              ),
-                            if (!_isSelectionMode) const SizedBox(height: 8),
-                            if (_sortField == _PlantSortField.name)
-                              ..._groupPlantsByLetter(
-                                sortedPlants,
-                              ).entries.map((entry) {
-                                final isCollapsed =
-                                    _collapsedLetterGroups.contains(entry.key);
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                            int crossAxisCount = 2;
+                            if (screenWidth >= 1000) {
+                              crossAxisCount = 6;
+                            } else if (screenWidth >= 600) {
+                              crossAxisCount = 4;
+                            }
+
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (!_isSelectionMode)
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    alignment: WrapAlignment.end,
                                     children: [
-                                      InkWell(
-                                        borderRadius: BorderRadius.circular(12),
-                                        onTap: () =>
-                                            _toggleLetterGroup(entry.key),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 4,
-                                            vertical: 8,
+                                      FilterChip(
+                                        selected: _filterPropagatingOnly,
+                                        label: const Text('С размножением'),
+                                        avatar: Icon(
+                                          Icons.spa_outlined,
+                                          size: 18,
+                                          color: _filterPropagatingOnly
+                                              ? AppColors.dark1
+                                              : AppColors.accentLight,
+                                        ),
+                                        selectedColor: AppColors.goldAccent,
+                                        checkmarkColor: AppColors.dark1,
+                                        labelStyle: TextStyle(
+                                          color: _filterPropagatingOnly
+                                              ? AppColors.dark1
+                                              : AppColors.textPrimary,
+                                        ),
+                                        backgroundColor:
+                                            AppColors.backgroundSecondary,
+                                        side: BorderSide(
+                                          color: _filterPropagatingOnly
+                                              ? AppColors.goldAccent
+                                              : AppColors.greenDeep,
+                                        ),
+                                        onSelected: (selected) {
+                                          setState(() {
+                                            _filterPropagatingOnly = selected;
+                                          });
+                                        },
+                                      ),
+                                      PopupMenuButton<_PlantSortField>(
+                                        tooltip: 'Sort plants',
+                                        onSelected: _setSortField,
+                                        itemBuilder: (context) =>
+                                            _PlantSortField.values
+                                                .map(
+                                                  (field) => PopupMenuItem(
+                                                    value: field,
+                                                    child: Row(
+                                                      children: [
+                                                        if (_sortField == field)
+                                                          Icon(
+                                                            _sortAscending
+                                                                ? Icons
+                                                                    .arrow_upward
+                                                                : Icons
+                                                                    .arrow_downward,
+                                                            size: 18,
+                                                          )
+                                                        else
+                                                          const SizedBox(
+                                                              width: 18),
+                                                        const SizedBox(
+                                                            width: 8),
+                                                        Text(
+                                                          switch (field) {
+                                                            _PlantSortField
+                                                                  .name =>
+                                                              'Name',
+                                                            _PlantSortField
+                                                                  .nickname =>
+                                                              'Nickname',
+                                                            _PlantSortField
+                                                                  .lastWateredAt =>
+                                                              'Last watering',
+                                                            _PlantSortField
+                                                                  .lastFertilizedAt =>
+                                                              'Last fertilizing',
+                                                            _PlantSortField
+                                                                  .createdAt =>
+                                                              'Date added',
+                                                            _PlantSortField
+                                                                  .family =>
+                                                              'Family',
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                )
+                                                .toList(),
+                                        child: Chip(
+                                          avatar: Icon(
+                                            _sortAscending
+                                                ? Icons.arrow_upward
+                                                : Icons.arrow_downward,
+                                            size: 18,
                                           ),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                entry.key,
-                                                style: const TextStyle(
-                                                  color: AppColors.heading,
-                                                  fontSize: 24,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                '${entry.value.length}',
-                                                style: const TextStyle(
-                                                  color:
-                                                      AppColors.textSecondary,
-                                                ),
-                                              ),
-                                              const Spacer(),
-                                              Icon(
-                                                isCollapsed
-                                                    ? Icons.keyboard_arrow_down
-                                                    : Icons.keyboard_arrow_up,
-                                                color: AppColors.heading,
-                                              ),
-                                            ],
-                                          ),
+                                          label: Text('Sort: $_sortLabel'),
                                         ),
                                       ),
-                                      if (!isCollapsed)
-                                        _buildPlantGrid(
-                                          entry.value,
-                                          crossAxisCount,
-                                        ),
                                     ],
                                   ),
-                                );
-                              })
-                            else
-                              _buildPlantGrid(sortedPlants, crossAxisCount),
-                          ],
+                                if (!_isSelectionMode)
+                                  const SizedBox(height: 8),
+                                if (_filterPropagatingOnly &&
+                                    sortedPlants.isEmpty)
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(24),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.backgroundSecondary,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: AppColors.greenDeep,
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Нет растений с активным размножением',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  )
+                                else if (_sortField == _PlantSortField.name)
+                                  ..._groupPlantsByLetter(
+                                    sortedPlants,
+                                  ).entries.map((entry) {
+                                    final isCollapsed = _collapsedLetterGroups
+                                        .contains(entry.key);
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 20),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          InkWell(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            onTap: () =>
+                                                _toggleLetterGroup(entry.key),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 4,
+                                                vertical: 8,
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    entry.key,
+                                                    style: const TextStyle(
+                                                      color: AppColors.heading,
+                                                      fontSize: 24,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    '${entry.value.length}',
+                                                    style: const TextStyle(
+                                                      color: AppColors
+                                                          .textSecondary,
+                                                    ),
+                                                  ),
+                                                  const Spacer(),
+                                                  Icon(
+                                                    isCollapsed
+                                                        ? Icons
+                                                            .keyboard_arrow_down
+                                                        : Icons
+                                                            .keyboard_arrow_up,
+                                                    color: AppColors.heading,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          if (!isCollapsed)
+                                            _buildPlantGrid(
+                                              entry.value,
+                                              crossAxisCount,
+                                            ),
+                                        ],
+                                      ),
+                                    );
+                                  })
+                                else
+                                  _buildPlantGrid(
+                                    sortedPlants,
+                                    crossAxisCount,
+                                  ),
+                              ],
+                            );
+                          },
                         );
                       },
                     );

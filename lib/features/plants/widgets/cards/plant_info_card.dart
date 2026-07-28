@@ -9,6 +9,7 @@ import '../../../../services/fertilize_service.dart';
 import '../../../../services/repotting_service.dart';
 import '../../../../services/watering_service.dart';
 import '../notes/plant_notes_section.dart';
+import '../propagations/plant_propagations_section.dart';
 import '../sheets/fertilizing_history_sheet.dart';
 import '../sheets/repotting_history_sheet.dart';
 import '../sheets/watering_history_sheet.dart';
@@ -200,6 +201,12 @@ class PlantInfoCard extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 32),
+          PlantPropagationsSection(
+            plantId: plantId,
+            plantName: data['name'] as String? ?? 'Unnamed Plant',
+            plantFamily: data['family'] as String? ?? '',
           ),
           const SizedBox(height: 32),
           const Text(

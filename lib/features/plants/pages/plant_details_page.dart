@@ -8,6 +8,7 @@ import '../../../services/plant_service.dart';
 import '../../../services/storage_service.dart';
 import '../widgets/sheets/update_plant_sheet.dart';
 import '../widgets/sheets/add_note_sheet.dart';
+import '../widgets/sheets/add_propagation_sheet.dart';
 import '../widgets/sheets/watering_history_sheet.dart';
 import '../widgets/sheets/add_repotting_sheet.dart';
 import '../widgets/sheets/add_fertilizing_sheet.dart';
@@ -168,6 +169,23 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                     isScrollControlled: true,
                     builder: (_) =>
                         AddRepottingSheet(plantId: widget.plantId),
+                  );
+                },
+              ),
+              _TopAction(
+                icon: Icons.spa_outlined,
+                label: 'Propagate',
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => AddPropagationSheet(
+                      parentPlantId: widget.plantId,
+                      parentPlantName:
+                          data['name'] as String? ?? 'Unnamed Plant',
+                      parentPlantFamily: data['family'] as String? ?? '',
+                    ),
                   );
                 },
               ),
