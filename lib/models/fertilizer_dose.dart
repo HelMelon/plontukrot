@@ -1,4 +1,4 @@
-const List<int> kWaterVolumesMl = [100, 250, 1000];
+const List<int> kWaterVolumesMl = [250, 500, 1000];
 
 enum FertilizerDoseUnit { g, ml }
 
@@ -23,12 +23,10 @@ class FertilizerDose {
     this.unit = FertilizerDoseUnit.g,
   });
 
-  /// Back-compat alias used by remove-sentinel checks.
   double get grams => amount;
 
   factory FertilizerDose.fromMap(Map<String, dynamic> data) {
-    final rawAmount =
-        (data['amount'] as num?)?.toDouble() ??
+    final rawAmount = (data['amount'] as num?)?.toDouble() ??
         (data['grams'] as num?)?.toDouble() ??
         0;
     return FertilizerDose(

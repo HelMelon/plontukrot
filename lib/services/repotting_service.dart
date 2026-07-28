@@ -17,6 +17,20 @@ class RepottingService {
     return _plantsCollection.doc(plantId).collection('repotting');
   }
 
+  Future<void> _syncLastRepottedAt(String plantId) async {
+    final snapshot = await _repottingRef(plantId)
+        .orderBy('repottedAt', descending: true)
+        .limit(1)
+        .get();
+
+    await _plantsCollection.doc(plantId).update({
+      'lastRepottedAt': snapshot.docs.isEmpty
+          ? FieldValue.delete()
+          : snapshot.docs.first.data()['repottedAt'],
+      'careHistoryMigrated': true,
+    });
+  }
+
   Future<void> addRepotting({
     required String plantId,
     required DateTime repottedAt,
@@ -70,19 +84,24 @@ class RepottingService {
     required String repottingId,
   }) async {
     await _repottingRef(plantId).doc(repottingId).delete();
+    await _syncLastRepottedAt(plantId);
   }
 
   Future<void> updateRepotting({
     required String plantId,
     required String repottingId,
-    DateTime? repottedAt,
+    required DateTime repottedAt,
+    required List<SoilComponent> components,
+    String? soilId,
+    String? soilName,
   }) async {
-    final updateData = <String, dynamic>{};
+    await _repottingRef(plantId).doc(repottingId).update({
+      'repottedAt': Timestamp.fromDate(repottedAt),
+      'soilId': soilId ?? FieldValue.delete(),
+      'soilName': soilName ?? FieldValue.delete(),
+      'components': components.map((e) => e.toMap()).toList(),
+    });
 
-    if (repottedAt != null) {
-      updateData['repottedAt'] = Timestamp.fromDate(repottedAt);
-    }
-
-    await _repottingRef(plantId).doc(repottingId).update(updateData);
+    await _syncLastRepottedAt(plantId);
   }
 }

@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../models/fertilizer.dart';
 import '../../../../models/fertilizer_dose.dart';
 import '../../../../models/fertilizer_ingredient.dart';
+import '../../../../models/fertilizing_entry.dart';
 import '../../../../services/fertilize_service.dart';
 import '../tags/fertilizer_component_tags.dart';
 import '../dialogs/fertilizer_composition_dialog.dart';
@@ -15,11 +16,13 @@ enum _FertilizerMode { saved, newMix }
 class AddFertilizingSheet extends StatefulWidget {
   final List<String> plantIds;
   final String title;
+  final FertilizingEntry? entry;
 
   const AddFertilizingSheet({
     super.key,
     required this.plantIds,
     this.title = 'Add Fertilizing',
+    this.entry,
   });
 
   factory AddFertilizingSheet.forPlant({
@@ -29,6 +32,21 @@ class AddFertilizingSheet extends StatefulWidget {
     return AddFertilizingSheet(key: key, plantIds: [plantId]);
   }
 
+  factory AddFertilizingSheet.edit({
+    Key? key,
+    required String plantId,
+    required FertilizingEntry entry,
+  }) {
+    return AddFertilizingSheet(
+      key: key,
+      plantIds: [plantId],
+      title: 'Edit Fertilizing',
+      entry: entry,
+    );
+  }
+
+  bool get isEditing => entry != null;
+
   @override
   State<AddFertilizingSheet> createState() => _AddFertilizingSheetState();
 }
@@ -37,14 +55,37 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
   final _service = FertilizeService();
   final _mixNameController = TextEditingController();
 
-  DateTime _selectedDate = DateTime.now();
-  _FertilizerMode _mode = _FertilizerMode.saved;
+  late DateTime _selectedDate;
+  late _FertilizerMode _mode;
   String? _selectedFertilizerId;
-  List<FertilizerDose> _components = [];
-  int _waterMl = 250;
+  late List<FertilizerDose> _components;
+  late int _waterMl;
   bool _saveMix = false;
   bool _saving = false;
   List<String> _catalogNames = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    final entry = widget.entry;
+    if (entry != null) {
+      _selectedDate = entry.appliedAt;
+      _components = List.from(entry.components);
+      _waterMl = entry.waterMl;
+      if (entry.fertilizerId != null) {
+        _mode = _FertilizerMode.saved;
+        _selectedFertilizerId = entry.fertilizerId;
+      } else {
+        _mode = _FertilizerMode.newMix;
+        _selectedFertilizerId = null;
+      }
+    } else {
+      _selectedDate = DateTime.now();
+      _mode = _FertilizerMode.saved;
+      _components = [];
+      _waterMl = 250;
+    }
+  }
 
   @override
   void dispose() {
@@ -220,7 +261,9 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
   bool get _canSave {
     if (_saving) return false;
     if (_mode == _FertilizerMode.saved) {
-      return _selectedFertilizerId != null;
+      if (_selectedFertilizerId != null) return true;
+      // Editing a saved mix that no longer exists in catalog.
+      return widget.isEditing && _components.isNotEmpty;
     }
     if (_components.isEmpty) return false;
     if (_saveMix && _mixNameController.text.trim().isEmpty) return false;
@@ -245,6 +288,10 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
         if (fertilizer != null) {
           components = fertilizer.components;
           waterMl = fertilizer.waterMl;
+        } else if (widget.entry != null) {
+          fertilizerName = widget.entry!.fertilizerName;
+          components = widget.entry!.components;
+          waterMl = widget.entry!.waterMl;
         }
       }
 
@@ -260,18 +307,31 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
         fertilizerName = 'Custom mix';
       }
 
-      await Future.wait(
-        widget.plantIds.map(
-          (plantId) => _service.addFertilizing(
-            plantId: plantId,
-            appliedAt: _selectedDate,
-            components: components,
-            waterMl: waterMl,
-            fertilizerId: fertilizerId,
-            fertilizerName: fertilizerName,
+      final entry = widget.entry;
+      if (entry != null) {
+        await _service.updateFertilizing(
+          plantId: widget.plantIds.first,
+          fertilizingId: entry.id,
+          appliedAt: _selectedDate,
+          components: components,
+          waterMl: waterMl,
+          fertilizerId: fertilizerId,
+          fertilizerName: fertilizerName,
+        );
+      } else {
+        await Future.wait(
+          widget.plantIds.map(
+            (plantId) => _service.addFertilizing(
+              plantId: plantId,
+              appliedAt: _selectedDate,
+              components: components,
+              waterMl: waterMl,
+              fertilizerId: fertilizerId,
+              fertilizerName: fertilizerName,
+            ),
           ),
-        ),
-      );
+        );
+      }
 
       if (!mounted) return;
       Navigator.pop(context, true);
@@ -384,8 +444,17 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                           children: [
                             Expanded(
                               child: DropdownButton<String>(
-                                value: _selectedFertilizerId,
-                                hint: const Text('Select fertilizer'),
+                                value: fertilizers.any(
+                                  (f) => f.id == _selectedFertilizerId,
+                                )
+                                    ? _selectedFertilizerId
+                                    : null,
+                                hint: Text(
+                                  _selectedFertilizerId != null &&
+                                          widget.entry != null
+                                      ? widget.entry!.fertilizerName
+                                      : 'Select fertilizer',
+                                ),
                                 isExpanded: true,
                                 items: fertilizers
                                     .map(
@@ -407,7 +476,8 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                             ),
                             IconButton(
                               tooltip: 'View composition',
-                              onPressed: _selectedFertilizerId == null
+                              onPressed: _selectedFertilizerId == null &&
+                                      _components.isEmpty
                                   ? null
                                   : () =>
                                       _showSelectedComposition(fertilizers),
@@ -415,7 +485,8 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                             ),
                           ],
                         ),
-                        if (_selectedFertilizerId != null) ...[
+                        if (_selectedFertilizerId != null ||
+                            _components.isNotEmpty) ...[
                           const SizedBox(height: 12),
                           Align(
                             alignment: Alignment.centerLeft,

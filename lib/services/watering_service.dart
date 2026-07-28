@@ -14,6 +14,20 @@ class WateringService {
     return _plantsCollection.doc(plantId).collection('watering');
   }
 
+  Future<void> _syncLastWateredAt(String plantId) async {
+    final snapshot = await _wateringRef(plantId)
+        .orderBy('wateredAt', descending: true)
+        .limit(1)
+        .get();
+
+    await _plantsCollection.doc(plantId).update({
+      'lastWateredAt': snapshot.docs.isEmpty
+          ? FieldValue.delete()
+          : snapshot.docs.first.data()['wateredAt'],
+      'careHistoryMigrated': true,
+    });
+  }
+
   Future<void> addWatering({
     required String plantId,
     required DateTime wateredAt,
@@ -106,31 +120,30 @@ class WateringService {
     required String wateringId,
   }) async {
     await _wateringRef(plantId).doc(wateringId).delete();
+    await _syncLastWateredAt(plantId);
   }
 
   Future<void> updateWatering({
     required String plantId,
     required String wateringId,
-    DateTime? wateredAt,
+    required DateTime wateredAt,
   }) async {
-    final updateData = <String, dynamic>{};
+    final updateData = <String, dynamic>{
+      'wateredAt': Timestamp.fromDate(wateredAt),
+    };
 
-    if (wateredAt != null) {
-      updateData['wateredAt'] = Timestamp.fromDate(wateredAt);
+    final plantDoc = await _plantsCollection.doc(plantId).get();
+    final frequency = plantDoc.data()?['wateringFrequency'] as int?;
 
-      final plantDoc = await _plantsCollection.doc(plantId).get();
-
-      final frequency = plantDoc.data()?['wateringFrequency'] as int?;
-
-      if (frequency != null && frequency > 0) {
-        updateData['nextWatering'] = Timestamp.fromDate(
-          wateredAt.add(Duration(days: frequency)),
-        );
-      } else {
-        updateData['nextWatering'] = null;
-      }
+    if (frequency != null && frequency > 0) {
+      updateData['nextWatering'] = Timestamp.fromDate(
+        wateredAt.add(Duration(days: frequency)),
+      );
+    } else {
+      updateData['nextWatering'] = null;
     }
 
     await _wateringRef(plantId).doc(wateringId).update(updateData);
+    await _syncLastWateredAt(plantId);
   }
 }

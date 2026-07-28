@@ -108,6 +108,24 @@ class FertilizeService {
 
   // --- Plant fertilizing history ---
 
+  DocumentReference<Map<String, dynamic>> _plantRef(String plantId) {
+    return _db.collection('users').doc(uid).collection('plants').doc(plantId);
+  }
+
+  Future<void> _syncLastFertilizedAt(String plantId) async {
+    final snapshot = await _fertilizingRef(plantId)
+        .orderBy('appliedAt', descending: true)
+        .limit(1)
+        .get();
+
+    await _plantRef(plantId).update({
+      'lastFertilizedAt': snapshot.docs.isEmpty
+          ? FieldValue.delete()
+          : snapshot.docs.first.data()['appliedAt'],
+      'careHistoryMigrated': true,
+    });
+  }
+
   Future<void> addFertilizing({
     required String plantId,
     required DateTime appliedAt,
@@ -117,8 +135,7 @@ class FertilizeService {
     String? fertilizerName,
     DateTime? nextFertilizing,
   }) async {
-    final plantRef =
-        _db.collection('users').doc(uid).collection('plants').doc(plantId);
+    final plantRef = _plantRef(plantId);
     final plant = await plantRef.get();
     final lastFertilizedAt = plant.data()?['lastFertilizedAt'] as Timestamp?;
 
@@ -140,6 +157,29 @@ class FertilizeService {
         'careHistoryMigrated': true,
       });
     }
+  }
+
+  Future<void> updateFertilizing({
+    required String plantId,
+    required String fertilizingId,
+    required DateTime appliedAt,
+    required List<FertilizerDose> components,
+    required int waterMl,
+    String? fertilizerId,
+    String? fertilizerName,
+    DateTime? nextFertilizing,
+  }) async {
+    await _fertilizingRef(plantId).doc(fertilizingId).update({
+      'fertilizerId': fertilizerId ?? FieldValue.delete(),
+      'fertilizerName': fertilizerName ?? FieldValue.delete(),
+      'waterMl': normalizeWaterMl(waterMl),
+      'components': components.map((e) => e.toMap()).toList(),
+      'appliedAt': Timestamp.fromDate(appliedAt),
+      'nextFertilizing':
+          nextFertilizing != null ? Timestamp.fromDate(nextFertilizing) : null,
+    });
+
+    await _syncLastFertilizedAt(plantId);
   }
 
   Stream<List<FertilizingEntry>> getFertilizingHistory(String plantId) {
@@ -176,5 +216,6 @@ class FertilizeService {
     required String fertilizingId,
   }) async {
     await _fertilizingRef(plantId).doc(fertilizingId).delete();
+    await _syncLastFertilizedAt(plantId);
   }
 }

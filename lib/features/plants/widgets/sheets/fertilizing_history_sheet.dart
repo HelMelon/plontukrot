@@ -18,13 +18,52 @@ class FertilizingHistorySheet extends StatefulWidget {
 
 class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
   final FertilizeService _service = FertilizeService();
-  String? _deleteModeId;
 
   Future<void> _showAddSheet() async {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (_) => AddFertilizingSheet.forPlant(plantId: widget.plantId),
+    );
+  }
+
+  Future<void> _showEditSheet(FertilizingEntry entry) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => AddFertilizingSheet.edit(
+        plantId: widget.plantId,
+        entry: entry,
+      ),
+    );
+  }
+
+  Future<void> _confirmDelete(FertilizingEntry entry) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete fertilizing'),
+          content: const Text('Delete this record?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    await _service.deleteFertilizing(
+      plantId: widget.plantId,
+      fertilizingId: entry.id,
     );
   }
 
@@ -83,7 +122,8 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                   itemBuilder: (context, index) {
                     final item = items[index];
 
-                    return GestureDetector(
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(16),
                       onTap: () {
                         showFertilizerCompositionDialog(
                           context: context,
@@ -91,15 +131,6 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                           components: item.components,
                           waterMl: item.waterMl,
                         );
-                      },
-                      onLongPress: () {
-                        setState(() {
-                          if (_deleteModeId == item.id) {
-                            _deleteModeId = null;
-                          } else {
-                            _deleteModeId = item.id;
-                          }
-                        });
                       },
                       child: Container(
                         padding: const EdgeInsets.all(16),
@@ -135,46 +166,16 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                                 ],
                               ),
                             ),
-                            if (_deleteModeId == item.id)
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline),
-                                onPressed: () async {
-                                  final confirmed = await showDialog<bool>(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: const Text('Delete fertilizing'),
-                                        content: const Text(
-                                          'Delete this record?',
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context, false),
-                                            child: const Text('Cancel'),
-                                          ),
-                                          FilledButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context, true),
-                                            child: const Text('Delete'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-
-                                  if (confirmed != true) return;
-
-                                  await _service.deleteFertilizing(
-                                    plantId: widget.plantId,
-                                    fertilizingId: item.id,
-                                  );
-
-                                  if (mounted) {
-                                    setState(() => _deleteModeId = null);
-                                  }
-                                },
-                              ),
+                            IconButton(
+                              tooltip: 'Edit',
+                              icon: const Icon(Icons.edit_outlined),
+                              onPressed: () => _showEditSheet(item),
+                            ),
+                            IconButton(
+                              tooltip: 'Delete',
+                              icon: const Icon(Icons.delete_outline),
+                              onPressed: () => _confirmDelete(item),
+                            ),
                           ],
                         ),
                       ),

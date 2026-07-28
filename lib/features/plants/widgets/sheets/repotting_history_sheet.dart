@@ -17,13 +17,52 @@ class RepottingHistorySheet extends StatefulWidget {
 
 class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
   final RepottingService _service = RepottingService();
-  String? _deleteModeRepottingId;
 
   Future<void> _showAddSheet() async {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (_) => AddRepottingSheet(plantId: widget.plantId),
+    );
+  }
+
+  Future<void> _showEditSheet(RepottingEntry entry) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => AddRepottingSheet.edit(
+        plantId: widget.plantId,
+        entry: entry,
+      ),
+    );
+  }
+
+  Future<void> _confirmDelete(String repottingId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete repotting'),
+          content: const Text('Delete this record?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    await _service.deleteRepotting(
+      plantId: widget.plantId,
+      repottingId: repottingId,
     );
   }
 
@@ -88,22 +127,14 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                         ? item.soilName!
                         : 'Custom mix';
 
-                    return GestureDetector(
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(16),
                       onTap: () {
                         showSoilCompositionDialog(
                           context: context,
                           title: title,
                           components: item.components,
                         );
-                      },
-                      onLongPress: () {
-                        setState(() {
-                          if (_deleteModeRepottingId == repottingId) {
-                            _deleteModeRepottingId = null;
-                          } else {
-                            _deleteModeRepottingId = repottingId;
-                          }
-                        });
                       },
                       child: Container(
                         padding: const EdgeInsets.all(16),
@@ -144,48 +175,16 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                                 ],
                               ),
                             ),
-                            if (_deleteModeRepottingId == repottingId)
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline),
-                                onPressed: () async {
-                                  final confirmed = await showDialog<bool>(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: const Text('Delete repotting'),
-                                        content: const Text(
-                                          'Delete this record?',
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context, false),
-                                            child: const Text('Cancel'),
-                                          ),
-                                          FilledButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context, true),
-                                            child: const Text('Delete'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-
-                                  if (confirmed != true) return;
-
-                                  await _service.deleteRepotting(
-                                    plantId: widget.plantId,
-                                    repottingId: repottingId,
-                                  );
-
-                                  if (mounted) {
-                                    setState(() {
-                                      _deleteModeRepottingId = null;
-                                    });
-                                  }
-                                },
-                              ),
+                            IconButton(
+                              tooltip: 'Edit',
+                              icon: const Icon(Icons.edit_outlined),
+                              onPressed: () => _showEditSheet(item),
+                            ),
+                            IconButton(
+                              tooltip: 'Delete',
+                              icon: const Icon(Icons.delete_outline),
+                              onPressed: () => _confirmDelete(repottingId),
+                            ),
                           ],
                         ),
                       ),

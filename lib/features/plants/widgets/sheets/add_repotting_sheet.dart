@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/catalog_component.dart';
 import '../../../../models/component.dart';
+import '../../../../models/repotting_entry.dart';
 import '../../../../models/soil.dart';
 import '../../../../services/component_service.dart';
 import '../../../../services/repotting_service.dart';
@@ -16,8 +17,23 @@ enum _SoilMode { saved, newMix }
 
 class AddRepottingSheet extends StatefulWidget {
   final String plantId;
+  final RepottingEntry? entry;
 
-  const AddRepottingSheet({super.key, required this.plantId});
+  const AddRepottingSheet({
+    super.key,
+    required this.plantId,
+    this.entry,
+  });
+
+  factory AddRepottingSheet.edit({
+    Key? key,
+    required String plantId,
+    required RepottingEntry entry,
+  }) {
+    return AddRepottingSheet(key: key, plantId: plantId, entry: entry);
+  }
+
+  bool get isEditing => entry != null;
 
   @override
   State<AddRepottingSheet> createState() => _AddRepottingSheetState();
@@ -29,10 +45,10 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
   final _componentService = ComponentService();
   final _mixNameController = TextEditingController();
 
-  DateTime _selectedDate = DateTime.now();
-  _SoilMode _mode = _SoilMode.newMix;
+  late DateTime _selectedDate;
+  late _SoilMode _mode;
   String? _selectedSoilId;
-  List<SoilComponent> _components = [];
+  late List<SoilComponent> _components;
   bool _saveMix = false;
   bool _saving = false;
   List<String> _catalogNames = const [];
@@ -41,6 +57,23 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
   void initState() {
     super.initState();
     _componentService.ensureDefaultComponents();
+
+    final entry = widget.entry;
+    if (entry != null) {
+      _selectedDate = entry.repottedAt;
+      _components = List.from(entry.components);
+      if (entry.soilId != null) {
+        _mode = _SoilMode.saved;
+        _selectedSoilId = entry.soilId;
+      } else {
+        _mode = _SoilMode.newMix;
+        _selectedSoilId = null;
+      }
+    } else {
+      _selectedDate = DateTime.now();
+      _mode = _SoilMode.newMix;
+      _components = [];
+    }
   }
 
   @override
@@ -170,7 +203,8 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
   bool get _canSave {
     if (_saving) return false;
     if (_mode == _SoilMode.saved) {
-      return _selectedSoilId != null && _components.isNotEmpty;
+      if (_selectedSoilId != null && _components.isNotEmpty) return true;
+      return widget.isEditing && _components.isNotEmpty;
     }
     if (_components.isEmpty) return false;
     if (_saveMix && _mixNameController.text.trim().isEmpty) return false;
@@ -185,31 +219,47 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
     try {
       String? soilId = _mode == _SoilMode.saved ? _selectedSoilId : null;
       String? soilName;
+      var components = _components;
 
       if (_mode == _SoilMode.saved && soilId != null) {
         final soil = await _soilService.getSoil(soilId);
-        soilName = soil?.name;
+        soilName = soil?.name ?? widget.entry?.soilName;
+        if (soil != null) {
+          components = List.from(soil.components);
+        }
       }
 
       if (_mode == _SoilMode.newMix && _saveMix) {
         final name = _mixNameController.text.trim();
         soilId = await _soilService.addSoil(
           name: name,
-          components: _components,
+          components: components,
         );
         soilName = name;
       }
 
-      await _repottingService.addRepotting(
-        plantId: widget.plantId,
-        repottedAt: _selectedDate,
-        components: _components,
-        soilId: soilId,
-        soilName: soilName,
-      );
+      final entry = widget.entry;
+      if (entry != null && entry.id != null) {
+        await _repottingService.updateRepotting(
+          plantId: widget.plantId,
+          repottingId: entry.id!,
+          repottedAt: _selectedDate,
+          components: components,
+          soilId: soilId,
+          soilName: soilName,
+        );
+      } else {
+        await _repottingService.addRepotting(
+          plantId: widget.plantId,
+          repottedAt: _selectedDate,
+          components: components,
+          soilId: soilId,
+          soilName: soilName,
+        );
+      }
 
       if (!mounted) return;
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -239,9 +289,9 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Add Repotting',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              Text(
+                widget.isEditing ? 'Edit Repotting' : 'Add Repotting',
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
               ListTile(
@@ -317,8 +367,14 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                       children: [
                         Expanded(
                           child: DropdownButton<String>(
-                            value: _selectedSoilId,
-                            hint: const Text('Select soil'),
+                            value: soils.any((s) => s.id == _selectedSoilId)
+                                ? _selectedSoilId
+                                : null,
+                            hint: Text(
+                              _selectedSoilId != null && widget.entry != null
+                                  ? (widget.entry!.soilName ?? 'Select soil')
+                                  : 'Select soil',
+                            ),
                             isExpanded: true,
                             items: soils
                                 .map(
@@ -338,7 +394,8 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                         ),
                         IconButton(
                           tooltip: 'View composition',
-                          onPressed: _selectedSoilId == null
+                          onPressed: _selectedSoilId == null &&
+                                  _components.isEmpty
                               ? null
                               : () => _showSelectedComposition(soils),
                           icon: const Icon(Icons.info_outline),

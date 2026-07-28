@@ -15,10 +15,12 @@ class WateringHistorySheet extends StatefulWidget {
 class _WateringHistorySheetState extends State<WateringHistorySheet> {
   final WateringService _service = WateringService();
 
-  String? _deleteModeWateringId;
-
-  Future<void> _showAddWateringSheet() async {
-    DateTime selectedDate = DateTime.now();
+  Future<void> _showWateringEditor({
+    String? wateringId,
+    DateTime? initialDate,
+  }) async {
+    DateTime selectedDate = initialDate ?? DateTime.now();
+    final isEditing = wateringId != null;
 
     await showModalBottomSheet(
       context: context,
@@ -40,9 +42,9 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      'Add Watering',
-                      style: TextStyle(
+                    Text(
+                      isEditing ? 'Edit Watering' : 'Add Watering',
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
@@ -80,10 +82,18 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                         const Spacer(),
                         FilledButton(
                           onPressed: () async {
-                            await _service.addWatering(
-                              plantId: widget.plantId,
-                              wateredAt: selectedDate,
-                            );
+                            if (isEditing) {
+                              await _service.updateWatering(
+                                plantId: widget.plantId,
+                                wateringId: wateringId,
+                                wateredAt: selectedDate,
+                              );
+                            } else {
+                              await _service.addWatering(
+                                plantId: widget.plantId,
+                                wateredAt: selectedDate,
+                              );
+                            }
                             if (!context.mounted) return;
                             Navigator.pop(sheetContext);
                           },
@@ -98,6 +108,35 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
           },
         );
       },
+    );
+  }
+
+  Future<void> _confirmDelete(String wateringId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete watering'),
+          content: const Text('Delete this record?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    await _service.deleteWatering(
+      plantId: widget.plantId,
+      wateringId: wateringId,
     );
   }
 
@@ -125,7 +164,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
               ),
               const Spacer(),
               FilledButton.icon(
-                onPressed: _showAddWateringSheet,
+                onPressed: () => _showWateringEditor(),
                 icon: const Icon(Icons.add),
                 label: const Text('Add watering'),
               ),
@@ -160,86 +199,44 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                     final wateringId = item['id'] as String;
                     final wateredAt = item['wateredAt'] as DateTime;
 
-                    return GestureDetector(
-                      onLongPress: () {
-                        setState(() {
-                          if (_deleteModeWateringId == wateringId) {
-                            _deleteModeWateringId = null;
-                          } else {
-                            _deleteModeWateringId = wateringId;
-                          }
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.surfaceContainerHighest,
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.water_drop_rounded,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                DateFormat('d MMMM y').format(wateredAt),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.water_drop_rounded,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              DateFormat('d MMMM y').format(wateredAt),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                            if (_deleteModeWateringId == wateringId)
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline),
-                                onPressed: () async {
-                                  final confirmed = await showDialog<bool>(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: const Text('Delete watering'),
-                                        content: const Text(
-                                          'Delete this record?',
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context, false),
-                                            child: const Text('Cancel'),
-                                          ),
-                                          FilledButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context, true),
-                                            child: const Text('Delete'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-
-                                  if (confirmed != true) {
-                                    return;
-                                  }
-
-                                  await _service.deleteWatering(
-                                    plantId: widget.plantId,
-                                    wateringId: wateringId,
-                                  );
-
-                                  if (mounted) {
-                                    setState(() {
-                                      _deleteModeWateringId = null;
-                                    });
-                                  }
-                                },
-                              ),
-                          ],
-                        ),
+                          ),
+                          IconButton(
+                            tooltip: 'Edit',
+                            icon: const Icon(Icons.edit_outlined),
+                            onPressed: () => _showWateringEditor(
+                              wateringId: wateringId,
+                              initialDate: wateredAt,
+                            ),
+                          ),
+                          IconButton(
+                            tooltip: 'Delete',
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: () => _confirmDelete(wateringId),
+                          ),
+                        ],
                       ),
                     );
                   },
