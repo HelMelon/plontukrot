@@ -20,30 +20,51 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
 
   bool isLoading = false;
   int selectedStage = 0;
+  String? nameError;
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    nickNameController.dispose();
+    familyController.dispose();
+    wateringFrequencyController.dispose();
+    super.dispose();
+  }
 
   Future<void> addPlant() async {
     final name = nameController.text.trim();
     final nickname = nickNameController.text.trim();
     final family = familyController.text.trim();
     if (name.isEmpty) {
+      setState(() => nameError = 'Укажите название растения');
       return;
     }
 
     if (mounted) {
       setState(() {
         isLoading = true;
+        nameError = null;
       });
     }
 
-    await PlantService().addPlant(
-      name: name,
-      nickname: nickname,
-      family: family,
-      stage: selectedStage,
-    );
+    try {
+      await PlantService().addPlant(
+        name: name,
+        nickname: nickname,
+        family: family,
+        stage: selectedStage,
+      );
 
-    if (mounted) {
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка: $e')),
+        );
+      }
     }
   }
 
@@ -90,8 +111,12 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
               TextField(
                 controller: nameController,
                 style: const TextStyle(color: AppColors.textPrimary),
+                onChanged: (_) {
+                  if (nameError != null) setState(() => nameError = null);
+                },
                 decoration: InputDecoration(
                   labelText: 'Plant name',
+                  errorText: nameError,
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.dark2,
@@ -118,7 +143,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
               ),
               const SizedBox(height: 18),
               TextField(
-                controller: nickNameController,
+                controller: familyController,
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
                   labelText: 'Plant family',

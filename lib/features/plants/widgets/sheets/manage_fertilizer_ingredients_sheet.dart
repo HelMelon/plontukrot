@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/prompt_text_dialog.dart';
 import '../../../../models/fertilizer_ingredient.dart';
 import '../../../../services/fertilize_service.dart';
 
@@ -26,36 +27,14 @@ class _ManageFertilizerIngredientsSheetState
   Future<String?> _promptName({
     required String title,
     String initial = '',
-  }) async {
-    final controller = TextEditingController(text: initial);
-    final result = await showDialog<String>(
+  }) {
+    return showPromptTextDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.backgroundSecondary,
-          title: Text(title),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            decoration: const InputDecoration(hintText: 'Ingredient name'),
-            textCapitalization: TextCapitalization.sentences,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, controller.text.trim()),
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
+      title: title,
+      initial: initial,
+      hintText: 'Ingredient name',
+      confirmLabel: 'Save',
     );
-    controller.dispose();
-    if (result == null || result.isEmpty) return null;
-    return result;
   }
 
   Future<void> _add() async {

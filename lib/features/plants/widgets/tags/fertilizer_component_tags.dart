@@ -8,106 +8,145 @@ Future<FertilizerDose?> showFertilizerDoseDialog({
   required BuildContext context,
   required String component,
   FertilizerDose? initial,
-}) async {
-  var unit = initial?.unit ?? FertilizerDoseUnit.g;
-  final amountController = TextEditingController(
-    text: initial == null
-        ? ''
-        : (initial.amount == initial.amount.roundToDouble()
-            ? initial.amount.toInt().toString()
-            : initial.amount.toString()),
-  );
-
-  final result = await showDialog<FertilizerDose>(
+}) {
+  return showDialog<FertilizerDose>(
     context: context,
-    builder: (context) {
-      return StatefulBuilder(
-        builder: (context, setDialogState) {
-          return AlertDialog(
-            backgroundColor: AppColors.backgroundSecondary,
-            title: Text(component),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SegmentedButton<FertilizerDoseUnit>(
-                  segments: const [
-                    ButtonSegment(
-                      value: FertilizerDoseUnit.g,
-                      label: Text('g'),
-                    ),
-                    ButtonSegment(
-                      value: FertilizerDoseUnit.ml,
-                      label: Text('ml'),
-                    ),
-                  ],
-                  selected: {unit},
-                  onSelectionChanged: (value) {
-                    setDialogState(() => unit = value.first);
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: amountController,
-                  autofocus: true,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-                  ],
-                  decoration: InputDecoration(
-                    labelText: unit == FertilizerDoseUnit.ml
-                        ? 'Milliliters'
-                        : 'Grams',
-                    hintText: 'e.g. 2',
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              if (initial != null)
-                TextButton(
-                  onPressed: () => Navigator.pop(
-                    context,
-                    FertilizerDose(
-                      component: component,
-                      amount: -1,
-                      unit: unit,
-                    ),
-                  ),
-                  child: const Text('Remove'),
-                ),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
+    builder: (context) => _FertilizerDoseDialog(
+      component: component,
+      initial: initial,
+    ),
+  );
+}
+
+class _FertilizerDoseDialog extends StatefulWidget {
+  final String component;
+  final FertilizerDose? initial;
+
+  const _FertilizerDoseDialog({
+    required this.component,
+    required this.initial,
+  });
+
+  @override
+  State<_FertilizerDoseDialog> createState() => _FertilizerDoseDialogState();
+}
+
+class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
+  late FertilizerDoseUnit _unit;
+  late final TextEditingController _amountController;
+  String? _errorText;
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initial;
+    _unit = initial?.unit ?? FertilizerDoseUnit.g;
+    _amountController = TextEditingController(
+      text: initial == null
+          ? ''
+          : (initial.amount == initial.amount.roundToDouble()
+              ? initial.amount.toInt().toString()
+              : initial.amount.toString()),
+    );
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final raw = _amountController.text.trim().replaceAll(',', '.');
+    if (raw.isEmpty) {
+      setState(() => _errorText = 'Укажите количество');
+      return;
+    }
+    final amount = double.tryParse(raw);
+    if (amount == null || amount <= 0) {
+      setState(() => _errorText = 'Некорректное число');
+      return;
+    }
+    Navigator.pop(
+      context,
+      FertilizerDose(
+        component: widget.component,
+        amount: amount,
+        unit: _unit,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: AppColors.backgroundSecondary,
+      title: Text(widget.component),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SegmentedButton<FertilizerDoseUnit>(
+            segments: const [
+              ButtonSegment(
+                value: FertilizerDoseUnit.g,
+                label: Text('g'),
               ),
-              FilledButton(
-                onPressed: () {
-                  final raw =
-                      amountController.text.trim().replaceAll(',', '.');
-                  final amount = double.tryParse(raw);
-                  if (amount == null || amount <= 0) return;
-                  Navigator.pop(
-                    context,
-                    FertilizerDose(
-                      component: component,
-                      amount: amount,
-                      unit: unit,
-                    ),
-                  );
-                },
-                child: const Text('Save'),
+              ButtonSegment(
+                value: FertilizerDoseUnit.ml,
+                label: Text('ml'),
               ),
             ],
-          );
-        },
-      );
-    },
-  );
-
-  amountController.dispose();
-  return result;
+            selected: {_unit},
+            onSelectionChanged: (value) {
+              setState(() => _unit = value.first);
+            },
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _amountController,
+            autofocus: true,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+            ],
+            onChanged: (_) {
+              if (_errorText != null) setState(() => _errorText = null);
+            },
+            onSubmitted: (_) => _save(),
+            decoration: InputDecoration(
+              labelText:
+                  _unit == FertilizerDoseUnit.ml ? 'Milliliters' : 'Grams',
+              hintText: 'e.g. 2',
+              errorText: _errorText,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        if (widget.initial != null)
+          TextButton(
+            onPressed: () => Navigator.pop(
+              context,
+              FertilizerDose(
+                component: widget.component,
+                amount: -1,
+                unit: _unit,
+              ),
+            ),
+            child: const Text('Remove'),
+          ),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: _save,
+          child: const Text('Save'),
+        ),
+      ],
+    );
+  }
 }
 
 class FertilizerComponentTags extends StatelessWidget {

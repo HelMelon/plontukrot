@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/prompt_text_dialog.dart';
 import '../../../../models/fertilizer.dart';
 import '../../../../models/fertilizer_dose.dart';
 import '../../../../models/fertilizer_ingredient.dart';
@@ -106,33 +107,12 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
   }
 
   Future<void> _addCustomIngredient() async {
-    final controller = TextEditingController();
-    final name = await showDialog<String>(
+    final name = await showPromptTextDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.backgroundSecondary,
-          title: const Text('Add ingredient'),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            decoration: const InputDecoration(hintText: 'Ingredient name'),
-            textCapitalization: TextCapitalization.sentences,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, controller.text.trim()),
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
+      title: 'Add ingredient',
+      hintText: 'Ingredient name',
+      confirmLabel: 'Add',
     );
-    controller.dispose();
 
     if (name == null || name.isEmpty) return;
 

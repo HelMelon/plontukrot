@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/prompt_text_dialog.dart';
 import '../../../../models/catalog_component.dart';
 import '../../../../models/component.dart';
 import '../../../../models/repotting_entry.dart';
@@ -95,33 +96,12 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
   }
 
   Future<void> _addCustomComponent() async {
-    final controller = TextEditingController();
-    final name = await showDialog<String>(
+    final name = await showPromptTextDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.backgroundSecondary,
-          title: const Text('Add component'),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            decoration: const InputDecoration(hintText: 'Component name'),
-            textCapitalization: TextCapitalization.sentences,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, controller.text.trim()),
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
+      title: 'Add component',
+      hintText: 'Component name',
+      confirmLabel: 'Add',
     );
-    controller.dispose();
 
     if (name == null || name.isEmpty) return;
 

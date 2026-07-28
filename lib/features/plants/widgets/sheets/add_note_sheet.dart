@@ -20,16 +20,30 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
   Future<void> saveNote() async {
     final text = noteController.text.trim();
 
-    if (text.isEmpty) return;
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Заметка не может быть пустой')),
+      );
+      return;
+    }
 
     setState(() {
       isLoading = true;
     });
 
-    await NoteService().addNote(plantId: widget.plantId, text: text);
+    try {
+      await NoteService().addNote(plantId: widget.plantId, text: text);
 
-    if (mounted) {
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка: $e')),
+        );
+      }
     }
   }
 

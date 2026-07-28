@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/prompt_text_dialog.dart';
 import '../../../models/plant.dart';
 import '../../../services/auth_service.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
@@ -208,29 +209,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _updateFamily() async {
-    final controller = TextEditingController();
-    final family = await showDialog<String>(
+    final family = await showPromptTextDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Change plant family'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(labelText: 'Family'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+      title: 'Change plant family',
+      labelText: 'Family',
+      confirmLabel: 'Save',
+      allowEmpty: true,
     );
-    controller.dispose();
 
     if (family == null) return;
 

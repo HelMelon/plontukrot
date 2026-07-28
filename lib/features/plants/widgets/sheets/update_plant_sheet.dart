@@ -27,6 +27,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
 
   bool isLoading = false;
   int selectedStage = 0;
+  String? nameError;
 
   @override
   void initState() {
@@ -35,7 +36,11 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     nameController.text = widget.plant['name'] ?? '';
     nickNameController.text = widget.plant['nickname'] ?? '';
     wateringFrequencyController.text =
-        (widget.plant['wateringFrequency'] ?? 0).toString();
+        (widget.plant['wateringFrequency'] ?? '').toString();
+    if (wateringFrequencyController.text == '0' ||
+        wateringFrequencyController.text == 'null') {
+      wateringFrequencyController.text = '';
+    }
     selectedStage = widget.plant['stage'] ?? 1;
     familyController.text = widget.plant['family'] ?? '';
   }
@@ -45,6 +50,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     nameController.dispose();
     nickNameController.dispose();
     wateringFrequencyController.dispose();
+    familyController.dispose();
     super.dispose();
   }
 
@@ -52,25 +58,47 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     final name = nameController.text.trim();
     final nickname = nickNameController.text.trim();
     final family = familyController.text.trim();
-    final wateringFrequency = int.tryParse(wateringFrequencyController.text);
+    final wateringRaw = wateringFrequencyController.text.trim();
+    final wateringFrequency =
+        wateringRaw.isEmpty ? null : int.tryParse(wateringRaw);
 
-    if (name.isEmpty) return;
+    if (name.isEmpty) {
+      setState(() => nameError = 'Укажите название растения');
+      return;
+    }
+
+    if (wateringRaw.isNotEmpty && wateringFrequency == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Некорректная частота полива')),
+      );
+      return;
+    }
 
     setState(() {
       isLoading = true;
+      nameError = null;
     });
 
-    await PlantService().updatePlant(
-      plantId: widget.plantId,
-      name: name,
-      nickname: nickname,
-      family: family,
-      wateringFrequency: wateringFrequency,
-      stage: selectedStage,
-    );
+    try {
+      await PlantService().updatePlant(
+        plantId: widget.plantId,
+        name: name,
+        nickname: nickname,
+        family: family,
+        wateringFrequency: wateringFrequency,
+        stage: selectedStage,
+      );
 
-    if (mounted) {
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка: $e')),
+        );
+      }
     }
   }
 
@@ -117,8 +145,12 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
               TextField(
                 controller: nameController,
                 style: const TextStyle(color: AppColors.textPrimary),
+                onChanged: (_) {
+                  if (nameError != null) setState(() => nameError = null);
+                },
                 decoration: InputDecoration(
                   labelText: 'Plant name',
+                  errorText: nameError,
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.dark2,

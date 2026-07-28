@@ -33,20 +33,34 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
   Future<void> save() async {
     final text = controller.text.trim();
 
-    if (text.isEmpty) return;
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Заметка не может быть пустой')),
+      );
+      return;
+    }
 
     setState(() {
       isLoading = true;
     });
 
-    await NoteService().updateNote(
-      plantId: widget.plantId,
-      noteId: widget.noteId,
-      text: text,
-    );
+    try {
+      await NoteService().updateNote(
+        plantId: widget.plantId,
+        noteId: widget.noteId,
+        text: text,
+      );
 
-    if (mounted) {
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка: $e')),
+        );
+      }
     }
   }
 
