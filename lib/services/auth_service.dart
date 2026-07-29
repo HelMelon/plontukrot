@@ -34,18 +34,17 @@ class AuthService {
     return _auth.authStateChanges().map(_mapUser);
   }
 
-  Future<UserCredential?> signInWithGoogle() async {
+  Future<void> signInWithGoogle() async {
     if (kIsWeb) {
       final provider = GoogleAuthProvider();
 
       provider.addScope('email');
       provider.addScope('profile');
 
-      final credential = await _auth.signInWithPopup(provider);
+      await _auth.signInWithPopup(provider);
 
       await FirestoreService().createUserDocument();
-
-      return credential;
+      return;
     }
 
     await _initializeGoogleSignIn();
@@ -67,11 +66,9 @@ class AuthService {
       idToken: idToken,
     );
 
-    final userCredential = await _auth.signInWithCredential(credential);
+    await _auth.signInWithCredential(credential);
 
     await FirestoreService().createUserDocument();
-
-    return userCredential;
   }
 
   Future<void> signOut() async {
