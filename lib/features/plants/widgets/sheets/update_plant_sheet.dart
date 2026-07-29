@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../models/plant.dart';
 import '../../../../services/plant_service.dart';
 import 'package:flutter/services.dart';
 import '../selectors/plant_stage_selector.dart';
 
 class UpdatePlantSheet extends StatefulWidget {
   final String plantId;
-  final Map<String, dynamic> plant;
+  final Plant plant;
 
   const UpdatePlantSheet({
     super.key,
@@ -33,16 +34,16 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   void initState() {
     super.initState();
 
-    nameController.text = widget.plant['name'] ?? '';
-    nickNameController.text = widget.plant['nickname'] ?? '';
+    nameController.text = widget.plant.name;
+    nickNameController.text = widget.plant.nickname;
     wateringFrequencyController.text =
-        (widget.plant['wateringFrequency'] ?? '').toString();
+        (widget.plant.wateringFrequency ?? '').toString();
     if (wateringFrequencyController.text == '0' ||
         wateringFrequencyController.text == 'null') {
       wateringFrequencyController.text = '';
     }
-    selectedStage = widget.plant['stage'] ?? 1;
-    familyController.text = widget.plant['family'] ?? '';
+    selectedStage = widget.plant.stage;
+    familyController.text = widget.plant.family;
   }
 
   @override

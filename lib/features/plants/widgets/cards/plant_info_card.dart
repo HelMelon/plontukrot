@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/fertilizing_entry.dart';
+import '../../../../models/plant.dart';
 import '../../../../models/repotting_entry.dart';
 import '../../../../models/stage_info.dart';
 import '../../../../models/watering_entry.dart';
@@ -17,10 +18,10 @@ import '../sheets/watering_history_sheet.dart';
 import 'info_card.dart';
 
 class PlantInfoCard extends StatelessWidget {
-  final Map<String, dynamic> data;
+  final Plant plant;
   final String plantId;
 
-  const PlantInfoCard({super.key, required this.data, required this.plantId});
+  const PlantInfoCard({super.key, required this.plant, required this.plantId});
 
   static Widget _icon(String asset) {
     return Image.asset(
@@ -34,7 +35,7 @@ class PlantInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stage = stageInfos.firstWhere(
-      (e) => e.value == data['stage'],
+      (e) => e.value == plant.stage,
       orElse: () => stageInfos.first,
     );
 
@@ -49,7 +50,7 @@ class PlantInfoCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            data['name'] ?? 'Без названия',
+            plant.name,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
@@ -59,7 +60,7 @@ class PlantInfoCard extends StatelessWidget {
             ),
           ),
           Text(
-            'Прозвище: ${data['nickname'] ?? 'Без названия'}',
+            'Прозвище: ${plant.nickname}',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
@@ -70,7 +71,7 @@ class PlantInfoCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Семейство: ${data['family'] ?? 'Не известно'}',
+            'Семейство: ${plant.family}',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
@@ -212,8 +213,8 @@ class PlantInfoCard extends StatelessWidget {
           const SizedBox(height: 32),
           PlantPropagationsSection(
             plantId: plantId,
-            plantName: data['name'] as String? ?? 'Без названия',
-            plantFamily: data['family'] as String? ?? '',
+            plantName: plant.name,
+            plantFamily: plant.family,
           ),
           const SizedBox(height: 32),
           const Text(

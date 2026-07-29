@@ -142,12 +142,12 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
     );
   }
 
-  void _openUpdatePlant(Map<String, dynamic> data) {
+  void _openUpdatePlant(Plant plant) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => UpdatePlantSheet(plantId: widget.plantId, plant: data),
+      builder: (_) => UpdatePlantSheet(plantId: widget.plantId, plant: plant),
     );
   }
 
@@ -175,7 +175,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
         }
 
         final plant = snapshot.data!;
-        final data = plant.toMap();
         final imageUrl = plant.imageUrl;
         final title = plant.nickname.isNotEmpty ? plant.nickname : 'Растение';
 
@@ -221,7 +220,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                     case _PlantDetailsMenuAction.propagation:
                       _openPropagation(plant);
                     case _PlantDetailsMenuAction.edit:
-                      _openUpdatePlant(data);
+                      _openUpdatePlant(plant);
                     case _PlantDetailsMenuAction.note:
                       _openAddNote();
                   }
@@ -273,7 +272,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                               Expanded(
                                 flex: 5,
                                 child: PlantInfoCard(
-                                  data: data,
+                                  plant: plant,
                                   plantId: widget.plantId,
                                 ),
                               ),
@@ -291,7 +290,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                               ),
                               const SizedBox(height: 24),
                               PlantInfoCard(
-                                data: data,
+                                plant: plant,
                                 plantId: widget.plantId,
                               ),
                             ],
