@@ -4,9 +4,11 @@ import 'firestore_helpers.dart';
 
 class Plant {
   final String id;
-  final String name;
+  final String genus;
+  final String species;
+  final String? cultivar;
+  final String? plantFamily;
   final String nickname;
-  final String family;
   final int stage;
   final String? imageUrl;
   final int? wateringFrequency;
@@ -15,12 +17,15 @@ class Plant {
   final DateTime? lastFertilizedAt;
   final DateTime? lastRepottedAt;
   final bool careHistoryMigrated;
+  final bool botanicalFieldsMigrated;
 
   const Plant({
     required this.id,
-    required this.name,
+    required this.genus,
+    required this.species,
+    this.cultivar,
+    this.plantFamily,
     required this.nickname,
-    required this.family,
     required this.stage,
     this.imageUrl,
     this.wateringFrequency,
@@ -29,14 +34,24 @@ class Plant {
     this.lastFertilizedAt,
     this.lastRepottedAt,
     this.careHistoryMigrated = false,
+    this.botanicalFieldsMigrated = false,
   });
 
+  static String? _nullableTrimmed(String? value) {
+    if (value == null) return null;
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
+
   factory Plant.fromMap(String id, Map<String, dynamic> data) {
+    final rawFamily = data['plantFamily'] as String? ?? data['family'] as String?;
     return Plant(
       id: id,
-      name: data['name'] as String? ?? '',
+      genus: data['genus'] as String? ?? '',
+      species: data['species'] as String? ?? data['name'] as String? ?? '',
+      cultivar: _nullableTrimmed(data['cultivar'] as String?),
+      plantFamily: _nullableTrimmed(rawFamily),
       nickname: data['nickname'] as String? ?? '',
-      family: data['family'] as String? ?? '',
       stage: data['stage'] as int? ?? 0,
       imageUrl: data['imageUrl'] as String?,
       wateringFrequency: data['wateringFrequency'] as int?,
@@ -45,6 +60,8 @@ class Plant {
       lastFertilizedAt: readTimestamp(data['lastFertilizedAt']),
       lastRepottedAt: readTimestamp(data['lastRepottedAt']),
       careHistoryMigrated: data['careHistoryMigrated'] as bool? ?? false,
+      botanicalFieldsMigrated:
+          data['botanicalFieldsMigrated'] as bool? ?? false,
     );
   }
 
@@ -61,9 +78,11 @@ class Plant {
 
   Map<String, dynamic> toMap() {
     return {
-      'name': name,
+      'genus': genus,
+      'species': species,
+      'cultivar': cultivar,
+      'plantFamily': plantFamily,
       'nickname': nickname,
-      'family': family,
       'stage': stage,
       'imageUrl': imageUrl,
       'wateringFrequency': wateringFrequency,
@@ -75,6 +94,7 @@ class Plant {
       if (lastRepottedAt != null)
         'lastRepottedAt': Timestamp.fromDate(lastRepottedAt!),
       'careHistoryMigrated': careHistoryMigrated,
+      'botanicalFieldsMigrated': botanicalFieldsMigrated,
     };
   }
 }

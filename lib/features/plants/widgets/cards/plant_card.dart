@@ -18,7 +18,7 @@ extension CapitalizeString on String {
 class PlantCard extends StatelessWidget {
   final Plant plant;
   final bool isSelected;
-  final bool preferNameAsTitle;
+  final bool preferSpeciesAsTitle;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
@@ -26,7 +26,7 @@ class PlantCard extends StatelessWidget {
     super.key,
     required this.plant,
     this.isSelected = false,
-    this.preferNameAsTitle = false,
+    this.preferSpeciesAsTitle = false,
     this.onTap,
     this.onLongPress,
   });
@@ -39,13 +39,14 @@ class PlantCard extends StatelessWidget {
     final imageUrl = plant.imageUrl;
     final hasImage = imageUrl != null && imageUrl.isNotEmpty;
 
-    final name =
-        (plant.name.isEmpty ? 'Без названия' : plant.name).toTitleCase();
+    final species =
+        (plant.species.isEmpty ? 'Без названия' : plant.species).toTitleCase();
     final nickname = plant.nickname.toTitleCase();
     final hasNickname = nickname.trim().isNotEmpty;
-    final showNameOnTop = preferNameAsTitle || !hasNickname;
-    final title = showNameOnTop ? name : nickname;
-    final subtitle = showNameOnTop ? (hasNickname ? nickname : null) : name;
+    final showSpeciesOnTop = preferSpeciesAsTitle || !hasNickname;
+    final title = showSpeciesOnTop ? species : nickname;
+    final subtitle =
+        showSpeciesOnTop ? (hasNickname ? nickname : null) : species;
 
     return GestureDetector(
       onTap: onTap ??

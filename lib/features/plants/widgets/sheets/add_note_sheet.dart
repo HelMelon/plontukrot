@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../services/note_service.dart';
 
 class AddNoteSheet extends StatefulWidget {
@@ -140,7 +141,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
-                height: 58,
+                height: AppTheme.buttonHeight,
                 child: ElevatedButton(
                   onPressed: isLoading ? null : saveNote,
                   style: ElevatedButton.styleFrom(

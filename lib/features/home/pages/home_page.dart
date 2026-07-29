@@ -13,18 +13,19 @@ import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../../services/watering_service.dart';
+import '../../plants/pages/plant_species_details_page.dart';
 import '../../plants/widgets/cards/plant_card.dart';
 import '../../plants/widgets/search/plant_search_delegate.dart';
 import '../../propagations/pages/propagations_page.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
 enum _PlantSortField {
-  name,
+  species,
   nickname,
   lastWateredAt,
   lastFertilizedAt,
   createdAt,
-  family,
+  plantFamily,
 }
 
 enum _SelectionMenuAction { updateFamily, delete }
@@ -47,7 +48,10 @@ class _HomePageState extends State<HomePage> {
   _PlantSortField _sortField = _PlantSortField.createdAt;
   bool _sortAscending = false;
   bool _careMigrationStarted = false;
+  bool _botanicalMigrationStarted = false;
   bool _filterPropagatingOnly = false;
+  String? _filterPlantFamily;
+  String? _filterSpecies;
 
   @override
   void initState() {
@@ -85,9 +89,9 @@ class _HomePageState extends State<HomePage> {
       } else {
         _sortField = field;
         _sortAscending = switch (field) {
-          _PlantSortField.name ||
+          _PlantSortField.species ||
           _PlantSortField.nickname ||
-          _PlantSortField.family =>
+          _PlantSortField.plantFamily =>
             true,
           _ => false,
         };
@@ -96,12 +100,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   String get _sortLabel => switch (_sortField) {
-        _PlantSortField.name => 'Название',
+        _PlantSortField.species => 'Вид',
         _PlantSortField.nickname => 'Прозвище',
         _PlantSortField.lastWateredAt => 'Полив',
         _PlantSortField.lastFertilizedAt => 'Подкормка',
         _PlantSortField.createdAt => 'Дата',
-        _PlantSortField.family => 'Семейство',
+        _PlantSortField.plantFamily => 'Семейство',
       };
 
   List<Plant> _sortPlants(Iterable<Plant> plants) {
@@ -131,12 +135,13 @@ class _HomePageState extends State<HomePage> {
       if (dates != null && dates.$1 == null && dates.$2 != null) return 1;
 
       var comparison = switch (_sortField) {
-        _PlantSortField.name =>
-          first.name.toLowerCase().compareTo(second.name.toLowerCase()),
+        _PlantSortField.species =>
+          first.species.toLowerCase().compareTo(second.species.toLowerCase()),
         _PlantSortField.nickname =>
           first.nickname.toLowerCase().compareTo(second.nickname.toLowerCase()),
-        _PlantSortField.family =>
-          first.family.toLowerCase().compareTo(second.family.toLowerCase()),
+        _PlantSortField.plantFamily => (first.plantFamily ?? '')
+            .toLowerCase()
+            .compareTo((second.plantFamily ?? '').toLowerCase()),
         _PlantSortField.lastWateredAt =>
           _compareDates(first.lastWateredAt, second.lastWateredAt),
         _PlantSortField.lastFertilizedAt =>
@@ -164,9 +169,9 @@ class _HomePageState extends State<HomePage> {
     final groups = <String, List<Plant>>{};
 
     for (final plant in plants) {
-      final trimmedName = plant.name.trim();
+      final trimmedSpecies = plant.species.trim();
       final firstCharacter =
-          trimmedName.isEmpty ? null : trimmedName.substring(0, 1);
+          trimmedSpecies.isEmpty ? null : trimmedSpecies.substring(0, 1);
       final letter = firstCharacter != null &&
               RegExp(r'^[A-Za-zА-Яа-яЁё]$').hasMatch(firstCharacter)
           ? firstCharacter.toUpperCase()
@@ -181,7 +186,7 @@ class _HomePageState extends State<HomePage> {
     final groups = <String, List<Plant>>{};
 
     for (final plant in plants) {
-      final family = plant.family.trim();
+      final family = (plant.plantFamily ?? '').trim();
       final key = family.isEmpty ? 'Без семейства' : family;
       groups.putIfAbsent(key, () => []).add(plant);
     }
@@ -269,8 +274,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildPlantGrid(List<Plant> plants, int crossAxisCount) {
-    final preferNameAsTitle = _sortField == _PlantSortField.name ||
-        _sortField == _PlantSortField.family;
+    final preferSpeciesAsTitle = _sortField == _PlantSortField.species ||
+        _sortField == _PlantSortField.plantFamily;
 
     return GridView.builder(
       shrinkWrap: true,
@@ -287,12 +292,175 @@ class _HomePageState extends State<HomePage> {
         return PlantCard(
           plant: plant,
           isSelected: _selectedPlantIds.contains(plant.id),
-          preferNameAsTitle: preferNameAsTitle,
+          preferSpeciesAsTitle: preferSpeciesAsTitle,
           onTap:
               _isSelectionMode ? () => _togglePlantSelection(plant.id) : null,
           onLongPress: () => _togglePlantSelection(plant.id),
         );
       },
+    );
+  }
+
+  List<String> _uniquePlantFamilies(Iterable<Plant> plants) {
+    final families = plants
+        .map((plant) => (plant.plantFamily ?? '').trim())
+        .where((family) => family.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return families;
+  }
+
+  List<String> _uniqueSpeciesForFamily(
+    Iterable<Plant> plants,
+    String plantFamily,
+  ) {
+    final species = plants
+        .where((plant) => (plant.plantFamily ?? '').trim() == plantFamily)
+        .map((plant) => plant.species.trim())
+        .where((value) => value.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return species;
+  }
+
+  List<Plant> _applyBotanicalFilters(Iterable<Plant> plants) {
+    return plants.where((plant) {
+      if (_filterPlantFamily != null &&
+          (plant.plantFamily ?? '').trim() != _filterPlantFamily) {
+        return false;
+      }
+      if (_filterSpecies != null &&
+          plant.species.trim() != _filterSpecies) {
+        return false;
+      }
+      return true;
+    }).toList();
+  }
+
+  void _openSpeciesPage(String species) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PlantSpeciesDetailsPage(species: species),
+      ),
+    );
+  }
+
+  Widget _buildFilterChip({
+    required String label,
+    required bool selected,
+    required ValueChanged<bool> onSelected,
+    VoidCallback? onLongPress,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: GestureDetector(
+        onLongPress: onLongPress,
+        child: FilterChip(
+          selected: selected,
+          visualDensity: VisualDensity.compact,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          label: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+          ),
+          selectedColor: AppColors.goldAccent,
+          checkmarkColor: AppColors.dark1,
+          labelStyle: TextStyle(
+            fontSize: 13,
+            color: selected ? AppColors.dark1 : AppColors.textPrimary,
+          ),
+          backgroundColor: AppColors.backgroundSecondary,
+          side: BorderSide(
+            color: selected ? AppColors.goldAccent : AppColors.greenDeep,
+          ),
+          onSelected: onSelected,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBotanicalFilters(List<Plant> plants) {
+    final families = _uniquePlantFamilies(plants);
+    if (families.isEmpty) return const SizedBox.shrink();
+
+    final speciesOptions = _filterPlantFamily == null
+        ? const <String>[]
+        : _uniqueSpeciesForFamily(plants, _filterPlantFamily!);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildFilterChip(
+                label: 'Все семейства',
+                selected: _filterPlantFamily == null,
+                onSelected: (_) {
+                  setState(() {
+                    _filterPlantFamily = null;
+                    _filterSpecies = null;
+                  });
+                },
+              ),
+              ...families.map(
+                (family) => _buildFilterChip(
+                  label: family,
+                  selected: _filterPlantFamily == family,
+                  onSelected: (_) {
+                    setState(() {
+                      if (_filterPlantFamily == family) {
+                        _filterPlantFamily = null;
+                        _filterSpecies = null;
+                      } else {
+                        _filterPlantFamily = family;
+                        _filterSpecies = null;
+                      }
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (_filterPlantFamily != null && speciesOptions.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildFilterChip(
+                  label: 'Все виды',
+                  selected: _filterSpecies == null,
+                  onSelected: (_) {
+                    setState(() => _filterSpecies = null);
+                  },
+                ),
+                ...speciesOptions.map(
+                  (species) => _buildFilterChip(
+                    label: species,
+                    selected: _filterSpecies == species,
+                    onSelected: (selected) {
+                      if (_filterSpecies == species) {
+                        _openSpeciesPage(species);
+                        return;
+                      }
+                      setState(() {
+                        _filterSpecies = selected ? species : null;
+                      });
+                    },
+                    onLongPress: () => _openSpeciesPage(species),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
     );
   }
 
@@ -307,9 +475,9 @@ class _HomePageState extends State<HomePage> {
 
     if (family == null) return;
 
-    await PlantService().updatePlantsFamily(
+    await PlantService().updatePlantsPlantFamily(
       plantIds: _selectedPlantIds,
-      family: family,
+      plantFamily: family,
     );
     if (mounted) _exitSelectionMode();
   }
@@ -553,12 +721,9 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
-                  backgroundColor: AppColors.backgroundSecondary,
+                  backgroundColor: Colors.transparent,
                   isScrollControlled: true,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(28)),
-                  ),
+                  enableDrag: true,
                   builder: (_) {
                     return const AddPlantSheet();
                   },
@@ -639,20 +804,28 @@ class _HomePageState extends State<HomePage> {
                       _careMigrationStarted = true;
                       unawaited(PlantService().migrateCareDates(plants));
                     }
+                    if (!_botanicalMigrationStarted &&
+                        plants.any(
+                          (plant) => !plant.botanicalFieldsMigrated,
+                        )) {
+                      _botanicalMigrationStarted = true;
+                      unawaited(PlantService().migrateBotanicalFields(plants));
+                    }
 
                     return StreamBuilder<Set<String>>(
                       stream: PropagationService().watchActiveParentPlantIds(),
                       builder: (context, propagatingSnapshot) {
                         final propagatingIds =
                             propagatingSnapshot.data ?? const <String>{};
-                        final filteredPlants = _filterPropagatingOnly
+                        var workingPlants = _filterPropagatingOnly
                             ? plants
                                 .where(
                                   (plant) => propagatingIds.contains(plant.id),
                                 )
                                 .toList()
                             : plants;
-                        final sortedPlants = _sortPlants(filteredPlants);
+                        workingPlants = _applyBotanicalFilters(workingPlants);
+                        final sortedPlants = _sortPlants(workingPlants);
                         _visiblePlantIds
                           ..clear()
                           ..addAll(sortedPlants.map((plant) => plant.id));
@@ -753,8 +926,8 @@ class _HomePageState extends State<HomePage> {
                                                             Text(
                                                               switch (field) {
                                                                 _PlantSortField
-                                                                      .name =>
-                                                                  'Название',
+                                                                      .species =>
+                                                                  'Вид',
                                                                 _PlantSortField
                                                                       .nickname =>
                                                                   'Прозвище',
@@ -768,7 +941,7 @@ class _HomePageState extends State<HomePage> {
                                                                       .createdAt =>
                                                                   'Дата добавления',
                                                                 _PlantSortField
-                                                                      .family =>
+                                                                      .plantFamily =>
                                                                   'Семейство',
                                                               },
                                                             ),
@@ -802,8 +975,11 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ],
                                   ),
-                                if (!_isSelectionMode)
+                                if (!_isSelectionMode) ...[
                                   const SizedBox(height: 8),
+                                  _buildBotanicalFilters(plants),
+                                  const SizedBox(height: 8),
+                                ],
                                 if (_filterPropagatingOnly &&
                                     sortedPlants.isEmpty)
                                   Container(
@@ -824,12 +1000,34 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ),
                                   )
-                                else if (_sortField == _PlantSortField.name)
+                                else if (sortedPlants.isEmpty &&
+                                    (_filterPlantFamily != null ||
+                                        _filterSpecies != null))
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(24),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.backgroundSecondary,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: AppColors.greenDeep,
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Нет растений по выбранному фильтру',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  )
+                                else if (_sortField == _PlantSortField.species)
                                   _buildGroupedPlants(
                                     _groupPlantsByLetter(sortedPlants),
                                     crossAxisCount,
                                   )
-                                else if (_sortField == _PlantSortField.family)
+                                else if (_sortField ==
+                                    _PlantSortField.plantFamily)
                                   _buildGroupedPlants(
                                     _groupPlantsByFamily(sortedPlants),
                                     crossAxisCount,

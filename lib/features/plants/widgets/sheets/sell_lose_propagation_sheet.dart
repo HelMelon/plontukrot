@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../models/propagation.dart';
 import '../../../../services/propagation_service.dart';
 
@@ -381,7 +382,7 @@ class _QuantityActionSheet extends StatelessWidget {
                   const SizedBox(height: 30),
                   SizedBox(
                     width: double.infinity,
-                    height: 58,
+                    height: AppTheme.buttonHeight,
                     child: ElevatedButton(
                       onPressed: saving ? null : onSave,
                       style: ElevatedButton.styleFrom(

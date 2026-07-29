@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../models/watering_entry.dart';
 import '../../../../services/watering_service.dart';
 
@@ -25,6 +27,8 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
 
     await showModalBottomSheet(
       context: context,
+      backgroundColor: AppColors.backgroundSecondary,
+      enableDrag: true,
       builder: (sheetContext) {
         return StatefulBuilder(
           builder: (context, setModalState) {
@@ -38,7 +42,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade400,
+                        color: AppColors.greenSoft,
                         borderRadius: BorderRadius.circular(99),
                       ),
                     ),
@@ -48,6 +52,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
+                        color: AppColors.heading,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -72,33 +77,52 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        OutlinedButton(
-                          onPressed: () {
-                            setModalState(() {
-                              selectedDate = DateTime.now();
-                            });
-                          },
-                          child: const Text('Сегодня'),
+                        Expanded(
+                          child: SizedBox(
+                            height: AppTheme.buttonHeight,
+                            child: OutlinedButton(
+                              onPressed: () {
+                                setModalState(() {
+                                  selectedDate = DateTime.now();
+                                });
+                              },
+                              child: const Text(
+                                'Сегодня',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
                         ),
-                        const Spacer(),
-                        FilledButton(
-                          onPressed: () async {
-                            if (isEditing) {
-                              await _service.updateWatering(
-                                plantId: widget.plantId,
-                                wateringId: wateringId,
-                                wateredAt: selectedDate,
-                              );
-                            } else {
-                              await _service.addWatering(
-                                plantId: widget.plantId,
-                                wateredAt: selectedDate,
-                              );
-                            }
-                            if (!context.mounted) return;
-                            Navigator.pop(sheetContext);
-                          },
-                          child: const Text('Сохранить'),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: SizedBox(
+                            height: AppTheme.buttonHeight,
+                            child: FilledButton(
+                              onPressed: () async {
+                                if (isEditing) {
+                                  await _service.updateWatering(
+                                    plantId: widget.plantId,
+                                    wateringId: wateringId,
+                                    wateredAt: selectedDate,
+                                  );
+                                } else {
+                                  await _service.addWatering(
+                                    plantId: widget.plantId,
+                                    wateredAt: selectedDate,
+                                  );
+                                }
+                                if (context.mounted) {
+                                  Navigator.pop(sheetContext);
+                                }
+                              },
+                              child: const Text(
+                                'Сохранить',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -143,117 +167,144 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.7,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade400,
-              borderRadius: BorderRadius.circular(99),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              const Expanded(
-                child: Text(
-                  'История полива',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+    final sheetHeight = MediaQuery.of(context).size.height * 0.7;
+
+    return Material(
+      color: AppColors.backgroundSecondary,
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      clipBehavior: Clip.antiAlias,
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: sheetHeight,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.greenSoft,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              FilledButton.icon(
-                onPressed: () => _showWateringEditor(),
-                icon: const Icon(Icons.add),
-                label: const Text('Добавить полив'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: StreamBuilder<List<WateringEntry>>(
-              stream: _service.getWateringHistory(widget.plantId),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(child: Text(snapshot.error.toString()));
-                }
-
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                final items = snapshot.data!;
-
-                if (items.isEmpty) {
-                  return const Center(
-                    child: Text('Пока нет записей о поливе 🌱'),
-                  );
-                }
-
-                return ListView.separated(
-                  itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    final wateringId = item.id;
-                    final wateredAt = item.wateredAt;
-
-                    if (wateringId == null) {
-                      return const SizedBox.shrink();
-                    }
-
-                    return Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.surfaceContainerHighest,
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'История полива',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.heading,
+                        ),
                       ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.water_drop_rounded,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              DateFormat('d MMMM y').format(wateredAt),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            tooltip: 'Изменить',
-                            icon: const Icon(Icons.edit_outlined),
-                            onPressed: () => _showWateringEditor(
-                              wateringId: wateringId,
-                              initialDate: wateredAt,
-                            ),
-                          ),
-                          IconButton(
-                            tooltip: 'Удалить',
-                            icon: const Icon(Icons.delete_outline),
-                            onPressed: () => _confirmDelete(wateringId),
-                          ),
-                        ],
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      height: AppTheme.buttonHeight,
+                      child: FilledButton.icon(
+                        onPressed: () => _showWateringEditor(),
+                        icon: const Icon(Icons.add, size: 18),
+                        label: const Text(
+                          'Добавить',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    );
-                  },
-                );
-              },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: StreamBuilder<List<WateringEntry>>(
+                    stream: _service.getWateringHistory(widget.plantId),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Center(child: Text(snapshot.error.toString()));
+                      }
+
+                      if (!snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      final items = snapshot.data!;
+
+                      if (items.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            'Пока нет записей о поливе',
+                            style: TextStyle(color: AppColors.textSecondary),
+                          ),
+                        );
+                      }
+
+                      return ListView.separated(
+                        itemCount: items.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final item = items[index];
+                          final wateringId = item.id;
+                          final wateredAt = item.wateredAt;
+
+                          if (wateringId == null) {
+                            return const SizedBox.shrink();
+                          }
+
+                          return Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              color: AppColors.dark2,
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.water_drop_rounded,
+                                  color: AppColors.accentLight,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    DateFormat('d MMMM y').format(wateredAt),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  tooltip: 'Изменить',
+                                  icon: const Icon(Icons.edit_outlined),
+                                  onPressed: () => _showWateringEditor(
+                                    wateringId: wateringId,
+                                    initialDate: wateredAt,
+                                  ),
+                                ),
+                                IconButton(
+                                  tooltip: 'Удалить',
+                                  icon: const Icon(Icons.delete_outline),
+                                  onPressed: () => _confirmDelete(wateringId),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

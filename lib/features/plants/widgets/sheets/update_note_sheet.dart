@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../services/note_service.dart';
 
 class UpdateNoteSheet extends StatefulWidget {
@@ -101,10 +102,14 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
-                height: 56,
+                height: AppTheme.buttonHeight,
                 child: ElevatedButton(
                   onPressed: isLoading ? null : save,
-                  child: const Text('Сохранить изменения'),
+                  child: const Text(
+                    'Сохранить изменения',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             ],

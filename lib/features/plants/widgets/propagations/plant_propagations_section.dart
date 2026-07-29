@@ -72,7 +72,7 @@ class PlantPropagationsSection extends StatelessWidget {
               child: Text(
                 'Размножение',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: AppColors.heading,
                 ),

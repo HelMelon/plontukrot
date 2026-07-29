@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
@@ -82,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 54),
                 SizedBox(
                   width: double.infinity,
-                  height: 58,
+                  height: AppTheme.buttonHeight,
                   child: ElevatedButton.icon(
                     onPressed: isLoading ? null : signIn,
                     icon: isLoading

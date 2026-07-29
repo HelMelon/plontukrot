@@ -109,6 +109,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      enableDrag: true,
       builder: (_) => WateringHistorySheet(plantId: widget.plantId),
     );
   }
@@ -136,8 +137,9 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
       backgroundColor: Colors.transparent,
       builder: (_) => AddPropagationSheet(
         parentPlantId: widget.plantId,
-        parentPlantName: plant.name.isNotEmpty ? plant.name : 'Без названия',
-        parentPlantFamily: plant.family,
+        parentPlantName:
+            plant.species.isNotEmpty ? plant.species : 'Без названия',
+        parentPlantFamily: plant.plantFamily ?? '',
       ),
     );
   }
@@ -147,6 +149,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      enableDrag: true,
       builder: (_) => UpdatePlantSheet(plantId: widget.plantId, plant: plant),
     );
   }

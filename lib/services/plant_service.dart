@@ -2,45 +2,64 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/plant.dart';
+import 'plant_species_service.dart';
 
 class PlantService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final PlantSpeciesService _plantSpeciesService = PlantSpeciesService();
 
   final String uid = FirebaseAuth.instance.currentUser!.uid;
 
+  CollectionReference<Map<String, dynamic>> get _plantsRef =>
+      _firestore.collection('users').doc(uid).collection('plants');
+
   Future<void> addPlant({
-    required String name,
+    required String genus,
+    required String species,
+    String? cultivar,
+    String? plantFamily,
     String nickname = '',
-    String family = '',
     required int stage,
   }) async {
-    await _firestore.collection('users').doc(uid).collection('plants').add({
-      'name': name,
+    final trimmedGenus = genus.trim();
+    final trimmedSpecies = species.trim();
+    final trimmedCultivar = cultivar?.trim();
+    final trimmedFamily = plantFamily?.trim();
+
+    await _plantsRef.add({
+      'genus': trimmedGenus,
+      'species': trimmedSpecies,
+      'cultivar':
+          (trimmedCultivar == null || trimmedCultivar.isEmpty)
+              ? null
+              : trimmedCultivar,
+      'plantFamily':
+          (trimmedFamily == null || trimmedFamily.isEmpty) ? null : trimmedFamily,
       'nickname': nickname,
       'stage': stage,
       'imageUrl': null,
       'wateringFrequency': null,
-      'family': family,
       'createdAt': FieldValue.serverTimestamp(),
       'careHistoryMigrated': true,
+      'botanicalFieldsMigrated': true,
     });
+
+    await _plantSpeciesService.ensureSpecies(
+      species: trimmedSpecies,
+      genus: trimmedGenus,
+      plantFamily: trimmedFamily,
+    );
   }
 
   Stream<List<Plant>> getPlants() {
-    return _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('plants')
+    return _plantsRef
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs.map(Plant.fromFirestore).toList());
   }
 
   Stream<Plant?> watchPlant(String plantId) {
-    return _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('plants')
+    return _plantsRef
         .doc(plantId)
         .snapshots()
         .map((doc) => doc.exists ? Plant.fromDocument(doc) : null);
@@ -52,11 +71,7 @@ class PlantService {
     );
 
     await Future.wait(plantsToMigrate.map((plant) async {
-      final plantRef = _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('plants')
-          .doc(plant.id);
+      final plantRef = _plantsRef.doc(plant.id);
       final results = await Future.wait([
         plantRef
             .collection('watering')
@@ -85,56 +100,111 @@ class PlantService {
     }));
   }
 
+  Future<void> migrateBotanicalFields(Iterable<Plant> plants) async {
+    final plantsToMigrate =
+        plants.where((plant) => !plant.botanicalFieldsMigrated).toList();
+
+    await Future.wait(plantsToMigrate.map((plant) async {
+      final plantRef = _plantsRef.doc(plant.id);
+      final snap = await plantRef.get();
+      final data = snap.data() ?? <String, dynamic>{};
+
+      final species = (data['species'] as String? ??
+              data['name'] as String? ??
+              plant.species)
+          .trim();
+      final rawFamily =
+          data['plantFamily'] as String? ?? data['family'] as String?;
+      final trimmedFamily = rawFamily?.trim();
+      final plantFamily =
+          (trimmedFamily == null || trimmedFamily.isEmpty) ? null : trimmedFamily;
+      final genus = (data['genus'] as String? ?? plant.genus).trim();
+
+      await plantRef.update({
+        'species': species,
+        'genus': genus,
+        'plantFamily': plantFamily,
+        'name': FieldValue.delete(),
+        'family': FieldValue.delete(),
+        'botanicalFieldsMigrated': true,
+      });
+    }));
+
+    final speciesSeed = <String, Plant>{};
+    for (final plant in plants) {
+      final species = plant.species.trim();
+      if (species.isEmpty) continue;
+      speciesSeed.putIfAbsent(species, () => plant);
+    }
+    // Re-read migrated values: use in-memory plants with fallbacks already applied.
+    for (final entry in speciesSeed.entries) {
+      final plant = entry.value;
+      await _plantSpeciesService.ensureSpecies(
+        species: entry.key,
+        genus: plant.genus,
+        plantFamily: plant.plantFamily,
+      );
+    }
+  }
+
   Future<void> updatePlantImage({
     required String plantId,
     required String imageUrl,
   }) async {
-    await _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('plants')
-        .doc(plantId)
-        .update({'imageUrl': imageUrl});
+    await _plantsRef.doc(plantId).update({'imageUrl': imageUrl});
   }
 
   Future<void> updatePlant({
     required String plantId,
-    required String name,
+    required String genus,
+    required String species,
+    String? cultivar,
+    String? plantFamily,
     required String nickname,
-    required String family,
     int? wateringFrequency,
     required int stage,
   }) async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final trimmedGenus = genus.trim();
+    final trimmedSpecies = species.trim();
+    final trimmedCultivar = cultivar?.trim();
+    final trimmedFamily = plantFamily?.trim();
 
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('plants')
-        .doc(plantId)
-        .update({
-      'name': name,
+    await _plantsRef.doc(plantId).update({
+      'genus': trimmedGenus,
+      'species': trimmedSpecies,
+      'cultivar':
+          (trimmedCultivar == null || trimmedCultivar.isEmpty)
+              ? null
+              : trimmedCultivar,
+      'plantFamily':
+          (trimmedFamily == null || trimmedFamily.isEmpty) ? null : trimmedFamily,
       'nickname': nickname,
       'wateringFrequency': wateringFrequency,
       'stage': stage,
-      'family': family,
+      'botanicalFieldsMigrated': true,
+      'name': FieldValue.delete(),
+      'family': FieldValue.delete(),
     });
+
+    await _plantSpeciesService.ensureSpecies(
+      species: trimmedSpecies,
+      genus: trimmedGenus,
+      plantFamily: trimmedFamily,
+    );
   }
 
-  Future<void> updatePlantsFamily({
+  Future<void> updatePlantsPlantFamily({
     required Iterable<String> plantIds,
-    required String family,
+    required String plantFamily,
   }) async {
     final batch = _firestore.batch();
+    final trimmed = plantFamily.trim();
+    final value = trimmed.isEmpty ? null : trimmed;
 
     for (final plantId in plantIds) {
       batch.update(
-        _firestore
-            .collection('users')
-            .doc(uid)
-            .collection('plants')
-            .doc(plantId),
-        {'family': family},
+        _plantsRef.doc(plantId),
+        {'plantFamily': value},
       );
     }
 
@@ -145,13 +215,7 @@ class PlantService {
     final batch = _firestore.batch();
 
     for (final plantId in plantIds) {
-      batch.delete(
-        _firestore
-            .collection('users')
-            .doc(uid)
-            .collection('plants')
-            .doc(plantId),
-      );
+      batch.delete(_plantsRef.doc(plantId));
     }
 
     await batch.commit();

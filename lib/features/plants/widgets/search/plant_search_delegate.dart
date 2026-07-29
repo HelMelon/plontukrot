@@ -112,12 +112,17 @@ class PlantSearchDelegate extends SearchDelegate {
         }
 
         final filtered = snapshot.data!.where((plant) {
-          final name = plant.name.trim().toLowerCase();
+          final species = plant.species.trim().toLowerCase();
           final nickname = plant.nickname.trim().toLowerCase();
+          final genus = plant.genus.trim().toLowerCase();
+          final cultivar = (plant.cultivar ?? '').trim().toLowerCase();
 
           if (cleanQuery.isEmpty) return true;
 
-          return name.contains(cleanQuery) || nickname.contains(cleanQuery);
+          return species.contains(cleanQuery) ||
+              nickname.contains(cleanQuery) ||
+              genus.contains(cleanQuery) ||
+              cultivar.contains(cleanQuery);
         }).toList();
 
         if (filtered.isEmpty) {
@@ -152,8 +157,8 @@ class PlantSearchDelegate extends SearchDelegate {
               final String nickname = capitalizeWords(
                 plant.nickname.trim(),
               );
-              final String name = capitalizeWords(
-                plant.name.trim(),
+              final String species = capitalizeWords(
+                plant.species.trim(),
               );
 
               final String titleText;
@@ -161,12 +166,11 @@ class PlantSearchDelegate extends SearchDelegate {
 
               if (nickname.isNotEmpty) {
                 titleText = nickname;
-                subtitleText = name.isNotEmpty ? '($name)' : null;
+                subtitleText = species.isNotEmpty ? '($species)' : null;
               } else {
-                titleText = name.isNotEmpty ? name : 'Без названия';
+                titleText = species.isNotEmpty ? species : 'Без названия';
                 subtitleText = null;
               }
-
               return Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16.0,
