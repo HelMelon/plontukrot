@@ -1,9 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../models/plant.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/storage_service.dart';
 import '../widgets/sheets/update_plant_sheet.dart';
@@ -26,6 +25,15 @@ class PlantDetailsPage extends StatefulWidget {
 
 class _PlantDetailsPageState extends State<PlantDetailsPage> {
   bool isUploading = false;
+  late final PlantService _plantService;
+  late final Stream<Plant?> _plantStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _plantService = PlantService();
+    _plantStream = _plantService.watchPlant(widget.plantId);
+  }
 
   Future<ImageSource?> selectImageSource() async {
     return showModalBottomSheet<ImageSource>(
@@ -76,7 +84,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
         plantId: widget.plantId,
       );
 
-      await PlantService().updatePlantImage(
+      await _plantService.updatePlantImage(
         plantId: widget.plantId,
         imageUrl: imageUrl,
       );
@@ -96,19 +104,68 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
     }
   }
 
+  void _openWateringHistory() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => WateringHistorySheet(plantId: widget.plantId),
+    );
+  }
+
+  void _openFertilizing() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => AddFertilizingSheet.forPlant(plantId: widget.plantId),
+    );
+  }
+
+  void _openRepotting() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => AddRepottingSheet(plantId: widget.plantId),
+    );
+  }
+
+  void _openPropagation(Plant plant) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => AddPropagationSheet(
+        parentPlantId: widget.plantId,
+        parentPlantName: plant.name.isNotEmpty ? plant.name : 'Без названия',
+        parentPlantFamily: plant.family,
+      ),
+    );
+  }
+
+  void _openUpdatePlant(Map<String, dynamic> data) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => UpdatePlantSheet(plantId: widget.plantId, plant: data),
+    );
+  }
+
+  void _openAddNote() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => AddNoteSheet(plantId: widget.plantId),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-
-    return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .collection('plants')
-          .doc(widget.plantId)
-          .snapshots(),
+    return StreamBuilder<Plant?>(
+      stream: _plantStream,
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+        if (!snapshot.hasData || snapshot.data == null) {
           return const Scaffold(
             backgroundColor: Colors.transparent,
             body: Center(
@@ -117,9 +174,10 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
           );
         }
 
-        final data = snapshot.data!.data() as Map<String, dynamic>;
-
-        final imageUrl = data['imageUrl'] as String?;
+        final plant = snapshot.data!;
+        final data = plant.toMap();
+        final imageUrl = plant.imageUrl;
+        final title = plant.nickname.isNotEmpty ? plant.nickname : 'Растение';
 
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -128,91 +186,60 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
             elevation: 0,
             surfaceTintColor: Colors.transparent,
             title: Text(
-              data['nickname'] ?? 'Растение',
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: AppColors.heading,
                 fontWeight: FontWeight.bold,
               ),
             ),
             actions: [
-              _TopAction(
-                icon: Icons.water_drop,
-                label: 'Полив',
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (_) =>
-                        WateringHistorySheet(plantId: widget.plantId),
-                  );
-                },
+              IconButton(
+                tooltip: 'Полив',
+                onPressed: _openWateringHistory,
+                icon: const Icon(Icons.water_drop, color: AppColors.goldAccent),
               ),
-              _TopAction(
-                icon: Icons.science_outlined,
-                label: 'Подкормка',
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (_) =>
-                        AddFertilizingSheet.forPlant(plantId: widget.plantId),
-                  );
-                },
+              IconButton(
+                tooltip: 'Подкормка',
+                onPressed: _openFertilizing,
+                icon: const Icon(
+                  Icons.science_outlined,
+                  color: AppColors.goldAccent,
+                ),
               ),
-              _TopAction(
-                icon: Icons.flaky,
-                label: 'Пересадка',
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (_) =>
-                        AddRepottingSheet(plantId: widget.plantId),
-                  );
-                },
+              IconButton(
+                tooltip: 'Пересадка',
+                onPressed: _openRepotting,
+                icon: const Icon(Icons.flaky, color: AppColors.goldAccent),
               ),
-              _TopAction(
-                icon: Icons.spa_outlined,
-                label: 'Размножение',
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (_) => AddPropagationSheet(
-                      parentPlantId: widget.plantId,
-                      parentPlantName:
-                          data['name'] as String? ?? 'Без названия',
-                      parentPlantFamily: data['family'] as String? ?? '',
-                    ),
-                  );
+              PopupMenuButton<_PlantDetailsMenuAction>(
+                tooltip: 'Ещё',
+                icon: const Icon(Icons.more_vert, color: AppColors.goldAccent),
+                onSelected: (action) {
+                  switch (action) {
+                    case _PlantDetailsMenuAction.propagation:
+                      _openPropagation(plant);
+                    case _PlantDetailsMenuAction.edit:
+                      _openUpdatePlant(data);
+                    case _PlantDetailsMenuAction.note:
+                      _openAddNote();
+                  }
                 },
-              ),
-              _TopAction(
-                icon: Icons.edit_rounded,
-                label: 'Изменить',
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (_) =>
-                        UpdatePlantSheet(plantId: widget.plantId, plant: data),
-                  );
-                },
-              ),
-              _TopAction(
-                icon: Icons.note_add_outlined,
-                label: 'Заметка',
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (_) => AddNoteSheet(plantId: widget.plantId),
-                  );
-                },
+                itemBuilder: (context) => const [
+                  PopupMenuItem(
+                    value: _PlantDetailsMenuAction.propagation,
+                    child: Text('Размножение'),
+                  ),
+                  PopupMenuItem(
+                    value: _PlantDetailsMenuAction.edit,
+                    child: Text('Изменить'),
+                  ),
+                  PopupMenuItem(
+                    value: _PlantDetailsMenuAction.note,
+                    child: Text('Заметка'),
+                  ),
+                ],
               ),
             ],
           ),
@@ -282,42 +309,4 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
   }
 }
 
-class _TopAction extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _TopAction({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: AppColors.goldAccent, size: 22),
-              const SizedBox(height: 2),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 10,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+enum _PlantDetailsMenuAction { propagation, edit, note }

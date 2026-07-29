@@ -36,6 +36,16 @@ class PlantService {
         .map((snapshot) => snapshot.docs.map(Plant.fromFirestore).toList());
   }
 
+  Stream<Plant?> watchPlant(String plantId) {
+    return _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('plants')
+        .doc(plantId)
+        .snapshots()
+        .map((doc) => doc.exists ? Plant.fromDocument(doc) : null);
+  }
+
   Future<void> migrateCareDates(Iterable<Plant> plants) async {
     final plantsToMigrate = plants.where(
       (plant) => !plant.careHistoryMigrated,
