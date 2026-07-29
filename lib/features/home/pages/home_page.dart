@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import './../../../services/firestore_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -43,7 +42,7 @@ class _HomePageState extends State<HomePage> {
   final Set<String> _selectedPlantIds = {};
   final Set<String> _visiblePlantIds = {};
   final Set<String> _collapsedLetterGroups = {};
-  late final Stream<DocumentSnapshot> _userDataStream;
+  late final Stream<bool> _userDocumentExistsStream;
   late final Stream<List<Plant>> _plantsStream;
   _PlantSortField _sortField = _PlantSortField.createdAt;
   bool _sortAscending = false;
@@ -53,7 +52,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _userDataStream = FirestoreService().getUserData();
+    _userDocumentExistsStream = FirestoreService().watchUserDocumentExists();
     _plantsStream = PlantService().getPlants();
   }
 
@@ -567,8 +566,8 @@ class _HomePageState extends State<HomePage> {
               },
               child: const Icon(Icons.add),
             ),
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: _userDataStream,
+      body: StreamBuilder<bool>(
+        stream: _userDocumentExistsStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -576,7 +575,7 @@ class _HomePageState extends State<HomePage> {
             );
           }
 
-          if (!snapshot.hasData || !snapshot.data!.exists) {
+          if (!snapshot.hasData || snapshot.data != true) {
             return const Center(
               child: Text(
                 'Нет данных пользователя',

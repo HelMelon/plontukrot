@@ -22,7 +22,11 @@ class FirestoreService {
     }
   }
 
-  Stream<DocumentSnapshot> getUserData() {
-    return _firestore.collection('users').doc(uid).snapshots();
+  Stream<bool> watchUserDocumentExists() {
+    return _firestore
+        .collection('users')
+        .doc(uid)
+        .snapshots()
+        .map((snapshot) => snapshot.exists);
   }
 }
