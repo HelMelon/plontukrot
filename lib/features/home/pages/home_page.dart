@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import './../../../services/firestore_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/prompt_text_dialog.dart';
+import '../../../models/app_user.dart';
 import '../../../models/plant.dart';
 import '../../../services/auth_service.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
@@ -30,7 +30,7 @@ enum _PlantSortField {
 enum _SelectionMenuAction { updateFamily, delete }
 
 class HomePage extends StatefulWidget {
-  final User user;
+  final AppUser user;
 
   const HomePage({super.key, required this.user});
 
@@ -479,10 +479,10 @@ class _HomePageState extends State<HomePage> {
                         width: 40,
                         height: 40,
                         child: ClipOval(
-                          child: widget.user.photoURL != null &&
-                                  widget.user.photoURL!.isNotEmpty
+                          child: widget.user.photoUrl != null &&
+                                  widget.user.photoUrl!.isNotEmpty
                               ? Image.network(
-                                  widget.user.photoURL!,
+                                  widget.user.photoUrl!,
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) => const Icon(
                                     Icons.person,

@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -10,6 +9,8 @@ import 'features/auth/pages/login_page.dart';
 import 'features/home/pages/home_page.dart';
 import 'features/splash/pages/splash_flow.dart';
 import 'firebase_options.dart';
+import 'models/app_user.dart';
+import 'services/auth_service.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -130,8 +131,8 @@ class AuthGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
+    return StreamBuilder<AppUser?>(
+      stream: AuthService().watchAuthState(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -140,7 +141,7 @@ class AuthGate extends StatelessWidget {
           );
         }
 
-        if (snapshot.hasData) {
+        if (snapshot.hasData && snapshot.data != null) {
           return HomePage(user: snapshot.data!);
         }
 

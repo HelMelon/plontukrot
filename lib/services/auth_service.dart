@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../models/app_user.dart';
 import 'firestore_service.dart';
 
 class AuthService {
@@ -19,6 +20,18 @@ class AuthService {
     await _googleSignIn.initialize();
 
     _initialized = true;
+  }
+
+  AppUser? _mapUser(User? user) {
+    if (user == null) return null;
+    return AppUser(
+      uid: user.uid,
+      photoUrl: user.photoURL,
+    );
+  }
+
+  Stream<AppUser?> watchAuthState() {
+    return _auth.authStateChanges().map(_mapUser);
   }
 
   Future<UserCredential?> signInWithGoogle() async {
