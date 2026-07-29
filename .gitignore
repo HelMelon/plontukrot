@@ -1,6 +1,7 @@
 # Файлы сборки Flutter (самые тяжелые)
 build/
 .dart_tool/
+.cursor/
 
 # Зависимости
 .packages
