@@ -45,9 +45,7 @@ class PlantCard extends StatelessWidget {
     final hasNickname = nickname.trim().isNotEmpty;
     final showNameOnTop = preferNameAsTitle || !hasNickname;
     final title = showNameOnTop ? name : nickname;
-    final subtitle = showNameOnTop
-        ? (hasNickname ? nickname : null)
-        : name;
+    final subtitle = showNameOnTop ? (hasNickname ? nickname : null) : name;
 
     return GestureDetector(
       onTap: onTap ??
@@ -111,23 +109,25 @@ class PlantCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: _mainFontSize,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: -0.3,
-                              color: AppColors.goldAccent,
-                              height: 1.2,
+                          Flexible(
+                            child: Text(
+                              title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: _mainFontSize,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: -0.3,
+                                color: AppColors.goldAccent,
+                                height: 1.2,
+                              ),
                             ),
                           ),
                           if (subtitle != null) ...[
                             const SizedBox(height: 4),
                             Text(
                               subtitle,
-                              maxLines: 2,
+                              maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: _subFontSize,

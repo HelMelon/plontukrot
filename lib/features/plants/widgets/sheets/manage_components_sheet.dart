@@ -100,11 +100,15 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
             const SizedBox(height: 16),
             Row(
               children: [
-                const Text(
-                  'Компоненты грунта',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                const Expanded(
+                  child: Text(
+                    'Компоненты грунта',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 FilledButton.icon(
                   onPressed: _add,
                   icon: const Icon(Icons.add),
@@ -139,17 +143,23 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
                       final item = items[index];
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text(item.name),
+                        title: Text(
+                          item.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
                               tooltip: 'Изменить',
+                              visualDensity: VisualDensity.compact,
                               icon: const Icon(Icons.edit_outlined),
                               onPressed: () => _edit(item),
                             ),
                             IconButton(
                               tooltip: 'Удалить',
+                              visualDensity: VisualDensity.compact,
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () => _delete(item),
                             ),

@@ -84,11 +84,15 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
           const SizedBox(height: 16),
           Row(
             children: [
-              const Text(
-                'История пересадок',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              const Expanded(
+                child: Text(
+                  'История пересадок',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               FilledButton.icon(
                 onPressed: _showAddSheet,
                 icon: const Icon(Icons.add),
@@ -157,6 +161,8 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                                 children: [
                                   Text(
                                     title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
@@ -166,6 +172,8 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                                   Text(
                                     DateFormat('d MMMM y')
                                         .format(item.repottedAt),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme
@@ -176,6 +184,8 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                                     const SizedBox(height: 4),
                                     Text(
                                       'Пролонгированное удобрение',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 13,
                                         color: Theme.of(context)
@@ -189,11 +199,13 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                             ),
                             IconButton(
                               tooltip: 'Изменить',
+                              visualDensity: VisualDensity.compact,
                               icon: const Icon(Icons.edit_outlined),
                               onPressed: () => _showEditSheet(item),
                             ),
                             IconButton(
                               tooltip: 'Удалить',
+                              visualDensity: VisualDensity.compact,
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () => _confirmDelete(repottingId),
                             ),

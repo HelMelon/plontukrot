@@ -85,11 +85,15 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
           const SizedBox(height: 16),
           Row(
             children: [
-              const Text(
-                'История подкормок',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              const Expanded(
+                child: Text(
+                  'История подкормок',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               FilledButton.icon(
                 onPressed: _showAddSheet,
                 icon: const Icon(Icons.add),
@@ -153,6 +157,8 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                                 children: [
                                   Text(
                                     item.fertilizerName,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
@@ -161,17 +167,21 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                                   const SizedBox(height: 4),
                                   Text(
                                     '${item.applicationMethod.label} · ${DateFormat('d MMMM y').format(item.appliedAt)}',
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
                             ),
                             IconButton(
                               tooltip: 'Изменить',
+                              visualDensity: VisualDensity.compact,
                               icon: const Icon(Icons.edit_outlined),
                               onPressed: () => _showEditSheet(item),
                             ),
                             IconButton(
                               tooltip: 'Удалить',
+                              visualDensity: VisualDensity.compact,
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () => _confirmDelete(item),
                             ),

@@ -81,48 +81,59 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: AppColors.backgroundSecondary,
-      title: Text(widget.component),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SegmentedButton<FertilizerDoseUnit>(
-            segments: const [
-              ButtonSegment(
-                value: FertilizerDoseUnit.g,
-                label: Text('г'),
-              ),
-              ButtonSegment(
-                value: FertilizerDoseUnit.ml,
-                label: Text('мл'),
-              ),
-            ],
-            selected: {_unit},
-            onSelectionChanged: (value) {
-              setState(() => _unit = value.first);
-            },
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _amountController,
-            autofocus: true,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-            ],
-            onChanged: (_) {
-              if (_errorText != null) setState(() => _errorText = null);
-            },
-            onSubmitted: (_) => _save(),
-            decoration: InputDecoration(
-              labelText:
-                  _unit == FertilizerDoseUnit.ml ? 'Миллилитры' : 'Граммы',
-              hintText: 'напр. 2',
-              errorText: _errorText,
-            ),
-          ),
-        ],
+      title: Text(
+        widget.component,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
       ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SegmentedButton<FertilizerDoseUnit>(
+              segments: const [
+                ButtonSegment(
+                  value: FertilizerDoseUnit.g,
+                  label: Text('г'),
+                ),
+                ButtonSegment(
+                  value: FertilizerDoseUnit.ml,
+                  label: Text('мл'),
+                ),
+              ],
+              selected: {_unit},
+              onSelectionChanged: (value) {
+                setState(() => _unit = value.first);
+              },
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _amountController,
+              autofocus: true,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+              ],
+              onChanged: (_) {
+                if (_errorText != null) setState(() => _errorText = null);
+              },
+              onSubmitted: (_) => _save(),
+              decoration: InputDecoration(
+                labelText:
+                    _unit == FertilizerDoseUnit.ml ? 'Миллилитры' : 'Граммы',
+                hintText: 'напр. 2',
+                errorText: _errorText,
+              ),
+            ),
+          ],
+        ),
+      ),
+      actionsAlignment: MainAxisAlignment.end,
+      actionsOverflowAlignment: OverflowBarAlignment.end,
+      actionsOverflowDirection: VerticalDirection.down,
+      actionsOverflowButtonSpacing: 8,
       actions: [
         if (widget.initial != null)
           TextButton(
@@ -219,43 +230,59 @@ class FertilizerComponentTags extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        ...availableComponents.map((name) {
-          final selectedDose = _find(name);
-          final isSelected = selectedDose != null;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final chipMaxWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : MediaQuery.sizeOf(context).width;
 
-          return GestureDetector(
-            onTap: () => _onTap(context, name),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.goldAccent.withValues(alpha: 0.25)
-                    : AppColors.greenDeep,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color:
-                      isSelected ? AppColors.goldAccent : AppColors.greenSoft,
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            ...availableComponents.map((name) {
+              final selectedDose = _find(name);
+              final isSelected = selectedDose != null;
+
+              return GestureDetector(
+                onTap: () => _onTap(context, name),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: chipMaxWidth),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppColors.goldAccent.withValues(alpha: 0.25)
+                          : AppColors.greenDeep,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColors.goldAccent
+                            : AppColors.greenSoft,
+                      ),
+                    ),
+                    child: Text(
+                      isSelected ? selectedDose.label : name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: isSelected
+                            ? AppColors.goldAccent
+                            : AppColors.textPrimary,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.w400,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              child: Text(
-                isSelected ? selectedDose.label : name,
-                style: TextStyle(
-                  color: isSelected
-                      ? AppColors.goldAccent
-                      : AppColors.textPrimary,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                ),
-              ),
-            ),
-          );
-        }),
-        if (onAddCustom != null) _addButton(),
-      ],
+              );
+            }),
+            if (onAddCustom != null) _addButton(),
+          ],
+        );
+      },
     );
   }
 }

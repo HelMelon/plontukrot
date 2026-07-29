@@ -67,65 +67,85 @@ class SoilComponentTags extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        ...availableComponents.map((name) {
-          final selectedComponent = _find(name);
-          final isSelected = selectedComponent != null;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final chipMaxWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : MediaQuery.sizeOf(context).width;
 
-          return GestureDetector(
-            onTap: () => _onTap(name),
-            onLongPress: () => _onLongPress(name),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.goldAccent.withValues(alpha: 0.25)
-                    : AppColors.greenDeep,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isSelected ? AppColors.goldAccent : AppColors.greenSoft,
-                ),
-              ),
-              child: Text(
-                isSelected
-                    ? '$name · ${formatParts(selectedComponent.parts)}'
-                    : name,
-                style: TextStyle(
-                  color: isSelected ? AppColors.goldAccent : AppColors.textPrimary,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                ),
-              ),
-            ),
-          );
-        }),
-        if (onAddCustom != null)
-          GestureDetector(
-            onTap: onAddCustom,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.backgroundSecondary,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.sage),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.add, size: 16, color: AppColors.heading),
-                  SizedBox(width: 4),
-                  Text(
-                    'Добавить',
-                    style: TextStyle(color: AppColors.heading),
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            ...availableComponents.map((name) {
+              final selectedComponent = _find(name);
+              final isSelected = selectedComponent != null;
+
+              return GestureDetector(
+                onTap: () => _onTap(name),
+                onLongPress: () => _onLongPress(name),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: chipMaxWidth),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppColors.goldAccent.withValues(alpha: 0.25)
+                          : AppColors.greenDeep,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColors.goldAccent
+                            : AppColors.greenSoft,
+                      ),
+                    ),
+                    child: Text(
+                      isSelected
+                          ? '$name · ${formatParts(selectedComponent.parts)}'
+                          : name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: isSelected
+                            ? AppColors.goldAccent
+                            : AppColors.textPrimary,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.w400,
+                      ),
+                    ),
                   ),
-                ],
+                ),
+              );
+            }),
+            if (onAddCustom != null)
+              GestureDetector(
+                onTap: onAddCustom,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.backgroundSecondary,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.sage),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add, size: 16, color: AppColors.heading),
+                      SizedBox(width: 4),
+                      Text(
+                        'Добавить',
+                        style: TextStyle(color: AppColors.heading),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
-      ],
+          ],
+        );
+      },
     );
   }
 }

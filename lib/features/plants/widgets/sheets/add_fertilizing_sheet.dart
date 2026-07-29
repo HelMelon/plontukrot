@@ -371,7 +371,8 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
               const SizedBox(height: 16),
               Text(
                 widget.title,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
               ListTile(
@@ -394,46 +395,58 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
-              SegmentedButton<FertilizerApplicationMethod>(
-                segments: const [
-                  ButtonSegment(
-                    value: FertilizerApplicationMethod.root,
-                    label: Text('Корневое'),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text('Корневое'),
+                    selected:
+                        _applicationMethod == FertilizerApplicationMethod.root,
+                    onSelected: (_) {
+                      setState(
+                        () => _applicationMethod =
+                            FertilizerApplicationMethod.root,
+                      );
+                    },
                   ),
-                  ButtonSegment(
-                    value: FertilizerApplicationMethod.foliar,
-                    label: Text('Внекорневое'),
+                  ChoiceChip(
+                    label: const Text('Внекорневое'),
+                    selected: _applicationMethod ==
+                        FertilizerApplicationMethod.foliar,
+                    onSelected: (_) {
+                      setState(
+                        () => _applicationMethod =
+                            FertilizerApplicationMethod.foliar,
+                      );
+                    },
                   ),
                 ],
-                selected: {_applicationMethod},
-                onSelectionChanged: (value) {
-                  setState(() => _applicationMethod = value.first);
-                },
               ),
               const SizedBox(height: 16),
-              SegmentedButton<_FertilizerMode>(
-                segments: const [
-                  ButtonSegment(
-                    value: _FertilizerMode.saved,
-                    label: Text('Сохранённые'),
-                    icon: Icon(Icons.bookmark_outline),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text('Сохранённые'),
+                    selected: _mode == _FertilizerMode.saved,
+                    onSelected: (_) {
+                      setState(() => _mode = _FertilizerMode.saved);
+                    },
                   ),
-                  ButtonSegment(
-                    value: _FertilizerMode.newMix,
-                    label: Text('Новый микс'),
-                    icon: Icon(Icons.science_outlined),
+                  ChoiceChip(
+                    label: const Text('Новый микс'),
+                    selected: _mode == _FertilizerMode.newMix,
+                    onSelected: (_) {
+                      setState(() {
+                        _mode = _FertilizerMode.newMix;
+                        _selectedFertilizerId = null;
+                        _saveMix = false;
+                      });
+                    },
                   ),
                 ],
-                selected: {_mode},
-                onSelectionChanged: (value) {
-                  setState(() {
-                    _mode = value.first;
-                    if (_mode == _FertilizerMode.newMix) {
-                      _selectedFertilizerId = null;
-                      _saveMix = false;
-                    }
-                  });
-                },
               ),
               const SizedBox(height: 16),
               if (_mode == _FertilizerMode.saved)

@@ -141,6 +141,8 @@ class PlantPropagationsSection extends StatelessWidget {
                               children: [
                                 Text(
                                   '${_stageTitle(item.stage)} · ${_daysLabel(item.daysSinceStart)}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.textPrimary,
@@ -149,6 +151,8 @@ class PlantPropagationsSection extends StatelessWidget {
                                 const SizedBox(height: 4),
                                 Text(
                                   '${item.quantityAlive} ${item.method.pluralLabel} · ${DateFormat('d MMM y').format(item.startedAt)}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     color: AppColors.textSecondary,
                                     fontSize: 13,

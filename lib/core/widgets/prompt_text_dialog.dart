@@ -91,25 +91,44 @@ class _PromptTextDialogState extends State<_PromptTextDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final maxContentHeight =
+        (media.size.height - media.viewInsets.bottom) * 0.4;
+
     return AlertDialog(
       backgroundColor: AppColors.backgroundSecondary,
-      title: Text(widget.title),
-      content: TextField(
-        controller: _controller,
-        autofocus: true,
-        keyboardType: widget.keyboardType,
-        inputFormatters: widget.inputFormatters,
-        textCapitalization: widget.textCapitalization,
-        onChanged: (_) {
-          if (_errorText != null) setState(() => _errorText = null);
-        },
-        onSubmitted: (_) => _submit(),
-        decoration: InputDecoration(
-          hintText: widget.hintText,
-          labelText: widget.labelText,
-          errorText: _errorText,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      title: Text(
+        widget.title,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+      content: ConstrainedBox(
+        constraints:
+            BoxConstraints(maxHeight: maxContentHeight.clamp(120.0, 320.0)),
+        child: SingleChildScrollView(
+          child: TextField(
+            controller: _controller,
+            autofocus: true,
+            keyboardType: widget.keyboardType,
+            inputFormatters: widget.inputFormatters,
+            textCapitalization: widget.textCapitalization,
+            onChanged: (_) {
+              if (_errorText != null) setState(() => _errorText = null);
+            },
+            onSubmitted: (_) => _submit(),
+            decoration: InputDecoration(
+              hintText: widget.hintText,
+              labelText: widget.labelText,
+              errorText: _errorText,
+            ),
+          ),
         ),
       ),
+      actionsAlignment: MainAxisAlignment.end,
+      actionsOverflowAlignment: OverflowBarAlignment.end,
+      actionsOverflowDirection: VerticalDirection.down,
+      actionsOverflowButtonSpacing: 8,
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),

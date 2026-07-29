@@ -121,6 +121,8 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
               const SizedBox(height: 8),
               Text(
                 widget.parentPlantName,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 16,
                   color: AppColors.textSecondary,
@@ -148,16 +150,12 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
                     selectedColor: AppColors.goldAccent,
                     backgroundColor: AppColors.dark2,
                     labelStyle: TextStyle(
-                      color: selected
-                          ? AppColors.dark1
-                          : AppColors.textPrimary,
-                      fontWeight:
-                          selected ? FontWeight.w700 : FontWeight.w500,
+                      color: selected ? AppColors.dark1 : AppColors.textPrimary,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                     ),
                     side: BorderSide(
-                      color: selected
-                          ? AppColors.goldAccent
-                          : AppColors.greenDeep,
+                      color:
+                          selected ? AppColors.goldAccent : AppColors.greenDeep,
                     ),
                   );
                 }).toList(),
@@ -213,11 +211,15 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
                         size: 20,
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        'Дата: ${DateFormat('d MMM y').format(_startedAt)}',
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 16,
+                      Expanded(
+                        child: Text(
+                          'Дата: ${DateFormat('d MMM y').format(_startedAt)}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ],

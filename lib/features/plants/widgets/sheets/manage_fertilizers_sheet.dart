@@ -114,9 +114,12 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
                 const Expanded(
                   child: Text(
                     'Удобрения',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
+                const SizedBox(width: 8),
                 FilledButton.icon(
                   onPressed: _addPurchased,
                   icon: const Icon(Icons.add),
@@ -129,6 +132,8 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
               alignment: Alignment.centerLeft,
               child: Text(
                 'Миксы сохраняются из «Новый микс». Вид можно менять: готовое ↔ микс.',
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
                   color: AppColors.textSecondary,
@@ -166,7 +171,11 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
 
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text(item.name),
+                        title: Text(
+                          item.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                         subtitle: Text(
                           [
                             item.kind.label,
@@ -181,11 +190,13 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
                           children: [
                             IconButton(
                               tooltip: 'Изменить',
+                              visualDensity: VisualDensity.compact,
                               icon: const Icon(Icons.edit_outlined),
                               onPressed: () => _edit(item),
                             ),
                             IconButton(
                               tooltip: 'Удалить',
+                              visualDensity: VisualDensity.compact,
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () => _delete(item),
                             ),
@@ -283,8 +294,8 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
 
     final doseRaw = _doseController.text.trim().replaceAll(',', '.');
     final components = <FertilizerDose>[];
-    final showSimpleDose =
-        _kind == FertilizerKind.purchased || widget.initialComponents.length <= 1;
+    final showSimpleDose = _kind == FertilizerKind.purchased ||
+        widget.initialComponents.length <= 1;
 
     if (showSimpleDose) {
       if (doseRaw.isNotEmpty) {
@@ -325,8 +336,7 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
   @override
   Widget build(BuildContext context) {
     final isPurchased = _kind == FertilizerKind.purchased;
-    final showSimpleDose =
-        isPurchased || widget.initialComponents.length <= 1;
+    final showSimpleDose = isPurchased || widget.initialComponents.length <= 1;
 
     return AlertDialog(
       backgroundColor: AppColors.backgroundSecondary,
@@ -345,7 +355,8 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
               },
               decoration: InputDecoration(
                 labelText: 'Название',
-                hintText: isPurchased ? 'напр. Pokon Universal' : 'Название микса',
+                hintText:
+                    isPurchased ? 'напр. Pokon Universal' : 'Название микса',
                 errorText: _nameError,
               ),
             ),

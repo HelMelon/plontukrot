@@ -196,8 +196,7 @@ class PlantSearchDelegate extends SearchDelegate {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: () {
-                          final String? imageUrl =
-                              plant.imageUrl?.trim();
+                          final String? imageUrl = plant.imageUrl?.trim();
 
                           if (imageUrl != null && imageUrl.isNotEmpty) {
                             return Image.network(
@@ -241,6 +240,8 @@ class PlantSearchDelegate extends SearchDelegate {
                     ),
                     title: Text(
                       titleText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: AppColors.heading,
                         fontSize: 16,
@@ -252,6 +253,8 @@ class PlantSearchDelegate extends SearchDelegate {
                             padding: const EdgeInsets.only(top: 4.0),
                             child: Text(
                               subtitleText,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 color: AppColors.textSecondary,
                                 fontSize: 13,

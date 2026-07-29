@@ -276,7 +276,8 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
               const SizedBox(height: 16),
               Text(
                 widget.isEditing ? 'Изменить пересадку' : 'Добавить пересадку',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
               ListTile(
@@ -294,29 +295,29 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                 ),
               ),
               const SizedBox(height: 16),
-              SegmentedButton<_SoilMode>(
-                segments: const [
-                  ButtonSegment(
-                    value: _SoilMode.saved,
-                    label: Text('Сохранённые'),
-                    icon: Icon(Icons.bookmark_outline),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text('Сохранённые'),
+                    selected: _mode == _SoilMode.saved,
+                    onSelected: (_) {
+                      setState(() => _mode = _SoilMode.saved);
+                    },
                   ),
-                  ButtonSegment(
-                    value: _SoilMode.newMix,
-                    label: Text('Новый микс'),
-                    icon: Icon(Icons.science_outlined),
+                  ChoiceChip(
+                    label: const Text('Новый микс'),
+                    selected: _mode == _SoilMode.newMix,
+                    onSelected: (_) {
+                      setState(() {
+                        _mode = _SoilMode.newMix;
+                        _selectedSoilId = null;
+                        _saveMix = false;
+                      });
+                    },
                   ),
                 ],
-                selected: {_mode},
-                onSelectionChanged: (value) {
-                  setState(() {
-                    _mode = value.first;
-                    if (_mode == _SoilMode.newMix) {
-                      _selectedSoilId = null;
-                      _saveMix = false;
-                    }
-                  });
-                },
               ),
               const SizedBox(height: 16),
               if (_mode == _SoilMode.saved)
@@ -379,10 +380,10 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                         ),
                         IconButton(
                           tooltip: 'Посмотреть состав',
-                          onPressed: _selectedSoilId == null &&
-                                  _components.isEmpty
-                              ? null
-                              : () => _showSelectedComposition(soils),
+                          onPressed:
+                              _selectedSoilId == null && _components.isEmpty
+                                  ? null
+                                  : () => _showSelectedComposition(soils),
                           icon: const Icon(Icons.info_outline),
                         ),
                       ],

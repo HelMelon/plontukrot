@@ -156,6 +156,8 @@ class PropagationDetailsSheet extends StatelessWidget {
                 const SizedBox(height: 24),
                 Text(
                   shown.parentPlantName,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
@@ -167,6 +169,8 @@ class PropagationDetailsSheet extends StatelessWidget {
                   isActive
                       ? '${shown.quantityAlive} ${shown.method.pluralLabel} · ${shown.method.label}'
                       : '${shown.method.label} · ${shown.status.label}',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 16,
                     color: AppColors.textSecondary,
@@ -177,6 +181,8 @@ class PropagationDetailsSheet extends StatelessWidget {
                   isActive
                       ? '${stage.title} · ${_daysLabel(shown.daysSinceStart)} · с ${DateFormat('d MMM y').format(shown.startedAt)}'
                       : '${stage.title} · с ${DateFormat('d MMM y').format(shown.startedAt)}',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 15,
                     color: AppColors.accentLight,
@@ -192,6 +198,8 @@ class PropagationDetailsSheet extends StatelessWidget {
                         'Погибло: ${shown.lostQuantity}',
                       'из ${shown.quantity}',
                     ].join(' · '),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 14,
                       color: AppColors.textSecondary,
@@ -249,15 +257,20 @@ class PropagationDetailsSheet extends StatelessWidget {
                                     Expanded(
                                       child: Text(
                                         entryStage.title,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                           fontWeight: FontWeight.w700,
                                           color: AppColors.textPrimary,
                                         ),
                                       ),
                                     ),
+                                    const SizedBox(width: 8),
                                     Text(
                                       DateFormat('d MMM y')
                                           .format(entry.changedAt),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         color: AppColors.textSecondary,
                                         fontSize: 13,

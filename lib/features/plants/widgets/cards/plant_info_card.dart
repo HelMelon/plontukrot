@@ -49,6 +49,8 @@ class PlantInfoCard extends StatelessWidget {
         children: [
           Text(
             data['name'] ?? 'Без названия',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
@@ -57,6 +59,8 @@ class PlantInfoCard extends StatelessWidget {
           ),
           Text(
             'Прозвище: ${data['nickname'] ?? 'Без названия'}',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               fontStyle: FontStyle.italic,
               fontSize: 24,
@@ -66,6 +70,8 @@ class PlantInfoCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Семейство: ${data['family'] ?? 'Не известно'}',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               fontStyle: FontStyle.italic,
               fontSize: 24,
@@ -76,6 +82,8 @@ class PlantInfoCard extends StatelessWidget {
           stage.value != 0
               ? Text(
                   'Стадия: ${stage.title}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontStyle: FontStyle.italic,
                     fontSize: 24,
@@ -95,8 +103,7 @@ class PlantInfoCard extends StatelessWidget {
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
-                        builder: (_) =>
-                            WateringHistorySheet(plantId: plantId),
+                        builder: (_) => WateringHistorySheet(plantId: plantId),
                       );
                     }
 
@@ -171,8 +178,7 @@ class PlantInfoCard extends StatelessWidget {
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
-                        builder: (_) =>
-                            RepottingHistorySheet(plantId: plantId),
+                        builder: (_) => RepottingHistorySheet(plantId: plantId),
                       );
                     }
 

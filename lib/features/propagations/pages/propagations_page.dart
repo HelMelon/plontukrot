@@ -103,6 +103,8 @@ class _PropagationsPageState extends State<PropagationsPage>
             const SizedBox(height: 10),
             Text(
               'По способам: ${methodParts.take(4).map((e) => '${e.key.label} ${e.value}').join(' · ')}',
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 13,
@@ -113,6 +115,8 @@ class _PropagationsPageState extends State<PropagationsPage>
             const SizedBox(height: 4),
             Text(
               'По семействам: ${familyParts.take(3).map((e) => '${e.key} ${e.value}').join(' · ')}',
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 13,
@@ -192,6 +196,8 @@ class _PropagationsPageState extends State<PropagationsPage>
                 children: [
                   Text(
                     title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
@@ -201,6 +207,8 @@ class _PropagationsPageState extends State<PropagationsPage>
                   const SizedBox(height: 6),
                   Text(
                     item.parentPlantName,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: AppColors.heading,
                       fontSize: 15,
@@ -209,6 +217,8 @@ class _PropagationsPageState extends State<PropagationsPage>
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 13,
@@ -219,9 +229,13 @@ class _PropagationsPageState extends State<PropagationsPage>
                     const SizedBox(height: 4),
                     Text(
                       [
-                        if (item.soldQuantity > 0) 'продано ${item.soldQuantity}',
-                        if (item.lostQuantity > 0) 'погибло ${item.lostQuantity}',
+                        if (item.soldQuantity > 0)
+                          'продано ${item.soldQuantity}',
+                        if (item.lostQuantity > 0)
+                          'погибло ${item.lostQuantity}',
                       ].join(' · '),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: AppColors.accentLight,
                         fontSize: 12,

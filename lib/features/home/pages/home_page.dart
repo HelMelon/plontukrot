@@ -28,6 +28,8 @@ enum _PlantSortField {
   family,
 }
 
+enum _SelectionMenuAction { updateFamily, delete }
+
 class HomePage extends StatefulWidget {
   final User user;
 
@@ -189,8 +191,7 @@ class _HomePageState extends State<HomePage> {
       ..sort((a, b) {
         if (a.key == 'Без семейства') return 1;
         if (b.key == 'Без семейства') return -1;
-        final comparison =
-            a.key.toLowerCase().compareTo(b.key.toLowerCase());
+        final comparison = a.key.toLowerCase().compareTo(b.key.toLowerCase());
         return _sortAscending ? comparison : -comparison;
       });
 
@@ -280,7 +281,7 @@ class _HomePageState extends State<HomePage> {
         crossAxisCount: crossAxisCount,
         crossAxisSpacing: 12,
         mainAxisSpacing: 16,
-        childAspectRatio: 0.60,
+        childAspectRatio: 0.55,
       ),
       itemBuilder: (context, index) {
         final plant = plants[index];
@@ -380,17 +381,16 @@ class _HomePageState extends State<HomePage> {
         onPressed: _exitSelectionMode,
         icon: const Icon(Icons.close),
       ),
-      title: Text('Выбрано: ${_selectedPlantIds.length}'),
+      title: Text(
+        'Выбрано: ${_selectedPlantIds.length}',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
       actions: [
         IconButton(
           tooltip: 'Выбрать все',
           onPressed: _selectAll,
           icon: const Icon(Icons.select_all),
-        ),
-        IconButton(
-          tooltip: 'Изменить семейство',
-          onPressed: _updateFamily,
-          icon: const Icon(Icons.family_restroom_outlined),
         ),
         IconButton(
           tooltip: 'Полив',
@@ -402,10 +402,26 @@ class _HomePageState extends State<HomePage> {
           onPressed: _showFertilizingSheet,
           icon: const Icon(Icons.science_outlined),
         ),
-        IconButton(
-          tooltip: 'Удалить',
-          onPressed: _deletePlants,
-          icon: const Icon(Icons.delete_outline),
+        PopupMenuButton<_SelectionMenuAction>(
+          tooltip: 'Ещё',
+          onSelected: (action) {
+            switch (action) {
+              case _SelectionMenuAction.updateFamily:
+                _updateFamily();
+              case _SelectionMenuAction.delete:
+                _deletePlants();
+            }
+          },
+          itemBuilder: (context) => const [
+            PopupMenuItem(
+              value: _SelectionMenuAction.updateFamily,
+              child: Text('Изменить семейство'),
+            ),
+            PopupMenuItem(
+              value: _SelectionMenuAction.delete,
+              child: Text('Удалить'),
+            ),
+          ],
         ),
       ],
       bottom: const PreferredSize(
@@ -626,8 +642,7 @@ class _HomePageState extends State<HomePage> {
                     }
 
                     return StreamBuilder<Set<String>>(
-                      stream:
-                          PropagationService().watchActiveParentPlantIds(),
+                      stream: PropagationService().watchActiveParentPlantIds(),
                       builder: (context, propagatingSnapshot) {
                         final propagatingIds =
                             propagatingSnapshot.data ?? const <String>{};
@@ -682,8 +697,7 @@ class _HomePageState extends State<HomePage> {
                                                   ? AppColors.dark1
                                                   : AppColors.accentLight,
                                             ),
-                                            selectedColor:
-                                                AppColors.goldAccent,
+                                            selectedColor: AppColors.goldAccent,
                                             checkmarkColor: AppColors.dark1,
                                             labelStyle: TextStyle(
                                               fontSize: 13,
@@ -778,8 +792,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                               label: Text(
                                                 _sortLabel,
-                                                overflow:
-                                                    TextOverflow.ellipsis,
+                                                overflow: TextOverflow.ellipsis,
                                                 style: const TextStyle(
                                                   fontSize: 13,
                                                 ),

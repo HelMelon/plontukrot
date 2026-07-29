@@ -12,25 +12,39 @@ Future<void> showSoilCompositionDialog({
   return showDialog<void>(
     context: context,
     builder: (context) {
+      final media = MediaQuery.of(context);
+      final maxHeight = (media.size.height - media.viewInsets.bottom) * 0.5;
+
       return AlertDialog(
         backgroundColor: AppColors.backgroundSecondary,
-        title: Text(title),
+        title: Text(
+          title,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
         content: components.isEmpty
             ? const Text('Нет компонентов')
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: components
-                    .map(
-                      (c) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Text(
-                          '${c.component} — ${formatParts(c.parts)} части',
-                          style: const TextStyle(color: AppColors.textPrimary),
-                        ),
-                      ),
-                    )
-                    .toList(),
+            : ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: maxHeight),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: components
+                        .map(
+                          (c) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Text(
+                              '${c.component} — ${formatParts(c.parts)} части',
+                              style: const TextStyle(
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
               ),
         actions: [
           TextButton(

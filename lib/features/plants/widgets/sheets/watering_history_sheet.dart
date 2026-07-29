@@ -158,11 +158,15 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
           const SizedBox(height: 16),
           Row(
             children: [
-              const Text(
-                'История полива',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              const Expanded(
+                child: Text(
+                  'История полива',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               FilledButton.icon(
                 onPressed: () => _showWateringEditor(),
                 icon: const Icon(Icons.add),
