@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../models/note.dart';
 import '../../../../services/note_service.dart';
 import 'plant_note_tile.dart';
 
@@ -17,7 +17,7 @@ class PlantNotesSection extends StatefulWidget {
 class _PlantNotesSectionState extends State<PlantNotesSection> {
   bool showAll = false;
 
-  late final Stream<QuerySnapshot<Map<String, dynamic>>> _notesStream;
+  late final Stream<List<Note>> _notesStream;
 
   String? _openedNoteId;
 
@@ -35,7 +35,7 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+    return StreamBuilder<List<Note>>(
       stream: _notesStream,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -56,9 +56,9 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
           );
         }
 
-        final docs = snapshot.data!.docs;
+        final notes = snapshot.data!;
 
-        if (docs.isEmpty) {
+        if (notes.isEmpty) {
           return Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -73,26 +73,25 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
           );
         }
 
-        final visibleNotes = showAll ? docs : docs.take(3).toList();
+        final visibleNotes = showAll ? notes : notes.take(3).toList();
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ...visibleNotes.map(
-              (doc) => Padding(
+              (note) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: PlantNoteTile(
                   plantId: widget.plantId,
-                  noteId: doc.id,
-                  data: doc.data(),
-                  isOpened: _openedNoteId == doc.id,
+                  note: note,
+                  isOpened: _openedNoteId == note.id,
                   onOpenChanged: (isOpen) {
-                    _handleNoteOpen(isOpen ? doc.id : null);
+                    _handleNoteOpen(isOpen ? note.id : null);
                   },
                 ),
               ),
             ),
-            if (docs.length > 3)
+            if (notes.length > 3)
               TextButton(
                 onPressed: () {
                   setState(() {

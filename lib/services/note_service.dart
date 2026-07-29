@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../models/note.dart';
+
 class NoteService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -43,9 +45,11 @@ class NoteService {
     await _notesRef(plantId).doc(noteId).delete();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> notesStream(String plantId) {
+  Stream<List<Note>> notesStream(String plantId) {
     return _notesRef(
       plantId,
-    ).orderBy('createdAt', descending: true).snapshots();
+    ).orderBy('createdAt', descending: true).snapshots().map(
+          (snapshot) => snapshot.docs.map(Note.fromFirestore).toList(),
+        );
   }
 }

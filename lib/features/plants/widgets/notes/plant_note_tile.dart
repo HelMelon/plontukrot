@@ -1,23 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../models/note.dart';
 import '../../../../services/note_service.dart';
 import '../sheets/update_note_sheet.dart';
 
 class PlantNoteTile extends StatefulWidget {
   final String plantId;
-  final String noteId;
-  final Map<String, dynamic> data;
+  final Note note;
   final bool isOpened;
   final ValueChanged<bool> onOpenChanged;
 
   const PlantNoteTile({
     super.key,
     required this.plantId,
-    required this.noteId,
-    required this.data,
+    required this.note,
     required this.isOpened,
     required this.onOpenChanged,
   });
@@ -72,7 +70,7 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
     if (confirmed == true && context.mounted) {
       await NoteService().deleteNote(
         plantId: widget.plantId,
-        noteId: widget.noteId,
+        noteId: widget.note.id,
       );
     }
   }
@@ -84,16 +82,15 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
       backgroundColor: Colors.transparent,
       builder: (_) => UpdateNoteSheet(
         plantId: widget.plantId,
-        noteId: widget.noteId,
-        initialText: widget.data['text'] ?? '',
+        noteId: widget.note.id,
+        initialText: widget.note.text,
       ),
     );
   }
 
   String _formatDate() {
-    final ts = widget.data['createdAt'];
-    if (ts == null) return '';
-    final date = (ts as Timestamp).toDate();
+    final date = widget.note.createdAt;
+    if (date == null) return '';
     return '${date.day.toString().padLeft(2, '0')}.'
         '${date.month.toString().padLeft(2, '0')}.'
         '${date.year}';
@@ -121,7 +118,7 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
           ),
           const SizedBox(height: 8),
           Text(
-            widget.data['text'] ?? '',
+            widget.note.text,
             style: const TextStyle(
               fontSize: 15,
               height: 1.6,
