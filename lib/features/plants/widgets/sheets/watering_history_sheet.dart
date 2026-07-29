@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../models/watering_entry.dart';
 import '../../../../services/watering_service.dart';
 
 class WateringHistorySheet extends StatefulWidget {
@@ -176,7 +177,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
           ),
           const SizedBox(height: 20),
           Expanded(
-            child: StreamBuilder<List<Map<String, dynamic>>>(
+            child: StreamBuilder<List<WateringEntry>>(
               stream: _service.getWateringHistory(widget.plantId),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
@@ -200,8 +201,12 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final item = items[index];
-                    final wateringId = item['id'] as String;
-                    final wateredAt = item['wateredAt'] as DateTime;
+                    final wateringId = item.id;
+                    final wateredAt = item.wateredAt;
+
+                    if (wateringId == null) {
+                      return const SizedBox.shrink();
+                    }
 
                     return Container(
                       padding: const EdgeInsets.all(16),

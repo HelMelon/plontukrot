@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../models/watering_entry.dart';
+
 class WateringService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
@@ -60,59 +62,34 @@ class WateringService {
     }
   }
 
-  Stream<List<Map<String, dynamic>>> getWateringHistory(String plantId) {
-    return _wateringRef(
-      plantId,
-    ).orderBy('wateredAt', descending: true).snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-
-        return {
-          'id': doc.id,
-          'wateredAt': (data['wateredAt'] as Timestamp).toDate(),
-          'nextWatering': data['nextWatering'] != null
-              ? (data['nextWatering'] as Timestamp).toDate()
-              : null,
-        };
-      }).toList();
-    });
+  Stream<List<WateringEntry>> getWateringHistory(String plantId) {
+    return _wateringRef(plantId)
+        .orderBy('wateredAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs.map(WateringEntry.fromFirestore).toList(),
+        );
   }
 
-  Stream<Map<String, dynamic>?> watchLastWatering(String plantId) {
+  Stream<WateringEntry?> watchLastWatering(String plantId) {
     return _wateringRef(plantId)
         .orderBy('wateredAt', descending: true)
         .limit(1)
         .snapshots()
         .map((snapshot) {
       if (snapshot.docs.isEmpty) return null;
-
-      final data = snapshot.docs.first.data();
-
-      return {
-        'wateredAt': (data['wateredAt'] as Timestamp).toDate(),
-        'nextWatering': data['nextWatering'] != null
-            ? (data['nextWatering'] as Timestamp).toDate()
-            : null,
-      };
+      return WateringEntry.fromFirestore(snapshot.docs.first);
     });
   }
 
-  Future<Map<String, dynamic>?> getLastWatering(String plantId) async {
-    final snapshot = await _wateringRef(
-      plantId,
-    ).orderBy('wateredAt', descending: true).limit(1).get();
+  Future<WateringEntry?> getLastWatering(String plantId) async {
+    final snapshot = await _wateringRef(plantId)
+        .orderBy('wateredAt', descending: true)
+        .limit(1)
+        .get();
 
     if (snapshot.docs.isEmpty) return null;
-
-    final data = snapshot.docs.first.data();
-
-    return {
-      'id': snapshot.docs.first.id,
-      'wateredAt': (data['wateredAt'] as Timestamp).toDate(),
-      'nextWatering': data['nextWatering'] != null
-          ? (data['nextWatering'] as Timestamp).toDate()
-          : null,
-    };
+    return WateringEntry.fromFirestore(snapshot.docs.first);
   }
 
   DateTime _startOfDay(DateTime date) =>

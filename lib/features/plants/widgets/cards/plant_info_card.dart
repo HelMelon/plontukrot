@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../models/fertilizing_entry.dart';
 import '../../../../models/repotting_entry.dart';
 import '../../../../models/stage_info.dart';
+import '../../../../models/watering_entry.dart';
 import '../../../../services/fertilize_service.dart';
 import '../../../../services/repotting_service.dart';
 import '../../../../services/watering_service.dart';
@@ -96,7 +97,7 @@ class PlantInfoCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: StreamBuilder<Map<String, dynamic>?>(
+                child: StreamBuilder<WateringEntry?>(
                   stream: WateringService().watchLastWatering(plantId),
                   builder: (context, snapshot) {
                     void openHistory() {
@@ -118,7 +119,7 @@ class PlantInfoCard extends StatelessWidget {
                     }
 
                     final watering = snapshot.data;
-                    final last = watering?['wateredAt'] as DateTime?;
+                    final last = watering?.wateredAt;
                     final value = last == null
                         ? 'Нет данных'
                         : DateFormat('d MMM y').format(last);
