@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../models/fertilizing_entry.dart';
 import '../../../../models/plant.dart';
+import '../../../../services/fertilize_service.dart';
 import '../../pages/plant_details_page.dart';
 
 extension CapitalizeString on String {
@@ -19,6 +21,7 @@ class PlantCard extends StatelessWidget {
   final Plant plant;
   final bool isSelected;
   final bool preferSpeciesAsTitle;
+  final bool showLastFertilizer;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
@@ -27,6 +30,7 @@ class PlantCard extends StatelessWidget {
     required this.plant,
     this.isSelected = false,
     this.preferSpeciesAsTitle = false,
+    this.showLastFertilizer = false,
     this.onTap,
     this.onLongPress,
   });
@@ -42,13 +46,66 @@ class PlantCard extends StatelessWidget {
     final speciesBase =
         (plant.species.isEmpty ? 'Без названия' : plant.species).toTitleCase();
     final cultivar = (plant.cultivar ?? '').trim().toTitleCase();
-    final species = cultivar.isEmpty ? speciesBase : '$speciesBase $cultivar';
+    final species = cultivar.isEmpty ? speciesBase : '$speciesBase · $cultivar';
     final nickname = plant.nickname.toTitleCase();
     final hasNickname = nickname.trim().isNotEmpty;
     final showSpeciesOnTop = preferSpeciesAsTitle || !hasNickname;
     final title = showSpeciesOnTop ? species : nickname;
     final subtitle =
         showSpeciesOnTop ? (hasNickname ? nickname : null) : species;
+
+    Widget textBlock({String? fertilizerName}) {
+      return Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Flexible(
+              child: Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: _mainFontSize,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.3,
+                  color: AppColors.goldAccent,
+                  height: 1.2,
+                ),
+              ),
+            ),
+            if (subtitle != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: _subFontSize,
+                  fontWeight: FontWeight.normal,
+                  color: AppColors.warmGray,
+                  height: 1.2,
+                ),
+              ),
+            ],
+            if (fertilizerName != null && fertilizerName.trim().isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                fertilizerName.trim(),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: _subFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.accentLight,
+                  height: 1.2,
+                ),
+              ),
+            ],
+          ],
+        ),
+      );
+    }
 
     return GestureDetector(
       onTap: onTap ??
@@ -107,42 +164,17 @@ class PlantCard extends StatelessWidget {
                         : const _PlantAssetPlaceholder(),
                   ),
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: _mainFontSize,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: -0.3,
-                                color: AppColors.goldAccent,
-                                height: 1.2,
-                              ),
-                            ),
-                          ),
-                          if (subtitle != null) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              subtitle,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: _subFontSize,
-                                fontWeight: FontWeight.normal,
-                                color: AppColors.warmGray,
-                                height: 1.2,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
+                    child: showLastFertilizer
+                        ? StreamBuilder<FertilizingEntry?>(
+                            stream: FertilizeService()
+                                .watchLastFertilizing(plant.id),
+                            builder: (context, snapshot) {
+                              return textBlock(
+                                fertilizerName: snapshot.data?.fertilizerName,
+                              );
+                            },
+                          )
+                        : textBlock(),
                   ),
                 ],
               ),

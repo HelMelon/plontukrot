@@ -223,6 +223,37 @@ class FertilizeService {
     });
   }
 
+  Stream<FertilizingEntry?> watchLastFertilizing(String plantId) {
+    return _fertilizingRef(plantId)
+        .orderBy('appliedAt', descending: true)
+        .limit(1)
+        .snapshots()
+        .asyncMap((snapshot) async {
+      if (snapshot.docs.isEmpty) return null;
+
+      final doc = snapshot.docs.first;
+      final data = doc.data();
+      final fertilizerId = data['fertilizerId'] as String?;
+      final storedName = data['fertilizerName'] as String?;
+
+      String resolvedName;
+      if (storedName != null && storedName.trim().isNotEmpty) {
+        resolvedName = storedName;
+      } else if (fertilizerId != null) {
+        final fertilizer = await getFertilizer(fertilizerId);
+        resolvedName = fertilizer?.name ?? 'Неизвестно';
+      } else {
+        resolvedName = 'Свой микс';
+      }
+
+      return FertilizingEntry.fromFirestoreData(
+        id: doc.id,
+        data: data,
+        fertilizerName: resolvedName,
+      );
+    });
+  }
+
   Future<void> deleteFertilizing({
     required String plantId,
     required String fertilizingId,

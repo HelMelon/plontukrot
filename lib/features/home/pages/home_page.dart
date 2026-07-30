@@ -2,6 +2,7 @@ import 'dart:async';
 
 import './../../../services/firestore_service.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/prompt_text_dialog.dart';
@@ -205,6 +206,24 @@ class _HomePageState extends State<HomePage> {
     return Map.fromEntries(entries);
   }
 
+  Map<String, List<Plant>> _groupPlantsByCareDate(
+    Iterable<Plant> plants, {
+    required DateTime? Function(Plant plant) dateOf,
+  }) {
+    final groups = <String, List<Plant>>{};
+    final formatter = DateFormat("d MMMM y 'года'", 'ru');
+
+    for (final plant in plants) {
+      final date = dateOf(plant);
+      final key = date == null
+          ? 'Без даты'
+          : formatter.format(DateTime(date.year, date.month, date.day));
+      groups.putIfAbsent(key, () => []).add(plant);
+    }
+
+    return groups;
+  }
+
   void _toggleGroup(String key) {
     setState(() {
       if (!_collapsedLetterGroups.add(key)) {
@@ -279,6 +298,9 @@ class _HomePageState extends State<HomePage> {
   Widget _buildPlantGrid(List<Plant> plants, int crossAxisCount) {
     final preferSpeciesAsTitle = _sortField == _PlantSortField.species ||
         _sortField == _PlantSortField.plantFamily;
+    final showLastFertilizer =
+        _sortField == _PlantSortField.lastFertilizedAt;
+    final childAspectRatio = showLastFertilizer ? 0.48 : 0.55;
 
     return GridView.builder(
       shrinkWrap: true,
@@ -288,7 +310,7 @@ class _HomePageState extends State<HomePage> {
         crossAxisCount: crossAxisCount,
         crossAxisSpacing: 12,
         mainAxisSpacing: 16,
-        childAspectRatio: 0.55,
+        childAspectRatio: childAspectRatio,
       ),
       itemBuilder: (context, index) {
         final plant = plants[index];
@@ -296,6 +318,7 @@ class _HomePageState extends State<HomePage> {
           plant: plant,
           isSelected: _selectedPlantIds.contains(plant.id),
           preferSpeciesAsTitle: preferSpeciesAsTitle,
+          showLastFertilizer: showLastFertilizer,
           onTap:
               _isSelectionMode ? () => _togglePlantSelection(plant.id) : null,
           onLongPress: () => _togglePlantSelection(plant.id),
@@ -1087,6 +1110,24 @@ class _HomePageState extends State<HomePage> {
                                     _PlantSortField.plantFamily)
                                   _buildGroupedPlants(
                                     _groupPlantsByFamily(sortedPlants),
+                                    crossAxisCount,
+                                  )
+                                else if (_sortField ==
+                                    _PlantSortField.lastWateredAt)
+                                  _buildGroupedPlants(
+                                    _groupPlantsByCareDate(
+                                      sortedPlants,
+                                      dateOf: (plant) => plant.lastWateredAt,
+                                    ),
+                                    crossAxisCount,
+                                  )
+                                else if (_sortField ==
+                                    _PlantSortField.lastFertilizedAt)
+                                  _buildGroupedPlants(
+                                    _groupPlantsByCareDate(
+                                      sortedPlants,
+                                      dateOf: (plant) => plant.lastFertilizedAt,
+                                    ),
                                     crossAxisCount,
                                   )
                                 else
