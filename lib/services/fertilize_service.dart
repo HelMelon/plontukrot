@@ -219,9 +219,13 @@ class FertilizeService {
     await _syncLastFertilizedAt(plantId);
   }
 
-  Stream<List<FertilizingEntry>> getFertilizingHistory(String plantId) {
+  Stream<List<FertilizingEntry>> getFertilizingHistory(
+    String plantId, {
+    int limit = 40,
+  }) {
     return _fertilizingRef(plantId)
         .orderBy('appliedAt', descending: true)
+        .limit(limit)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {

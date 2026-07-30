@@ -62,9 +62,13 @@ class WateringService {
     }
   }
 
-  Stream<List<WateringEntry>> getWateringHistory(String plantId) {
+  Stream<List<WateringEntry>> getWateringHistory(
+    String plantId, {
+    int limit = 40,
+  }) {
     return _wateringRef(plantId)
         .orderBy('wateredAt', descending: true)
+        .limit(limit)
         .snapshots()
         .map(
           (snapshot) => snapshot.docs.map(WateringEntry.fromFirestore).toList(),

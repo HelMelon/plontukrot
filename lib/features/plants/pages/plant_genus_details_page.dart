@@ -7,8 +7,13 @@ import '../widgets/cards/plant_card.dart';
 
 class PlantGenusDetailsPage extends StatefulWidget {
   final String genus;
+  final Stream<List<Plant>>? plantsStream;
 
-  const PlantGenusDetailsPage({super.key, required this.genus});
+  const PlantGenusDetailsPage({
+    super.key,
+    required this.genus,
+    this.plantsStream,
+  });
 
   @override
   State<PlantGenusDetailsPage> createState() => _PlantGenusDetailsPageState();
@@ -20,7 +25,7 @@ class _PlantGenusDetailsPageState extends State<PlantGenusDetailsPage> {
   @override
   void initState() {
     super.initState();
-    _plantsStream = PlantService().getPlants();
+    _plantsStream = widget.plantsStream ?? PlantService().getPlants();
   }
 
   int _crossAxisCount(double width) {

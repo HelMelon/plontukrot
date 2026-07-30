@@ -15,21 +15,31 @@ class PlantNotesSection extends StatefulWidget {
 }
 
 class _PlantNotesSectionState extends State<PlantNotesSection> {
-  bool showAll = false;
+  static const int _pageSize = 20;
 
-  late final Stream<List<Note>> _notesStream;
+  bool showAll = false;
+  int _limit = _pageSize;
+  late Stream<List<Note>> _notesStream;
 
   String? _openedNoteId;
 
   @override
   void initState() {
     super.initState();
-    _notesStream = NoteService().notesStream(widget.plantId);
+    _notesStream = NoteService().notesStream(widget.plantId, limit: _limit);
   }
 
   void _handleNoteOpen(String? noteId) {
     setState(() {
       _openedNoteId = noteId;
+    });
+  }
+
+  void _loadMore() {
+    setState(() {
+      _limit += _pageSize;
+      showAll = true;
+      _notesStream = NoteService().notesStream(widget.plantId, limit: _limit);
     });
   }
 
@@ -74,6 +84,7 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
         }
 
         final visibleNotes = showAll ? notes : notes.take(3).toList();
+        final canLoadMore = notes.length >= _limit;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,16 +102,42 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
                 ),
               ),
             ),
-            if (notes.length > 3)
+            if (!showAll && notes.length > 3)
               TextButton(
                 onPressed: () {
                   setState(() {
-                    showAll = !showAll;
+                    showAll = true;
                   });
                 },
-                child: Text(
-                  showAll ? 'Свернуть' : 'Показать ещё',
-                  style: const TextStyle(
+                child: const Text(
+                  'Показать ещё',
+                  style: TextStyle(
+                    color: AppColors.goldAccent,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              )
+            else if (showAll && canLoadMore)
+              TextButton(
+                onPressed: _loadMore,
+                child: const Text(
+                  'Загрузить ещё',
+                  style: TextStyle(
+                    color: AppColors.goldAccent,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              )
+            else if (showAll && notes.length > 3)
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    showAll = false;
+                  });
+                },
+                child: const Text(
+                  'Свернуть',
+                  style: TextStyle(
                     color: AppColors.goldAccent,
                     fontWeight: FontWeight.w600,
                   ),

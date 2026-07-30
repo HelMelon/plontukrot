@@ -19,6 +19,29 @@ class RepottingHistorySheet extends StatefulWidget {
 
 class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
   final RepottingService _service = RepottingService();
+  static const int _pageSize = 40;
+
+  int _limit = _pageSize;
+  late Stream<List<RepottingEntry>> _historyStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _historyStream = _service.getRepottingHistory(
+      widget.plantId,
+      limit: _limit,
+    );
+  }
+
+  void _loadMore() {
+    setState(() {
+      _limit += _pageSize;
+      _historyStream = _service.getRepottingHistory(
+        widget.plantId,
+        limit: _limit,
+      );
+    });
+  }
 
   Future<void> _showAddSheet() async {
     await showModalBottomSheet(
@@ -125,7 +148,7 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                 const SizedBox(height: 20),
                 Expanded(
                   child: StreamBuilder<List<RepottingEntry>>(
-                    stream: _service.getRepottingHistory(widget.plantId),
+                    stream: _historyStream,
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         return Center(child: Text(snapshot.error.toString()));
@@ -146,10 +169,25 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                         );
                       }
 
+                      final canLoadMore = items.length >= _limit;
+
                       return ListView.separated(
-                        itemCount: items.length,
+                        itemCount: items.length + (canLoadMore ? 1 : 0),
                         separatorBuilder: (_, __) => const SizedBox(height: 12),
                         itemBuilder: (context, index) {
+                          if (index == items.length) {
+                            return TextButton(
+                              onPressed: _loadMore,
+                              child: const Text(
+                                'Показать ещё',
+                                style: TextStyle(
+                                  color: AppColors.goldAccent,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            );
+                          }
+
                           final item = items[index];
                           final repottingId = item.id!;
                           final title = (item.soilName?.isNotEmpty == true)

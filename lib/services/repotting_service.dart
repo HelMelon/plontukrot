@@ -60,9 +60,13 @@ class RepottingService {
     }
   }
 
-  Stream<List<RepottingEntry>> getRepottingHistory(String plantId) {
+  Stream<List<RepottingEntry>> getRepottingHistory(
+    String plantId, {
+    int limit = 40,
+  }) {
     return _repottingRef(plantId)
         .orderBy('repottedAt', descending: true)
+        .limit(limit)
         .snapshots()
         .map(
           (snapshot) =>

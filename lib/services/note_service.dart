@@ -45,10 +45,12 @@ class NoteService {
     await _notesRef(plantId).doc(noteId).delete();
   }
 
-  Stream<List<Note>> notesStream(String plantId) {
-    return _notesRef(
-      plantId,
-    ).orderBy('createdAt', descending: true).snapshots().map(
+  Stream<List<Note>> notesStream(String plantId, {int limit = 20}) {
+    return _notesRef(plantId)
+        .orderBy('createdAt', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map(
           (snapshot) => snapshot.docs.map(Note.fromFirestore).toList(),
         );
   }

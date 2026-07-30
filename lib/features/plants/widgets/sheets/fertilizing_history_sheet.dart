@@ -20,6 +20,29 @@ class FertilizingHistorySheet extends StatefulWidget {
 
 class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
   final FertilizeService _service = FertilizeService();
+  static const int _pageSize = 40;
+
+  int _limit = _pageSize;
+  late Stream<List<FertilizingEntry>> _historyStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _historyStream = _service.getFertilizingHistory(
+      widget.plantId,
+      limit: _limit,
+    );
+  }
+
+  void _loadMore() {
+    setState(() {
+      _limit += _pageSize;
+      _historyStream = _service.getFertilizingHistory(
+        widget.plantId,
+        limit: _limit,
+      );
+    });
+  }
 
   Future<void> _showAddSheet() async {
     await showModalBottomSheet(
@@ -126,7 +149,7 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                 const SizedBox(height: 20),
                 Expanded(
                   child: StreamBuilder<List<FertilizingEntry>>(
-                    stream: _service.getFertilizingHistory(widget.plantId),
+                    stream: _historyStream,
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         return Center(child: Text(snapshot.error.toString()));
@@ -147,10 +170,25 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                         );
                       }
 
+                      final canLoadMore = items.length >= _limit;
+
                       return ListView.separated(
-                        itemCount: items.length,
+                        itemCount: items.length + (canLoadMore ? 1 : 0),
                         separatorBuilder: (_, __) => const SizedBox(height: 12),
                         itemBuilder: (context, index) {
+                          if (index == items.length) {
+                            return TextButton(
+                              onPressed: _loadMore,
+                              child: const Text(
+                                'Показать ещё',
+                                style: TextStyle(
+                                  color: AppColors.goldAccent,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            );
+                          }
+
                           final item = items[index];
 
                           return InkWell(

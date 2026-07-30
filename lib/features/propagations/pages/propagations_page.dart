@@ -18,11 +18,19 @@ class PropagationsPage extends StatefulWidget {
 class _PropagationsPageState extends State<PropagationsPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+  late final PropagationService _service;
+  late final Stream<List<Propagation>> _activeStream;
+  late final Stream<List<Propagation>> _archivedStream;
+  late final Stream<PropagationYearStats> _yearStatsStream;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _service = PropagationService();
+    _activeStream = _service.watchActivePropagations().asBroadcastStream();
+    _archivedStream = _service.watchArchivedPropagations().asBroadcastStream();
+    _yearStatsStream = _service.yearStatsFrom(_activeStream, _archivedStream);
   }
 
   @override
@@ -257,8 +265,6 @@ class _PropagationsPageState extends State<PropagationsPage>
 
   @override
   Widget build(BuildContext context) {
-    final service = PropagationService();
-
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
@@ -288,7 +294,7 @@ class _PropagationsPageState extends State<PropagationsPage>
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
             child: StreamBuilder<PropagationYearStats>(
-              stream: service.watchYearStats(),
+              stream: _yearStatsStream,
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const SizedBox(height: 8);
@@ -302,7 +308,7 @@ class _PropagationsPageState extends State<PropagationsPage>
               controller: _tabController,
               children: [
                 StreamBuilder<List<Propagation>>(
-                  stream: service.watchActivePropagations(),
+                  stream: _activeStream,
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       return Center(
@@ -348,7 +354,7 @@ class _PropagationsPageState extends State<PropagationsPage>
                   },
                 ),
                 StreamBuilder<List<Propagation>>(
-                  stream: service.watchArchivedPropagations(),
+                  stream: _archivedStream,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting &&
                         !snapshot.hasData) {

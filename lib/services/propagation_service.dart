@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -87,7 +89,16 @@ class PropagationService {
   }
 
   Stream<List<Propagation>> watchArchivedPropagations() {
-    return _propagationsRef.snapshots().map((snapshot) {
+    return _propagationsRef
+        .where(
+          'status',
+          whereIn: [
+            PropagationStatus.sold.code,
+            PropagationStatus.lost.code,
+          ],
+        )
+        .snapshots()
+        .map((snapshot) {
       final items = snapshot.docs
           .map(Propagation.fromFirestore)
           .where((item) => item.isArchiveVisible)
@@ -101,19 +112,61 @@ class PropagationService {
     });
   }
 
-  Stream<List<Propagation>> watchAllPropagations() {
-    return _propagationsRef.snapshots().map((snapshot) {
-      final items = snapshot.docs.map(Propagation.fromFirestore).toList();
-      items.sort((a, b) => b.startedAt.compareTo(a.startedAt));
-      return items;
-    });
+  Stream<PropagationYearStats> watchYearStats([int? year]) {
+    return yearStatsFrom(
+      watchActivePropagations(),
+      watchArchivedPropagations(),
+      year,
+    );
   }
 
-  Stream<PropagationYearStats> watchYearStats([int? year]) {
+  /// Derive year stats from already-open active/archive streams (no extra queries).
+  Stream<PropagationYearStats> yearStatsFrom(
+    Stream<List<Propagation>> active,
+    Stream<List<Propagation>> archived, [
+    int? year,
+  ]) {
     final targetYear = year ?? DateTime.now().year;
-    return watchAllPropagations().map(
+    return _combinePropagationLists(active, archived).map(
       (items) => PropagationYearStats.fromList(targetYear, items),
     );
+  }
+
+  static Stream<List<Propagation>> _combinePropagationLists(
+    Stream<List<Propagation>> active,
+    Stream<List<Propagation>> archived,
+  ) {
+    late final StreamController<List<Propagation>> controller;
+    List<Propagation>? latestActive;
+    List<Propagation>? latestArchived;
+    StreamSubscription<List<Propagation>>? activeSub;
+    StreamSubscription<List<Propagation>>? archivedSub;
+
+    void emit() {
+      if (latestActive == null || latestArchived == null) return;
+      if (!controller.isClosed) {
+        controller.add([...latestActive!, ...latestArchived!]);
+      }
+    }
+
+    controller = StreamController<List<Propagation>>(
+      onListen: () {
+        activeSub = active.listen((items) {
+          latestActive = items;
+          emit();
+        }, onError: controller.addError);
+        archivedSub = archived.listen((items) {
+          latestArchived = items;
+          emit();
+        }, onError: controller.addError);
+      },
+      onCancel: () async {
+        await activeSub?.cancel();
+        await archivedSub?.cancel();
+      },
+    );
+
+    return controller.stream;
   }
 
   Stream<Set<String>> watchActiveParentPlantIds() {

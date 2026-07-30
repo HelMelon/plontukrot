@@ -17,6 +17,29 @@ class WateringHistorySheet extends StatefulWidget {
 
 class _WateringHistorySheetState extends State<WateringHistorySheet> {
   final WateringService _service = WateringService();
+  static const int _pageSize = 40;
+
+  int _limit = _pageSize;
+  late Stream<List<WateringEntry>> _historyStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _historyStream = _service.getWateringHistory(
+      widget.plantId,
+      limit: _limit,
+    );
+  }
+
+  void _loadMore() {
+    setState(() {
+      _limit += _pageSize;
+      _historyStream = _service.getWateringHistory(
+        widget.plantId,
+        limit: _limit,
+      );
+    });
+  }
 
   Future<void> _showWateringEditor({
     String? wateringId,
@@ -222,7 +245,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                 const SizedBox(height: 20),
                 Expanded(
                   child: StreamBuilder<List<WateringEntry>>(
-                    stream: _service.getWateringHistory(widget.plantId),
+                    stream: _historyStream,
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         return Center(child: Text(snapshot.error.toString()));
@@ -243,10 +266,25 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                         );
                       }
 
+                      final canLoadMore = items.length >= _limit;
+
                       return ListView.separated(
-                        itemCount: items.length,
+                        itemCount: items.length + (canLoadMore ? 1 : 0),
                         separatorBuilder: (_, __) => const SizedBox(height: 12),
                         itemBuilder: (context, index) {
+                          if (index == items.length) {
+                            return TextButton(
+                              onPressed: _loadMore,
+                              child: const Text(
+                                'Показать ещё',
+                                style: TextStyle(
+                                  color: AppColors.goldAccent,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            );
+                          }
+
                           final item = items[index];
                           final wateringId = item.id;
                           final wateredAt = item.wateredAt;

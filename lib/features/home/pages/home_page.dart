@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _userDocumentExistsStream = FirestoreService().watchUserDocumentExists();
-    _plantsStream = PlantService().getPlants();
+    _plantsStream = PlantService().getPlants().asBroadcastStream();
     _activeParentPlantIdsStream =
         PropagationService().watchActiveParentPlantIds();
   }
@@ -374,7 +374,10 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => PlantGenusDetailsPage(genus: genus),
+        builder: (_) => PlantGenusDetailsPage(
+          genus: genus,
+          plantsStream: _plantsStream,
+        ),
       ),
     );
   }
@@ -383,7 +386,10 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => PlantStageDetailsPage(stage: stage),
+        builder: (_) => PlantStageDetailsPage(
+          stage: stage,
+          plantsStream: _plantsStream,
+        ),
       ),
     );
   }
