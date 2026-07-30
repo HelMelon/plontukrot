@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/prompt_text_dialog.dart';
 import '../../../models/app_user.dart';
 import '../../../models/plant.dart';
+import '../../../models/stage_info.dart';
 import '../../../services/auth_service.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
 import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
@@ -14,6 +15,7 @@ import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../../services/watering_service.dart';
 import '../../plants/pages/plant_genus_details_page.dart';
+import '../../plants/pages/plant_stage_details_page.dart';
 import '../../plants/widgets/cards/plant_card.dart';
 import '../../plants/widgets/search/plant_search_delegate.dart';
 import '../../propagations/pages/propagations_page.dart';
@@ -52,6 +54,7 @@ class _HomePageState extends State<HomePage> {
   bool _filterPropagatingOnly = false;
   String? _filterPlantFamily;
   String? _filterGenus;
+  int? _filterStage;
 
   @override
   void initState() {
@@ -334,6 +337,9 @@ class _HomePageState extends State<HomePage> {
       if (_filterGenus != null && plant.genus.trim() != _filterGenus) {
         return false;
       }
+      if (_filterStage != null && plant.stage != _filterStage) {
+        return false;
+      }
       return true;
     }).toList();
   }
@@ -345,6 +351,22 @@ class _HomePageState extends State<HomePage> {
         builder: (_) => PlantGenusDetailsPage(genus: genus),
       ),
     );
+  }
+
+  void _openStagePage(int stage) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PlantStageDetailsPage(stage: stage),
+      ),
+    );
+  }
+
+  List<StageInfo> _stagesPresentIn(Iterable<Plant> plants) {
+    final presentValues = plants.map((plant) => plant.stage).toSet();
+    return stageInfos
+        .where((stage) => presentValues.contains(stage.value))
+        .toList();
   }
 
   Widget _buildFilterChip({
@@ -383,49 +405,49 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildBotanicalFilters(List<Plant> plants) {
     final families = _uniquePlantFamilies(plants);
-    if (families.isEmpty) return const SizedBox.shrink();
-
     final genusOptions = _filterPlantFamily == null
         ? const <String>[]
         : _uniqueGeneraForFamily(plants, _filterPlantFamily!);
+    final stageOptions = _stagesPresentIn(plants);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _buildFilterChip(
-                label: 'Все семейства',
-                selected: _filterPlantFamily == null,
-                onSelected: (_) {
-                  setState(() {
-                    _filterPlantFamily = null;
-                    _filterGenus = null;
-                  });
-                },
-              ),
-              ...families.map(
-                (family) => _buildFilterChip(
-                  label: family,
-                  selected: _filterPlantFamily == family,
+        if (families.isNotEmpty)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildFilterChip(
+                  label: 'Все семейства',
+                  selected: _filterPlantFamily == null,
                   onSelected: (_) {
                     setState(() {
-                      if (_filterPlantFamily == family) {
-                        _filterPlantFamily = null;
-                        _filterGenus = null;
-                      } else {
-                        _filterPlantFamily = family;
-                        _filterGenus = null;
-                      }
+                      _filterPlantFamily = null;
+                      _filterGenus = null;
                     });
                   },
                 ),
-              ),
-            ],
+                ...families.map(
+                  (family) => _buildFilterChip(
+                    label: family,
+                    selected: _filterPlantFamily == family,
+                    onSelected: (_) {
+                      setState(() {
+                        if (_filterPlantFamily == family) {
+                          _filterPlantFamily = null;
+                          _filterGenus = null;
+                        } else {
+                          _filterPlantFamily = family;
+                          _filterGenus = null;
+                        }
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
         if (_filterPlantFamily != null && genusOptions.isNotEmpty) ...[
           const SizedBox(height: 8),
           SingleChildScrollView(
@@ -453,6 +475,41 @@ class _HomePageState extends State<HomePage> {
                       });
                     },
                     onLongPress: () => _openGenusPage(genus),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+        if (stageOptions.isNotEmpty) ...[
+          if (families.isNotEmpty ||
+              (_filterPlantFamily != null && genusOptions.isNotEmpty))
+            const SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildFilterChip(
+                  label: 'Все стадии',
+                  selected: _filterStage == null,
+                  onSelected: (_) {
+                    setState(() => _filterStage = null);
+                  },
+                ),
+                ...stageOptions.map(
+                  (stage) => _buildFilterChip(
+                    label: stage.title,
+                    selected: _filterStage == stage.value,
+                    onSelected: (selected) {
+                      if (_filterStage == stage.value) {
+                        _openStagePage(stage.value);
+                        return;
+                      }
+                      setState(() {
+                        _filterStage = selected ? stage.value : null;
+                      });
+                    },
+                    onLongPress: () => _openStagePage(stage.value),
                   ),
                 ),
               ],
@@ -1001,7 +1058,8 @@ class _HomePageState extends State<HomePage> {
                                   )
                                 else if (sortedPlants.isEmpty &&
                                     (_filterPlantFamily != null ||
-                                        _filterGenus != null))
+                                        _filterGenus != null ||
+                                        _filterStage != null))
                                   Container(
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(24),
