@@ -8,6 +8,7 @@ import '../../../../models/fertilizer_application_method.dart';
 import '../../../../models/fertilizer_dose.dart';
 import '../../../../models/fertilizer_ingredient.dart';
 import '../../../../models/fertilizing_entry.dart';
+import '../../../../models/plant.dart';
 import '../../../../services/fertilize_service.dart';
 import '../tags/fertilizer_component_tags.dart';
 import '../dialogs/fertilizer_composition_dialog.dart';
@@ -18,12 +19,14 @@ enum _FertilizerMode { saved, newMix }
 
 class AddFertilizingSheet extends StatefulWidget {
   final List<String> plantIds;
+  final List<Plant> plants;
   final String title;
   final FertilizingEntry? entry;
 
   const AddFertilizingSheet({
     super.key,
     required this.plantIds,
+    this.plants = const [],
     this.title = 'Добавить подкормку',
     this.entry,
   });
@@ -31,18 +34,25 @@ class AddFertilizingSheet extends StatefulWidget {
   factory AddFertilizingSheet.forPlant({
     Key? key,
     required String plantId,
+    Plant? plant,
   }) {
-    return AddFertilizingSheet(key: key, plantIds: [plantId]);
+    return AddFertilizingSheet(
+      key: key,
+      plantIds: [plantId],
+      plants: plant == null ? const [] : [plant],
+    );
   }
 
   factory AddFertilizingSheet.edit({
     Key? key,
     required String plantId,
     required FertilizingEntry entry,
+    Plant? plant,
   }) {
     return AddFertilizingSheet(
       key: key,
       plantIds: [plantId],
+      plants: plant == null ? const [] : [plant],
       title: 'Изменить подкормку',
       entry: entry,
     );
@@ -322,19 +332,39 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
           fertilizerId: fertilizerId,
           fertilizerName: fertilizerName,
         );
+      } else if (widget.plantIds.length > 1 || widget.plants.isNotEmpty) {
+        final plantsById = {
+          for (final plant in widget.plants) plant.id: plant,
+        };
+        await _service.addFertilizings(
+          plantIds: widget.plantIds,
+          appliedAt: _selectedDate,
+          components: components,
+          waterMl: waterMl,
+          applicationMethod: _applicationMethod,
+          fertilizerId: fertilizerId,
+          fertilizerName: fertilizerName,
+          lastFertilizedAtByPlantId: {
+            for (final id in widget.plantIds)
+              id: plantsById[id]?.lastFertilizedAt,
+          },
+          lastWateredAtByPlantId: {
+            for (final id in widget.plantIds) id: plantsById[id]?.lastWateredAt,
+          },
+          wateringFrequencyByPlantId: {
+            for (final id in widget.plantIds)
+              id: plantsById[id]?.wateringFrequency,
+          },
+        );
       } else {
-        await Future.wait(
-          widget.plantIds.map(
-            (plantId) => _service.addFertilizing(
-              plantId: plantId,
-              appliedAt: _selectedDate,
-              components: components,
-              waterMl: waterMl,
-              applicationMethod: _applicationMethod,
-              fertilizerId: fertilizerId,
-              fertilizerName: fertilizerName,
-            ),
-          ),
+        await _service.addFertilizing(
+          plantId: widget.plantIds.first,
+          appliedAt: _selectedDate,
+          components: components,
+          waterMl: waterMl,
+          applicationMethod: _applicationMethod,
+          fertilizerId: fertilizerId,
+          fertilizerName: fertilizerName,
         );
       }
 

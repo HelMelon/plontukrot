@@ -34,6 +34,7 @@ class PlantImageCard extends StatelessWidget {
                   imageUrl: imageUrl!,
                   fit: BoxFit.cover,
                   alignment: Alignment.center,
+                  memCacheWidth: 800,
                   placeholder: (context, url) => const Align(
                     alignment: Alignment.topCenter,
                     child: PlaceholderWithIcon(),

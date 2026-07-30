@@ -155,10 +155,20 @@ class FertilizeService {
     String? fertilizerId,
     String? fertilizerName,
     DateTime? nextFertilizing,
+    DateTime? lastFertilizedAt,
+    DateTime? lastWateredAt,
+    int? wateringFrequency,
+    bool skipPlantFetch = false,
   }) async {
     final plantRef = _plantRef(plantId);
-    final plant = await plantRef.get();
-    final lastFertilizedAt = plant.data()?['lastFertilizedAt'] as Timestamp?;
+    var lastFertilized = lastFertilizedAt;
+
+    if (!skipPlantFetch && lastFertilized == null) {
+      final plant = await plantRef.get();
+      lastFertilized =
+          (plant.data()?['lastFertilizedAt'] as Timestamp?)?.toDate();
+    }
+
     final trimmedName = fertilizerName?.trim();
     final storedName =
         (trimmedName != null && trimmedName.isNotEmpty) ? trimmedName : null;
@@ -167,7 +177,8 @@ class FertilizeService {
       if (storedName != null) 'fertilizerName': storedName,
     });
 
-    await _fertilizingRef(plantId).add({
+    final batch = _db.batch();
+    batch.set(_fertilizingRef(plantId).doc(), {
       if (fertilizerId != null) 'fertilizerId': fertilizerId,
       if (storedName != null) 'fertilizerName': storedName,
       'waterMl': normalizeWaterMl(waterMl),
@@ -179,19 +190,89 @@ class FertilizeService {
       'createdAt': FieldValue.serverTimestamp(),
     });
 
-    if (lastFertilizedAt == null ||
-        appliedAt.isAfter(lastFertilizedAt.toDate())) {
-      await plantRef.update({
+    if (lastFertilized == null || appliedAt.isAfter(lastFertilized)) {
+      batch.update(plantRef, {
         'lastFertilizedAt': Timestamp.fromDate(appliedAt),
         'lastFertilizerName': displayName,
         'careHistoryMigrated': true,
       });
     }
 
+    await batch.commit();
+
     await WateringService().addWateringIfMissingBeforeFertilizing(
       plantId: plantId,
       fertilizedAt: appliedAt,
+      lastWateredAt: lastWateredAt,
+      wateringFrequency: wateringFrequency,
+      skipPlantFetch: skipPlantFetch || lastWateredAt != null,
     );
+  }
+
+  /// Bulk fertilizing using known plant denorm fields (no plant doc reads).
+  Future<void> addFertilizings({
+    required Iterable<String> plantIds,
+    required DateTime appliedAt,
+    required List<FertilizerDose> components,
+    required int waterMl,
+    required FertilizerApplicationMethod applicationMethod,
+    String? fertilizerId,
+    String? fertilizerName,
+    DateTime? nextFertilizing,
+    Map<String, DateTime?> lastFertilizedAtByPlantId = const {},
+    Map<String, DateTime?> lastWateredAtByPlantId = const {},
+    Map<String, int?> wateringFrequencyByPlantId = const {},
+  }) async {
+    final ids = plantIds.toList();
+    const chunkSize = 200;
+    final trimmedName = fertilizerName?.trim();
+    final storedName =
+        (trimmedName != null && trimmedName.isNotEmpty) ? trimmedName : null;
+    final displayName = resolveFertilizerDisplayName({
+      if (fertilizerId != null) 'fertilizerId': fertilizerId,
+      if (storedName != null) 'fertilizerName': storedName,
+    });
+
+    for (var i = 0; i < ids.length; i += chunkSize) {
+      final chunk = ids.skip(i).take(chunkSize);
+      final batch = _db.batch();
+
+      for (final plantId in chunk) {
+        final lastFertilized = lastFertilizedAtByPlantId[plantId];
+        batch.set(_fertilizingRef(plantId).doc(), {
+          if (fertilizerId != null) 'fertilizerId': fertilizerId,
+          if (storedName != null) 'fertilizerName': storedName,
+          'waterMl': normalizeWaterMl(waterMl),
+          'components': components.map((e) => e.toMap()).toList(),
+          'appliedAt': Timestamp.fromDate(appliedAt),
+          'applicationMethod': applicationMethod.code,
+          'nextFertilizing': nextFertilizing != null
+              ? Timestamp.fromDate(nextFertilizing)
+              : null,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        if (lastFertilized == null || appliedAt.isAfter(lastFertilized)) {
+          batch.update(_plantRef(plantId), {
+            'lastFertilizedAt': Timestamp.fromDate(appliedAt),
+            'lastFertilizerName': displayName,
+            'careHistoryMigrated': true,
+          });
+        }
+      }
+
+      await batch.commit();
+    }
+
+    for (final plantId in ids) {
+      await WateringService().addWateringIfMissingBeforeFertilizing(
+        plantId: plantId,
+        fertilizedAt: appliedAt,
+        lastWateredAt: lastWateredAtByPlantId[plantId],
+        wateringFrequency: wateringFrequencyByPlantId[plantId],
+        skipPlantFetch: true,
+      );
+    }
   }
 
   Future<void> updateFertilizing({

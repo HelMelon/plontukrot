@@ -6,6 +6,8 @@ import '../models/watering_entry.dart';
 class WateringService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  static const int _batchPlantChunk = 200;
+
   String get _uid => FirebaseAuth.instance.currentUser!.uid;
 
   CollectionReference<Map<String, dynamic>> get _plantsCollection {
@@ -30,35 +32,86 @@ class WateringService {
     });
   }
 
+  /// When [skipPlantFetch] is true, uses [wateringFrequency] / [lastWateredAt]
+  /// as provided (including null) and does not read the plant document.
   Future<void> addWatering({
     required String plantId,
     required DateTime wateredAt,
+    int? wateringFrequency,
+    DateTime? lastWateredAt,
+    bool skipPlantFetch = false,
   }) async {
-    final plantDoc = await _plantsCollection.doc(plantId).get();
+    var frequency = wateringFrequency;
+    var last = lastWateredAt;
 
-    final plantData = plantDoc.data();
+    if (!skipPlantFetch) {
+      final plantDoc = await _plantsCollection.doc(plantId).get();
+      final plantData = plantDoc.data();
+      frequency ??= plantData?['wateringFrequency'] as int?;
+      last ??= (plantData?['lastWateredAt'] as Timestamp?)?.toDate();
+    }
 
     DateTime? nextWatering;
-
-    final frequency = plantData?['wateringFrequency'] as int?;
-
     if (frequency != null && frequency > 0) {
       nextWatering = wateredAt.add(Duration(days: frequency));
     }
-    final lastWateredAt = plantData?['lastWateredAt'] as Timestamp?;
 
-    await _wateringRef(plantId).add({
+    final batch = _db.batch();
+    final entryRef = _wateringRef(plantId).doc();
+    batch.set(entryRef, {
       'wateredAt': Timestamp.fromDate(wateredAt),
       'nextWatering':
           nextWatering != null ? Timestamp.fromDate(nextWatering) : null,
       'createdAt': FieldValue.serverTimestamp(),
     });
 
-    if (lastWateredAt == null || wateredAt.isAfter(lastWateredAt.toDate())) {
-      await _plantsCollection.doc(plantId).update({
+    if (last == null || wateredAt.isAfter(last)) {
+      batch.update(_plantsCollection.doc(plantId), {
         'lastWateredAt': Timestamp.fromDate(wateredAt),
         'careHistoryMigrated': true,
       });
+    }
+
+    await batch.commit();
+  }
+
+  /// Bulk watering without per-plant plant-document reads when maps are supplied.
+  Future<void> addWaterings({
+    required Iterable<String> plantIds,
+    required DateTime wateredAt,
+    Map<String, int?> wateringFrequencyByPlantId = const {},
+    Map<String, DateTime?> lastWateredAtByPlantId = const {},
+  }) async {
+    final ids = plantIds.toList();
+    for (var i = 0; i < ids.length; i += _batchPlantChunk) {
+      final chunk = ids.skip(i).take(_batchPlantChunk);
+      final batch = _db.batch();
+
+      for (final plantId in chunk) {
+        final frequency = wateringFrequencyByPlantId[plantId];
+        final last = lastWateredAtByPlantId[plantId];
+
+        DateTime? nextWatering;
+        if (frequency != null && frequency > 0) {
+          nextWatering = wateredAt.add(Duration(days: frequency));
+        }
+
+        batch.set(_wateringRef(plantId).doc(), {
+          'wateredAt': Timestamp.fromDate(wateredAt),
+          'nextWatering':
+              nextWatering != null ? Timestamp.fromDate(nextWatering) : null,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        if (last == null || wateredAt.isAfter(last)) {
+          batch.update(_plantsCollection.doc(plantId), {
+            'lastWateredAt': Timestamp.fromDate(wateredAt),
+            'careHistoryMigrated': true,
+          });
+        }
+      }
+
+      await batch.commit();
     }
   }
 
@@ -120,18 +173,34 @@ class WateringService {
   Future<void> addWateringIfMissingBeforeFertilizing({
     required String plantId,
     required DateTime fertilizedAt,
+    DateTime? lastWateredAt,
+    int? wateringFrequency,
+    bool skipPlantFetch = false,
   }) async {
     final fertDay = _startOfDay(fertilizedAt);
     final dayBefore = fertDay.subtract(const Duration(days: 1));
 
-    if (await hasWateringOnDay(plantId: plantId, day: dayBefore)) {
-      return;
-    }
-    if (await hasWateringOnDay(plantId: plantId, day: fertDay)) {
-      return;
+    if (skipPlantFetch || lastWateredAt != null) {
+      if (lastWateredAt != null) {
+        final lastDay = _startOfDay(lastWateredAt);
+        if (!lastDay.isBefore(dayBefore)) return;
+      }
+    } else {
+      if (await hasWateringOnDay(plantId: plantId, day: dayBefore)) {
+        return;
+      }
+      if (await hasWateringOnDay(plantId: plantId, day: fertDay)) {
+        return;
+      }
     }
 
-    await addWatering(plantId: plantId, wateredAt: fertDay);
+    await addWatering(
+      plantId: plantId,
+      wateredAt: fertDay,
+      wateringFrequency: wateringFrequency,
+      lastWateredAt: lastWateredAt,
+      skipPlantFetch: skipPlantFetch || lastWateredAt != null,
+    );
   }
 
   Future<void> deleteWatering({
@@ -146,13 +215,18 @@ class WateringService {
     required String plantId,
     required String wateringId,
     required DateTime wateredAt,
+    int? wateringFrequency,
+    bool skipPlantFetch = false,
   }) async {
     final updateData = <String, dynamic>{
       'wateredAt': Timestamp.fromDate(wateredAt),
     };
 
-    final plantDoc = await _plantsCollection.doc(plantId).get();
-    final frequency = plantDoc.data()?['wateringFrequency'] as int?;
+    var frequency = wateringFrequency;
+    if (!skipPlantFetch && frequency == null) {
+      final plantDoc = await _plantsCollection.doc(plantId).get();
+      frequency = plantDoc.data()?['wateringFrequency'] as int?;
+    }
 
     if (frequency != null && frequency > 0) {
       updateData['nextWatering'] = Timestamp.fromDate(

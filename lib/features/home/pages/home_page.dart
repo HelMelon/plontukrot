@@ -49,6 +49,7 @@ class _HomePageState extends State<HomePage> {
   late final Stream<bool> _userDocumentExistsStream;
   late final Stream<List<Plant>> _plantsStream;
   late final Stream<Set<String>> _activeParentPlantIdsStream;
+  List<Plant> _latestPlants = const [];
   _PlantSortField _sortField = _PlantSortField.createdAt;
   bool _sortAscending = false;
   bool _careMigrationStarted = false;
@@ -579,24 +580,35 @@ class _HomePageState extends State<HomePage> {
     );
     if (wateredAt == null) return;
 
-    final service = WateringService();
-    await Future.wait(
-      _selectedPlantIds.map(
-        (plantId) => service.addWatering(
-          plantId: plantId,
-          wateredAt: wateredAt,
-        ),
-      ),
+    final selected = _latestPlants
+        .where((plant) => _selectedPlantIds.contains(plant.id))
+        .toList();
+    final frequencyById = {
+      for (final plant in selected) plant.id: plant.wateringFrequency,
+    };
+    final lastWateredById = {
+      for (final plant in selected) plant.id: plant.lastWateredAt,
+    };
+
+    await WateringService().addWaterings(
+      plantIds: _selectedPlantIds,
+      wateredAt: wateredAt,
+      wateringFrequencyByPlantId: frequencyById,
+      lastWateredAtByPlantId: lastWateredById,
     );
     if (mounted) _exitSelectionMode();
   }
 
   Future<void> _showFertilizingSheet() async {
+    final selectedPlants = _latestPlants
+        .where((plant) => _selectedPlantIds.contains(plant.id))
+        .toList();
     final applied = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       builder: (_) => AddFertilizingSheet(
         plantIds: _selectedPlantIds.toList(),
+        plants: selectedPlants,
         title: 'Подкормить выбранные растения',
       ),
     );
@@ -890,6 +902,7 @@ class _HomePageState extends State<HomePage> {
                     }
 
                     final plants = plantSnapshot.data!;
+                    _latestPlants = plants;
                     if (!_careMigrationStarted &&
                         plants.any((plant) => !plant.careHistoryMigrated)) {
                       _careMigrationStarted = true;

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -101,21 +102,16 @@ class PlantCard extends StatelessWidget {
                   AspectRatio(
                     aspectRatio: 1.0,
                     child: hasImage
-                        ? FadeInImage(
-                            placeholder: const AssetImage(
-                                'assets/images/plant_placeholder.png'),
-                            image: NetworkImage(imageUrl),
+                        ? CachedNetworkImage(
+                            imageUrl: imageUrl,
                             fit: BoxFit.cover,
                             alignment: Alignment.center,
+                            memCacheWidth: 600,
                             fadeInDuration: const Duration(milliseconds: 300),
-                            fadeInCurve: Curves.easeIn,
-                            imageErrorBuilder: (context, error, stackTrace) {
-                              return const _PlantAssetPlaceholder();
-                            },
-                            placeholderErrorBuilder:
-                                (context, error, stackTrace) {
-                              return const _PlantAssetPlaceholder();
-                            },
+                            placeholder: (context, url) =>
+                                const _PlantAssetPlaceholder(),
+                            errorWidget: (context, url, error) =>
+                                const _PlantAssetPlaceholder(),
                           )
                         : const _PlantAssetPlaceholder(),
                   ),

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -206,34 +207,30 @@ class PlantSearchDelegate extends SearchDelegate {
                           final String? imageUrl = plant.imageUrl?.trim();
 
                           if (imageUrl != null && imageUrl.isNotEmpty) {
-                            return Image.network(
-                              imageUrl,
+                            return CachedNetworkImage(
+                              imageUrl: imageUrl,
                               fit: BoxFit.cover,
                               width: 40,
                               height: 40,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(
+                              memCacheWidth: 80,
+                              memCacheHeight: 80,
+                              errorWidget: (context, url, error) => const Icon(
                                 Icons.local_florist,
                                 color: AppColors.goldAccent,
                                 size: 22,
                               ),
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Center(
-                                  child: SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        AppColors.goldAccent
-                                            .withValues(alpha: 0.5),
-                                      ),
+                              placeholder: (context, url) => const Center(
+                                child: SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      AppColors.goldAccent,
                                     ),
                                   ),
-                                );
-                              },
+                                ),
+                              ),
                             );
                           }
 

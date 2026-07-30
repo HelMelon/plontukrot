@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/plant.dart';
 import '../models/variegation.dart';
 import 'plant_species_service.dart';
+import 'storage_service.dart';
 
 class PlantService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -230,13 +231,51 @@ class PlantService {
     await batch.commit();
   }
 
-  Future<void> deletePlants(Iterable<String> plantIds) async {
-    final batch = _firestore.batch();
+  Future<void> _deleteQueryInBatches(
+    Query<Map<String, dynamic>> query, {
+    int pageSize = 200,
+  }) async {
+    while (true) {
+      final snapshot = await query.limit(pageSize).get();
+      if (snapshot.docs.isEmpty) break;
 
-    for (final plantId in plantIds) {
-      batch.delete(_plantsRef.doc(plantId));
+      final batch = _firestore.batch();
+      for (final doc in snapshot.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+
+      if (snapshot.docs.length < pageSize) break;
+    }
+  }
+
+  Future<void> _deletePlantSubtree(String plantId) async {
+    final plantRef = _plantsRef.doc(plantId);
+
+    await _deleteQueryInBatches(plantRef.collection('watering'));
+    await _deleteQueryInBatches(plantRef.collection('fertilizing'));
+    await _deleteQueryInBatches(plantRef.collection('repotting'));
+    await _deleteQueryInBatches(plantRef.collection('notes'));
+
+    final propagations = await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('propagations')
+        .where('parentPlantId', isEqualTo: plantId)
+        .get();
+
+    for (final prop in propagations.docs) {
+      await _deleteQueryInBatches(prop.reference.collection('stageHistory'));
+      await prop.reference.delete();
     }
 
-    await batch.commit();
+    await StorageService().deletePlantImage(plantId);
+    await plantRef.delete();
+  }
+
+  Future<void> deletePlants(Iterable<String> plantIds) async {
+    for (final plantId in plantIds) {
+      await _deletePlantSubtree(plantId);
+    }
   }
 }
