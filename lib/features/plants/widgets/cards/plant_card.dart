@@ -39,8 +39,10 @@ class PlantCard extends StatelessWidget {
     final imageUrl = plant.imageUrl;
     final hasImage = imageUrl != null && imageUrl.isNotEmpty;
 
-    final species =
+    final speciesBase =
         (plant.species.isEmpty ? 'Без названия' : plant.species).toTitleCase();
+    final cultivar = (plant.cultivar ?? '').trim().toTitleCase();
+    final species = cultivar.isEmpty ? speciesBase : '$speciesBase $cultivar';
     final nickname = plant.nickname.toTitleCase();
     final hasNickname = nickname.trim().isNotEmpty;
     final showSpeciesOnTop = preferSpeciesAsTitle || !hasNickname;
@@ -128,7 +130,7 @@ class PlantCard extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               subtitle,
-                              maxLines: 1,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: _subFontSize,
