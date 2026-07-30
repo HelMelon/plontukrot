@@ -11,7 +11,7 @@ import '../../../../models/watering_entry.dart';
 import '../../../../services/fertilize_service.dart';
 import '../../../../services/repotting_service.dart';
 import '../../../../services/watering_service.dart';
-import '../../pages/plant_species_details_page.dart';
+import '../../pages/plant_genus_details_page.dart';
 import '../notes/plant_notes_section.dart';
 import '../propagations/plant_propagations_section.dart';
 import '../sheets/add_note_sheet.dart';
@@ -87,11 +87,10 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     final cultivarTrimmed = plant.cultivar?.trim() ?? '';
     final tradingNameTrimmed = plant.tradingName.trim();
     final plantFamilyLine = _botanicalLine('Семейство', plant.plantFamily);
-    final genusLine = _botanicalLine('Род', plant.genus);
     final tradingNameLine = _botanicalLine('Торговое название', tradingNameTrimmed);
     final variegation = plant.variegation;
     final hasBotanicalDetails = plantFamilyLine != null ||
-        genusLine != null ||
+        plant.genus.trim().isNotEmpty ||
         tradingNameLine != null ||
         variegation != Variegation.none;
 
@@ -124,28 +123,11 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => PlantSpeciesDetailsPage(
-                              species: speciesTrimmed,
-                            ),
-                          ),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(8),
-                      child: Text(
-                        'Вид: $speciesTrimmed',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: _botanicalStyle.copyWith(
-                          decoration: TextDecoration.underline,
-                          decorationColor:
-                              AppColors.heading.withValues(alpha: 0.4),
-                        ),
-                      ),
+                    child: Text(
+                      'Вид: $speciesTrimmed',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: _botanicalStyle,
                     ),
                   ),
                   if (variegation.showIconNearSpecies) ...[
@@ -409,7 +391,33 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                   ),
                   const SizedBox(height: 12),
                   if (plantFamilyLine != null) plantFamilyLine,
-                  if (genusLine != null) genusLine,
+                  if (plant.genus.trim().isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PlantGenusDetailsPage(
+                                genus: plant.genus.trim(),
+                              ),
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        child: Text(
+                          'Род: ${plant.genus.trim()}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: _botanicalStyle.copyWith(
+                            decoration: TextDecoration.underline,
+                            decorationColor:
+                                AppColors.heading.withValues(alpha: 0.4),
+                          ),
+                        ),
+                      ),
+                    ),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Row(

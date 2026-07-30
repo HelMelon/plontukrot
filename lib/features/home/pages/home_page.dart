@@ -13,7 +13,7 @@ import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../../services/watering_service.dart';
-import '../../plants/pages/plant_species_details_page.dart';
+import '../../plants/pages/plant_genus_details_page.dart';
 import '../../plants/widgets/cards/plant_card.dart';
 import '../../plants/widgets/search/plant_search_delegate.dart';
 import '../../propagations/pages/propagations_page.dart';
@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
   bool _botanicalMigrationStarted = false;
   bool _filterPropagatingOnly = false;
   String? _filterPlantFamily;
-  String? _filterSpecies;
+  String? _filterGenus;
 
   @override
   void initState() {
@@ -311,18 +311,18 @@ class _HomePageState extends State<HomePage> {
     return families;
   }
 
-  List<String> _uniqueSpeciesForFamily(
+  List<String> _uniqueGeneraForFamily(
     Iterable<Plant> plants,
     String plantFamily,
   ) {
-    final species = plants
+    final genera = plants
         .where((plant) => (plant.plantFamily ?? '').trim() == plantFamily)
-        .map((plant) => plant.species.trim())
+        .map((plant) => plant.genus.trim())
         .where((value) => value.isNotEmpty)
         .toSet()
         .toList()
       ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
-    return species;
+    return genera;
   }
 
   List<Plant> _applyBotanicalFilters(Iterable<Plant> plants) {
@@ -331,19 +331,18 @@ class _HomePageState extends State<HomePage> {
           (plant.plantFamily ?? '').trim() != _filterPlantFamily) {
         return false;
       }
-      if (_filterSpecies != null &&
-          plant.species.trim() != _filterSpecies) {
+      if (_filterGenus != null && plant.genus.trim() != _filterGenus) {
         return false;
       }
       return true;
     }).toList();
   }
 
-  void _openSpeciesPage(String species) {
+  void _openGenusPage(String genus) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => PlantSpeciesDetailsPage(species: species),
+        builder: (_) => PlantGenusDetailsPage(genus: genus),
       ),
     );
   }
@@ -386,9 +385,9 @@ class _HomePageState extends State<HomePage> {
     final families = _uniquePlantFamilies(plants);
     if (families.isEmpty) return const SizedBox.shrink();
 
-    final speciesOptions = _filterPlantFamily == null
+    final genusOptions = _filterPlantFamily == null
         ? const <String>[]
-        : _uniqueSpeciesForFamily(plants, _filterPlantFamily!);
+        : _uniqueGeneraForFamily(plants, _filterPlantFamily!);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -403,7 +402,7 @@ class _HomePageState extends State<HomePage> {
                 onSelected: (_) {
                   setState(() {
                     _filterPlantFamily = null;
-                    _filterSpecies = null;
+                    _filterGenus = null;
                   });
                 },
               ),
@@ -415,10 +414,10 @@ class _HomePageState extends State<HomePage> {
                     setState(() {
                       if (_filterPlantFamily == family) {
                         _filterPlantFamily = null;
-                        _filterSpecies = null;
+                        _filterGenus = null;
                       } else {
                         _filterPlantFamily = family;
-                        _filterSpecies = null;
+                        _filterGenus = null;
                       }
                     });
                   },
@@ -427,33 +426,33 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        if (_filterPlantFamily != null && speciesOptions.isNotEmpty) ...[
+        if (_filterPlantFamily != null && genusOptions.isNotEmpty) ...[
           const SizedBox(height: 8),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
                 _buildFilterChip(
-                  label: 'Все виды',
-                  selected: _filterSpecies == null,
+                  label: 'Все роды',
+                  selected: _filterGenus == null,
                   onSelected: (_) {
-                    setState(() => _filterSpecies = null);
+                    setState(() => _filterGenus = null);
                   },
                 ),
-                ...speciesOptions.map(
-                  (species) => _buildFilterChip(
-                    label: species,
-                    selected: _filterSpecies == species,
+                ...genusOptions.map(
+                  (genus) => _buildFilterChip(
+                    label: genus,
+                    selected: _filterGenus == genus,
                     onSelected: (selected) {
-                      if (_filterSpecies == species) {
-                        _openSpeciesPage(species);
+                      if (_filterGenus == genus) {
+                        _openGenusPage(genus);
                         return;
                       }
                       setState(() {
-                        _filterSpecies = selected ? species : null;
+                        _filterGenus = selected ? genus : null;
                       });
                     },
-                    onLongPress: () => _openSpeciesPage(species),
+                    onLongPress: () => _openGenusPage(genus),
                   ),
                 ),
               ],
@@ -1002,7 +1001,7 @@ class _HomePageState extends State<HomePage> {
                                   )
                                 else if (sortedPlants.isEmpty &&
                                     (_filterPlantFamily != null ||
-                                        _filterSpecies != null))
+                                        _filterGenus != null))
                                   Container(
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(24),
