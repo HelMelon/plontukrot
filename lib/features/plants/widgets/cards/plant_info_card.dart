@@ -2,15 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../models/fertilizing_entry.dart';
 import '../../../../models/plant.dart';
-import '../../../../models/repotting_entry.dart';
 import '../../../../models/stage_info.dart';
 import '../../../../models/variegation.dart';
-import '../../../../models/watering_entry.dart';
-import '../../../../services/fertilize_service.dart';
-import '../../../../services/repotting_service.dart';
-import '../../../../services/watering_service.dart';
 import '../../pages/plant_genus_details_page.dart';
 import '../notes/plant_notes_section.dart';
 import '../propagations/plant_propagations_section.dart';
@@ -206,128 +200,67 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                 return SizedBox(width: itemWidth, child: child);
               }
 
+              String careDateLabel(DateTime? date) {
+                if (date == null) return 'Нет данных';
+                return DateFormat('d MMM y').format(date);
+              }
+
+              void openWateringHistory() {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  enableDrag: true,
+                  builder: (_) => WateringHistorySheet(plantId: plantId),
+                );
+              }
+
+              void openFertilizingHistory() {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  enableDrag: true,
+                  builder: (_) => FertilizingHistorySheet(plantId: plantId),
+                );
+              }
+
+              void openRepottingHistory() {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  enableDrag: true,
+                  builder: (_) => RepottingHistorySheet(plantId: plantId),
+                );
+              }
+
               return Wrap(
                 spacing: spacing,
                 runSpacing: spacing,
                 children: [
                   wrapItem(
-                    StreamBuilder<WateringEntry?>(
-                      stream: WateringService().watchLastWatering(plantId),
-                      builder: (context, snapshot) {
-                        void openHistory() {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            enableDrag: true,
-                            builder: (_) =>
-                                WateringHistorySheet(plantId: plantId),
-                          );
-                        }
-
-                        if (snapshot.connectionState ==
-                                ConnectionState.waiting &&
-                            !snapshot.hasData) {
-                          return InfoCard(
-                            icon: _icon('assets/icons/watering.png'),
-                            title: 'Полив',
-                            value: 'Загрузка...',
-                            onTap: openHistory,
-                          );
-                        }
-
-                        final watering = snapshot.data;
-                        final last = watering?.wateredAt;
-                        final value = last == null
-                            ? 'Нет данных'
-                            : DateFormat('d MMM y').format(last);
-
-                        return InfoCard(
-                          icon: _icon('assets/icons/watering.png'),
-                          title: 'Полив',
-                          value: value,
-                          onTap: openHistory,
-                        );
-                      },
+                    InfoCard(
+                      icon: _icon('assets/icons/watering.png'),
+                      title: 'Полив',
+                      value: careDateLabel(plant.lastWateredAt),
+                      onTap: openWateringHistory,
                     ),
                   ),
                   wrapItem(
-                    StreamBuilder<List<FertilizingEntry>>(
-                      stream: FertilizeService().getFertilizingHistory(plantId),
-                      builder: (context, snapshot) {
-                        void openHistory() {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            enableDrag: true,
-                            builder: (_) =>
-                                FertilizingHistorySheet(plantId: plantId),
-                          );
-                        }
-
-                        if (!snapshot.hasData) {
-                          return InfoCard(
-                            icon: _icon('assets/icons/fertilize.png'),
-                            title: 'Подкормка',
-                            value: 'Загрузка...',
-                            onTap: openHistory,
-                          );
-                        }
-
-                        final items = snapshot.data!;
-                        final value = items.isEmpty
-                            ? 'Нет данных'
-                            : DateFormat('d MMM y')
-                                .format(items.first.appliedAt);
-
-                        return InfoCard(
-                          icon: _icon('assets/icons/fertilize.png'),
-                          title: 'Подкормка',
-                          value: value,
-                          onTap: openHistory,
-                        );
-                      },
+                    InfoCard(
+                      icon: _icon('assets/icons/fertilize.png'),
+                      title: 'Подкормка',
+                      value: careDateLabel(plant.lastFertilizedAt),
+                      onTap: openFertilizingHistory,
                     ),
                   ),
                   wrapItem(
-                    StreamBuilder<RepottingEntry?>(
-                      stream: RepottingService().watchLastRepotting(plantId),
-                      builder: (context, snapshot) {
-                        void openHistory() {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            enableDrag: true,
-                            builder: (_) =>
-                                RepottingHistorySheet(plantId: plantId),
-                          );
-                        }
-
-                        if (!snapshot.hasData &&
-                            snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                          return InfoCard(
-                            icon: _icon('assets/icons/potting.png'),
-                            title: 'Пересадка',
-                            value: 'Загрузка...',
-                            onTap: openHistory,
-                          );
-                        }
-
-                        final last = snapshot.data;
-                        final value = last == null
-                            ? 'Нет данных'
-                            : DateFormat('d MMM y').format(last.repottedAt);
-
-                        return InfoCard(
-                          icon: _icon('assets/icons/potting.png'),
-                          title: 'Пересадка',
-                          value: value,
-                          onTap: openHistory,
-                        );
-                      },
+                    InfoCard(
+                      icon: _icon('assets/icons/potting.png'),
+                      title: 'Пересадка',
+                      value: careDateLabel(plant.lastRepottedAt),
+                      onTap: openRepottingHistory,
                     ),
                   ),
                 ],

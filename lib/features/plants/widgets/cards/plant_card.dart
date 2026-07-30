@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../models/fertilizing_entry.dart';
 import '../../../../models/plant.dart';
-import '../../../../services/fertilize_service.dart';
 import '../../pages/plant_details_page.dart';
 
 extension CapitalizeString on String {
@@ -38,6 +37,15 @@ class PlantCard extends StatelessWidget {
   static const double _mainFontSize = 15;
   static const double _subFontSize = 13;
 
+  String? get _fertilizerLabel {
+    if (!showLastFertilizer) return null;
+    final name = plant.lastFertilizerName?.trim();
+    if (name != null && name.isNotEmpty) return name;
+    final at = plant.lastFertilizedAt;
+    if (at == null) return null;
+    return DateFormat('d MMM y').format(at);
+  }
+
   @override
   Widget build(BuildContext context) {
     final imageUrl = plant.imageUrl;
@@ -53,59 +61,7 @@ class PlantCard extends StatelessWidget {
     final title = showSpeciesOnTop ? species : nickname;
     final subtitle =
         showSpeciesOnTop ? (hasNickname ? nickname : null) : species;
-
-    Widget textBlock({String? fertilizerName}) {
-      return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Flexible(
-              child: Text(
-                title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: _mainFontSize,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.3,
-                  color: AppColors.goldAccent,
-                  height: 1.2,
-                ),
-              ),
-            ),
-            if (subtitle != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: _subFontSize,
-                  fontWeight: FontWeight.normal,
-                  color: AppColors.warmGray,
-                  height: 1.2,
-                ),
-              ),
-            ],
-            if (fertilizerName != null && fertilizerName.trim().isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(
-                fertilizerName.trim(),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: _subFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.accentLight,
-                  height: 1.2,
-                ),
-              ),
-            ],
-          ],
-        ),
-      );
-    }
+    final fertilizerName = _fertilizerLabel;
 
     return GestureDetector(
       onTap: onTap ??
@@ -164,17 +120,56 @@ class PlantCard extends StatelessWidget {
                         : const _PlantAssetPlaceholder(),
                   ),
                   Expanded(
-                    child: showLastFertilizer
-                        ? StreamBuilder<FertilizingEntry?>(
-                            stream: FertilizeService()
-                                .watchLastFertilizing(plant.id),
-                            builder: (context, snapshot) {
-                              return textBlock(
-                                fertilizerName: snapshot.data?.fertilizerName,
-                              );
-                            },
-                          )
-                        : textBlock(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: _mainFontSize,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: -0.3,
+                                color: AppColors.goldAccent,
+                                height: 1.2,
+                              ),
+                            ),
+                          ),
+                          if (subtitle != null) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              subtitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: _subFontSize,
+                                fontWeight: FontWeight.normal,
+                                color: AppColors.warmGray,
+                                height: 1.2,
+                              ),
+                            ),
+                          ],
+                          if (fertilizerName != null) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              fertilizerName,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: _subFontSize,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.accentLight,
+                                height: 1.2,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),

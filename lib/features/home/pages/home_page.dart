@@ -48,6 +48,7 @@ class _HomePageState extends State<HomePage> {
   final Set<String> _collapsedLetterGroups = {};
   late final Stream<bool> _userDocumentExistsStream;
   late final Stream<List<Plant>> _plantsStream;
+  late final Stream<Set<String>> _activeParentPlantIdsStream;
   _PlantSortField _sortField = _PlantSortField.createdAt;
   bool _sortAscending = false;
   bool _careMigrationStarted = false;
@@ -62,6 +63,8 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _userDocumentExistsStream = FirestoreService().watchUserDocumentExists();
     _plantsStream = PlantService().getPlants();
+    _activeParentPlantIdsStream =
+        PropagationService().watchActiveParentPlantIds();
   }
 
   bool get _isSelectionMode => _selectedPlantIds.isNotEmpty;
@@ -764,7 +767,10 @@ class _HomePageState extends State<HomePage> {
                     onTap: () {
                       showSearch(
                         context: context,
-                        delegate: PlantSearchDelegate(userId: widget.user.uid),
+                        delegate: PlantSearchDelegate(
+                          userId: widget.user.uid,
+                          plantsStream: _plantsStream,
+                        ),
                       );
                     },
                     child: AbsorbPointer(
@@ -892,7 +898,7 @@ class _HomePageState extends State<HomePage> {
                     }
 
                     return StreamBuilder<Set<String>>(
-                      stream: PropagationService().watchActiveParentPlantIds(),
+                      stream: _activeParentPlantIdsStream,
                       builder: (context, propagatingSnapshot) {
                         final propagatingIds =
                             propagatingSnapshot.data ?? const <String>{};

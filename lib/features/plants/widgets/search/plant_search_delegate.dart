@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/plant.dart';
-import '../../../../services/plant_service.dart';
 import '../../pages/plant_details_page.dart';
 
 class PlantSearchDelegate extends SearchDelegate {
   final String userId;
+  final Stream<List<Plant>> plantsStream;
 
-  PlantSearchDelegate({required this.userId});
+  PlantSearchDelegate({
+    required this.userId,
+    required this.plantsStream,
+  });
 
   @override
   String get searchFieldLabel => 'Поиск растений...';
@@ -90,7 +93,7 @@ class PlantSearchDelegate extends SearchDelegate {
     final cleanQuery = query.trim().toLowerCase();
 
     return StreamBuilder<List<Plant>>(
-      stream: PlantService().getPlants(),
+      stream: plantsStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const ContainerWithBackground(

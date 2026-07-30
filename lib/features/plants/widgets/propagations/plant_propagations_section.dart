@@ -8,7 +8,7 @@ import '../../../../services/propagation_service.dart';
 import '../sheets/add_propagation_sheet.dart';
 import '../sheets/propagation_details_sheet.dart';
 
-class PlantPropagationsSection extends StatelessWidget {
+class PlantPropagationsSection extends StatefulWidget {
   final String plantId;
   final String plantName;
   final String plantFamily;
@@ -19,6 +19,21 @@ class PlantPropagationsSection extends StatelessWidget {
     required this.plantName,
     required this.plantFamily,
   });
+
+  @override
+  State<PlantPropagationsSection> createState() =>
+      _PlantPropagationsSectionState();
+}
+
+class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
+  late final Stream<List<Propagation>> _propagationsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _propagationsStream =
+        PropagationService().watchPropagationsForPlant(widget.plantId);
+  }
 
   static String _daysLabel(int days) {
     if (days == 0) return 'сегодня';
@@ -42,9 +57,9 @@ class PlantPropagationsSection extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => AddPropagationSheet(
-        parentPlantId: plantId,
-        parentPlantName: plantName,
-        parentPlantFamily: plantFamily,
+        parentPlantId: widget.plantId,
+        parentPlantName: widget.plantName,
+        parentPlantFamily: widget.plantFamily,
       ),
     );
   }
@@ -90,7 +105,7 @@ class PlantPropagationsSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         StreamBuilder<List<Propagation>>(
-          stream: PropagationService().watchPropagationsForPlant(plantId),
+          stream: _propagationsStream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting &&
                 !snapshot.hasData) {

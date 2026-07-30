@@ -115,16 +115,33 @@ class FertilizeService {
     return _db.collection('users').doc(uid).collection('plants').doc(plantId);
   }
 
+  /// Display name from entry fields only — no catalog reads.
+  static String resolveFertilizerDisplayName(Map<String, dynamic> data) {
+    final stored = (data['fertilizerName'] as String?)?.trim();
+    if (stored != null && stored.isNotEmpty) return stored;
+    if (data['fertilizerId'] != null) return 'Неизвестно';
+    return 'Свой микс';
+  }
+
   Future<void> _syncLastFertilizedAt(String plantId) async {
     final snapshot = await _fertilizingRef(plantId)
         .orderBy('appliedAt', descending: true)
         .limit(1)
         .get();
 
+    if (snapshot.docs.isEmpty) {
+      await _plantRef(plantId).update({
+        'lastFertilizedAt': FieldValue.delete(),
+        'lastFertilizerName': FieldValue.delete(),
+        'careHistoryMigrated': true,
+      });
+      return;
+    }
+
+    final data = snapshot.docs.first.data();
     await _plantRef(plantId).update({
-      'lastFertilizedAt': snapshot.docs.isEmpty
-          ? FieldValue.delete()
-          : snapshot.docs.first.data()['appliedAt'],
+      'lastFertilizedAt': data['appliedAt'],
+      'lastFertilizerName': resolveFertilizerDisplayName(data),
       'careHistoryMigrated': true,
     });
   }
@@ -142,10 +159,17 @@ class FertilizeService {
     final plantRef = _plantRef(plantId);
     final plant = await plantRef.get();
     final lastFertilizedAt = plant.data()?['lastFertilizedAt'] as Timestamp?;
+    final trimmedName = fertilizerName?.trim();
+    final storedName =
+        (trimmedName != null && trimmedName.isNotEmpty) ? trimmedName : null;
+    final displayName = resolveFertilizerDisplayName({
+      if (fertilizerId != null) 'fertilizerId': fertilizerId,
+      if (storedName != null) 'fertilizerName': storedName,
+    });
 
     await _fertilizingRef(plantId).add({
       if (fertilizerId != null) 'fertilizerId': fertilizerId,
-      if (fertilizerName != null) 'fertilizerName': fertilizerName,
+      if (storedName != null) 'fertilizerName': storedName,
       'waterMl': normalizeWaterMl(waterMl),
       'components': components.map((e) => e.toMap()).toList(),
       'appliedAt': Timestamp.fromDate(appliedAt),
@@ -159,6 +183,7 @@ class FertilizeService {
         appliedAt.isAfter(lastFertilizedAt.toDate())) {
       await plantRef.update({
         'lastFertilizedAt': Timestamp.fromDate(appliedAt),
+        'lastFertilizerName': displayName,
         'careHistoryMigrated': true,
       });
     }
@@ -198,26 +223,13 @@ class FertilizeService {
     return _fertilizingRef(plantId)
         .orderBy('appliedAt', descending: true)
         .snapshots()
-        .asyncMap((snapshot) async {
-      final fertilizersSnap = await _fertilizersRef.get();
-      final fertilizerMap = {
-        for (var doc in fertilizersSnap.docs)
-          doc.id: doc.data()['name'] as String? ?? 'Неизвестно',
-      };
-
+        .map((snapshot) {
       return snapshot.docs.map((doc) {
         final data = doc.data();
-        final fertilizerId = data['fertilizerId'] as String?;
-        final storedName = data['fertilizerName'] as String?;
-        final resolvedName = storedName ??
-            (fertilizerId != null
-                ? fertilizerMap[fertilizerId] ?? 'Неизвестно'
-                : 'Свой микс');
-
         return FertilizingEntry.fromFirestoreData(
           id: doc.id,
           data: data,
-          fertilizerName: resolvedName,
+          fertilizerName: resolveFertilizerDisplayName(data),
         );
       }).toList();
     });
@@ -228,28 +240,15 @@ class FertilizeService {
         .orderBy('appliedAt', descending: true)
         .limit(1)
         .snapshots()
-        .asyncMap((snapshot) async {
+        .map((snapshot) {
       if (snapshot.docs.isEmpty) return null;
 
       final doc = snapshot.docs.first;
       final data = doc.data();
-      final fertilizerId = data['fertilizerId'] as String?;
-      final storedName = data['fertilizerName'] as String?;
-
-      String resolvedName;
-      if (storedName != null && storedName.trim().isNotEmpty) {
-        resolvedName = storedName;
-      } else if (fertilizerId != null) {
-        final fertilizer = await getFertilizer(fertilizerId);
-        resolvedName = fertilizer?.name ?? 'Неизвестно';
-      } else {
-        resolvedName = 'Свой микс';
-      }
-
       return FertilizingEntry.fromFirestoreData(
         id: doc.id,
         data: data,
-        fertilizerName: resolvedName,
+        fertilizerName: resolveFertilizerDisplayName(data),
       );
     });
   }

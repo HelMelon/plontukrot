@@ -98,8 +98,16 @@ class PlantService {
         updates['lastWateredAt'] = watering.docs.first.data()['wateredAt'];
       }
       if (fertilizing.docs.isNotEmpty) {
-        updates['lastFertilizedAt'] =
-            fertilizing.docs.first.data()['appliedAt'];
+        final fertData = fertilizing.docs.first.data();
+        updates['lastFertilizedAt'] = fertData['appliedAt'];
+        final storedName = (fertData['fertilizerName'] as String?)?.trim();
+        if (storedName != null && storedName.isNotEmpty) {
+          updates['lastFertilizerName'] = storedName;
+        } else if (fertData['fertilizerId'] != null) {
+          updates['lastFertilizerName'] = 'Неизвестно';
+        } else {
+          updates['lastFertilizerName'] = 'Свой микс';
+        }
       }
 
       await plantRef.update(updates);

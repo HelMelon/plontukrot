@@ -18,6 +18,7 @@ class Plant {
   final DateTime? createdAt;
   final DateTime? lastWateredAt;
   final DateTime? lastFertilizedAt;
+  final String? lastFertilizerName;
   final DateTime? lastRepottedAt;
   final bool careHistoryMigrated;
   final bool botanicalFieldsMigrated;
@@ -37,6 +38,7 @@ class Plant {
     this.createdAt,
     this.lastWateredAt,
     this.lastFertilizedAt,
+    this.lastFertilizerName,
     this.lastRepottedAt,
     this.careHistoryMigrated = false,
     this.botanicalFieldsMigrated = false,
@@ -65,6 +67,7 @@ class Plant {
       createdAt: readTimestamp(data['createdAt']),
       lastWateredAt: readTimestamp(data['lastWateredAt']),
       lastFertilizedAt: readTimestamp(data['lastFertilizedAt']),
+      lastFertilizerName: _nullableTrimmed(data['lastFertilizerName'] as String?),
       lastRepottedAt: readTimestamp(data['lastRepottedAt']),
       careHistoryMigrated: data['careHistoryMigrated'] as bool? ?? false,
       botanicalFieldsMigrated:
@@ -100,6 +103,8 @@ class Plant {
         'lastWateredAt': Timestamp.fromDate(lastWateredAt!),
       if (lastFertilizedAt != null)
         'lastFertilizedAt': Timestamp.fromDate(lastFertilizedAt!),
+      if (lastFertilizerName != null)
+        'lastFertilizerName': lastFertilizerName,
       if (lastRepottedAt != null)
         'lastRepottedAt': Timestamp.fromDate(lastRepottedAt!),
       'careHistoryMigrated': careHistoryMigrated,
