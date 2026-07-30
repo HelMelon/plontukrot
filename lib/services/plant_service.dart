@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/plant.dart';
+import '../models/variegation.dart';
 import 'plant_species_service.dart';
 
 class PlantService {
@@ -18,6 +19,8 @@ class PlantService {
     required String species,
     String? cultivar,
     String? plantFamily,
+    Variegation variegation = Variegation.none,
+    String tradingName = '',
     String nickname = '',
     required int stage,
   }) async {
@@ -25,6 +28,7 @@ class PlantService {
     final trimmedSpecies = species.trim();
     final trimmedCultivar = cultivar?.trim();
     final trimmedFamily = plantFamily?.trim();
+    final trimmedTradingName = tradingName.trim();
 
     await _plantsRef.add({
       'genus': trimmedGenus,
@@ -35,6 +39,8 @@ class PlantService {
               : trimmedCultivar,
       'plantFamily':
           (trimmedFamily == null || trimmedFamily.isEmpty) ? null : trimmedFamily,
+      'variegation': variegation.storageValue,
+      'tradingName': trimmedTradingName,
       'nickname': nickname,
       'stage': stage,
       'imageUrl': null,
@@ -160,6 +166,8 @@ class PlantService {
     required String species,
     String? cultivar,
     String? plantFamily,
+    Variegation variegation = Variegation.none,
+    String tradingName = '',
     required String nickname,
     int? wateringFrequency,
     required int stage,
@@ -168,6 +176,7 @@ class PlantService {
     final trimmedSpecies = species.trim();
     final trimmedCultivar = cultivar?.trim();
     final trimmedFamily = plantFamily?.trim();
+    final trimmedTradingName = tradingName.trim();
 
     await _plantsRef.doc(plantId).update({
       'genus': trimmedGenus,
@@ -178,6 +187,8 @@ class PlantService {
               : trimmedCultivar,
       'plantFamily':
           (trimmedFamily == null || trimmedFamily.isEmpty) ? null : trimmedFamily,
+      'variegation': variegation.storageValue,
+      'tradingName': trimmedTradingName,
       'nickname': nickname,
       'wateringFrequency': wateringFrequency,
       'stage': stage,

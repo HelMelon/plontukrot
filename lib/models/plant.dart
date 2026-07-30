@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'firestore_helpers.dart';
+import 'variegation.dart';
 
 class Plant {
   final String id;
@@ -8,6 +9,8 @@ class Plant {
   final String species;
   final String? cultivar;
   final String? plantFamily;
+  final Variegation variegation;
+  final String tradingName;
   final String nickname;
   final int stage;
   final String? imageUrl;
@@ -25,6 +28,8 @@ class Plant {
     required this.species,
     this.cultivar,
     this.plantFamily,
+    this.variegation = Variegation.none,
+    this.tradingName = '',
     required this.nickname,
     required this.stage,
     this.imageUrl,
@@ -51,6 +56,8 @@ class Plant {
       species: data['species'] as String? ?? data['name'] as String? ?? '',
       cultivar: _nullableTrimmed(data['cultivar'] as String?),
       plantFamily: _nullableTrimmed(rawFamily),
+      variegation: Variegation.fromStorage(data['variegation'] as String?),
+      tradingName: data['tradingName'] as String? ?? '',
       nickname: data['nickname'] as String? ?? '',
       stage: data['stage'] as int? ?? 0,
       imageUrl: data['imageUrl'] as String?,
@@ -82,6 +89,8 @@ class Plant {
       'species': species,
       'cultivar': cultivar,
       'plantFamily': plantFamily,
+      'variegation': variegation.storageValue,
+      'tradingName': tradingName,
       'nickname': nickname,
       'stage': stage,
       'imageUrl': imageUrl,

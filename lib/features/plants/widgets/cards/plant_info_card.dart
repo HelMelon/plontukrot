@@ -6,6 +6,7 @@ import '../../../../models/fertilizing_entry.dart';
 import '../../../../models/plant.dart';
 import '../../../../models/repotting_entry.dart';
 import '../../../../models/stage_info.dart';
+import '../../../../models/variegation.dart';
 import '../../../../models/watering_entry.dart';
 import '../../../../services/fertilize_service.dart';
 import '../../../../services/repotting_service.dart';
@@ -19,11 +20,18 @@ import '../sheets/repotting_history_sheet.dart';
 import '../sheets/watering_history_sheet.dart';
 import 'info_card.dart';
 
-class PlantInfoCard extends StatelessWidget {
+class PlantInfoCard extends StatefulWidget {
   final Plant plant;
   final String plantId;
 
   const PlantInfoCard({super.key, required this.plant, required this.plantId});
+
+  @override
+  State<PlantInfoCard> createState() => _PlantInfoCardState();
+}
+
+class _PlantInfoCardState extends State<PlantInfoCard> {
+  final GlobalKey _botanicalDetailsKey = GlobalKey();
 
   static Widget _icon(String asset) {
     return Image.asset(
@@ -53,17 +61,39 @@ class PlantInfoCard extends StatelessWidget {
     );
   }
 
+  Future<void> _scrollToBotanicalDetails() async {
+    final targetContext = _botanicalDetailsKey.currentContext;
+    if (targetContext == null) return;
+
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOutCubic,
+      alignment: 0.05,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final plant = widget.plant;
+    final plantId = widget.plantId;
+
     final stage = stageInfos.firstWhere(
       (e) => e.value == plant.stage,
       orElse: () => stageInfos.first,
     );
 
+    final speciesTrimmed = plant.species.trim();
+    final cultivarTrimmed = plant.cultivar?.trim() ?? '';
+    final tradingNameTrimmed = plant.tradingName.trim();
     final plantFamilyLine = _botanicalLine('Семейство', plant.plantFamily);
     final genusLine = _botanicalLine('Род', plant.genus);
-    final speciesTrimmed = plant.species.trim();
-    final cultivarLine = _botanicalLine('Сорт', plant.cultivar);
+    final tradingNameLine = _botanicalLine('Торговое название', tradingNameTrimmed);
+    final variegation = plant.variegation;
+    final hasBotanicalDetails = plantFamilyLine != null ||
+        genusLine != null ||
+        tradingNameLine != null ||
+        variegation != Variegation.none;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -75,57 +105,112 @@ class PlantInfoCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            plant.nickname,
-            maxLines: 4,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+          if (plant.nickname.trim().isNotEmpty)
+            Text(
+              plant.nickname,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          if (plantFamilyLine != null) plantFamilyLine,
-          if (genusLine != null) genusLine,
+          if (plant.nickname.trim().isNotEmpty) const SizedBox(height: 8),
           if (speciesTrimmed.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => PlantSpeciesDetailsPage(
-                        species: speciesTrimmed,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PlantSpeciesDetailsPage(
+                              species: speciesTrimmed,
+                            ),
+                          ),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      child: Text(
+                        'Вид: $speciesTrimmed',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: _botanicalStyle.copyWith(
+                          decoration: TextDecoration.underline,
+                          decorationColor:
+                              AppColors.heading.withValues(alpha: 0.4),
+                        ),
                       ),
                     ),
-                  );
-                },
-                borderRadius: BorderRadius.circular(8),
-                child: Text(
-                  'Вид: $speciesTrimmed',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: _botanicalStyle.copyWith(
-                    decoration: TextDecoration.underline,
-                    decorationColor: AppColors.heading.withValues(alpha: 0.4),
                   ),
+                  if (variegation.showIconNearSpecies) ...[
+                    const SizedBox(width: 8),
+                    Tooltip(
+                      message: variegation.label,
+                      child: Icon(
+                        variegation.icon,
+                        color: variegation.iconColor,
+                        size: 24,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          if (cultivarTrimmed.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(
+                'Сорт: $cultivarTrimmed',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: _botanicalStyle,
+              ),
+            ),
+          if (stage.value != 0)
+            Text(
+              'Стадия: ${stage.title}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 20,
+                color: AppColors.heading,
+              ),
+            ),
+          if (hasBotanicalDetails) ...[
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: _scrollToBotanicalDetails,
+              borderRadius: BorderRadius.circular(8),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Ботанические данные',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: AppColors.goldAccent,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(width: 4),
+                    Icon(
+                      Icons.arrow_downward,
+                      size: 16,
+                      color: AppColors.goldAccent,
+                    ),
+                  ],
                 ),
               ),
             ),
-          if (cultivarLine != null) cultivarLine,
-          stage.value != 0
-              ? Text(
-                  'Стадия: ${stage.title}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    color: AppColors.heading,
-                  ),
-                )
-              : const SizedBox.shrink(),
+          ],
           const SizedBox(height: 12),
           LayoutBuilder(
             builder: (context, constraints) {
@@ -307,6 +392,52 @@ class PlantInfoCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           PlantNotesSection(plantId: plantId),
+          if (hasBotanicalDetails) ...[
+            const SizedBox(height: 32),
+            KeyedSubtree(
+              key: _botanicalDetailsKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Ботанические данные',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.heading,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  if (plantFamilyLine != null) plantFamilyLine,
+                  if (genusLine != null) genusLine,
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'Вариегатность: ${variegation.label}',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: _botanicalStyle,
+                          ),
+                        ),
+                        if (variegation != Variegation.none) ...[
+                          const SizedBox(width: 8),
+                          Icon(
+                            variegation.icon,
+                            color: variegation.iconColor,
+                            size: 22,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  if (tradingNameLine != null) tradingNameLine,
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );

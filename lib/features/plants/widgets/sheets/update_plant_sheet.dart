@@ -4,8 +4,10 @@ import 'package:flutter/services.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../models/plant.dart';
+import '../../../../models/variegation.dart';
 import '../../../../services/plant_service.dart';
 import '../selectors/plant_stage_selector.dart';
+import '../selectors/plant_variegation_selector.dart';
 
 class UpdatePlantSheet extends StatefulWidget {
   final String plantId;
@@ -26,11 +28,13 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   final speciesController = TextEditingController();
   final cultivarController = TextEditingController();
   final plantFamilyController = TextEditingController();
+  final tradingNameController = TextEditingController();
   final nickNameController = TextEditingController();
   final wateringFrequencyController = TextEditingController();
 
   bool isLoading = false;
   int selectedStage = 0;
+  Variegation selectedVariegation = Variegation.none;
   String? genusError;
   String? speciesError;
 
@@ -42,6 +46,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     speciesController.text = widget.plant.species;
     cultivarController.text = widget.plant.cultivar ?? '';
     plantFamilyController.text = widget.plant.plantFamily ?? '';
+    tradingNameController.text = widget.plant.tradingName;
     nickNameController.text = widget.plant.nickname;
     wateringFrequencyController.text =
         (widget.plant.wateringFrequency ?? '').toString();
@@ -50,6 +55,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
       wateringFrequencyController.text = '';
     }
     selectedStage = widget.plant.stage;
+    selectedVariegation = widget.plant.variegation;
   }
 
   @override
@@ -58,6 +64,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     speciesController.dispose();
     cultivarController.dispose();
     plantFamilyController.dispose();
+    tradingNameController.dispose();
     nickNameController.dispose();
     wateringFrequencyController.dispose();
     super.dispose();
@@ -98,6 +105,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     final species = speciesController.text.trim();
     final cultivar = cultivarController.text.trim();
     final plantFamily = plantFamilyController.text.trim();
+    final tradingName = tradingNameController.text.trim();
     final nickname = nickNameController.text.trim();
     final wateringRaw = wateringFrequencyController.text.trim();
     final wateringFrequency =
@@ -139,6 +147,8 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
         species: species,
         cultivar: cultivar.isEmpty ? null : cultivar,
         plantFamily: plantFamily.isEmpty ? null : plantFamily,
+        variegation: selectedVariegation,
+        tradingName: tradingName,
         nickname: nickname,
         wateringFrequency: wateringFrequency,
         stage: selectedStage,
@@ -248,6 +258,23 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             decoration: _fieldDecoration(
                               labelText: 'Сорт',
                               icon: Icons.spa_outlined,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          PlantVariegationSelector(
+                            selected: selectedVariegation,
+                            onChanged: (value) {
+                              setState(() => selectedVariegation = value);
+                            },
+                          ),
+                          const SizedBox(height: 18),
+                          TextField(
+                            controller: tradingNameController,
+                            style:
+                                const TextStyle(color: AppColors.textPrimary),
+                            decoration: _fieldDecoration(
+                              labelText: 'Торговое название',
+                              icon: Icons.storefront_outlined,
                             ),
                           ),
                           const SizedBox(height: 18),
