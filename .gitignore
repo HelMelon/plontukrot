@@ -2,6 +2,7 @@
 build/
 .dart_tool/
 .cursor/
+exports
 
 # Зависимости
 .packages
@@ -34,3 +35,4 @@ Thumbs.db
 
 
 ios/Podfile.lock
+tools/export_plants.dart
