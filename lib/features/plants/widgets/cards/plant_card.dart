@@ -49,8 +49,8 @@ class PlantCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = plant.imageUrl;
-    final hasImage = imageUrl != null && imageUrl.isNotEmpty;
+    final imageUrl = plant.listImageUrl;
+    final hasImage = imageUrl != null;
 
     final speciesBase =
         (plant.species.isEmpty ? 'Без названия' : plant.species).toTitleCase();

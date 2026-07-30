@@ -45,6 +45,7 @@ class PlantService {
       'nickname': nickname,
       'stage': stage,
       'imageUrl': null,
+      'imageThumbUrl': null,
       'wateringFrequency': null,
       'createdAt': FieldValue.serverTimestamp(),
       'careHistoryMigrated': true,
@@ -165,8 +166,12 @@ class PlantService {
   Future<void> updatePlantImage({
     required String plantId,
     required String imageUrl,
+    String? imageThumbUrl,
   }) async {
-    await _plantsRef.doc(plantId).update({'imageUrl': imageUrl});
+    await _plantsRef.doc(plantId).update({
+      'imageUrl': imageUrl,
+      if (imageThumbUrl != null) 'imageThumbUrl': imageThumbUrl,
+    });
   }
 
   Future<void> updatePlant({

@@ -204,9 +204,9 @@ class PlantSearchDelegate extends SearchDelegate {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: () {
-                          final String? imageUrl = plant.imageUrl?.trim();
+                          final String? imageUrl = plant.listImageUrl;
 
-                          if (imageUrl != null && imageUrl.isNotEmpty) {
+                          if (imageUrl != null) {
                             return CachedNetworkImage(
                               imageUrl: imageUrl,
                               fit: BoxFit.cover,

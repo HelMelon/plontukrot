@@ -14,6 +14,7 @@ class Plant {
   final String nickname;
   final int stage;
   final String? imageUrl;
+  final String? imageThumbUrl;
   final int? wateringFrequency;
   final DateTime? createdAt;
   final DateTime? lastWateredAt;
@@ -34,6 +35,7 @@ class Plant {
     required this.nickname,
     required this.stage,
     this.imageUrl,
+    this.imageThumbUrl,
     this.wateringFrequency,
     this.createdAt,
     this.lastWateredAt,
@@ -43,6 +45,15 @@ class Plant {
     this.careHistoryMigrated = false,
     this.botanicalFieldsMigrated = false,
   });
+
+  /// Prefer thumb for lists/grids; fall back to full image.
+  String? get listImageUrl {
+    final thumb = imageThumbUrl?.trim();
+    if (thumb != null && thumb.isNotEmpty) return thumb;
+    final full = imageUrl?.trim();
+    if (full != null && full.isNotEmpty) return full;
+    return null;
+  }
 
   static String? _nullableTrimmed(String? value) {
     if (value == null) return null;
@@ -63,6 +74,7 @@ class Plant {
       nickname: data['nickname'] as String? ?? '',
       stage: data['stage'] as int? ?? 0,
       imageUrl: data['imageUrl'] as String?,
+      imageThumbUrl: data['imageThumbUrl'] as String?,
       wateringFrequency: data['wateringFrequency'] as int?,
       createdAt: readTimestamp(data['createdAt']),
       lastWateredAt: readTimestamp(data['lastWateredAt']),
@@ -97,6 +109,7 @@ class Plant {
       'nickname': nickname,
       'stage': stage,
       'imageUrl': imageUrl,
+      'imageThumbUrl': imageThumbUrl,
       'wateringFrequency': wateringFrequency,
       if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
       if (lastWateredAt != null)

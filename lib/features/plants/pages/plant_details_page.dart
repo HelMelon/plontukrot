@@ -79,14 +79,15 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
     try {
       final Uint8List imageBytes = await pickedFile.readAsBytes();
 
-      final imageUrl = await StorageService().uploadPlantImageWeb(
+      final upload = await StorageService().uploadPlantImages(
         imageBytes: imageBytes,
         plantId: widget.plantId,
       );
 
       await _plantService.updatePlantImage(
         plantId: widget.plantId,
-        imageUrl: imageUrl,
+        imageUrl: upload.imageUrl,
+        imageThumbUrl: upload.imageThumbUrl,
       );
     } catch (e) {
       if (!mounted) return;
