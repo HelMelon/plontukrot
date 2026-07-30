@@ -21,16 +21,14 @@ class _PropagationsPageState extends State<PropagationsPage>
   late final PropagationService _service;
   late final Stream<List<Propagation>> _activeStream;
   late final Stream<List<Propagation>> _archivedStream;
-  late final Stream<PropagationYearStats> _yearStatsStream;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _service = PropagationService();
-    _activeStream = _service.watchActivePropagations().asBroadcastStream();
-    _archivedStream = _service.watchArchivedPropagations().asBroadcastStream();
-    _yearStatsStream = _service.yearStatsFrom(_activeStream, _archivedStream);
+    _activeStream = _service.watchActivePropagations();
+    _archivedStream = _service.watchArchivedPropagations();
   }
 
   @override
@@ -263,132 +261,113 @@ class _PropagationsPageState extends State<PropagationsPage>
     );
   }
 
+  Widget _propagationList(
+    AsyncSnapshot<List<Propagation>> snapshot, {
+    required bool archived,
+  }) {
+    if (snapshot.hasError) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            'Ошибка: ${snapshot.error}',
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: AppColors.textSecondary),
+          ),
+        ),
+      );
+    }
+
+    if (!snapshot.hasData) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.goldAccent),
+      );
+    }
+
+    final items = snapshot.data!;
+    if (items.isEmpty) {
+      return _emptyState(
+        icon: archived ? Icons.inventory_2_outlined : Icons.spa_outlined,
+        title: archived ? 'Архив пуст' : 'Нет активных размножений',
+        subtitle: archived
+            ? 'Проданные и погибшие партии хранятся 1 год'
+            : 'Добавьте партию со страницы растения',
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(20),
+      itemCount: items.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      itemBuilder: (context, index) {
+        return _propagationTile(items[index], archived: archived);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          'Размножение',
-          style: TextStyle(
-            color: AppColors.heading,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: AppColors.goldAccent,
-          labelColor: AppColors.goldAccent,
-          unselectedLabelColor: AppColors.textSecondary,
-          tabs: const [
-            Tab(text: 'Активные'),
-            Tab(text: 'Архив'),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-            child: StreamBuilder<PropagationYearStats>(
-              stream: _yearStatsStream,
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const SizedBox(height: 8);
-                }
-                return _statsCard(snapshot.data!);
-              },
-            ),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                StreamBuilder<List<Propagation>>(
-                  stream: _activeStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Text(
-                            'Ошибка: ${snapshot.error}',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ),
-                      );
-                    }
+    return StreamBuilder<List<Propagation>>(
+      stream: _activeStream,
+      builder: (context, activeSnapshot) {
+        return StreamBuilder<List<Propagation>>(
+          stream: _archivedStream,
+          builder: (context, archivedSnapshot) {
+            final stats =
+                activeSnapshot.hasData && archivedSnapshot.hasData
+                    ? PropagationYearStats.fromList(
+                        DateTime.now().year,
+                        [...activeSnapshot.data!, ...archivedSnapshot.data!],
+                      )
+                    : null;
 
-                    if (snapshot.connectionState == ConnectionState.waiting &&
-                        !snapshot.hasData) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.goldAccent,
-                        ),
-                      );
-                    }
-
-                    final items = snapshot.data ?? const <Propagation>[];
-                    if (items.isEmpty) {
-                      return _emptyState(
-                        icon: Icons.spa_outlined,
-                        title: 'Нет активных размножений',
-                        subtitle: 'Добавьте партию со страницы растения',
-                      );
-                    }
-
-                    return ListView.separated(
-                      padding: const EdgeInsets.all(20),
-                      itemCount: items.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        return _propagationTile(items[index], archived: false);
-                      },
-                    );
-                  },
+            return Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: AppBar(
+                backgroundColor: AppColors.background,
+                surfaceTintColor: Colors.transparent,
+                elevation: 0,
+                title: const Text(
+                  'Размножение',
+                  style: TextStyle(
+                    color: AppColors.heading,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                StreamBuilder<List<Propagation>>(
-                  stream: _archivedStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting &&
-                        !snapshot.hasData) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.goldAccent,
-                        ),
-                      );
-                    }
-
-                    final items = snapshot.data ?? const <Propagation>[];
-                    if (items.isEmpty) {
-                      return _emptyState(
-                        icon: Icons.inventory_2_outlined,
-                        title: 'Архив пуст',
-                        subtitle: 'Проданные и погибшие партии хранятся 1 год',
-                      );
-                    }
-
-                    return ListView.separated(
-                      padding: const EdgeInsets.all(20),
-                      itemCount: items.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        return _propagationTile(items[index], archived: true);
-                      },
-                    );
-                  },
+                bottom: TabBar(
+                  controller: _tabController,
+                  indicatorColor: AppColors.goldAccent,
+                  labelColor: AppColors.goldAccent,
+                  unselectedLabelColor: AppColors.textSecondary,
+                  tabs: const [
+                    Tab(text: 'Активные'),
+                    Tab(text: 'Архив'),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
+              ),
+              body: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                    child: stats == null
+                        ? const SizedBox(height: 8)
+                        : _statsCard(stats),
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _propagationList(activeSnapshot, archived: false),
+                        _propagationList(archivedSnapshot, archived: true),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

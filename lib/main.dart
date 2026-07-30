@@ -96,7 +96,7 @@ class _AppStartupState extends State<AppStartup> {
         _statusText = null;
       });
 
-      await Future<void>.delayed(const Duration(milliseconds: 200));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       if (!mounted) return;
       setState(() => _phase = _StartupPhase.splash);
     } catch (_) {

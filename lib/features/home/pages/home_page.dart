@@ -84,9 +84,15 @@ class _HomePageState extends State<HomePage> {
 
   void _selectAll() {
     setState(() {
-      _selectedPlantIds
-        ..clear()
-        ..addAll(_visiblePlantIds);
+      final allVisibleSelected = _visiblePlantIds.isNotEmpty &&
+          _visiblePlantIds.every(_selectedPlantIds.contains);
+      if (allVisibleSelected) {
+        _selectedPlantIds.clear();
+      } else {
+        _selectedPlantIds
+          ..clear()
+          ..addAll(_visiblePlantIds);
+      }
     });
   }
 
@@ -655,9 +661,17 @@ class _HomePageState extends State<HomePage> {
       ),
       actions: [
         IconButton(
-          tooltip: 'Выбрать все',
+          tooltip: _visiblePlantIds.isNotEmpty &&
+                  _visiblePlantIds.every(_selectedPlantIds.contains)
+              ? 'Снять выделение'
+              : 'Выбрать все',
           onPressed: _selectAll,
-          icon: const Icon(Icons.select_all),
+          icon: Icon(
+            _visiblePlantIds.isNotEmpty &&
+                    _visiblePlantIds.every(_selectedPlantIds.contains)
+                ? Icons.deselect
+                : Icons.select_all,
+          ),
         ),
         IconButton(
           tooltip: 'Полив',

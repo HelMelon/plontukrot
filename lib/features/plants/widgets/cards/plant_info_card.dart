@@ -327,28 +327,36 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                   if (plant.genus.trim().isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PlantGenusDetailsPage(
-                                genus: plant.genus.trim(),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Род: ', style: _botanicalStyle),
+                          Flexible(
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => PlantGenusDetailsPage(
+                                      genus: plant.genus.trim(),
+                                    ),
+                                  ),
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(8),
+                              child: Text(
+                                plant.genus.trim(),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: _botanicalStyle.copyWith(
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: AppColors.heading
+                                      .withValues(alpha: 0.4),
+                                ),
                               ),
                             ),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(8),
-                        child: Text(
-                          'Род: ${plant.genus.trim()}',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: _botanicalStyle.copyWith(
-                            decoration: TextDecoration.underline,
-                            decorationColor:
-                                AppColors.heading.withValues(alpha: 0.4),
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   Padding(

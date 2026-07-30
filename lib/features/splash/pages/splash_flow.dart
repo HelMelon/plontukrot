@@ -6,7 +6,7 @@ import '../../../core/theme/app_colors.dart';
 
 /// Bootstrap while Firebase and other startup work runs.
 /// App logo centered + progress bar at the bottom.
-class AppBootstrapPage extends StatelessWidget {
+class AppBootstrapPage extends StatefulWidget {
   final double progress;
   final String? statusText;
 
@@ -19,8 +19,31 @@ class AppBootstrapPage extends StatelessWidget {
   static const logoPath = 'assets/images/app-icon.png';
 
   @override
+  State<AppBootstrapPage> createState() => _AppBootstrapPageState();
+}
+
+class _AppBootstrapPageState extends State<AppBootstrapPage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _rotationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1600),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final clamped = progress.clamp(0.0, 1.0);
+    final clamped = widget.progress.clamp(0.0, 1.0);
 
     return Scaffold(
       backgroundColor: AppColors.dark1,
@@ -38,21 +61,24 @@ class AppBootstrapPage extends StatelessWidget {
                             constraints.maxHeight,
                           ) *
                           0.88;
-                      return Image.asset(
-                        logoPath,
-                        width: side,
-                        height: side,
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) =>
-                            SizedBox(width: side, height: side),
+                      return RotationTransition(
+                        turns: _rotationController,
+                        child: Image.asset(
+                          AppBootstrapPage.logoPath,
+                          width: side,
+                          height: side,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) =>
+                              SizedBox(width: side, height: side),
+                        ),
                       );
                     },
                   ),
                 ),
               ),
-              if (statusText != null) ...[
+              if (widget.statusText != null) ...[
                 Text(
-                  statusText!,
+                  widget.statusText!,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: AppColors.textSecondary,
@@ -86,7 +112,7 @@ class SplashCarouselPage extends StatefulWidget {
   const SplashCarouselPage({
     super.key,
     required this.onFinished,
-    this.secondsPerImage = const Duration(milliseconds: 2200),
+    this.secondsPerImage = const Duration(milliseconds: 1100),
   });
 
   static const images = [
@@ -127,7 +153,7 @@ class _SplashCarouselPageState extends State<SplashCarouselPage> {
     return Scaffold(
       backgroundColor: AppColors.dark1,
       body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 400),
+        duration: const Duration(milliseconds: 200),
         switchInCurve: Curves.easeInOut,
         switchOutCurve: Curves.easeInOut,
         // contain: same framing for every splash, full art + text visible
