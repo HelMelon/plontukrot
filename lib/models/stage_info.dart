@@ -28,7 +28,7 @@ const stageInfos = [
   ),
   StageInfo(
     value: 2,
-    title: "🌿 Малыш",
+    title: "🌿 Детка",
     checklist: [
       "1–2 настоящих листа",
       "Корневая только формируется",
@@ -37,7 +37,7 @@ const stageInfos = [
   ),
   StageInfo(
     value: 3,
-    title: "🌳 Ювенильное",
+    title: "🌳 Ювенил",
     checklist: [
       "3–5 листьев",
       "Хорошая корневая",
