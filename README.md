@@ -1,17 +1,18 @@
-# plontukrot
+# Plöntukrot
 
-A new Flutter project.
+Mobile plant collection and care tracker (brand **SKÖRD**).
 
-## Getting Started
+## Documentation
 
-This project is a starting point for a Flutter application.
+| Area | Start here |
+|------|------------|
+| Product | [docs/product/](docs/product/) |
+| **Architecture** | [docs/architecture/overview.md](docs/architecture/overview.md) |
+| Architecture audit | [docs/architecture/ARCHITECTURE_AUDIT.md](docs/architecture/ARCHITECTURE_AUDIT.md) |
+| Firebase | [docs/architecture/firebase.md](docs/architecture/firebase.md) |
+| Data model | [docs/architecture/data-model.md](docs/architecture/data-model.md) |
+| Development | [docs/development/](docs/development/) |
+| ADRs | [docs/decisions/](docs/decisions/) |
+| Research | [docs/research/](docs/research/) |
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Cursor agent rules (enforced for contributors using Cursor): `.cursor/rules/`.
