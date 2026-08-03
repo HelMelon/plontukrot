@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -101,6 +102,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   }
 
   Future<void> updatePlant() async {
+    final l10n = AppLocalizations.of(context);
     final genus = genusController.text.trim();
     final species = speciesController.text.trim();
     final cultivar = cultivarController.text.trim();
@@ -114,10 +116,10 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     String? nextGenusError;
     String? nextSpeciesError;
     if (genus.isEmpty) {
-      nextGenusError = 'Укажите род растения';
+      nextGenusError = l10n.plantGenusRequired;
     }
     if (species.isEmpty) {
-      nextSpeciesError = 'Укажите вид растения';
+      nextSpeciesError = l10n.plantSpeciesRequired;
     }
     if (nextGenusError != null || nextSpeciesError != null) {
       setState(() {
@@ -129,7 +131,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
 
     if (wateringRaw.isNotEmpty && wateringFrequency == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Некорректная частота полива')),
+        SnackBar(content: Text(l10n.plantInvalidWateringFrequency)),
       );
       return;
     }
@@ -161,7 +163,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
       if (mounted) {
         setState(() => isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка: $e')),
+          SnackBar(content: Text(l10n.commonError(e.toString()))),
         );
       }
     }
@@ -169,6 +171,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final media = MediaQuery.of(context);
     final maxHeight = media.size.height * 0.92;
 
@@ -201,11 +204,11 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                       ),
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(22, 16, 22, 0),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(22, 16, 22, 0),
                     child: Text(
-                      'Изменить растение',
-                      style: TextStyle(
+                      l10n.plantEdit,
+                      style: const TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
                         letterSpacing: -1,
@@ -229,7 +232,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                               }
                             },
                             decoration: _fieldDecoration(
-                              labelText: 'Род',
+                              labelText: l10n.plantGenus,
                               errorText: genusError,
                               icon: Icons.park_outlined,
                             ),
@@ -245,7 +248,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                               }
                             },
                             decoration: _fieldDecoration(
-                              labelText: 'Вид',
+                              labelText: l10n.plantSpecies,
                               errorText: speciesError,
                               icon: Icons.eco,
                             ),
@@ -256,7 +259,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             style:
                                 const TextStyle(color: AppColors.textPrimary),
                             decoration: _fieldDecoration(
-                              labelText: 'Сорт',
+                              labelText: l10n.plantCultivar,
                               icon: Icons.spa_outlined,
                             ),
                           ),
@@ -273,7 +276,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             style:
                                 const TextStyle(color: AppColors.textPrimary),
                             decoration: _fieldDecoration(
-                              labelText: 'Торговое название',
+                              labelText: l10n.plantTradingName,
                               icon: Icons.storefront_outlined,
                             ),
                           ),
@@ -283,7 +286,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             style:
                                 const TextStyle(color: AppColors.textPrimary),
                             decoration: _fieldDecoration(
-                              labelText: 'Семейство',
+                              labelText: l10n.plantFamily,
                               icon: Icons.family_restroom,
                             ),
                           ),
@@ -293,7 +296,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             style:
                                 const TextStyle(color: AppColors.textPrimary),
                             decoration: _fieldDecoration(
-                              labelText: 'Прозвище',
+                              labelText: l10n.plantNickname,
                               icon: Icons.local_florist,
                             ),
                           ),
@@ -307,14 +310,14 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             style:
                                 const TextStyle(color: AppColors.textPrimary),
                             decoration: _fieldDecoration(
-                              labelText: 'Частота полива',
+                              labelText: l10n.plantWateringFrequency,
                               icon: Icons.water_drop,
                             ),
                           ),
                           const SizedBox(height: 18),
-                          const Text(
-                            'Стадия роста',
-                            style: TextStyle(
+                          Text(
+                            l10n.plantGrowthStage,
+                            style: const TextStyle(
                               color: AppColors.textSecondary,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -357,8 +360,8 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                                   color: AppColors.dark1,
                                 ),
                               )
-                            : const Text(
-                                'Сохранить изменения',
+                            : Text(
+                                l10n.plantSaveChanges,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),

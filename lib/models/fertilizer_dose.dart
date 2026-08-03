@@ -44,12 +44,10 @@ class FertilizerDose {
     };
   }
 
-  String get unitLabel => unit == FertilizerDoseUnit.ml ? 'мл' : 'г';
-
-  String get label {
-    final value = amount == amount.roundToDouble()
+  /// Formats amount only. Unit and full label belong in UI via AppLocalizations.
+  String get amountLabel {
+    return amount == amount.roundToDouble()
         ? amount.toInt().toString()
         : amount.toString();
-    return '$component · $value$unitLabel';
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/fertilizer_dose.dart';
@@ -12,6 +14,7 @@ Future<void> showFertilizerCompositionDialog({
   return showDialog<void>(
     context: context,
     builder: (context) {
+      final l10n = AppLocalizations.of(context);
       final media = MediaQuery.of(context);
       final maxHeight = (media.size.height - media.viewInsets.bottom) * 0.5;
 
@@ -23,7 +26,7 @@ Future<void> showFertilizerCompositionDialog({
           overflow: TextOverflow.ellipsis,
         ),
         content: components.isEmpty && waterMl == null
-            ? const Text('Нет компонентов')
+            ? Text(l10n.noComponents)
             : ConstrainedBox(
                 constraints: BoxConstraints(maxHeight: maxHeight),
                 child: SingleChildScrollView(
@@ -35,7 +38,7 @@ Future<void> showFertilizerCompositionDialog({
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Text(
-                            'Вода: $waterMl мл',
+                            l10n.fertilizerWaterLine(waterMl),
                             style: const TextStyle(
                               color: AppColors.heading,
                               fontWeight: FontWeight.w600,
@@ -43,13 +46,13 @@ Future<void> showFertilizerCompositionDialog({
                           ),
                         ),
                       if (components.isEmpty)
-                        const Text('Нет компонентов')
+                        Text(l10n.noComponents)
                       else
                         ...components.map(
                           (c) => Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             child: Text(
-                              c.label,
+                              l10n.fertilizerDoseLabel(c),
                               style: const TextStyle(
                                 color: AppColors.textPrimary,
                               ),
@@ -63,7 +66,7 @@ Future<void> showFertilizerCompositionDialog({
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Закрыть'),
+            child: Text(l10n.commonClose),
           ),
         ],
       );

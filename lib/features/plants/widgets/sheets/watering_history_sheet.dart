@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -47,6 +48,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
   }) async {
     DateTime selectedDate = initialDate ?? DateTime.now();
     final isEditing = wateringId != null;
+    final l10n = AppLocalizations.of(context);
 
     await showModalBottomSheet(
       context: context,
@@ -71,7 +73,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      isEditing ? 'Изменить полив' : 'Добавить полив',
+                      isEditing ? l10n.wateringEdit : l10n.wateringAdd,
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -81,7 +83,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                     const SizedBox(height: 20),
                     ListTile(
                       leading: const Icon(Icons.calendar_today),
-                      title: Text(DateFormat('d MMMM y').format(selectedDate)),
+                      title: Text(DateFormat.yMMMMd().format(selectedDate)),
                       onTap: () async {
                         final picked = await showDatePicker(
                           context: context,
@@ -109,8 +111,8 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                                   selectedDate = DateTime.now();
                                 });
                               },
-                              child: const Text(
-                                'Сегодня',
+                              child: Text(
+                                l10n.commonToday,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -139,8 +141,8 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                                   Navigator.pop(sheetContext);
                                 }
                               },
-                              child: const Text(
-                                'Сохранить',
+                              child: Text(
+                                l10n.commonSave,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -160,20 +162,21 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
   }
 
   Future<void> _confirmDelete(String wateringId) async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Удалить полив'),
-          content: const Text('Удалить эту запись?'),
+          title: Text(l10n.wateringDeleteTitle),
+          content: Text(l10n.wateringDeleteConfirm),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Отмена'),
+              child: Text(l10n.commonCancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Удалить'),
+              child: Text(l10n.commonDelete),
             ),
           ],
         );
@@ -190,6 +193,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final sheetHeight = MediaQuery.of(context).size.height * 0.7;
 
     return Material(
@@ -215,12 +219,12 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'История полива',
+                        l10n.wateringHistory,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: AppColors.heading,
@@ -233,8 +237,8 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                       child: FilledButton.icon(
                         onPressed: () => _showWateringEditor(),
                         icon: const Icon(Icons.add, size: 18),
-                        label: const Text(
-                          'Добавить',
+                        label: Text(
+                          l10n.commonAdd,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -258,10 +262,12 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                       final items = snapshot.data!;
 
                       if (items.isEmpty) {
-                        return const Center(
+                        return Center(
                           child: Text(
-                            'Пока нет записей о поливе',
-                            style: TextStyle(color: AppColors.textSecondary),
+                            l10n.wateringEmpty,
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                         );
                       }
@@ -275,9 +281,9 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                           if (index == items.length) {
                             return TextButton(
                               onPressed: _loadMore,
-                              child: const Text(
-                                'Показать ещё',
-                                style: TextStyle(
+                              child: Text(
+                                l10n.commonShowMore,
+                                style: const TextStyle(
                                   color: AppColors.goldAccent,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -308,7 +314,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    DateFormat('d MMMM y').format(wateredAt),
+                                    DateFormat.yMMMMd().format(wateredAt),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
@@ -319,7 +325,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                                   ),
                                 ),
                                 IconButton(
-                                  tooltip: 'Изменить',
+                                  tooltip: l10n.commonEdit,
                                   icon: const Icon(Icons.edit_outlined),
                                   onPressed: () => _showWateringEditor(
                                     wateringId: wateringId,
@@ -327,7 +333,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                                   ),
                                 ),
                                 IconButton(
-                                  tooltip: 'Удалить',
+                                  tooltip: l10n.commonDelete,
                                   icon: const Icon(Icons.delete_outline),
                                   onPressed: () => _confirmDelete(wateringId),
                                 ),

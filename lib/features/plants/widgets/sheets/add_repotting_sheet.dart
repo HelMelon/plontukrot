@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/prompt_text_dialog.dart';
@@ -99,11 +101,12 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
   }
 
   Future<void> _addCustomComponent() async {
+    final l10n = AppLocalizations.of(context);
     final name = await showPromptTextDialog(
       context: context,
-      title: 'Добавить компонент',
-      hintText: 'Название компонента',
-      confirmLabel: 'Добавить',
+      title: l10n.componentAddTitle,
+      hintText: l10n.componentNameHint,
+      confirmLabel: l10n.commonAdd,
     );
 
     if (name == null || name.isEmpty) return;
@@ -159,21 +162,28 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
   }
 
   Future<void> _showSelectedComposition(List<Soil> soils) async {
+    final l10n = AppLocalizations.of(context);
     List<SoilComponent> components;
     String title;
 
     if (_mode == _SoilMode.saved && _selectedSoilId != null) {
       final soil = soils.firstWhere(
         (s) => s.id == _selectedSoilId,
-        orElse: () => Soil(id: '', name: 'Грунт', components: _components),
+        orElse: () => Soil(
+          id: '',
+          name: l10n.repottingSoilFallback,
+          components: _components,
+        ),
       );
       components = soil.components;
-      title = soil.name.isEmpty ? 'Состав грунта' : soil.name;
+      title = soil.name.isEmpty
+          ? l10n.repottingSoilComposition
+          : soil.name;
     } else {
       components = _components;
       title = _saveMix && _mixNameController.text.trim().isNotEmpty
           ? _mixNameController.text.trim()
-          : 'Свой микс';
+          : l10n.soilCustomMix;
     }
 
     await showSoilCompositionDialog(
@@ -252,6 +262,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Padding(
@@ -275,7 +286,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
               ),
               const SizedBox(height: 16),
               Text(
-                widget.isEditing ? 'Изменить пересадку' : 'Добавить пересадку',
+                widget.isEditing ? l10n.repottingEdit : l10n.repottingAdd,
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
@@ -291,7 +302,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                 child: OutlinedButton(
                   onPressed: () =>
                       setState(() => _selectedDate = DateTime.now()),
-                  child: const Text('Сегодня'),
+                  child: Text(l10n.commonToday),
                 ),
               ),
               const SizedBox(height: 16),
@@ -300,14 +311,14 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                 runSpacing: 8,
                 children: [
                   ChoiceChip(
-                    label: const Text('Сохранённые'),
+                    label: Text(l10n.fertilizingSaved),
                     selected: _mode == _SoilMode.saved,
                     onSelected: (_) {
                       setState(() => _mode = _SoilMode.saved);
                     },
                   ),
                   ChoiceChip(
-                    label: const Text('Новый микс'),
+                    label: Text(l10n.fertilizingNewMix),
                     selected: _mode == _SoilMode.newMix,
                     onSelected: (_) {
                       setState(() {
@@ -335,15 +346,17 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Пока нет сохранённых грунтов. Создайте новый микс.',
-                            style: TextStyle(color: AppColors.textSecondary),
+                          Text(
+                            l10n.repottingEmptySoils,
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                           TextButton(
                             onPressed: () {
                               setState(() => _mode = _SoilMode.newMix);
                             },
-                            child: const Text('Перейти к «Новый микс»'),
+                            child: Text(l10n.fertilizingGoToNewMix),
                           ),
                         ],
                       );
@@ -358,8 +371,10 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                                 : null,
                             hint: Text(
                               _selectedSoilId != null && widget.entry != null
-                                  ? (widget.entry!.soilName ?? 'Выберите грунт')
-                                  : 'Выберите грунт',
+                                  ? l10n.soilDisplayName(
+                                      widget.entry!.soilName,
+                                    )
+                                  : l10n.repottingSelectSoil,
                             ),
                             isExpanded: true,
                             items: soils
@@ -379,7 +394,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                           ),
                         ),
                         IconButton(
-                          tooltip: 'Посмотреть состав',
+                          tooltip: l10n.fertilizingViewComposition,
                           onPressed:
                               _selectedSoilId == null && _components.isEmpty
                                   ? null
@@ -393,15 +408,15 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
               if (_mode == _SoilMode.newMix) ...[
                 Row(
                   children: [
-                    const Text(
-                      'Компоненты',
-                      style: TextStyle(fontWeight: FontWeight.w600),
+                    Text(
+                      l10n.commonComposition,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     const Spacer(),
                     TextButton.icon(
                       onPressed: _openManageComponents,
                       icon: const Icon(Icons.edit_outlined, size: 18),
-                      label: const Text('Управление'),
+                      label: Text(l10n.commonManage),
                     ),
                   ],
                 ),
@@ -430,9 +445,9 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                   },
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Нажатие: +1 часть · Долгое нажатие: ½ части (ещё раз — убрать)',
-                  style: TextStyle(
+                Text(
+                  l10n.repottingSoilTapHint,
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
                   ),
@@ -444,15 +459,15 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                   onChanged: (value) {
                     setState(() => _saveMix = value ?? false);
                   },
-                  title: const Text('Сохранить этот микс'),
+                  title: Text(l10n.fertilizingSaveThisMix),
                   controlAffinity: ListTileControlAffinity.leading,
                 ),
                 if (_saveMix)
                   TextField(
                     controller: _mixNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Название микса',
-                      hintText: 'напр. Микс для ароидов',
+                    decoration: InputDecoration(
+                      labelText: l10n.fertilizingMixName,
+                      hintText: l10n.repottingMixNameHint,
                     ),
                     onChanged: (_) => setState(() {}),
                   ),
@@ -464,10 +479,10 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                 onChanged: (value) {
                   setState(() => _slowReleaseFertilizer = value ?? false);
                 },
-                title: const Text('Пролонгированное удобрение в грунт'),
-                subtitle: const Text(
-                  'Вносилось ли при пересадке',
-                  style: TextStyle(fontSize: 12),
+                title: Text(l10n.repottingSlowRelease),
+                subtitle: Text(
+                  l10n.repottingSlowReleaseSubtitle,
+                  style: const TextStyle(fontSize: 12),
                 ),
                 controlAffinity: ListTileControlAffinity.leading,
               ),
@@ -480,7 +495,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Сохранить'),
+                    : Text(l10n.commonSave),
               ),
             ],
           ),

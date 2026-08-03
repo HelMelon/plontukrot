@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/note.dart';
@@ -28,6 +30,7 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
   bool get isDesktop => kIsWeb;
 
   Future<void> _deleteNote(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -36,27 +39,27 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Text(
-            'Удалить заметку?',
-            style: TextStyle(color: AppColors.textPrimary),
+          title: Text(
+            l10n.notesDeleteTitle,
+            style: const TextStyle(color: AppColors.textPrimary),
           ),
-          content: const Text(
-            'Вы уверены, что хотите навсегда удалить эту заметку? Это действие нельзя отменить.',
-            style: TextStyle(color: AppColors.textSecondary),
+          content: Text(
+            l10n.notesDeleteConfirm,
+            style: const TextStyle(color: AppColors.textSecondary),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text(
-                'Отмена',
-                style: TextStyle(color: AppColors.textSecondary),
+              child: Text(
+                l10n.commonCancel,
+                style: const TextStyle(color: AppColors.textSecondary),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text(
-                'Удалить',
-                style: TextStyle(
+              child: Text(
+                l10n.commonDelete,
+                style: const TextStyle(
                   color: Colors.redAccent,
                   fontWeight: FontWeight.bold,
                 ),
@@ -91,9 +94,7 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
   String _formatDate() {
     final date = widget.note.createdAt;
     if (date == null) return '';
-    return '${date.day.toString().padLeft(2, '0')}.'
-        '${date.month.toString().padLeft(2, '0')}.'
-        '${date.year}';
+    return DateFormat.yMd().format(date);
   }
 
   @override

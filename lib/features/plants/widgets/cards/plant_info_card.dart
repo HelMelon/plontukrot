@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/plant.dart';
@@ -69,6 +71,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final plant = widget.plant;
     final plantId = widget.plantId;
 
@@ -80,9 +83,11 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     final speciesTrimmed = plant.species.trim();
     final cultivarTrimmed = plant.cultivar?.trim() ?? '';
     final tradingNameTrimmed = plant.tradingName.trim();
-    final plantFamilyLine = _botanicalLine('Семейство', plant.plantFamily);
-    final tradingNameLine = _botanicalLine('Торговое название', tradingNameTrimmed);
+    final plantFamilyLine = _botanicalLine(l10n.plantFamilyLabel, plant.plantFamily);
+    final tradingNameLine =
+        _botanicalLine(l10n.plantTradingNameLabel, tradingNameTrimmed);
     final variegation = plant.variegation;
+    final variegationLabel = l10n.variegationLabelOf(variegation);
     final hasBotanicalDetails = plantFamilyLine != null ||
         plant.genus.trim().isNotEmpty ||
         tradingNameLine != null ||
@@ -118,7 +123,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Вид: $speciesTrimmed',
+                      l10n.plantSpeciesLabel(speciesTrimmed),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: _botanicalStyle,
@@ -127,7 +132,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                   if (variegation.showIconNearSpecies) ...[
                     const SizedBox(width: 8),
                     Tooltip(
-                      message: variegation.label,
+                      message: variegationLabel,
                       child: Icon(
                         variegation.icon,
                         color: variegation.iconColor,
@@ -142,7 +147,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Text(
-                'Сорт: $cultivarTrimmed',
+                l10n.plantCultivarLabel(cultivarTrimmed),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: _botanicalStyle,
@@ -150,7 +155,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
             ),
           if (stage.value != 0)
             Text(
-              'Стадия: ${stage.title}',
+              l10n.plantStageLabel(l10n.stageInfoTitle(stage)),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
@@ -163,21 +168,21 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
             InkWell(
               onTap: _scrollToBotanicalDetails,
               borderRadius: BorderRadius.circular(8),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 4),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Ботанические данные',
-                      style: TextStyle(
+                      l10n.plantBotanicalData,
+                      style: const TextStyle(
                         fontSize: 15,
                         color: AppColors.goldAccent,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    SizedBox(width: 4),
-                    Icon(
+                    const SizedBox(width: 4),
+                    const Icon(
                       Icons.arrow_downward,
                       size: 16,
                       color: AppColors.goldAccent,
@@ -201,7 +206,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
               }
 
               String careDateLabel(DateTime? date) {
-                if (date == null) return 'Нет данных';
+                if (date == null) return l10n.commonNoData;
                 return DateFormat('d MMM y').format(date);
               }
 
@@ -242,7 +247,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                   wrapItem(
                     InfoCard(
                       icon: _icon('assets/icons/watering.png'),
-                      title: 'Полив',
+                      title: l10n.watering,
                       value: careDateLabel(plant.lastWateredAt),
                       onTap: openWateringHistory,
                     ),
@@ -250,7 +255,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                   wrapItem(
                     InfoCard(
                       icon: _icon('assets/icons/fertilize.png'),
-                      title: 'Подкормка',
+                      title: l10n.fertilizing,
                       value: careDateLabel(plant.lastFertilizedAt),
                       onTap: openFertilizingHistory,
                     ),
@@ -258,7 +263,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                   wrapItem(
                     InfoCard(
                       icon: _icon('assets/icons/potting.png'),
-                      title: 'Пересадка',
+                      title: l10n.repotting,
                       value: careDateLabel(plant.lastRepottedAt),
                       onTap: openRepottingHistory,
                     ),
@@ -270,17 +275,18 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
           const SizedBox(height: 32),
           PlantPropagationsSection(
             plantId: plantId,
-            plantName:
-                plant.species.isNotEmpty ? plant.species : 'Без названия',
+            plantName: plant.species.isNotEmpty
+                ? plant.species
+                : l10n.commonUntitled,
             plantFamily: plant.plantFamily ?? '',
           ),
           const SizedBox(height: 32),
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Журнал',
-                  style: TextStyle(
+                  l10n.plantJournal,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: AppColors.heading,
@@ -298,7 +304,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                   );
                 },
                 icon: const Icon(Icons.add, size: 18),
-                label: const Text('Добавить'),
+                label: Text(l10n.commonAdd),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.goldAccent,
                 ),
@@ -314,9 +320,9 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Ботанические данные',
-                    style: TextStyle(
+                  Text(
+                    l10n.plantBotanicalData,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: AppColors.heading,
@@ -330,7 +336,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Род: ', style: _botanicalStyle),
+                          Text(l10n.plantGenusPrefix, style: _botanicalStyle),
                           Flexible(
                             child: InkWell(
                               onTap: () {
@@ -365,7 +371,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                       children: [
                         Flexible(
                           child: Text(
-                            'Вариегатность: ${variegation.label}',
+                            l10n.plantVariegationLabel(variegationLabel),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: _botanicalStyle,

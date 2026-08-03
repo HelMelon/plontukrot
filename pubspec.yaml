@@ -29,6 +29,7 @@ dependencies:
   intl: ^0.20.2
   google_fonts: ^8.2.0
   flutter_image_compress: ^2.5.1
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
@@ -37,6 +38,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0 # Версия 4.0.0 идеально работает с Dart 3.5.4+
 
 flutter:
+  generate: true
   uses-material-design: true
 
   fonts:

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
+import 'core/locale/app_locale_controller.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/pages/login_page.dart';
 import 'features/home/pages/home_page.dart';
@@ -12,8 +14,9 @@ import 'firebase_options.dart';
 import 'models/app_user.dart';
 import 'services/auth_service.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await AppLocaleController.instance.load();
   runApp(const MyApp());
 }
 
@@ -22,32 +25,37 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
-      locale: const Locale('ru'),
-      supportedLocales: const [
-        Locale('ru'),
-        Locale('en'),
-      ],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      builder: (context, child) {
-        return Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/background.png'),
-              repeat: ImageRepeat.repeat,
-              fit: BoxFit.contain,
-            ),
-          ),
-          child: child,
+    return ListenableBuilder(
+      listenable: AppLocaleController.instance,
+      builder: (context, _) {
+        final localeOverride = AppLocaleController.instance.localeOverride;
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.darkTheme,
+          locale: localeOverride,
+          supportedLocales: AppLocalizations.supportedLocales,
+          localeResolutionCallback: AppLocaleController.resolveLocale,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          builder: (context, child) {
+            return Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/background.png'),
+                  repeat: ImageRepeat.repeat,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              child: child,
+            );
+          },
+          home: const AppStartup(),
         );
       },
-      home: const AppStartup(),
     );
   }
 }
@@ -74,9 +82,18 @@ class _AppStartupState extends State<AppStartup> {
 
   Future<void> _bootstrap() async {
     try {
+      final override = AppLocaleController.instance.localeOverride;
+      final device = WidgetsBinding.instance.platformDispatcher.locale;
+      final resolved = AppLocaleController.resolveLocale(
+            override ?? device,
+            AppLocalizations.supportedLocales,
+          ) ??
+          const Locale('en');
+      final l10n = lookupAppLocalizations(resolved);
+
       setState(() {
         _progress = 0.15;
-        _statusText = 'Загрузка…';
+        _statusText = l10n.loading;
       });
 
       await Firebase.initializeApp(
@@ -85,11 +102,11 @@ class _AppStartupState extends State<AppStartup> {
       if (!mounted) return;
       setState(() {
         _progress = 0.65;
-        _statusText = 'Подготовка…';
+        _statusText = l10n.preparing;
       });
 
-      await initializeDateFormatting('ru');
-      Intl.defaultLocale = 'ru';
+      await initializeDateFormatting(resolved.languageCode);
+      Intl.defaultLocale = resolved.languageCode;
       if (!mounted) return;
       setState(() {
         _progress = 1;

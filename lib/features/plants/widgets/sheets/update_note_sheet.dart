@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -32,11 +33,12 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
   }
 
   Future<void> save() async {
+    final l10n = AppLocalizations.of(context);
     final text = controller.text.trim();
 
     if (text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Заметка не может быть пустой')),
+        SnackBar(content: Text(l10n.notesCannotBeEmpty)),
       );
       return;
     }
@@ -59,7 +61,7 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
       if (mounted) {
         setState(() => isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка: $e')),
+          SnackBar(content: Text(l10n.commonError(e.toString()))),
         );
       }
     }
@@ -73,6 +75,8 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.backgroundSecondary,
@@ -94,7 +98,7 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
                 maxLines: 8,
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
-                  labelText: 'Изменить заметку',
+                  labelText: l10n.notesEditLabel,
                   filled: true,
                   fillColor: AppColors.dark2,
                 ),
@@ -105,8 +109,8 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
                 height: AppTheme.buttonHeight,
                 child: ElevatedButton(
                   onPressed: isLoading ? null : save,
-                  child: const Text(
-                    'Сохранить изменения',
+                  child: Text(
+                    l10n.plantSaveChanges,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

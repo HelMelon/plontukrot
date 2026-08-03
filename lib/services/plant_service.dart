@@ -105,10 +105,8 @@ class PlantService {
         final storedName = (fertData['fertilizerName'] as String?)?.trim();
         if (storedName != null && storedName.isNotEmpty) {
           updates['lastFertilizerName'] = storedName;
-        } else if (fertData['fertilizerId'] != null) {
-          updates['lastFertilizerName'] = 'Неизвестно';
         } else {
-          updates['lastFertilizerName'] = 'Свой микс';
+          updates['lastFertilizerName'] = FieldValue.delete();
         }
       }
 

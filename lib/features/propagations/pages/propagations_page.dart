@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../models/propagation.dart';
 import '../../../models/propagation_year_stats.dart';
-import '../../../models/stage_info.dart';
 import '../../../services/propagation_service.dart';
 import '../../plants/widgets/sheets/propagation_details_sheet.dart';
 
@@ -37,22 +38,6 @@ class _PropagationsPageState extends State<PropagationsPage>
     super.dispose();
   }
 
-  static String _daysLabel(int days) {
-    if (days == 0) return 'сегодня';
-    if (days == 1) return '1 день';
-    if (days >= 2 && days <= 4) return '$days дня';
-    return '$days дней';
-  }
-
-  static String _stageTitle(int value) {
-    return stageInfos
-        .firstWhere(
-          (stage) => stage.value == value,
-          orElse: () => stageInfos[1],
-        )
-        .title;
-  }
-
   Future<void> _openDetails(
     BuildContext context,
     Propagation propagation,
@@ -66,6 +51,7 @@ class _PropagationsPageState extends State<PropagationsPage>
   }
 
   Widget _statsCard(PropagationYearStats stats) {
+    final l10n = AppLocalizations.of(context);
     final methodParts = stats.byMethod.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     final familyParts = stats.byFamily.entries.toList()
@@ -83,7 +69,7 @@ class _PropagationsPageState extends State<PropagationsPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Статистика ${stats.year}',
+            l10n.propagationStatsTitle(stats.year),
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -92,23 +78,40 @@ class _PropagationsPageState extends State<PropagationsPage>
           ),
           const SizedBox(height: 12),
           Text(
-            'Поставлено: ${stats.startedBatches} парт. · ${stats.startedQuantity} шт.',
+            l10n.propagationStartedLabel(
+              stats.startedBatches,
+              stats.startedQuantity,
+            ),
             style: const TextStyle(color: AppColors.textPrimary),
           ),
           const SizedBox(height: 4),
           Text(
-            'Продано: ${stats.soldQuantity} шт.',
+            l10n.propagationSoldLabel(
+              stats.soldQuantity,
+              l10n.unitPiecesShort,
+            ),
             style: const TextStyle(color: AppColors.textPrimary),
           ),
           const SizedBox(height: 4),
           Text(
-            'Погибло: ${stats.lostQuantity} шт.',
+            l10n.propagationLostLabel(
+              stats.lostQuantity,
+              l10n.unitPiecesShort,
+            ),
             style: const TextStyle(color: AppColors.textPrimary),
           ),
           if (methodParts.isNotEmpty) ...[
             const SizedBox(height: 10),
             Text(
-              'По способам: ${methodParts.take(4).map((e) => '${e.key.label} ${e.value}').join(' · ')}',
+              l10n.propagationByMethods(
+                methodParts
+                    .take(4)
+                    .map(
+                      (e) =>
+                          '${l10n.propagationMethodLabel(e.key)} ${e.value}',
+                    )
+                    .join(' · '),
+              ),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
@@ -120,7 +123,15 @@ class _PropagationsPageState extends State<PropagationsPage>
           if (familyParts.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
-              'По семействам: ${familyParts.take(3).map((e) => '${e.key} ${e.value}').join(' · ')}',
+              l10n.propagationByFamilies(
+                familyParts
+                    .take(3)
+                    .map(
+                      (e) =>
+                          '${e.key.isEmpty ? l10n.homeNoFamily : e.key} ${e.value}',
+                    )
+                    .join(' · '),
+              ),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
@@ -176,13 +187,15 @@ class _PropagationsPageState extends State<PropagationsPage>
   }
 
   Widget _propagationTile(Propagation item, {required bool archived}) {
+    final l10n = AppLocalizations.of(context);
+    final dateLocale = Localizations.localeOf(context).toString();
     final subtitle = archived
-        ? '${item.status.label} · ${item.quantity} ${item.method.pluralLabel}'
-        : '${item.quantityAlive} ${item.method.pluralLabel} · ${DateFormat('d MMM y').format(item.startedAt)}';
+        ? '${l10n.propagationStatusLabel(item.status)} · ${item.quantity} ${l10n.propagationMethodPlural(item.method)}'
+        : '${l10n.propagationAliveWithMethod(item.quantityAlive, l10n.propagationMethodPlural(item.method))} · ${DateFormat('d MMM y', dateLocale).format(item.startedAt)}';
 
     final title = archived
-        ? '${_stageTitle(item.stage)} · ${item.status.label}'
-        : '${_stageTitle(item.stage)} · ${_daysLabel(item.daysSinceStart)}';
+        ? '${l10n.stageTitle(item.stage)} · ${l10n.propagationStatusLabel(item.status)}'
+        : '${l10n.stageTitle(item.stage)} · ${l10n.daysCount(item.daysSinceStart)}';
 
     return InkWell(
       onTap: () => _openDetails(context, item),
@@ -236,9 +249,9 @@ class _PropagationsPageState extends State<PropagationsPage>
                     Text(
                       [
                         if (item.soldQuantity > 0)
-                          'продано ${item.soldQuantity}',
+                          l10n.propagationSoldCount(item.soldQuantity),
                         if (item.lostQuantity > 0)
-                          'погибло ${item.lostQuantity}',
+                          l10n.propagationLostCount(item.lostQuantity),
                       ].join(' · '),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -265,12 +278,14 @@ class _PropagationsPageState extends State<PropagationsPage>
     AsyncSnapshot<List<Propagation>> snapshot, {
     required bool archived,
   }) {
+    final l10n = AppLocalizations.of(context);
+
     if (snapshot.hasError) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Text(
-            'Ошибка: ${snapshot.error}',
+            l10n.commonError('${snapshot.error}'),
             textAlign: TextAlign.center,
             style: const TextStyle(color: AppColors.textSecondary),
           ),
@@ -288,10 +303,12 @@ class _PropagationsPageState extends State<PropagationsPage>
     if (items.isEmpty) {
       return _emptyState(
         icon: archived ? Icons.inventory_2_outlined : Icons.spa_outlined,
-        title: archived ? 'Архив пуст' : 'Нет активных размножений',
+        title: archived
+            ? l10n.propagationEmptyArchive
+            : l10n.propagationEmptyActive,
         subtitle: archived
-            ? 'Проданные и погибшие партии хранятся 1 год'
-            : 'Добавьте партию со страницы растения',
+            ? l10n.propagationEmptyArchiveHint
+            : l10n.propagationEmptyActiveHint,
       );
     }
 
@@ -307,6 +324,8 @@ class _PropagationsPageState extends State<PropagationsPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return StreamBuilder<List<Propagation>>(
       stream: _activeStream,
       builder: (context, activeSnapshot) {
@@ -327,9 +346,9 @@ class _PropagationsPageState extends State<PropagationsPage>
                 backgroundColor: AppColors.background,
                 surfaceTintColor: Colors.transparent,
                 elevation: 0,
-                title: const Text(
-                  'Размножение',
-                  style: TextStyle(
+                title: Text(
+                  l10n.propagationTitle,
+                  style: const TextStyle(
                     color: AppColors.heading,
                     fontWeight: FontWeight.bold,
                   ),
@@ -339,9 +358,9 @@ class _PropagationsPageState extends State<PropagationsPage>
                   indicatorColor: AppColors.goldAccent,
                   labelColor: AppColors.goldAccent,
                   unselectedLabelColor: AppColors.textSecondary,
-                  tabs: const [
-                    Tab(text: 'Активные'),
-                    Tab(text: 'Архив'),
+                  tabs: [
+                    Tab(text: l10n.propagationActiveTab),
+                    Tab(text: l10n.propagationArchiveTab),
                   ],
                 ),
               ),

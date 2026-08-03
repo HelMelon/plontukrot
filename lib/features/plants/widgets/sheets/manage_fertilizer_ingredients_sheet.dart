@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/prompt_text_dialog.dart';
@@ -28,24 +29,27 @@ class _ManageFertilizerIngredientsSheetState
     required String title,
     String initial = '',
   }) {
+    final l10n = AppLocalizations.of(context);
     return showPromptTextDialog(
       context: context,
       title: title,
       initial: initial,
-      hintText: 'Название ингредиента',
-      confirmLabel: 'Сохранить',
+      hintText: l10n.fertilizingIngredientNameHint,
+      confirmLabel: l10n.commonSave,
     );
   }
 
   Future<void> _add() async {
-    final name = await _promptName(title: 'Добавить ингредиент');
+    final l10n = AppLocalizations.of(context);
+    final name = await _promptName(title: l10n.fertilizingAddIngredient);
     if (name == null) return;
     await _service.addIngredient(name: name);
   }
 
   Future<void> _edit(FertilizerIngredient ingredient) async {
+    final l10n = AppLocalizations.of(context);
     final name = await _promptName(
-      title: 'Изменить ингредиент',
+      title: l10n.ingredientEditTitle,
       initial: ingredient.name,
     );
     if (name == null || name == ingredient.name) return;
@@ -57,21 +61,22 @@ class _ManageFertilizerIngredientsSheetState
   }
 
   Future<void> _delete(FertilizerIngredient ingredient) async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppColors.backgroundSecondary,
-          title: const Text('Удалить ингредиент'),
-          content: Text('Удалить «${ingredient.name}» из каталога?'),
+          title: Text(l10n.ingredientDeleteTitle),
+          content: Text(l10n.catalogItemDeleteConfirm(ingredient.name)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Отмена'),
+              child: Text(l10n.commonCancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Удалить'),
+              child: Text(l10n.commonDelete),
             ),
           ],
         );
@@ -85,6 +90,8 @@ class _ManageFertilizerIngredientsSheetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -102,19 +109,22 @@ class _ManageFertilizerIngredientsSheetState
             const SizedBox(height: 16),
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Ингредиенты удобрений',
+                    l10n.manageFertilizerIngredientsTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 FilledButton.icon(
                   onPressed: _add,
                   icon: const Icon(Icons.add),
-                  label: const Text('Добавить'),
+                  label: Text(l10n.commonAdd),
                 ),
               ],
             ),
@@ -133,7 +143,7 @@ class _ManageFertilizerIngredientsSheetState
 
                   final items = snapshot.data!;
                   if (items.isEmpty) {
-                    return const Center(child: Text('Пока нет ингредиентов'));
+                    return Center(child: Text(l10n.emptyIngredients));
                   }
 
                   return ListView.separated(
@@ -152,13 +162,13 @@ class _ManageFertilizerIngredientsSheetState
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              tooltip: 'Изменить',
+                              tooltip: l10n.commonEdit,
                               visualDensity: VisualDensity.compact,
                               icon: const Icon(Icons.edit_outlined),
                               onPressed: () => _edit(item),
                             ),
                             IconButton(
-                              tooltip: 'Удалить',
+                              tooltip: l10n.commonDelete,
                               visualDensity: VisualDensity.compact,
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () => _delete(item),

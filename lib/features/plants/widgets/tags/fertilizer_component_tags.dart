@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/fertilizer_dose.dart';
@@ -57,14 +59,15 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
   }
 
   void _save() {
+    final l10n = AppLocalizations.of(context);
     final raw = _amountController.text.trim().replaceAll(',', '.');
     if (raw.isEmpty) {
-      setState(() => _errorText = 'Укажите количество');
+      setState(() => _errorText = l10n.doseAmountRequired);
       return;
     }
     final amount = double.tryParse(raw);
     if (amount == null || amount <= 0) {
-      setState(() => _errorText = 'Некорректное число');
+      setState(() => _errorText = l10n.doseInvalidNumber);
       return;
     }
     Navigator.pop(
@@ -79,6 +82,8 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return AlertDialog(
       backgroundColor: AppColors.backgroundSecondary,
       title: Text(
@@ -92,14 +97,14 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SegmentedButton<FertilizerDoseUnit>(
-              segments: const [
+              segments: [
                 ButtonSegment(
                   value: FertilizerDoseUnit.g,
-                  label: Text('г'),
+                  label: Text(l10n.unitGrams),
                 ),
                 ButtonSegment(
                   value: FertilizerDoseUnit.ml,
-                  label: Text('мл'),
+                  label: Text(l10n.unitMl),
                 ),
               ],
               selected: {_unit},
@@ -121,9 +126,10 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
               },
               onSubmitted: (_) => _save(),
               decoration: InputDecoration(
-                labelText:
-                    _unit == FertilizerDoseUnit.ml ? 'Миллилитры' : 'Граммы',
-                hintText: 'напр. 2',
+                labelText: _unit == FertilizerDoseUnit.ml
+                    ? l10n.milliliters
+                    : l10n.grams,
+                hintText: l10n.fertilizerDoseHint,
                 errorText: _errorText,
               ),
             ),
@@ -145,15 +151,15 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
                 unit: _unit,
               ),
             ),
-            child: const Text('Убрать'),
+            child: Text(l10n.doseRemove),
           ),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Отмена'),
+          child: Text(l10n.commonCancel),
         ),
         FilledButton(
           onPressed: _save,
-          child: const Text('Сохранить'),
+          child: Text(l10n.commonSave),
         ),
       ],
     );
@@ -206,7 +212,7 @@ class FertilizerComponentTags extends StatelessWidget {
     onChanged(next);
   }
 
-  Widget _addButton() {
+  Widget _addButton(AppLocalizations l10n) {
     return GestureDetector(
       onTap: onAddCustom,
       child: Container(
@@ -216,12 +222,12 @@ class FertilizerComponentTags extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: AppColors.sage),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.add, size: 16, color: AppColors.heading),
-            SizedBox(width: 4),
-            Text('Добавить', style: TextStyle(color: AppColors.heading)),
+            const Icon(Icons.add, size: 16, color: AppColors.heading),
+            const SizedBox(width: 4),
+            Text(l10n.commonAdd, style: const TextStyle(color: AppColors.heading)),
           ],
         ),
       ),
@@ -230,6 +236,8 @@ class FertilizerComponentTags extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final chipMaxWidth = constraints.maxWidth.isFinite
@@ -264,7 +272,9 @@ class FertilizerComponentTags extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      isSelected ? selectedDose.label : name,
+                      isSelected
+                          ? l10n.fertilizerDoseLabel(selectedDose)
+                          : name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -279,7 +289,7 @@ class FertilizerComponentTags extends StatelessWidget {
                 ),
               );
             }),
-            if (onAddCustom != null) _addButton(),
+            if (onAddCustom != null) _addButton(l10n),
           ],
         );
       },

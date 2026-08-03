@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/fertilizer.dart';
@@ -22,11 +24,12 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
   final _service = FertilizeService();
 
   Future<void> _addPurchased() async {
+    final l10n = AppLocalizations.of(context);
     final result = await showDialog<_FertilizerFormResult>(
       context: context,
-      builder: (_) => const _FertilizerFormDialog(
-        title: 'Готовое удобрение',
-        confirmLabel: 'Добавить',
+      builder: (_) => _FertilizerFormDialog(
+        title: l10n.fertilizerPurchasedAddTitle,
+        confirmLabel: l10n.commonAdd,
         initialKind: FertilizerKind.purchased,
       ),
     );
@@ -41,11 +44,12 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
   }
 
   Future<void> _edit(Fertilizer fertilizer) async {
+    final l10n = AppLocalizations.of(context);
     final result = await showDialog<_FertilizerFormResult>(
       context: context,
       builder: (_) => _FertilizerFormDialog(
-        title: 'Изменить удобрение',
-        confirmLabel: 'Сохранить',
+        title: l10n.fertilizerEditTitle,
+        confirmLabel: l10n.commonSave,
         initialName: fertilizer.name,
         initialKind: fertilizer.kind,
         initialWaterMl: fertilizer.waterMl,
@@ -64,23 +68,22 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
   }
 
   Future<void> _delete(Fertilizer fertilizer) async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppColors.backgroundSecondary,
-          title: const Text('Удалить удобрение'),
-          content: Text(
-            'Удалить «${fertilizer.name}» из каталога?',
-          ),
+          title: Text(l10n.fertilizerDeleteTitle),
+          content: Text(l10n.catalogItemDeleteConfirm(fertilizer.name)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Отмена'),
+              child: Text(l10n.commonCancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Удалить'),
+              child: Text(l10n.commonDelete),
             ),
           ],
         );
@@ -94,6 +97,8 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -111,30 +116,33 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
             const SizedBox(height: 16),
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Удобрения',
+                    l10n.manageFertilizersTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 FilledButton.icon(
                   onPressed: _addPurchased,
                   icon: const Icon(Icons.add),
-                  label: const Text('Готовое'),
+                  label: Text(l10n.fertilizerKindPurchased),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Миксы сохраняются из «Новый микс». Вид можно менять: готовое ↔ микс.',
+                l10n.manageFertilizersHint,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.textSecondary,
                 ),
@@ -155,9 +163,7 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
 
                   final items = snapshot.data!;
                   if (items.isEmpty) {
-                    return const Center(
-                      child: Text('Пока нет удобрений'),
-                    );
+                    return Center(child: Text(l10n.emptyFertilizers));
                   }
 
                   return ListView.separated(
@@ -167,7 +173,9 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
                       final item = items[index];
                       final doseLabel = item.components.isEmpty
                           ? null
-                          : item.components.map((c) => c.label).join(', ');
+                          : item.components
+                              .map((c) => l10n.fertilizerDoseLabel(c))
+                              .join(', ');
 
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
@@ -178,8 +186,8 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
                         ),
                         subtitle: Text(
                           [
-                            item.kind.label,
-                            '${item.waterMl} мл',
+                            l10n.fertilizerKindLabel(item.kind),
+                            l10n.unitMlWithValue(item.waterMl),
                             if (doseLabel != null) doseLabel,
                           ].join(' · '),
                           maxLines: 2,
@@ -189,13 +197,13 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              tooltip: 'Изменить',
+                              tooltip: l10n.commonEdit,
                               visualDensity: VisualDensity.compact,
                               icon: const Icon(Icons.edit_outlined),
                               onPressed: () => _edit(item),
                             ),
                             IconButton(
-                              tooltip: 'Удалить',
+                              tooltip: l10n.commonDelete,
                               visualDensity: VisualDensity.compact,
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () => _delete(item),
@@ -286,9 +294,10 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
   }
 
   void _submit() {
+    final l10n = AppLocalizations.of(context);
     final name = _nameController.text.trim();
     if (name.isEmpty) {
-      setState(() => _nameError = 'Укажите название');
+      setState(() => _nameError = l10n.fieldRequired);
       return;
     }
 
@@ -302,17 +311,17 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
         final amount = double.tryParse(doseRaw);
         if (amount == null || amount <= 0) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Некорректная доза')),
+            SnackBar(content: Text(l10n.fertilizerInvalidDose)),
           );
           return;
         }
         components.add(
           FertilizerDose(
             component: _kind == FertilizerKind.purchased
-                ? 'Доза'
+                ? 'dose'
                 : (widget.initialComponents.isNotEmpty
                     ? widget.initialComponents.first.component
-                    : 'Доза'),
+                    : 'dose'),
             amount: amount,
             unit: _doseUnit,
           ),
@@ -335,6 +344,7 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isPurchased = _kind == FertilizerKind.purchased;
     final showSimpleDose = isPurchased || widget.initialComponents.length <= 1;
 
@@ -354,27 +364,28 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
                 if (_nameError != null) setState(() => _nameError = null);
               },
               decoration: InputDecoration(
-                labelText: 'Название',
-                hintText:
-                    isPurchased ? 'напр. Pokon Universal' : 'Название микса',
+                labelText: l10n.fertilizerNameLabel,
+                hintText: isPurchased
+                    ? l10n.fertilizerNameHint
+                    : l10n.fertilizingMixNameHint,
                 errorText: _nameError,
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Вид',
-              style: TextStyle(fontWeight: FontWeight.w600),
+            Text(
+              l10n.fertilizerKindSection,
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             SegmentedButton<FertilizerKind>(
-              segments: const [
+              segments: [
                 ButtonSegment(
                   value: FertilizerKind.purchased,
-                  label: Text('Готовое'),
+                  label: Text(l10n.fertilizerKindPurchased),
                 ),
                 ButtonSegment(
                   value: FertilizerKind.mix,
-                  label: Text('Микс'),
+                  label: Text(l10n.fertilizerKindMix),
                 ),
               ],
               selected: {_kind},
@@ -383,15 +394,18 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
               },
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Вода для разведения',
-              style: TextStyle(fontWeight: FontWeight.w600),
+            Text(
+              l10n.fertilizerWaterForDilution,
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             SegmentedButton<int>(
               segments: [
                 for (final ml in kWaterVolumesMl)
-                  ButtonSegment(value: ml, label: Text('$ml мл')),
+                  ButtonSegment(
+                    value: ml,
+                    label: Text(l10n.unitMlWithValue(ml)),
+                  ),
               ],
               selected: {_waterMl},
               onSelectionChanged: (value) {
@@ -401,14 +415,14 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
             if (showSimpleDose) ...[
               const SizedBox(height: 16),
               SegmentedButton<FertilizerDoseUnit>(
-                segments: const [
+                segments: [
                   ButtonSegment(
                     value: FertilizerDoseUnit.g,
-                    label: Text('г'),
+                    label: Text(l10n.unitGrams),
                   ),
                   ButtonSegment(
                     value: FertilizerDoseUnit.ml,
-                    label: Text('мл'),
+                    label: Text(l10n.unitMl),
                   ),
                 ],
                 selected: {_doseUnit},
@@ -427,15 +441,19 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
                 ],
                 decoration: InputDecoration(
                   labelText: isPurchased
-                      ? 'Доза на $_waterMl мл (необязательно)'
-                      : 'Доза (необязательно)',
-                  hintText: 'напр. 2',
+                      ? l10n.fertilizerDoseOnWaterOptional(_waterMl)
+                      : l10n.fertilizerDoseOptional,
+                  hintText: l10n.fertilizerDoseHint,
                 ),
               ),
             ] else ...[
               const SizedBox(height: 12),
               Text(
-                'Состав микса: ${widget.initialComponents.map((c) => c.label).join(', ')}',
+                l10n.fertilizerMixComposition(
+                  widget.initialComponents
+                      .map((c) => l10n.fertilizerDoseLabel(c))
+                      .join(', '),
+                ),
                 style: const TextStyle(
                   fontSize: 13,
                   color: AppColors.textSecondary,
@@ -448,7 +466,7 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Отмена'),
+          child: Text(l10n.commonCancel),
         ),
         FilledButton(
           onPressed: _submit,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
+import 'package:plontukrot/l10n/app_localizations.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../models/plant.dart';
 import '../../../services/plant_service.dart';
@@ -36,6 +38,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
   }
 
   Future<ImageSource?> selectImageSource() async {
+    final l10n = AppLocalizations.of(context);
     return showModalBottomSheet<ImageSource>(
       context: context,
       backgroundColor: AppColors.dark2,
@@ -46,12 +49,12 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
             children: [
               ListTile(
                 leading: const Icon(Icons.photo_library),
-                title: const Text('Галерея'),
+                title: Text(l10n.plantGallery),
                 onTap: () => Navigator.pop(context, ImageSource.gallery),
               ),
               ListTile(
                 leading: const Icon(Icons.camera_alt),
-                title: const Text('Камера'),
+                title: Text(l10n.plantCamera),
                 onTap: () => Navigator.pop(context, ImageSource.camera),
               ),
             ],
@@ -91,11 +94,12 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
       );
     } catch (e) {
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: AppColors.dark2,
           content: Text(
-            'Ошибка загрузки: $e',
+            l10n.plantUploadError(e.toString()),
             style: const TextStyle(color: AppColors.textPrimary),
           ),
         ),
@@ -132,14 +136,16 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
   }
 
   void _openPropagation(Plant plant) {
+    final l10n = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => AddPropagationSheet(
         parentPlantId: widget.plantId,
-        parentPlantName:
-            plant.species.isNotEmpty ? plant.species : 'Без названия',
+        parentPlantName: plant.species.isNotEmpty
+            ? plant.species
+            : l10n.commonUntitled,
         parentPlantFamily: plant.plantFamily ?? '',
       ),
     );
@@ -166,6 +172,8 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return StreamBuilder<Plant?>(
       stream: _plantStream,
       builder: (context, snapshot) {
@@ -180,7 +188,8 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
 
         final plant = snapshot.data!;
         final imageUrl = plant.imageUrl;
-        final title = plant.nickname.isNotEmpty ? plant.nickname : 'Растение';
+        final title =
+            plant.nickname.isNotEmpty ? plant.nickname : l10n.plantDefaultTitle;
 
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -199,12 +208,12 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
             ),
             actions: [
               IconButton(
-                tooltip: 'Полив',
+                tooltip: l10n.watering,
                 onPressed: _openWateringHistory,
                 icon: const Icon(Icons.water_drop, color: AppColors.goldAccent),
               ),
               IconButton(
-                tooltip: 'Подкормка',
+                tooltip: l10n.fertilizing,
                 onPressed: _openFertilizing,
                 icon: const Icon(
                   Icons.science_outlined,
@@ -212,12 +221,12 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                 ),
               ),
               IconButton(
-                tooltip: 'Пересадка',
+                tooltip: l10n.repotting,
                 onPressed: _openRepotting,
                 icon: const Icon(Icons.flaky, color: AppColors.goldAccent),
               ),
               PopupMenuButton<_PlantDetailsMenuAction>(
-                tooltip: 'Ещё',
+                tooltip: l10n.commonMore,
                 icon: const Icon(Icons.more_vert, color: AppColors.goldAccent),
                 onSelected: (action) {
                   switch (action) {
@@ -229,18 +238,18 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                       _openAddNote();
                   }
                 },
-                itemBuilder: (context) => const [
+                itemBuilder: (context) => [
                   PopupMenuItem(
                     value: _PlantDetailsMenuAction.propagation,
-                    child: Text('Размножение'),
+                    child: Text(l10n.plantPropagation),
                   ),
                   PopupMenuItem(
                     value: _PlantDetailsMenuAction.edit,
-                    child: Text('Изменить'),
+                    child: Text(l10n.commonEdit),
                   ),
                   PopupMenuItem(
                     value: _PlantDetailsMenuAction.note,
-                    child: Text('Заметка'),
+                    child: Text(l10n.plantNote),
                   ),
                 ],
               ),

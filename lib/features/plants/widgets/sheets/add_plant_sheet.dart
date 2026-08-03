@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -73,6 +74,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
   }
 
   Future<void> addPlant() async {
+    final l10n = AppLocalizations.of(context);
     final genus = genusController.text.trim();
     final species = speciesController.text.trim();
     final cultivar = cultivarController.text.trim();
@@ -83,10 +85,10 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
     String? nextGenusError;
     String? nextSpeciesError;
     if (genus.isEmpty) {
-      nextGenusError = 'Укажите род растения';
+      nextGenusError = l10n.plantGenusRequired;
     }
     if (species.isEmpty) {
-      nextSpeciesError = 'Укажите вид растения';
+      nextSpeciesError = l10n.plantSpeciesRequired;
     }
     if (nextGenusError != null || nextSpeciesError != null) {
       setState(() {
@@ -123,7 +125,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
       if (mounted) {
         setState(() => isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка: $e')),
+          SnackBar(content: Text(l10n.commonError(e.toString()))),
         );
       }
     }
@@ -131,6 +133,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final media = MediaQuery.of(context);
     final maxHeight = media.size.height * 0.92;
 
@@ -163,11 +166,11 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                       ),
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(22, 16, 22, 0),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(22, 16, 22, 0),
                     child: Text(
-                      'Добавить растение',
-                      style: TextStyle(
+                      l10n.plantAdd,
+                      style: const TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
                         letterSpacing: -1,
@@ -191,7 +194,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                               }
                             },
                             decoration: _fieldDecoration(
-                              labelText: 'Род',
+                              labelText: l10n.plantGenus,
                               errorText: genusError,
                               icon: Icons.park_outlined,
                             ),
@@ -207,7 +210,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                               }
                             },
                             decoration: _fieldDecoration(
-                              labelText: 'Вид',
+                              labelText: l10n.plantSpecies,
                               errorText: speciesError,
                               icon: Icons.eco,
                             ),
@@ -218,7 +221,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             style:
                                 const TextStyle(color: AppColors.textPrimary),
                             decoration: _fieldDecoration(
-                              labelText: 'Сорт',
+                              labelText: l10n.plantCultivar,
                               icon: Icons.spa_outlined,
                             ),
                           ),
@@ -235,7 +238,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             style:
                                 const TextStyle(color: AppColors.textPrimary),
                             decoration: _fieldDecoration(
-                              labelText: 'Торговое название',
+                              labelText: l10n.plantTradingName,
                               icon: Icons.storefront_outlined,
                             ),
                           ),
@@ -245,7 +248,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             style:
                                 const TextStyle(color: AppColors.textPrimary),
                             decoration: _fieldDecoration(
-                              labelText: 'Семейство',
+                              labelText: l10n.plantFamily,
                               icon: Icons.family_restroom,
                             ),
                           ),
@@ -255,14 +258,14 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             style:
                                 const TextStyle(color: AppColors.textPrimary),
                             decoration: _fieldDecoration(
-                              labelText: 'Прозвище',
+                              labelText: l10n.plantNickname,
                               icon: Icons.local_florist,
                             ),
                           ),
                           const SizedBox(height: 18),
-                          const Text(
-                            'Стадия роста',
-                            style: TextStyle(
+                          Text(
+                            l10n.plantGrowthStage,
+                            style: const TextStyle(
                               color: AppColors.textSecondary,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -287,7 +290,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             style:
                                 const TextStyle(color: AppColors.textPrimary),
                             decoration: _fieldDecoration(
-                              labelText: 'Частота полива',
+                              labelText: l10n.plantWateringFrequency,
                               icon: Icons.water_drop,
                             ),
                           ),
@@ -319,8 +322,8 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                                   color: AppColors.dark1,
                                 ),
                               )
-                            : const Text(
-                                'Сохранить',
+                            : Text(
+                                l10n.commonSave,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),

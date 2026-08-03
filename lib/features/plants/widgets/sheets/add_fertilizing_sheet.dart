@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/prompt_text_dialog.dart';
@@ -20,14 +22,14 @@ enum _FertilizerMode { saved, newMix }
 class AddFertilizingSheet extends StatefulWidget {
   final List<String> plantIds;
   final List<Plant> plants;
-  final String title;
+  final String? title;
   final FertilizingEntry? entry;
 
   const AddFertilizingSheet({
     super.key,
     required this.plantIds,
     this.plants = const [],
-    this.title = 'Добавить подкормку',
+    this.title,
     this.entry,
   });
 
@@ -53,7 +55,6 @@ class AddFertilizingSheet extends StatefulWidget {
       key: key,
       plantIds: [plantId],
       plants: plant == null ? const [] : [plant],
-      title: 'Изменить подкормку',
       entry: entry,
     );
   }
@@ -122,11 +123,12 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
   }
 
   Future<void> _addCustomIngredient() async {
+    final l10n = AppLocalizations.of(context);
     final name = await showPromptTextDialog(
       context: context,
-      title: 'Добавить ингредиент',
-      hintText: 'Название ингредиента',
-      confirmLabel: 'Добавить',
+      title: l10n.fertilizingAddIngredient,
+      hintText: l10n.fertilizingIngredientNameHint,
+      confirmLabel: l10n.commonAdd,
     );
 
     if (name == null || name.isEmpty) return;
@@ -214,6 +216,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
   }
 
   Future<void> _showSelectedComposition(List<Fertilizer> fertilizers) async {
+    final l10n = AppLocalizations.of(context);
     List<FertilizerDose> components;
     String title;
     int waterMl;
@@ -223,20 +226,22 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
         (f) => f.id == _selectedFertilizerId,
         orElse: () => Fertilizer(
           id: '',
-          name: 'Удобрение',
+          name: l10n.fertilizerFallbackName,
           waterMl: _waterMl,
           components: _components,
         ),
       );
       components = fertilizer.components;
       waterMl = fertilizer.waterMl;
-      title = fertilizer.name.isEmpty ? 'Состав' : fertilizer.name;
+      title = fertilizer.name.isEmpty
+          ? l10n.commonComposition
+          : fertilizer.name;
     } else {
       components = _components;
       waterMl = _waterMl;
       title = _saveMix && _mixNameController.text.trim().isNotEmpty
           ? _mixNameController.text.trim()
-          : 'Свой микс';
+          : l10n.fertilizerCustomMix;
     }
 
     await showFertilizerCompositionDialog(
@@ -247,19 +252,22 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
     );
   }
 
-  Widget _waterVolumePicker({bool enabled = true}) {
+  Widget _waterVolumePicker(AppLocalizations l10n, {bool enabled = true}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Объём воды',
-          style: TextStyle(fontWeight: FontWeight.w600),
+        Text(
+          l10n.fertilizingWaterVolume,
+          style: const TextStyle(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         SegmentedButton<int>(
           segments: [
             for (final ml in kWaterVolumesMl)
-              ButtonSegment(value: ml, label: Text('$ml мл')),
+              ButtonSegment(
+                value: ml,
+                label: Text(l10n.unitMlWithValue(ml)),
+              ),
           ],
           selected: {_waterMl},
           onSelectionChanged: enabled
@@ -316,8 +324,6 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
           components: _components,
         );
         fertilizerName = name;
-      } else if (_mode == _FertilizerMode.newMix) {
-        fertilizerName = 'Свой микс';
       }
 
       final entry = widget.entry;
@@ -377,7 +383,10 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final title = widget.title ??
+        (widget.isEditing ? l10n.fertilizingEdit : l10n.fertilizingAdd);
 
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
@@ -400,7 +409,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
               ),
               const SizedBox(height: 16),
               Text(
-                widget.title,
+                title,
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
@@ -416,13 +425,13 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                 child: OutlinedButton(
                   onPressed: () =>
                       setState(() => _selectedDate = DateTime.now()),
-                  child: const Text('Сегодня'),
+                  child: Text(l10n.commonToday),
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Способ внесения',
-                style: TextStyle(fontWeight: FontWeight.w600),
+              Text(
+                l10n.fertilizingApplicationMethod,
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
               Wrap(
@@ -430,7 +439,9 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                 runSpacing: 8,
                 children: [
                   ChoiceChip(
-                    label: const Text('Корневое'),
+                    label: Text(l10n.applicationMethodLabel(
+                      FertilizerApplicationMethod.root,
+                    )),
                     selected:
                         _applicationMethod == FertilizerApplicationMethod.root,
                     onSelected: (_) {
@@ -441,7 +452,9 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                     },
                   ),
                   ChoiceChip(
-                    label: const Text('Внекорневое'),
+                    label: Text(l10n.applicationMethodLabel(
+                      FertilizerApplicationMethod.foliar,
+                    )),
                     selected: _applicationMethod ==
                         FertilizerApplicationMethod.foliar,
                     onSelected: (_) {
@@ -459,14 +472,14 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                 runSpacing: 8,
                 children: [
                   ChoiceChip(
-                    label: const Text('Сохранённые'),
+                    label: Text(l10n.fertilizingSaved),
                     selected: _mode == _FertilizerMode.saved,
                     onSelected: (_) {
                       setState(() => _mode = _FertilizerMode.saved);
                     },
                   ),
                   ChoiceChip(
-                    label: const Text('Новый микс'),
+                    label: Text(l10n.fertilizingNewMix),
                     selected: _mode == _FertilizerMode.newMix,
                     onSelected: (_) {
                       setState(() {
@@ -495,15 +508,17 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                       children: [
                         Row(
                           children: [
-                            const Text(
-                              'Каталог',
-                              style: TextStyle(fontWeight: FontWeight.w600),
+                            Text(
+                              l10n.fertilizingCatalog,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                             const Spacer(),
                             TextButton.icon(
                               onPressed: _openManageFertilizers,
                               icon: const Icon(Icons.edit_outlined, size: 18),
-                              label: const Text('Управление'),
+                              label: Text(l10n.commonManage),
                             ),
                           ],
                         ),
@@ -511,9 +526,9 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Пока нет удобрений. Добавьте готовое или сохраните микс.',
-                                style: TextStyle(
+                              Text(
+                                l10n.fertilizingEmptyCatalog,
+                                style: const TextStyle(
                                   color: AppColors.textSecondary,
                                 ),
                               ),
@@ -523,7 +538,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                                     () => _mode = _FertilizerMode.newMix,
                                   );
                                 },
-                                child: const Text('Перейти к «Новый микс»'),
+                                child: Text(l10n.fertilizingGoToNewMix),
                               ),
                             ],
                           )
@@ -540,8 +555,13 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                                   hint: Text(
                                     _selectedFertilizerId != null &&
                                             widget.entry != null
-                                        ? widget.entry!.fertilizerName
-                                        : 'Выберите удобрение',
+                                        ? l10n.fertilizerDisplayName(
+                                            storedName:
+                                                widget.entry!.fertilizerName,
+                                            fertilizerId:
+                                                widget.entry!.fertilizerId,
+                                          )
+                                        : l10n.fertilizingSelectFertilizer,
                                   ),
                                   isExpanded: true,
                                   items: fertilizers
@@ -549,7 +569,11 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                                         (f) => DropdownMenuItem(
                                           value: f.id,
                                           child: Text(
-                                            '${f.name} · ${f.kind.label} · ${f.waterMl} мл',
+                                            l10n.fertilizerWithMeta(
+                                              f.name,
+                                              l10n.fertilizerKindLabel(f.kind),
+                                              f.waterMl,
+                                            ),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
@@ -564,7 +588,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                                 ),
                               ),
                               IconButton(
-                                tooltip: 'Посмотреть состав',
+                                tooltip: l10n.fertilizingViewComposition,
                                 onPressed: _selectedFertilizerId == null &&
                                         _components.isEmpty
                                     ? null
@@ -580,7 +604,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                             Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                'Объём воды микса: $_waterMl мл',
+                                l10n.fertilizingMixWaterVolume(_waterMl),
                                 style: const TextStyle(
                                   color: AppColors.textSecondary,
                                 ),
@@ -593,19 +617,19 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                   },
                 ),
               if (_mode == _FertilizerMode.newMix) ...[
-                _waterVolumePicker(),
+                _waterVolumePicker(l10n),
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    const Text(
-                      'Ингредиенты',
-                      style: TextStyle(fontWeight: FontWeight.w600),
+                    Text(
+                      l10n.fertilizingIngredients,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     const Spacer(),
                     TextButton.icon(
                       onPressed: _openManageIngredients,
                       icon: const Icon(Icons.edit_outlined, size: 18),
-                      label: const Text('Управление'),
+                      label: Text(l10n.commonManage),
                     ),
                   ],
                 ),
@@ -634,9 +658,9 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                   },
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Нажмите на ингредиент, чтобы указать количество (г или мл)',
-                  style: TextStyle(
+                Text(
+                  l10n.fertilizingTapIngredientHint,
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
                   ),
@@ -648,15 +672,15 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                   onChanged: (value) {
                     setState(() => _saveMix = value ?? false);
                   },
-                  title: const Text('Сохранить этот микс'),
+                  title: Text(l10n.fertilizingSaveThisMix),
                   controlAffinity: ListTileControlAffinity.leading,
                 ),
                 if (_saveMix)
                   TextField(
                     controller: _mixNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Название микса',
-                      hintText: 'напр. Формула роста',
+                    decoration: InputDecoration(
+                      labelText: l10n.fertilizingMixName,
+                      hintText: l10n.fertilizingMixNameHint,
                     ),
                     onChanged: (_) => setState(() {}),
                   ),
@@ -670,7 +694,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Сохранить'),
+                    : Text(l10n.commonSave),
               ),
             ],
           ),

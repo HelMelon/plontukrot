@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -50,10 +51,11 @@ class _SellPropagationSheetState extends State<SellPropagationSheet> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
     final quantity = int.tryParse(_quantityController.text.trim());
     if (quantity == null || quantity < 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Укажите количество для продажи')),
+        SnackBar(content: Text(l10n.propagationSellQuantityRequired)),
       );
       return;
     }
@@ -61,7 +63,9 @@ class _SellPropagationSheetState extends State<SellPropagationSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Не больше ${widget.propagation.quantityAlive} живых',
+            l10n.propagationQuantityExceedsAlive(
+              widget.propagation.quantityAlive,
+            ),
           ),
         ),
       );
@@ -81,7 +85,7 @@ class _SellPropagationSheetState extends State<SellPropagationSheet> {
       if (mounted) {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка: $e')),
+          SnackBar(content: Text(l10n.commonError('$e'))),
         );
       }
     }
@@ -89,18 +93,22 @@ class _SellPropagationSheetState extends State<SellPropagationSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return _QuantityActionSheet(
-      title: 'Продать',
-      subtitle:
-          '${widget.propagation.quantityAlive} живых · ${widget.propagation.parentPlantName}',
+      title: l10n.propagationSell,
+      subtitle: l10n.propagationAliveWithPlant(
+        widget.propagation.quantityAlive,
+        widget.propagation.parentPlantName,
+      ),
       quantityController: _quantityController,
-      quantityLabel: 'Сколько продать',
+      quantityLabel: l10n.propagationSellQuantity,
       date: _soldAt,
       onPickDate: _pickDate,
       noteController: _noteController,
       saving: _saving,
       onSave: _save,
-      buttonLabel: 'Продать',
+      buttonLabel: l10n.propagationSell,
     );
   }
 }
@@ -148,10 +156,11 @@ class _LosePropagationSheetState extends State<LosePropagationSheet> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
     final quantity = int.tryParse(_quantityController.text.trim());
     if (quantity == null || quantity < 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Укажите количество')),
+        SnackBar(content: Text(l10n.propagationLoseQuantityRequired)),
       );
       return;
     }
@@ -159,7 +168,9 @@ class _LosePropagationSheetState extends State<LosePropagationSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Не больше ${widget.propagation.quantityAlive} живых',
+            l10n.propagationQuantityExceedsAlive(
+              widget.propagation.quantityAlive,
+            ),
           ),
         ),
       );
@@ -179,7 +190,7 @@ class _LosePropagationSheetState extends State<LosePropagationSheet> {
       if (mounted) {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка: $e')),
+          SnackBar(content: Text(l10n.commonError('$e'))),
         );
       }
     }
@@ -187,18 +198,22 @@ class _LosePropagationSheetState extends State<LosePropagationSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return _QuantityActionSheet(
-      title: 'Погибло',
-      subtitle:
-          '${widget.propagation.quantityAlive} живых · ${widget.propagation.parentPlantName}',
+      title: l10n.propagationStatusLost,
+      subtitle: l10n.propagationAliveWithPlant(
+        widget.propagation.quantityAlive,
+        widget.propagation.parentPlantName,
+      ),
       quantityController: _quantityController,
-      quantityLabel: 'Сколько погибло',
+      quantityLabel: l10n.propagationLoseQuantity,
       date: _lostAt,
       onPickDate: _pickDate,
       noteController: _noteController,
       saving: _saving,
       onSave: _save,
-      buttonLabel: 'Списать',
+      buttonLabel: l10n.propagationWriteOff,
     );
   }
 }
@@ -230,6 +245,7 @@ class _QuantityActionSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final media = MediaQuery.of(context);
     final keyboard = media.viewInsets.bottom;
     final maxHeight =
@@ -337,7 +353,9 @@ class _QuantityActionSheet extends StatelessWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Дата: ${DateFormat('d MMM y').format(date)}',
+                              l10n.propagationDate(
+                                DateFormat('d MMM y').format(date),
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -356,7 +374,7 @@ class _QuantityActionSheet extends StatelessWidget {
                     maxLines: 2,
                     style: const TextStyle(color: AppColors.textPrimary),
                     decoration: InputDecoration(
-                      labelText: 'Заметка (необязательно)',
+                      labelText: l10n.notesOptional,
                       labelStyle:
                           const TextStyle(color: AppColors.textSecondary),
                       filled: true,

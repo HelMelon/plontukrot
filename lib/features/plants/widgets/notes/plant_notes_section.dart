@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/note.dart';
@@ -45,13 +46,15 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return StreamBuilder<List<Note>>(
       stream: _notesStream,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Center(
             child: Text(
-              'Ошибка: ${snapshot.error}',
+              l10n.commonError(snapshot.error.toString()),
               style: const TextStyle(color: Colors.red),
             ),
           );
@@ -76,9 +79,9 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
               color: AppColors.dark2,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text(
-              'Заметок пока нет',
-              style: TextStyle(color: AppColors.textSecondary),
+            child: Text(
+              l10n.notesEmpty,
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           );
         }
@@ -109,9 +112,9 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
                     showAll = true;
                   });
                 },
-                child: const Text(
-                  'Показать ещё',
-                  style: TextStyle(
+                child: Text(
+                  l10n.commonShowMore,
+                  style: const TextStyle(
                     color: AppColors.goldAccent,
                     fontWeight: FontWeight.w600,
                   ),
@@ -120,9 +123,9 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
             else if (showAll && canLoadMore)
               TextButton(
                 onPressed: _loadMore,
-                child: const Text(
-                  'Загрузить ещё',
-                  style: TextStyle(
+                child: Text(
+                  l10n.commonLoadMore,
+                  style: const TextStyle(
                     color: AppColors.goldAccent,
                     fontWeight: FontWeight.w600,
                   ),
@@ -135,9 +138,9 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
                     showAll = false;
                   });
                 },
-                child: const Text(
-                  'Свернуть',
-                  style: TextStyle(
+                child: Text(
+                  l10n.commonCollapse,
+                  style: const TextStyle(
                     color: AppColors.goldAccent,
                     fontWeight: FontWeight.w600,
                   ),

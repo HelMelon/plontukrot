@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/variegation.dart';
@@ -15,6 +17,8 @@ class PlantVariegationSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return DropdownButtonFormField<Variegation>(
       key: ValueKey(selected),
       initialValue: selected,
@@ -22,7 +26,7 @@ class PlantVariegationSelector extends StatelessWidget {
       dropdownColor: AppColors.dark2,
       style: const TextStyle(color: AppColors.textPrimary),
       decoration: InputDecoration(
-        labelText: 'Вариегатность',
+        labelText: l10n.variegationLabel,
         labelStyle: const TextStyle(color: AppColors.textSecondary),
         filled: true,
         fillColor: AppColors.dark2,
@@ -48,7 +52,7 @@ class PlantVariegationSelector extends StatelessWidget {
             (item) => DropdownMenuItem(
               value: item,
               child: Text(
-                item.label,
+                l10n.variegationLabelOf(item),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

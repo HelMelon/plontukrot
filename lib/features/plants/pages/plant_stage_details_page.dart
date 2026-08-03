@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../models/plant.dart';
-import '../../../models/stage_info.dart';
 import '../../../services/plant_service.dart';
 import '../widgets/cards/plant_card.dart';
 
@@ -35,17 +36,10 @@ class _PlantStageDetailsPageState extends State<PlantStageDetailsPage> {
     return 2;
   }
 
-  String get _stageTitle {
-    return stageInfos
-        .firstWhere(
-          (stage) => stage.value == widget.stage,
-          orElse: () => stageInfos.first,
-        )
-        .title;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -53,7 +47,7 @@ class _PlantStageDetailsPageState extends State<PlantStageDetailsPage> {
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.heading),
         title: Text(
-          _stageTitle,
+          l10n.stageTitle(widget.stage),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
@@ -77,13 +71,16 @@ class _PlantStageDetailsPageState extends State<PlantStageDetailsPage> {
               .toList();
 
           if (plants.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
+                padding: const EdgeInsets.all(24),
                 child: Text(
-                  'В коллекции пока нет растений этой стадии',
+                  l10n.plantEmptyStage,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.textPrimary, fontSize: 16),
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             );

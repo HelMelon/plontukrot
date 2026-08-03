@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../models/plant.dart';
@@ -36,6 +37,7 @@ class _PlantGenusDetailsPageState extends State<PlantGenusDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final genus = widget.genus.trim();
 
     return Scaffold(
@@ -45,7 +47,7 @@ class _PlantGenusDetailsPageState extends State<PlantGenusDetailsPage> {
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.heading),
         title: Text(
-          genus.isEmpty ? 'Род' : genus,
+          genus.isEmpty ? l10n.plantGenusFallback : genus,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
@@ -69,13 +71,16 @@ class _PlantGenusDetailsPageState extends State<PlantGenusDetailsPage> {
               .toList();
 
           if (plants.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
+                padding: const EdgeInsets.all(24),
                 child: Text(
-                  'В коллекции пока нет растений этого рода',
+                  l10n.plantEmptyGenus,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.textPrimary, fontSize: 16),
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             );

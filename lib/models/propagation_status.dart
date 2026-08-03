@@ -1,11 +1,7 @@
 enum PropagationStatus {
-  active('Активно'),
-  sold('Продано'),
-  lost('Погибло');
-
-  const PropagationStatus(this.label);
-
-  final String label;
+  active,
+  sold,
+  lost;
 
   String get code => name;
 

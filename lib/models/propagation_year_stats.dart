@@ -44,9 +44,8 @@ class PropagationYearStats {
           (value) => value + item.quantity,
           ifAbsent: () => item.quantity,
         );
-        final family = item.parentPlantFamily.trim().isEmpty
-            ? 'Без семейства'
-            : item.parentPlantFamily.trim();
+        // Empty key = no family; localize only when rendering UI.
+        final family = item.parentPlantFamily.trim();
         byFamily.update(
           family,
           (value) => value + item.quantity,

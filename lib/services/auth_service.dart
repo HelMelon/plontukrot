@@ -58,7 +58,6 @@ class AuthService {
     if (idToken == null) {
       throw FirebaseAuthException(
         code: 'google-id-token-null',
-        message: 'Google не вернул ID-токен.',
       );
     }
 

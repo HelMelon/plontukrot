@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
@@ -23,11 +25,16 @@ class _LoginPageState extends State<LoginPage> {
       await AuthService().signInWithGoogle();
     } catch (e) {
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context);
+      final message = e is FirebaseAuthException &&
+              e.code == 'google-id-token-null'
+          ? l10n.authGoogleIdTokenMissing
+          : l10n.authSignInError(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: AppColors.dark2,
           content: Text(
-            'Ошибка входа: $e',
+            message,
             style: const TextStyle(color: AppColors.textPrimary),
           ),
         ),
@@ -41,6 +48,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
@@ -59,10 +68,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 42),
-                const Text(
-                  'SKÖRD',
+                Text(
+                  l10n.appName,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'NordicStyle',
                     fontSize: 38,
                     fontWeight: FontWeight.bold,
@@ -72,9 +81,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  'Журнал борьбы за свет и влагу. Всходы — не гарантия. Только наблюдение.',
+                  l10n.brandTagline,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     height: 1.5,
                     color: AppColors.textSecondary,
@@ -97,19 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                           )
                         : const Icon(Icons.login),
                     label: Text(
-                      isLoading ? 'Вход...' : 'Войти через Google',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.goldAccent,
-                      foregroundColor: AppColors.dark1,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
+                      isLoading ? l10n.authSigningIn : l10n.authSignInGoogle,
                     ),
                   ),
                 ),

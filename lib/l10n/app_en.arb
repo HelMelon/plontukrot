@@ -1,0 +1,528 @@
+{
+  "@@locale": "en",
+
+  "appName": "SKÖRD",
+  "brandTagline": "A journal of the fight for light and moisture. Sprouts are no guarantee. Only observation.",
+
+  "commonCancel": "Cancel",
+  "commonSave": "Save",
+  "commonDelete": "Delete",
+  "commonEdit": "Edit",
+  "commonAdd": "Add",
+  "commonClose": "Close",
+  "commonMore": "More",
+  "commonToday": "Today",
+  "commonError": "Error: {error}",
+  "@commonError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "commonShowMore": "Show more",
+  "commonLoadMore": "Load more",
+  "commonCollapse": "Collapse",
+  "commonManage": "Manage",
+  "commonOk": "OK",
+  "commonNoDate": "No date",
+  "commonNoData": "No data",
+  "commonUntitled": "Untitled",
+  "commonComposition": "Composition",
+
+  "unitMl": "ml",
+  "unitGrams": "g",
+  "unitPiecesShort": "pcs",
+  "unitMlWithValue": "{value} ml",
+  "@unitMlWithValue": {
+    "placeholders": {
+      "value": {"type": "int"}
+    }
+  },
+  "milliliters": "Milliliters",
+  "grams": "Grams",
+
+  "loading": "Loading…",
+  "preparing": "Preparing…",
+
+  "authSignInGoogle": "Sign in with Google",
+  "authSigningIn": "Signing in…",
+  "authSignInError": "Sign-in error: {error}",
+  "@authSignInError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "authGoogleIdTokenMissing": "Google did not return an ID token.",
+  "authSignOut": "Sign out",
+
+  "settingsTitle": "Settings",
+  "settingsLanguage": "Language",
+  "settingsLanguageSystem": "System default",
+  "settingsLanguageEnglish": "English",
+  "settingsLanguageRussian": "Russian",
+  "settingsLanguageGerman": "German",
+  "settingsLanguageFrench": "French",
+
+  "homeSearchHint": "Search plants…",
+  "homeNoUserData": "No user data",
+  "homeNoPlantsYet": "No plants added yet",
+  "homeNoPropagatingPlants": "No plants with active propagation",
+  "homeNoPlantsForFilter": "No plants match the selected filter",
+  "homeAllFamilies": "All families",
+  "homeAllGenera": "All genera",
+  "homeAllStages": "All stages",
+  "homeNoFamily": "No family",
+  "homePropagation": "Propagation",
+  "homeSort": "Sort",
+  "homeSortSpecies": "Species",
+  "homeSortNickname": "Nickname",
+  "homeSortWatering": "Watering",
+  "homeSortFertilizing": "Fertilizing",
+  "homeSortDate": "Date",
+  "homeSortFamily": "Family",
+  "homeSortLastWatered": "Last watered",
+  "homeSortLastFertilized": "Last fertilized",
+  "homeSortDateAdded": "Date added",
+  "homeSelectedCount": "Selected: {count}",
+  "@homeSelectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "homeSelectAll": "Select all",
+  "homeClearSelection": "Clear selection",
+  "homeWatering": "Watering",
+  "homeFertilizing": "Fertilizing",
+  "homeUpdateFamily": "Update family",
+  "homeUpdateFamilyTitle": "Update family",
+  "homeFamilyLabel": "Family",
+  "homeFertilizeSelectedTitle": "Fertilize selected plants",
+  "homeDeleteSelectedTitle": "Delete selected plants?",
+  "homeDeleteSelectedBody": "This will permanently delete {count} plant(s).",
+  "@homeDeleteSelectedBody": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "homeDeleteSelectedBodyPlural": "{count, plural, =1{This will permanently delete 1 plant.} other{This will permanently delete {count} plants.}}",
+  "@homeDeleteSelectedBodyPlural": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "searchNoPlantsInJournal": "No plants in the journal",
+  "searchNothingFound": "Nothing found",
+
+  "plantAdd": "Add plant",
+  "plantEdit": "Edit plant",
+  "plantSaveChanges": "Save changes",
+  "plantGenus": "Genus",
+  "plantSpecies": "Species",
+  "plantCultivar": "Cultivar",
+  "plantTradingName": "Trading name",
+  "plantFamily": "Family",
+  "plantNickname": "Nickname",
+  "plantWateringFrequency": "Watering frequency",
+  "plantGrowthStage": "Growth stage",
+  "plantGenusRequired": "Enter the plant genus",
+  "plantSpeciesRequired": "Enter the plant species",
+  "plantInvalidWateringFrequency": "Invalid watering frequency",
+  "plantUntitled": "Untitled",
+  "plantDefaultTitle": "Plant",
+  "plantGenusFallback": "Genus",
+  "plantSpeciesLabel": "Species: {species}",
+  "@plantSpeciesLabel": {
+    "placeholders": {
+      "species": {"type": "String"}
+    }
+  },
+  "plantCultivarLabel": "Cultivar: {cultivar}",
+  "@plantCultivarLabel": {
+    "placeholders": {
+      "cultivar": {"type": "String"}
+    }
+  },
+  "plantStageLabel": "Stage: {stage}",
+  "@plantStageLabel": {
+    "placeholders": {
+      "stage": {"type": "String"}
+    }
+  },
+  "plantFamilyLabel": "Family",
+  "plantTradingNameLabel": "Trading name",
+  "plantGenusPrefix": "Genus: ",
+  "plantVariegationLabel": "Variegation: {value}",
+  "@plantVariegationLabel": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "plantBotanicalData": "Botanical data",
+  "plantJournal": "Journal",
+  "plantGallery": "Gallery",
+  "plantCamera": "Camera",
+  "plantUploadError": "Upload error: {error}",
+  "@plantUploadError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "plantEmptyStage": "No plants of this stage in the collection yet",
+  "plantEmptyGenus": "No plants of this genus in the collection yet",
+  "plantNote": "Note",
+  "plantPropagation": "Propagation",
+
+  "stageUnknown": "🌱 Unknown",
+  "stageStart": "🌱 Start",
+  "stageBaby": "🌿 Baby",
+  "stageJuvenile": "🌳 Juvenile",
+  "stageAdult": "🌴 Adult",
+  "stageDescriptionTitle": "Stage description",
+  "stageStartCheck1": "Tuber without roots",
+  "stageStartCheck2": "Leaf with a small rhizome",
+  "stageStartCheck3": "Rootable cutting",
+  "stageStartCheck4": "Plant is just starting to grow",
+  "stageBabyCheck1": "1–2 true leaves",
+  "stageBabyCheck2": "Root system still forming",
+  "stageBabyCheck3": "Independent growth",
+  "stageJuvenileCheck1": "3–5 leaves",
+  "stageJuvenileCheck2": "Good root system",
+  "stageJuvenileCheck3": "Active growth",
+  "stageAdultCheck1": "Fully formed plant",
+  "stageAdultCheck2": "Regularly produces new leaves",
+  "stageAdultCheck3": "Can be divided or cuttings taken",
+
+  "variegationLabel": "Variegation",
+  "variegationNone": "None",
+  "variegationAurea": "Aurea",
+  "variegationAlba": "Alba",
+  "variegationPink": "Pink",
+  "variegationSplash": "Splash",
+  "variegationMint": "Mint",
+  "variegationMulticolor": "Multicolor",
+  "variegationTricolor": "Tricolor",
+  "variegationUnknown": "Unknown",
+
+  "watering": "Watering",
+  "wateringHistory": "Watering history",
+  "wateringAdd": "Add watering",
+  "wateringEdit": "Edit watering",
+  "wateringDeleteTitle": "Delete watering",
+  "wateringDeleteConfirm": "Delete this entry?",
+  "wateringEmpty": "No watering entries yet",
+
+  "fertilizing": "Fertilizing",
+  "fertilizingHistory": "Fertilizing history",
+  "fertilizingAdd": "Add fertilizing",
+  "fertilizingEdit": "Edit fertilizing",
+  "fertilizingDeleteTitle": "Delete fertilizing",
+  "fertilizingDeleteConfirm": "Delete this entry?",
+  "fertilizingEmpty": "No fertilizing entries yet",
+  "fertilizingSelectedTitle": "Fertilize selected plants",
+  "fertilizingApplicationMethod": "Application method",
+  "fertilizingRoot": "Root",
+  "fertilizingFoliar": "Foliar",
+  "fertilizingSaved": "Saved",
+  "fertilizingNewMix": "New mix",
+  "fertilizingCatalog": "Catalog",
+  "fertilizingEmptyCatalog": "No fertilizers yet. Add a ready-made one or save a mix.",
+  "fertilizingGoToNewMix": "Go to “New mix”",
+  "fertilizingSelectFertilizer": "Select a fertilizer",
+  "fertilizingViewComposition": "View composition",
+  "fertilizingMixWaterVolume": "Mix water volume: {value} ml",
+  "@fertilizingMixWaterVolume": {
+    "placeholders": {
+      "value": {"type": "int"}
+    }
+  },
+  "fertilizingIngredients": "Ingredients",
+  "fertilizingTapIngredientHint": "Tap an ingredient to set the amount (g or ml)",
+  "fertilizingSaveThisMix": "Save this mix",
+  "fertilizingMixName": "Mix name",
+  "fertilizingMixNameHint": "e.g. Growth formula",
+  "fertilizingWaterVolume": "Water volume",
+  "fertilizingAddIngredient": "Add ingredient",
+  "fertilizingIngredientNameHint": "Ingredient name",
+  "fertilizerFallbackName": "Fertilizer",
+  "fertilizerKindMix": "Mix",
+  "fertilizerKindPurchased": "Ready-made",
+  "fertilizerCustomMix": "Custom mix",
+  "fertilizerUnknown": "Unknown",
+  "fertilizerInvalidDose": "Invalid dose",
+  "fertilizerNameLabel": "Name",
+  "fertilizerNameHint": "e.g. Pokon Universal",
+  "fertilizerDoseLabelPurchased": "Dose",
+  "fertilizerDoseLabelMix": "Amount",
+  "fertilizerDoseHint": "e.g. 2",
+  "fertilizerMixComposition": "Mix composition: {components}",
+  "@fertilizerMixComposition": {
+    "placeholders": {
+      "components": {"type": "String"}
+    }
+  },
+  "fertilizerWithMeta": "{name} · {kind} · {waterMl} ml",
+  "@fertilizerWithMeta": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "kind": {"type": "String"},
+      "waterMl": {"type": "int"}
+    }
+  },
+  "fertilizerWaterLine": "Water: {value} ml",
+  "@fertilizerWaterLine": {
+    "placeholders": {
+      "value": {"type": "int"}
+    }
+  },
+  "manageFertilizersTitle": "Manage fertilizers",
+  "manageFertilizerIngredientsTitle": "Manage ingredients",
+  "manageComponentsTitle": "Manage components",
+  "componentNameHint": "Component name",
+  "emptyFertilizers": "No fertilizers yet",
+  "emptyIngredients": "No ingredients yet",
+  "emptyComponents": "No components yet",
+  "emptyComposition": "Composition is empty",
+
+  "repotting": "Repotting",
+  "repottingHistory": "Repotting history",
+  "repottingAdd": "Add repotting",
+  "repottingEdit": "Edit repotting",
+  "repottingDeleteTitle": "Delete repotting",
+  "repottingDeleteConfirm": "Delete this entry?",
+  "repottingEmpty": "No repotting entries yet",
+  "repottingSlowRelease": "Slow-release fertilizer",
+  "repottingSelectSoil": "Select soil",
+  "repottingSoilFallback": "Soil",
+  "repottingSoilComposition": "Soil composition",
+  "soilCustomMix": "Custom mix",
+  "soilParts": "{parts} parts",
+  "@soilParts": {
+    "placeholders": {
+      "parts": {"type": "String"}
+    }
+  },
+
+  "notesEmpty": "No notes yet",
+  "notesAdd": "Add note",
+  "notesAddHint": "Add a new journal entry for this plant.",
+  "notesEdit": "Edit note",
+  "notesLabel": "Journal entry",
+  "notesEditLabel": "Edit note",
+  "notesCannotBeEmpty": "Note cannot be empty",
+  "notesDeleteTitle": "Delete note",
+  "notesDeleteConfirm": "Delete this note?",
+  "notesOptional": "Note (optional)",
+  "fieldRequired": "This field is required",
+
+  "propagationTitle": "Propagation",
+  "propagationActiveTab": "Active",
+  "propagationArchiveTab": "Archive",
+  "propagationEmptyActive": "No active propagations",
+  "propagationEmptyArchive": "Archive is empty",
+  "propagationEmptyActiveHint": "Add a batch from a plant page",
+  "propagationEmptyArchiveHint": "Sold and lost batches are kept for 1 year",
+  "propagationAdd": "Add propagation",
+  "propagationChangeStage": "Change stage",
+  "propagationSell": "Sell",
+  "propagationLose": "Mark as lost",
+  "propagationDetails": "Propagation details",
+  "propagationQuantity": "Quantity",
+  "propagationQuantityMin": "Enter a quantity (minimum 1)",
+  "propagationAliveNow": "Alive now",
+  "propagationAliveRequired": "Enter the number alive",
+  "propagationSellQuantityRequired": "Enter a quantity to sell",
+  "propagationLoseQuantityRequired": "Enter a quantity",
+  "propagationQuantityExceedsAlive": "Cannot exceed alive count ({count})",
+  "@propagationQuantityExceedsAlive": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationDate": "Date: {date}",
+  "@propagationDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "propagationSinceDate": "since {date}",
+  "@propagationSinceDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "propagationSoldCount": "sold {count}",
+  "@propagationSoldCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationLostCount": "lost {count}",
+  "@propagationLostCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationSoldLabel": "Sold: {count} {unit}",
+  "@propagationSoldLabel": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "unit": {"type": "String"}
+    }
+  },
+  "propagationLostLabel": "Lost: {count} {unit}",
+  "@propagationLostLabel": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "unit": {"type": "String"}
+    }
+  },
+  "propagationStartedLabel": "Started: {batches} batches · {quantity} pcs",
+  "@propagationStartedLabel": {
+    "placeholders": {
+      "batches": {"type": "int"},
+      "quantity": {"type": "int"}
+    }
+  },
+  "propagationStatsTitle": "Stats {year}",
+  "@propagationStatsTitle": {
+    "placeholders": {
+      "year": {"type": "int"}
+    }
+  },
+  "propagationByMethods": "By methods: {methods}",
+  "@propagationByMethods": {
+    "placeholders": {
+      "methods": {"type": "String"}
+    }
+  },
+  "propagationByFamilies": "By families: {families}",
+  "@propagationByFamilies": {
+    "placeholders": {
+      "families": {"type": "String"}
+    }
+  },
+  "propagationQuantityPieces": "{count} pcs",
+  "@propagationQuantityPieces": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationDeleteTitle": "Delete propagation",
+  "propagationDeleteConfirm": "Delete this propagation batch?",
+  "propagationDeleteHistoryEntry": "Delete history entry?",
+  "propagationTimelineEmpty": "No stage history yet",
+  "daysCount": "{count, plural, =0{today} =1{1 day} other{{count} days}}",
+  "@daysCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationAliveWithMethod": "{count} {method}",
+  "@propagationAliveWithMethod": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "method": {"type": "String"}
+    }
+  },
+
+  "propagationMethodLeaf": "Leaf",
+  "propagationMethodLeafPlural": "leaves",
+  "propagationMethodLeafFragment": "Leaf fragment",
+  "propagationMethodLeafFragmentPlural": "leaf fragments",
+  "propagationMethodRhizome": "Rhizome",
+  "propagationMethodRhizomePlural": "rhizomes",
+  "propagationMethodTuber": "Tuber",
+  "propagationMethodTuberPlural": "tubers",
+  "propagationMethodDivision": "Division",
+  "propagationMethodDivisionPlural": "divisions",
+  "propagationMethodOffset": "Offset",
+  "propagationMethodOffsetPlural": "offsets",
+  "propagationMethodCutting": "Cutting",
+  "propagationMethodCuttingPlural": "cuttings",
+
+  "propagationStatusActive": "Active",
+  "propagationStatusSold": "Sold",
+  "propagationStatusLost": "Lost",
+
+  "propagationStartRooting": "Start rooting",
+  "propagationMethodField": "Method",
+  "propagationQuantityExceedsOriginal": "Cannot exceed original quantity ({count})",
+  "@propagationQuantityExceedsOriginal": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationAliveWithPlant": "{count} alive · {plantName}",
+  "@propagationAliveWithPlant": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "plantName": {"type": "String"}
+    }
+  },
+  "propagationSellQuantity": "Quantity to sell",
+  "propagationLoseQuantity": "Quantity lost",
+  "propagationWriteOff": "Write off",
+  "propagationTimeline": "Timeline",
+  "propagationSoldCountLabel": "Sold: {count}",
+  "@propagationSoldCountLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationLostCountLabel": "Lost: {count}",
+  "@propagationLostCountLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationOfTotal": "of {count}",
+  "@propagationOfTotal": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationDeleteStartStageBody": "Deleting the \"{stageName}\" stage will delete the entire propagation batch and all other stages.",
+  "@propagationDeleteStartStageBody": {
+    "placeholders": {
+      "stageName": {"type": "String"}
+    }
+  },
+  "propagationDeleteStageEntryBody": "Only this stage entry will be deleted. Others will remain.",
+
+  "deleteEntryConfirm": "Delete this entry?",
+  "promptEmptyNotAllowed": "Value cannot be empty",
+
+  "repottingEmptySoils": "No saved soils yet. Create a new mix.",
+  "repottingSoilTapHint": "Tap: +1 part · Long press: ½ part (again to remove)",
+  "repottingSlowReleaseSubtitle": "Added during repotting",
+  "repottingMixNameHint": "e.g. Aroid mix",
+  "fertilizerPurchasedAddTitle": "Ready-made fertilizer",
+  "fertilizerEditTitle": "Edit fertilizer",
+  "fertilizerDeleteTitle": "Delete fertilizer",
+  "ingredientEditTitle": "Edit ingredient",
+  "ingredientDeleteTitle": "Delete ingredient",
+  "componentEditTitle": "Edit component",
+  "componentDeleteTitle": "Delete component",
+  "componentAddTitle": "Add component",
+  "catalogItemDeleteConfirm": "Remove \"{name}\" from the catalog?",
+  "@catalogItemDeleteConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "manageFertilizersHint": "Mixes are saved from \"New mix\". Type can be changed: ready-made ↔ mix.",
+  "fertilizerWaterForDilution": "Water for dilution",
+  "fertilizerDoseOnWaterOptional": "Dose per {waterMl} ml (optional)",
+  "@fertilizerDoseOnWaterOptional": {
+    "placeholders": {
+      "waterMl": {"type": "int"}
+    }
+  },
+  "fertilizerDoseOptional": "Dose (optional)",
+  "fertilizerKindSection": "Type",
+  "soilComponentsTitle": "Soil components",
+  "noComponents": "No components",
+  "doseAmountRequired": "Enter an amount",
+  "doseInvalidNumber": "Invalid number",
+  "doseRemove": "Remove"
+}

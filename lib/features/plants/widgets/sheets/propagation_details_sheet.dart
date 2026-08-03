@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/propagation.dart';
@@ -16,13 +18,6 @@ class PropagationDetailsSheet extends StatelessWidget {
     super.key,
     required this.propagation,
   });
-
-  static String _daysLabel(int days) {
-    if (days == 0) return 'сегодня';
-    if (days == 1) return '1 день';
-    if (days >= 2 && days <= 4) return '$days дня';
-    return '$days дней';
-  }
 
   static StageInfo _stageInfo(int value) {
     return stageInfos.firstWhere(
@@ -66,6 +61,7 @@ class PropagationDetailsSheet extends StatelessWidget {
     Propagation current,
     PropagationStageEntry entry,
   ) async {
+    final l10n = AppLocalizations.of(context);
     final entryId = entry.id;
     if (entryId == null) return;
 
@@ -76,21 +72,23 @@ class PropagationDetailsSheet extends StatelessWidget {
         return AlertDialog(
           backgroundColor: AppColors.backgroundSecondary,
           title: Text(
-            isStart ? 'Удалить партию?' : 'Удалить стадию?',
+            isStart
+                ? l10n.propagationDeleteTitle
+                : l10n.propagationDeleteHistoryEntry,
           ),
           content: Text(
             isStart
-                ? 'Удаление стадии «Старт» удалит всю партию размножения и все остальные стадии.'
-                : 'Будет удалена только эта запись стадии. Остальные останутся.',
+                ? l10n.propagationDeleteStartStageBody(l10n.stageTitle(1))
+                : l10n.propagationDeleteStageEntryBody,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Отмена'),
+              child: Text(l10n.commonCancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Удалить'),
+              child: Text(l10n.commonDelete),
             ),
           ],
         );
@@ -113,6 +111,7 @@ class PropagationDetailsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final service = PropagationService();
 
     return Container(
@@ -137,6 +136,7 @@ class PropagationDetailsSheet extends StatelessWidget {
           final shown = current ?? propagation;
           final stage = _stageInfo(shown.stage);
           final isActive = shown.isActive;
+          final startedAtLabel = DateFormat('d MMM y').format(shown.startedAt);
 
           return Padding(
             padding: const EdgeInsets.fromLTRB(22, 22, 22, 24),
@@ -167,8 +167,8 @@ class PropagationDetailsSheet extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   isActive
-                      ? '${shown.quantityAlive} ${shown.method.pluralLabel} · ${shown.method.label}'
-                      : '${shown.method.label} · ${shown.status.label}',
+                      ? '${l10n.propagationAliveWithMethod(shown.quantityAlive, l10n.propagationMethodPlural(shown.method))} · ${l10n.propagationMethodLabel(shown.method)}'
+                      : '${l10n.propagationMethodLabel(shown.method)} · ${l10n.propagationStatusLabel(shown.status)}',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -179,8 +179,8 @@ class PropagationDetailsSheet extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   isActive
-                      ? '${stage.title} · ${_daysLabel(shown.daysSinceStart)} · с ${DateFormat('d MMM y').format(shown.startedAt)}'
-                      : '${stage.title} · с ${DateFormat('d MMM y').format(shown.startedAt)}',
+                      ? '${l10n.stageInfoTitle(stage)} · ${l10n.daysCount(shown.daysSinceStart)} · ${l10n.propagationSinceDate(startedAtLabel)}'
+                      : '${l10n.stageInfoTitle(stage)} · ${l10n.propagationSinceDate(startedAtLabel)}',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -193,10 +193,10 @@ class PropagationDetailsSheet extends StatelessWidget {
                   Text(
                     [
                       if (shown.soldQuantity > 0)
-                        'Продано: ${shown.soldQuantity}',
+                        l10n.propagationSoldCountLabel(shown.soldQuantity),
                       if (shown.lostQuantity > 0)
-                        'Погибло: ${shown.lostQuantity}',
-                      'из ${shown.quantity}',
+                        l10n.propagationLostCountLabel(shown.lostQuantity),
+                      l10n.propagationOfTotal(shown.quantity),
                     ].join(' · '),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -207,9 +207,9 @@ class PropagationDetailsSheet extends StatelessWidget {
                   ),
                 ],
                 const SizedBox(height: 24),
-                const Text(
-                  'Таймлайн',
-                  style: TextStyle(
+                Text(
+                  l10n.propagationTimeline,
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.heading,
@@ -230,9 +230,11 @@ class PropagationDetailsSheet extends StatelessWidget {
 
                       final history = historySnapshot.data!;
                       if (history.isEmpty) {
-                        return const Text(
-                          'Пока нет записей',
-                          style: TextStyle(color: AppColors.textSecondary),
+                        return Text(
+                          l10n.propagationTimelineEmpty,
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                          ),
                         );
                       }
 
@@ -256,7 +258,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        entryStage.title,
+                                        l10n.stageInfoTitle(entryStage),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
@@ -277,7 +279,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                                       ),
                                     ),
                                     IconButton(
-                                      tooltip: 'Удалить',
+                                      tooltip: l10n.commonDelete,
                                       visualDensity: VisualDensity.compact,
                                       onPressed: () => _confirmDeleteStage(
                                         context,
@@ -294,7 +296,9 @@ class PropagationDetailsSheet extends StatelessWidget {
                                 if (entry.quantityAlive != null) ...[
                                   const SizedBox(height: 4),
                                   Text(
-                                    '${entry.quantityAlive} шт.',
+                                    l10n.propagationQuantityPieces(
+                                      entry.quantityAlive!,
+                                    ),
                                     style: const TextStyle(
                                       color: AppColors.accentLight,
                                       fontSize: 13,
@@ -335,9 +339,9 @@ class PropagationDetailsSheet extends StatelessWidget {
                           borderRadius: BorderRadius.circular(18),
                         ),
                       ),
-                      child: const Text(
-                        'Сменить стадию',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.propagationChangeStage,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
@@ -358,7 +362,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                               borderRadius: BorderRadius.circular(18),
                             ),
                           ),
-                          child: const Text('Продать'),
+                          child: Text(l10n.propagationSell),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -373,7 +377,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                               borderRadius: BorderRadius.circular(18),
                             ),
                           ),
-                          child: const Text('Погибло'),
+                          child: Text(l10n.propagationStatusLost),
                         ),
                       ),
                     ],

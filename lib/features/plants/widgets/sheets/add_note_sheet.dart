@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -19,11 +20,12 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
   bool isLoading = false;
 
   Future<void> saveNote() async {
+    final l10n = AppLocalizations.of(context);
     final text = noteController.text.trim();
 
     if (text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Заметка не может быть пустой')),
+        SnackBar(content: Text(l10n.notesCannotBeEmpty)),
       );
       return;
     }
@@ -42,7 +44,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
       if (mounted) {
         setState(() => isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка: $e')),
+          SnackBar(content: Text(l10n.commonError(e.toString()))),
         );
       }
     }
@@ -56,6 +58,8 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.backgroundSecondary,
@@ -84,9 +88,9 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                 ),
               ),
               const SizedBox(height: 28),
-              const Text(
-                'Добавить заметку',
-                style: TextStyle(
+              Text(
+                l10n.notesAdd,
+                style: const TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
                   letterSpacing: -1,
@@ -94,9 +98,9 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                'Добавьте новую запись в журнал для этого растения.',
-                style: TextStyle(
+              Text(
+                l10n.notesAddHint,
+                style: const TextStyle(
                   fontSize: 15,
                   height: 1.5,
                   color: AppColors.textSecondary,
@@ -109,7 +113,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                 autofocus: true,
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
-                  labelText: 'Запись в журнале',
+                  labelText: l10n.notesLabel,
                   alignLabelWithHint: true,
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
@@ -161,9 +165,9 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                             color: AppColors.dark1,
                           ),
                         )
-                      : const Text(
-                          'Сохранить заметку',
-                          style: TextStyle(
+                      : Text(
+                          l10n.commonSave,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                           ),

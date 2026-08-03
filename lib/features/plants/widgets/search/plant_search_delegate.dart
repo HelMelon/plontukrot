@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/plant.dart';
@@ -8,14 +9,16 @@ import '../../pages/plant_details_page.dart';
 class PlantSearchDelegate extends SearchDelegate {
   final String userId;
   final Stream<List<Plant>> plantsStream;
+  final String _searchFieldLabel;
 
   PlantSearchDelegate({
     required this.userId,
     required this.plantsStream,
-  });
+    required String searchFieldLabel,
+  }) : _searchFieldLabel = searchFieldLabel;
 
   @override
-  String get searchFieldLabel => 'Поиск растений...';
+  String get searchFieldLabel => _searchFieldLabel;
 
   @override
   ThemeData appBarTheme(BuildContext context) {
@@ -85,12 +88,14 @@ class PlantSearchDelegate extends SearchDelegate {
   }
 
   @override
-  Widget buildResults(BuildContext context) => _buildSearchWithStream();
+  Widget buildResults(BuildContext context) => _buildSearchWithStream(context);
 
   @override
-  Widget buildSuggestions(BuildContext context) => _buildSearchWithStream();
+  Widget buildSuggestions(BuildContext context) =>
+      _buildSearchWithStream(context);
 
-  Widget _buildSearchWithStream() {
+  Widget _buildSearchWithStream(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final cleanQuery = query.trim().toLowerCase();
 
     return StreamBuilder<List<Plant>>(
@@ -105,11 +110,11 @@ class PlantSearchDelegate extends SearchDelegate {
         }
 
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const ContainerWithBackground(
+          return ContainerWithBackground(
             child: Center(
               child: Text(
-                'В журнале нет растений',
-                style: TextStyle(color: AppColors.textPrimary),
+                l10n.searchNoPlantsInJournal,
+                style: const TextStyle(color: AppColors.textPrimary),
               ),
             ),
           );
@@ -130,11 +135,11 @@ class PlantSearchDelegate extends SearchDelegate {
         }).toList();
 
         if (filtered.isEmpty) {
-          return const ContainerWithBackground(
+          return ContainerWithBackground(
             child: Center(
               child: Text(
-                'Ничего не найдено',
-                style: TextStyle(color: AppColors.textPrimary),
+                l10n.searchNothingFound,
+                style: const TextStyle(color: AppColors.textPrimary),
               ),
             ),
           );
@@ -172,7 +177,8 @@ class PlantSearchDelegate extends SearchDelegate {
                 titleText = nickname;
                 subtitleText = species.isNotEmpty ? '($species)' : null;
               } else {
-                titleText = species.isNotEmpty ? species : 'Без названия';
+                titleText =
+                    species.isNotEmpty ? species : l10n.commonUntitled;
                 subtitleText = null;
               }
               return Padding(

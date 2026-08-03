@@ -3,6 +3,8 @@ import 'dart:async';
 import './../../../services/firestore_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/prompt_text_dialog.dart';
@@ -20,6 +22,7 @@ import '../../plants/pages/plant_stage_details_page.dart';
 import '../../plants/widgets/cards/plant_card.dart';
 import '../../plants/widgets/search/plant_search_delegate.dart';
 import '../../propagations/pages/propagations_page.dart';
+import '../../settings/pages/settings_page.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
 enum _PlantSortField {
@@ -113,13 +116,23 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  String get _sortLabel => switch (_sortField) {
-        _PlantSortField.species => 'Вид',
-        _PlantSortField.nickname => 'Прозвище',
-        _PlantSortField.lastWateredAt => 'Полив',
-        _PlantSortField.lastFertilizedAt => 'Подкормка',
-        _PlantSortField.createdAt => 'Дата',
-        _PlantSortField.plantFamily => 'Семейство',
+  String _sortLabel(AppLocalizations l10n) => switch (_sortField) {
+        _PlantSortField.species => l10n.homeSortSpecies,
+        _PlantSortField.nickname => l10n.homeSortNickname,
+        _PlantSortField.lastWateredAt => l10n.homeSortWatering,
+        _PlantSortField.lastFertilizedAt => l10n.homeSortFertilizing,
+        _PlantSortField.createdAt => l10n.homeSortDate,
+        _PlantSortField.plantFamily => l10n.homeSortFamily,
+      };
+
+  String _sortMenuLabel(_PlantSortField field, AppLocalizations l10n) =>
+      switch (field) {
+        _PlantSortField.species => l10n.homeSortSpecies,
+        _PlantSortField.nickname => l10n.homeSortNickname,
+        _PlantSortField.lastWateredAt => l10n.homeSortLastWatered,
+        _PlantSortField.lastFertilizedAt => l10n.homeSortLastFertilized,
+        _PlantSortField.createdAt => l10n.homeSortDateAdded,
+        _PlantSortField.plantFamily => l10n.homeSortFamily,
       };
 
   List<Plant> _sortPlants(Iterable<Plant> plants) {
@@ -201,14 +214,14 @@ class _HomePageState extends State<HomePage> {
 
     for (final plant in plants) {
       final family = (plant.plantFamily ?? '').trim();
-      final key = family.isEmpty ? 'Без семейства' : family;
+      final key = family.isEmpty ? '' : family;
       groups.putIfAbsent(key, () => []).add(plant);
     }
 
     final entries = groups.entries.toList()
       ..sort((a, b) {
-        if (a.key == 'Без семейства') return 1;
-        if (b.key == 'Без семейства') return -1;
+        if (a.key.isEmpty) return 1;
+        if (b.key.isEmpty) return -1;
         final comparison = a.key.toLowerCase().compareTo(b.key.toLowerCase());
         return _sortAscending ? comparison : -comparison;
       });
@@ -219,14 +232,15 @@ class _HomePageState extends State<HomePage> {
   Map<String, List<Plant>> _groupPlantsByCareDate(
     Iterable<Plant> plants, {
     required DateTime? Function(Plant plant) dateOf,
+    required String noDateLabel,
   }) {
     final groups = <String, List<Plant>>{};
-    final formatter = DateFormat("d MMMM y 'года'", 'ru');
+    final formatter = DateFormat.yMMMMd();
 
     for (final plant in plants) {
       final date = dateOf(plant);
       final key = date == null
-          ? 'Без даты'
+          ? noDateLabel
           : formatter.format(DateTime(date.year, date.month, date.day));
       groups.putIfAbsent(key, () => []).add(plant);
     }
@@ -244,8 +258,9 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildGroupedPlants(
     Map<String, List<Plant>> groups,
-    int crossAxisCount,
-  ) {
+    int crossAxisCount, {
+    required String Function(String key) titleForKey,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: groups.entries.map((entry) {
@@ -267,7 +282,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Expanded(
                         child: Text(
-                          entry.key,
+                          titleForKey(entry.key),
                           style: const TextStyle(
                             color: AppColors.heading,
                             fontSize: 22,
@@ -308,8 +323,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildPlantGrid(List<Plant> plants, int crossAxisCount) {
     final preferSpeciesAsTitle = _sortField == _PlantSortField.species ||
         _sortField == _PlantSortField.plantFamily;
-    final showLastFertilizer =
-        _sortField == _PlantSortField.lastFertilizedAt;
+    final showLastFertilizer = _sortField == _PlantSortField.lastFertilizedAt;
     final childAspectRatio = showLastFertilizer ? 0.48 : 0.55;
 
     return GridView.builder(
@@ -442,7 +456,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildBotanicalFilters(List<Plant> plants) {
+  Widget _buildBotanicalFilters(List<Plant> plants, AppLocalizations l10n) {
     final families = _uniquePlantFamilies(plants);
     final genusOptions = _filterPlantFamily == null
         ? const <String>[]
@@ -458,7 +472,7 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               children: [
                 _buildFilterChip(
-                  label: 'Все семейства',
+                  label: l10n.homeAllFamilies,
                   selected: _filterPlantFamily == null,
                   onSelected: (_) {
                     setState(() {
@@ -494,7 +508,7 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               children: [
                 _buildFilterChip(
-                  label: 'Все роды',
+                  label: l10n.homeAllGenera,
                   selected: _filterGenus == null,
                   onSelected: (_) {
                     setState(() => _filterGenus = null);
@@ -529,7 +543,7 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               children: [
                 _buildFilterChip(
-                  label: 'Все стадии',
+                  label: l10n.homeAllStages,
                   selected: _filterStage == null,
                   onSelected: (_) {
                     setState(() => _filterStage = null);
@@ -537,7 +551,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 ...stageOptions.map(
                   (stage) => _buildFilterChip(
-                    label: stage.title,
+                    label: l10n.stageInfoTitle(stage),
                     selected: _filterStage == stage.value,
                     onSelected: (selected) {
                       if (_filterStage == stage.value) {
@@ -560,11 +574,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _updateFamily() async {
+    final l10n = AppLocalizations.of(context);
     final family = await showPromptTextDialog(
       context: context,
-      title: 'Изменить семейство',
-      labelText: 'Семейство',
-      confirmLabel: 'Сохранить',
+      title: l10n.homeUpdateFamilyTitle,
+      labelText: l10n.homeFamilyLabel,
       allowEmpty: true,
     );
 
@@ -606,6 +620,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _showFertilizingSheet() async {
+    final l10n = AppLocalizations.of(context);
     final selectedPlants = _latestPlants
         .where((plant) => _selectedPlantIds.contains(plant.id))
         .toList();
@@ -615,28 +630,28 @@ class _HomePageState extends State<HomePage> {
       builder: (_) => AddFertilizingSheet(
         plantIds: _selectedPlantIds.toList(),
         plants: selectedPlants,
-        title: 'Подкормить выбранные растения',
+        title: l10n.homeFertilizeSelectedTitle,
       ),
     );
     if (applied == true && mounted) _exitSelectionMode();
   }
 
   Future<void> _deletePlants() async {
+    final l10n = AppLocalizations.of(context);
+    final count = _selectedPlantIds.length;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Удалить выбранные растения?'),
-        content: Text(
-          'Это навсегда удалит ${_selectedPlantIds.length} растение(й).',
-        ),
+        title: Text(l10n.homeDeleteSelectedTitle),
+        content: Text(l10n.homeDeleteSelectedBodyPlural(count)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Отмена'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Удалить'),
+            child: Text(l10n.commonDelete),
           ),
         ],
       ),
@@ -647,7 +662,10 @@ class _HomePageState extends State<HomePage> {
     if (mounted) _exitSelectionMode();
   }
 
-  AppBar _buildSelectionAppBar() {
+  AppBar _buildSelectionAppBar(AppLocalizations l10n) {
+    final allVisibleSelected = _visiblePlantIds.isNotEmpty &&
+        _visiblePlantIds.every(_selectedPlantIds.contains);
+
     return AppBar(
       backgroundColor: AppColors.background,
       leading: IconButton(
@@ -655,36 +673,31 @@ class _HomePageState extends State<HomePage> {
         icon: const Icon(Icons.close),
       ),
       title: Text(
-        'Выбрано: ${_selectedPlantIds.length}',
+        l10n.homeSelectedCount(_selectedPlantIds.length),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
       actions: [
         IconButton(
-          tooltip: _visiblePlantIds.isNotEmpty &&
-                  _visiblePlantIds.every(_selectedPlantIds.contains)
-              ? 'Снять выделение'
-              : 'Выбрать все',
+          tooltip:
+              allVisibleSelected ? l10n.homeClearSelection : l10n.homeSelectAll,
           onPressed: _selectAll,
           icon: Icon(
-            _visiblePlantIds.isNotEmpty &&
-                    _visiblePlantIds.every(_selectedPlantIds.contains)
-                ? Icons.deselect
-                : Icons.select_all,
+            allVisibleSelected ? Icons.deselect : Icons.select_all,
           ),
         ),
         IconButton(
-          tooltip: 'Полив',
+          tooltip: l10n.homeWatering,
           onPressed: _addWatering,
           icon: const Icon(Icons.water_drop_outlined),
         ),
         IconButton(
-          tooltip: 'Подкормка',
+          tooltip: l10n.homeFertilizing,
           onPressed: _showFertilizingSheet,
           icon: const Icon(Icons.science_outlined),
         ),
         PopupMenuButton<_SelectionMenuAction>(
-          tooltip: 'Ещё',
+          tooltip: l10n.commonMore,
           onSelected: (action) {
             switch (action) {
               case _SelectionMenuAction.updateFamily:
@@ -693,14 +706,14 @@ class _HomePageState extends State<HomePage> {
                 _deletePlants();
             }
           },
-          itemBuilder: (context) => const [
+          itemBuilder: (context) => [
             PopupMenuItem(
               value: _SelectionMenuAction.updateFamily,
-              child: Text('Изменить семейство'),
+              child: Text(l10n.homeUpdateFamily),
             ),
             PopupMenuItem(
               value: _SelectionMenuAction.delete,
-              child: Text('Удалить'),
+              child: Text(l10n.commonDelete),
             ),
           ],
         ),
@@ -715,11 +728,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final authService = AuthService();
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: _isSelectionMode
-          ? _buildSelectionAppBar()
+          ? _buildSelectionAppBar(l10n)
           : AppBar(
               backgroundColor: AppColors.background,
               surfaceTintColor: Colors.transparent,
@@ -739,7 +753,7 @@ class _HomePageState extends State<HomePage> {
               ),
               actions: [
                 IconButton(
-                  tooltip: 'Размножение',
+                  tooltip: l10n.homePropagation,
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -749,6 +763,20 @@ class _HomePageState extends State<HomePage> {
                   },
                   icon: const Icon(
                     Icons.spa_outlined,
+                    color: AppColors.accentLight,
+                  ),
+                ),
+                IconButton(
+                  tooltip: l10n.settingsTitle,
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const SettingsPage(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.settings,
                     color: AppColors.accentLight,
                   ),
                 ),
@@ -777,6 +805,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(width: 8),
                       IconButton(
+                        tooltip: l10n.authSignOut,
                         onPressed: () async {
                           await authService.signOut();
                         },
@@ -802,13 +831,14 @@ class _HomePageState extends State<HomePage> {
                         delegate: PlantSearchDelegate(
                           userId: widget.user.uid,
                           plantsStream: _plantsStream,
+                          searchFieldLabel: l10n.homeSearchHint,
                         ),
                       );
                     },
                     child: AbsorbPointer(
                       child: TextField(
                         decoration: InputDecoration(
-                          hintText: 'Поиск растений...',
+                          hintText: l10n.homeSearchHint,
                           hintStyle:
                               const TextStyle(color: AppColors.textSecondary),
                           prefixIcon: const Icon(
@@ -833,7 +863,6 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: _isSelectionMode
           ? null
           : FloatingActionButton(
-              backgroundColor: AppColors.goldAccent,
               foregroundColor: AppColors.dark1,
               onPressed: () {
                 showModalBottomSheet(
@@ -858,10 +887,10 @@ class _HomePageState extends State<HomePage> {
           }
 
           if (!snapshot.hasData || snapshot.data != true) {
-            return const Center(
+            return Center(
               child: Text(
-                'Нет данных пользователя',
-                style: TextStyle(color: AppColors.textPrimary),
+                l10n.homeNoUserData,
+                style: const TextStyle(color: AppColors.textPrimary),
               ),
             );
           }
@@ -895,17 +924,17 @@ class _HomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(28),
                           border: Border.all(color: AppColors.greenDeep),
                         ),
-                        child: const Column(
+                        child: Column(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.eco_rounded,
                               size: 48,
                               color: AppColors.accentLight,
                             ),
-                            SizedBox(height: 12),
+                            const SizedBox(height: 12),
                             Text(
-                              'Растения ещё не добавлены',
-                              style: TextStyle(
+                              l10n.homeNoPlantsYet,
+                              style: const TextStyle(
                                 color: AppColors.textSecondary,
                                 fontSize: 16,
                               ),
@@ -960,6 +989,9 @@ class _HomePageState extends State<HomePage> {
                               crossAxisCount = 4;
                             }
 
+                            String groupTitle(String key) =>
+                                key.isEmpty ? l10n.homeNoFamily : key;
+
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -976,8 +1008,8 @@ class _HomePageState extends State<HomePage> {
                                             materialTapTargetSize:
                                                 MaterialTapTargetSize
                                                     .shrinkWrap,
-                                            label: const Text(
-                                              'Размножение',
+                                            label: Text(
+                                              l10n.homePropagation,
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                             avatar: Icon(
@@ -1017,7 +1049,7 @@ class _HomePageState extends State<HomePage> {
                                           alignment: Alignment.centerRight,
                                           child:
                                               PopupMenuButton<_PlantSortField>(
-                                            tooltip: 'Сортировка',
+                                            tooltip: l10n.homeSort,
                                             onSelected: _setSortField,
                                             itemBuilder: (context) =>
                                                 _PlantSortField.values
@@ -1042,26 +1074,10 @@ class _HomePageState extends State<HomePage> {
                                                             const SizedBox(
                                                                 width: 8),
                                                             Text(
-                                                              switch (field) {
-                                                                _PlantSortField
-                                                                      .species =>
-                                                                  'Вид',
-                                                                _PlantSortField
-                                                                      .nickname =>
-                                                                  'Прозвище',
-                                                                _PlantSortField
-                                                                      .lastWateredAt =>
-                                                                  'Последний полив',
-                                                                _PlantSortField
-                                                                      .lastFertilizedAt =>
-                                                                  'Последняя подкормка',
-                                                                _PlantSortField
-                                                                      .createdAt =>
-                                                                  'Дата добавления',
-                                                                _PlantSortField
-                                                                      .plantFamily =>
-                                                                  'Семейство',
-                                                              },
+                                                              _sortMenuLabel(
+                                                                field,
+                                                                l10n,
+                                                              ),
                                                             ),
                                                           ],
                                                         ),
@@ -1081,7 +1097,7 @@ class _HomePageState extends State<HomePage> {
                                                 size: 16,
                                               ),
                                               label: Text(
-                                                _sortLabel,
+                                                _sortLabel(l10n),
                                                 overflow: TextOverflow.ellipsis,
                                                 style: const TextStyle(
                                                   fontSize: 13,
@@ -1095,7 +1111,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 if (!_isSelectionMode) ...[
                                   const SizedBox(height: 8),
-                                  _buildBotanicalFilters(plants),
+                                  _buildBotanicalFilters(plants, l10n),
                                   const SizedBox(height: 8),
                                 ],
                                 if (_filterPropagatingOnly &&
@@ -1110,10 +1126,10 @@ class _HomePageState extends State<HomePage> {
                                         color: AppColors.greenDeep,
                                       ),
                                     ),
-                                    child: const Text(
-                                      'Нет растений с активным размножением',
+                                    child: Text(
+                                      l10n.homeNoPropagatingPlants,
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: AppColors.textSecondary,
                                       ),
                                     ),
@@ -1132,10 +1148,10 @@ class _HomePageState extends State<HomePage> {
                                         color: AppColors.greenDeep,
                                       ),
                                     ),
-                                    child: const Text(
-                                      'Нет растений по выбранному фильтру',
+                                    child: Text(
+                                      l10n.homeNoPlantsForFilter,
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: AppColors.textSecondary,
                                       ),
                                     ),
@@ -1144,12 +1160,14 @@ class _HomePageState extends State<HomePage> {
                                   _buildGroupedPlants(
                                     _groupPlantsByLetter(sortedPlants),
                                     crossAxisCount,
+                                    titleForKey: (key) => key,
                                   )
                                 else if (_sortField ==
                                     _PlantSortField.plantFamily)
                                   _buildGroupedPlants(
                                     _groupPlantsByFamily(sortedPlants),
                                     crossAxisCount,
+                                    titleForKey: groupTitle,
                                   )
                                 else if (_sortField ==
                                     _PlantSortField.lastWateredAt)
@@ -1157,8 +1175,10 @@ class _HomePageState extends State<HomePage> {
                                     _groupPlantsByCareDate(
                                       sortedPlants,
                                       dateOf: (plant) => plant.lastWateredAt,
+                                      noDateLabel: l10n.commonNoDate,
                                     ),
                                     crossAxisCount,
+                                    titleForKey: (key) => key,
                                   )
                                 else if (_sortField ==
                                     _PlantSortField.lastFertilizedAt)
@@ -1166,8 +1186,10 @@ class _HomePageState extends State<HomePage> {
                                     _groupPlantsByCareDate(
                                       sortedPlants,
                                       dateOf: (plant) => plant.lastFertilizedAt,
+                                      noDateLabel: l10n.commonNoDate,
                                     ),
                                     crossAxisCount,
+                                    titleForKey: (key) => key,
                                   )
                                 else
                                   _buildPlantGrid(

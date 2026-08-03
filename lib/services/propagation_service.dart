@@ -297,9 +297,7 @@ class PropagationService {
       'stage': stage,
       'changedAt': Timestamp.fromDate(soldAt),
       'quantityAlive': newAlive,
-      'note': note?.trim().isNotEmpty == true
-          ? note!.trim()
-          : 'Продано: $sellCount шт.',
+      if (note?.trim().isNotEmpty == true) 'note': note!.trim(),
     });
 
     await batch.commit();
@@ -346,9 +344,7 @@ class PropagationService {
       'stage': stage,
       'changedAt': Timestamp.fromDate(lostAt),
       'quantityAlive': newAlive,
-      'note': note?.trim().isNotEmpty == true
-          ? note!.trim()
-          : 'Погибло: $loseCount шт.',
+      if (note?.trim().isNotEmpty == true) 'note': note!.trim(),
     });
 
     await batch.commit();

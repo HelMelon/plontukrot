@@ -115,12 +115,11 @@ class FertilizeService {
     return _db.collection('users').doc(uid).collection('plants').doc(plantId);
   }
 
-  /// Display name from entry fields only — no catalog reads.
-  static String resolveFertilizerDisplayName(Map<String, dynamic> data) {
+  /// Returns stored UGC fertilizer name only. Never invents presentation fallbacks.
+  static String? resolveStoredFertilizerName(Map<String, dynamic> data) {
     final stored = (data['fertilizerName'] as String?)?.trim();
     if (stored != null && stored.isNotEmpty) return stored;
-    if (data['fertilizerId'] != null) return 'Неизвестно';
-    return 'Свой микс';
+    return null;
   }
 
   Future<void> _syncLastFertilizedAt(String plantId) async {
@@ -139,9 +138,13 @@ class FertilizeService {
     }
 
     final data = snapshot.docs.first.data();
+    final storedName = resolveStoredFertilizerName(data);
     await _plantRef(plantId).update({
       'lastFertilizedAt': data['appliedAt'],
-      'lastFertilizerName': resolveFertilizerDisplayName(data),
+      if (storedName != null)
+        'lastFertilizerName': storedName
+      else
+        'lastFertilizerName': FieldValue.delete(),
       'careHistoryMigrated': true,
     });
   }
@@ -172,10 +175,6 @@ class FertilizeService {
     final trimmedName = fertilizerName?.trim();
     final storedName =
         (trimmedName != null && trimmedName.isNotEmpty) ? trimmedName : null;
-    final displayName = resolveFertilizerDisplayName({
-      if (fertilizerId != null) 'fertilizerId': fertilizerId,
-      if (storedName != null) 'fertilizerName': storedName,
-    });
 
     final batch = _db.batch();
     batch.set(_fertilizingRef(plantId).doc(), {
@@ -193,7 +192,10 @@ class FertilizeService {
     if (lastFertilized == null || appliedAt.isAfter(lastFertilized)) {
       batch.update(plantRef, {
         'lastFertilizedAt': Timestamp.fromDate(appliedAt),
-        'lastFertilizerName': displayName,
+        if (storedName != null)
+          'lastFertilizerName': storedName
+        else
+          'lastFertilizerName': FieldValue.delete(),
         'careHistoryMigrated': true,
       });
     }
@@ -228,10 +230,6 @@ class FertilizeService {
     final trimmedName = fertilizerName?.trim();
     final storedName =
         (trimmedName != null && trimmedName.isNotEmpty) ? trimmedName : null;
-    final displayName = resolveFertilizerDisplayName({
-      if (fertilizerId != null) 'fertilizerId': fertilizerId,
-      if (storedName != null) 'fertilizerName': storedName,
-    });
 
     for (var i = 0; i < ids.length; i += chunkSize) {
       final chunk = ids.skip(i).take(chunkSize);
@@ -255,7 +253,10 @@ class FertilizeService {
         if (lastFertilized == null || appliedAt.isAfter(lastFertilized)) {
           batch.update(_plantRef(plantId), {
             'lastFertilizedAt': Timestamp.fromDate(appliedAt),
-            'lastFertilizerName': displayName,
+            if (storedName != null)
+              'lastFertilizerName': storedName
+            else
+              'lastFertilizerName': FieldValue.delete(),
             'careHistoryMigrated': true,
           });
         }
@@ -286,9 +287,13 @@ class FertilizeService {
     String? fertilizerName,
     DateTime? nextFertilizing,
   }) async {
+    final trimmedName = fertilizerName?.trim();
+    final storedName =
+        (trimmedName != null && trimmedName.isNotEmpty) ? trimmedName : null;
+
     await _fertilizingRef(plantId).doc(fertilizingId).update({
       'fertilizerId': fertilizerId ?? FieldValue.delete(),
-      'fertilizerName': fertilizerName ?? FieldValue.delete(),
+      'fertilizerName': storedName ?? FieldValue.delete(),
       'waterMl': normalizeWaterMl(waterMl),
       'components': components.map((e) => e.toMap()).toList(),
       'appliedAt': Timestamp.fromDate(appliedAt),
@@ -314,7 +319,7 @@ class FertilizeService {
         return FertilizingEntry.fromFirestoreData(
           id: doc.id,
           data: data,
-          fertilizerName: resolveFertilizerDisplayName(data),
+          fertilizerName: resolveStoredFertilizerName(data) ?? '',
         );
       }).toList();
     });
@@ -333,7 +338,7 @@ class FertilizeService {
       return FertilizingEntry.fromFirestoreData(
         id: doc.id,
         data: data,
-        fertilizerName: resolveFertilizerDisplayName(data),
+        fertilizerName: resolveStoredFertilizerName(data) ?? '',
       );
     });
   }

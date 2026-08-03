@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -62,10 +64,11 @@ class _ChangePropagationStageSheetState
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
     final quantityAlive = int.tryParse(_quantityController.text.trim());
     if (quantityAlive == null || quantityAlive < 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Укажите количество живых')),
+        SnackBar(content: Text(l10n.propagationAliveRequired)),
       );
       return;
     }
@@ -73,7 +76,9 @@ class _ChangePropagationStageSheetState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Не больше исходных ${widget.propagation.quantity} шт.',
+            l10n.propagationQuantityExceedsOriginal(
+              widget.propagation.quantity,
+            ),
           ),
         ),
       );
@@ -95,7 +100,7 @@ class _ChangePropagationStageSheetState
       if (mounted) {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка: $e')),
+          SnackBar(content: Text(l10n.commonError('$e'))),
         );
       }
     }
@@ -103,6 +108,7 @@ class _ChangePropagationStageSheetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final media = MediaQuery.of(context);
     final keyboard = media.viewInsets.bottom;
     final maxHeight =
@@ -134,11 +140,11 @@ class _ChangePropagationStageSheetState
                     ),
                   ),
                   const SizedBox(height: 28),
-                  const Text(
-                    'Сменить стадию',
+                  Text(
+                    l10n.propagationChangeStage,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -1,
@@ -147,7 +153,7 @@ class _ChangePropagationStageSheetState
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${widget.propagation.quantityAlive} ${widget.propagation.method.pluralLabel} · ${widget.propagation.parentPlantName}',
+                    '${l10n.propagationAliveWithMethod(widget.propagation.quantityAlive, l10n.propagationMethodPlural(widget.propagation.method))} · ${widget.propagation.parentPlantName}',
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -169,7 +175,7 @@ class _ChangePropagationStageSheetState
                             : AppColors.textSecondary,
                       ),
                       title: Text(
-                        stage.title,
+                        l10n.stageInfoTitle(stage),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -188,7 +194,7 @@ class _ChangePropagationStageSheetState
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     style: const TextStyle(color: AppColors.textPrimary),
                     decoration: InputDecoration(
-                      labelText: 'Живых сейчас',
+                      labelText: l10n.propagationAliveNow,
                       labelStyle:
                           const TextStyle(color: AppColors.textSecondary),
                       filled: true,
@@ -236,7 +242,9 @@ class _ChangePropagationStageSheetState
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Дата: ${DateFormat('d MMM y').format(_changedAt)}',
+                              l10n.propagationDate(
+                                DateFormat('d MMM y').format(_changedAt),
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -255,7 +263,7 @@ class _ChangePropagationStageSheetState
                     maxLines: 2,
                     style: const TextStyle(color: AppColors.textPrimary),
                     decoration: InputDecoration(
-                      labelText: 'Заметка (необязательно)',
+                      labelText: l10n.notesOptional,
                       labelStyle:
                           const TextStyle(color: AppColors.textSecondary),
                       filled: true,
@@ -301,9 +309,9 @@ class _ChangePropagationStageSheetState
                                 color: AppColors.dark1,
                               ),
                             )
-                          : const Text(
-                              'Сохранить',
-                              style: TextStyle(
+                          : Text(
+                              l10n.commonSave,
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),

@@ -9,11 +9,6 @@ enum FertilizerKind {
 
   String get code => name;
 
-  String get label => switch (this) {
-        FertilizerKind.mix => 'Микс',
-        FertilizerKind.purchased => 'Готовое',
-      };
-
   static FertilizerKind fromCode(String? code) {
     return FertilizerKind.values.firstWhere(
       (kind) => kind.name == code,

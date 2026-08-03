@@ -8,17 +8,19 @@ class AppTheme {
   static ThemeData darkTheme = ThemeData(
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.goldAccent,
         minimumSize: const Size(64, buttonHeight),
         maximumSize: const Size(double.infinity, buttonHeight),
         padding: const EdgeInsets.symmetric(horizontal: 16),
         textStyle: const TextStyle(
-          fontSize: 16,
+          fontSize: 14,
           fontWeight: FontWeight.w700,
         ),
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
+        backgroundColor: AppColors.goldAccent,
         minimumSize: const Size(64, buttonHeight),
         maximumSize: const Size(double.infinity, buttonHeight),
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -30,12 +32,16 @@ class AppTheme {
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
+        backgroundColor: AppColors.goldAccent,
         minimumSize: const Size(64, buttonHeight),
         maximumSize: const Size(double.infinity, buttonHeight),
         padding: const EdgeInsets.symmetric(horizontal: 16),
+        textStyle: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     ),
-
     brightness: Brightness.dark,
     scaffoldBackgroundColor: AppColors.background,
     colorScheme: const ColorScheme.dark(

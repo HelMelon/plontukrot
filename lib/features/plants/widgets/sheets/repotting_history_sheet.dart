@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -63,20 +65,21 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
   }
 
   Future<void> _confirmDelete(String repottingId) async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Удалить пересадку'),
-          content: const Text('Удалить эту запись?'),
+          title: Text(l10n.repottingDeleteTitle),
+          content: Text(l10n.repottingDeleteConfirm),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Отмена'),
+              child: Text(l10n.commonCancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Удалить'),
+              child: Text(l10n.commonDelete),
             ),
           ],
         );
@@ -93,6 +96,7 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final sheetHeight = MediaQuery.of(context).size.height * 0.7;
 
     return Material(
@@ -118,12 +122,12 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'История пересадок',
+                        l10n.repottingHistory,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: AppColors.heading,
@@ -136,8 +140,8 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                       child: FilledButton.icon(
                         onPressed: _showAddSheet,
                         icon: const Icon(Icons.add, size: 18),
-                        label: const Text(
-                          'Добавить',
+                        label: Text(
+                          l10n.commonAdd,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -161,10 +165,12 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                       final items = snapshot.data!;
 
                       if (items.isEmpty) {
-                        return const Center(
+                        return Center(
                           child: Text(
-                            'Пока нет записей о пересадке',
-                            style: TextStyle(color: AppColors.textSecondary),
+                            l10n.repottingEmpty,
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                         );
                       }
@@ -178,9 +184,9 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                           if (index == items.length) {
                             return TextButton(
                               onPressed: _loadMore,
-                              child: const Text(
-                                'Показать ещё',
-                                style: TextStyle(
+                              child: Text(
+                                l10n.commonShowMore,
+                                style: const TextStyle(
                                   color: AppColors.goldAccent,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -190,9 +196,7 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
 
                           final item = items[index];
                           final repottingId = item.id!;
-                          final title = (item.soilName?.isNotEmpty == true)
-                              ? item.soilName!
-                              : 'Свой микс';
+                          final title = l10n.soilDisplayName(item.soilName);
 
                           return InkWell(
                             borderRadius: BorderRadius.circular(16),
@@ -233,7 +237,7 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          DateFormat('d MMMM y')
+                                          DateFormat.yMMMMd()
                                               .format(item.repottedAt),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -243,11 +247,11 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                                         ),
                                         if (item.slowReleaseFertilizer) ...[
                                           const SizedBox(height: 4),
-                                          const Text(
-                                            'Пролонгированное удобрение',
+                                          Text(
+                                            l10n.repottingSlowRelease,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               fontSize: 13,
                                               color: AppColors.accentLight,
                                             ),
@@ -257,13 +261,13 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                                     ),
                                   ),
                                   IconButton(
-                                    tooltip: 'Изменить',
+                                    tooltip: l10n.commonEdit,
                                     visualDensity: VisualDensity.compact,
                                     icon: const Icon(Icons.edit_outlined),
                                     onPressed: () => _showEditSheet(item),
                                   ),
                                   IconButton(
-                                    tooltip: 'Удалить',
+                                    tooltip: l10n.commonDelete,
                                     visualDensity: VisualDensity.compact,
                                     icon: const Icon(Icons.delete_outline),
                                     onPressed: () =>

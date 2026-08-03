@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/component.dart';
@@ -12,6 +13,7 @@ Future<void> showSoilCompositionDialog({
   return showDialog<void>(
     context: context,
     builder: (context) {
+      final l10n = AppLocalizations.of(context);
       final media = MediaQuery.of(context);
       final maxHeight = (media.size.height - media.viewInsets.bottom) * 0.5;
 
@@ -23,7 +25,7 @@ Future<void> showSoilCompositionDialog({
           overflow: TextOverflow.ellipsis,
         ),
         content: components.isEmpty
-            ? const Text('Нет компонентов')
+            ? Text(l10n.noComponents)
             : ConstrainedBox(
                 constraints: BoxConstraints(maxHeight: maxHeight),
                 child: SingleChildScrollView(
@@ -35,7 +37,7 @@ Future<void> showSoilCompositionDialog({
                           (c) => Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             child: Text(
-                              '${c.component} — ${formatParts(c.parts)} части',
+                              '${c.component} — ${l10n.soilParts(formatParts(c.parts))}',
                               style: const TextStyle(
                                 color: AppColors.textPrimary,
                               ),
@@ -49,7 +51,7 @@ Future<void> showSoilCompositionDialog({
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Закрыть'),
+            child: Text(l10n.commonClose),
           ),
         ],
       );

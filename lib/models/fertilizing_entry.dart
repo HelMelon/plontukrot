@@ -31,7 +31,7 @@ class FertilizingEntry {
       fertilizerId: data['fertilizerId'] as String?,
       fertilizerName: data['fertilizerName'] as String? ??
           data['name'] as String? ??
-          'Неизвестно',
+          '',
       appliedAt: readTimestamp(data['appliedAt']) ?? DateTime.now(),
       nextFertilizing: readTimestamp(data['nextFertilizing']),
       waterMl: normalizeWaterMl((data['waterMl'] as num?)?.toInt()),

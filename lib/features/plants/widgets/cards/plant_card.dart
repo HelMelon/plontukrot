@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/plant.dart';
@@ -49,11 +50,13 @@ class PlantCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final imageUrl = plant.listImageUrl;
     final hasImage = imageUrl != null;
 
     final speciesBase =
-        (plant.species.isEmpty ? 'Без названия' : plant.species).toTitleCase();
+        (plant.species.isEmpty ? l10n.commonUntitled : plant.species)
+            .toTitleCase();
     final cultivar = (plant.cultivar ?? '').trim().toTitleCase();
     final species = cultivar.isEmpty ? speciesBase : '$speciesBase · $cultivar';
     final nickname = plant.nickname.toTitleCase();

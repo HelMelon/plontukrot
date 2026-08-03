@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/component.dart';
@@ -67,6 +68,8 @@ class SoilComponentTags extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final chipMaxWidth = constraints.maxWidth.isFinite
@@ -130,14 +133,14 @@ class SoilComponentTags extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: AppColors.sage),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.add, size: 16, color: AppColors.heading),
-                      SizedBox(width: 4),
+                      const Icon(Icons.add, size: 16, color: AppColors.heading),
+                      const SizedBox(width: 4),
                       Text(
-                        'Добавить',
-                        style: TextStyle(color: AppColors.heading),
+                        l10n.commonAdd,
+                        style: const TextStyle(color: AppColors.heading),
                       ),
                     ],
                   ),

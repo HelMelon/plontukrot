@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -50,10 +52,11 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
     final quantity = int.tryParse(_quantityController.text.trim());
     if (quantity == null || quantity < 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Укажите количество (минимум 1)')),
+        SnackBar(content: Text(l10n.propagationQuantityMin)),
       );
       return;
     }
@@ -74,7 +77,7 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
       if (mounted) {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка: $e')),
+          SnackBar(content: Text(l10n.commonError('$e'))),
         );
       }
     }
@@ -82,6 +85,8 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.backgroundSecondary,
@@ -110,9 +115,9 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
                 ),
               ),
               const SizedBox(height: 28),
-              const Text(
-                'Поставить на укоренение',
-                style: TextStyle(
+              Text(
+                l10n.propagationStartRooting,
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   letterSpacing: -1,
@@ -130,9 +135,9 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
                 ),
               ),
               const SizedBox(height: 28),
-              const Text(
-                'Способ',
-                style: TextStyle(
+              Text(
+                l10n.propagationMethodField,
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.heading,
@@ -145,7 +150,7 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
                 children: PropagationMethod.values.map((method) {
                   final selected = _method == method;
                   return ChoiceChip(
-                    label: Text(method.label),
+                    label: Text(l10n.propagationMethodLabel(method)),
                     selected: selected,
                     onSelected: (_) => setState(() => _method = method),
                     selectedColor: AppColors.goldAccent,
@@ -168,7 +173,7 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
-                  labelText: 'Количество',
+                  labelText: l10n.propagationQuantity,
                   labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.dark2,
@@ -214,7 +219,9 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Дата: ${DateFormat('d MMM y').format(_startedAt)}',
+                          l10n.propagationDate(
+                            DateFormat('d MMM y').format(_startedAt),
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -250,9 +257,9 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
                             color: AppColors.dark1,
                           ),
                         )
-                      : const Text(
-                          'Сохранить',
-                          style: TextStyle(
+                      : Text(
+                          l10n.commonSave,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                           ),

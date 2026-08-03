@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/prompt_text_dialog.dart';
@@ -26,24 +27,27 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
     required String title,
     String initial = '',
   }) {
+    final l10n = AppLocalizations.of(context);
     return showPromptTextDialog(
       context: context,
       title: title,
       initial: initial,
-      hintText: 'Название компонента',
-      confirmLabel: 'Сохранить',
+      hintText: l10n.componentNameHint,
+      confirmLabel: l10n.commonSave,
     );
   }
 
   Future<void> _add() async {
-    final name = await _promptName(title: 'Добавить компонент');
+    final l10n = AppLocalizations.of(context);
+    final name = await _promptName(title: l10n.componentAddTitle);
     if (name == null) return;
     await _service.addComponent(name: name);
   }
 
   Future<void> _edit(CatalogComponent component) async {
+    final l10n = AppLocalizations.of(context);
     final name = await _promptName(
-      title: 'Изменить компонент',
+      title: l10n.componentEditTitle,
       initial: component.name,
     );
     if (name == null || name == component.name) return;
@@ -55,21 +59,22 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
   }
 
   Future<void> _delete(CatalogComponent component) async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppColors.backgroundSecondary,
-          title: const Text('Удалить компонент'),
-          content: Text('Удалить «${component.name}» из каталога?'),
+          title: Text(l10n.componentDeleteTitle),
+          content: Text(l10n.catalogItemDeleteConfirm(component.name)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Отмена'),
+              child: Text(l10n.commonCancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Удалить'),
+              child: Text(l10n.commonDelete),
             ),
           ],
         );
@@ -83,6 +88,8 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -100,19 +107,22 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
             const SizedBox(height: 16),
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Компоненты грунта',
+                    l10n.soilComponentsTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 FilledButton.icon(
                   onPressed: _add,
                   icon: const Icon(Icons.add),
-                  label: const Text('Добавить'),
+                  label: Text(l10n.commonAdd),
                 ),
               ],
             ),
@@ -131,9 +141,7 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
 
                   final items = snapshot.data!;
                   if (items.isEmpty) {
-                    return const Center(
-                      child: Text('Пока нет компонентов'),
-                    );
+                    return Center(child: Text(l10n.emptyComponents));
                   }
 
                   return ListView.separated(
@@ -152,13 +160,13 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              tooltip: 'Изменить',
+                              tooltip: l10n.commonEdit,
                               visualDensity: VisualDensity.compact,
                               icon: const Icon(Icons.edit_outlined),
                               onPressed: () => _edit(item),
                             ),
                             IconButton(
-                              tooltip: 'Удалить',
+                              tooltip: l10n.commonDelete,
                               visualDensity: VisualDensity.compact,
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () => _delete(item),

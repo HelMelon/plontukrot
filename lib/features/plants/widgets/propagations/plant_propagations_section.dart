@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/propagation.dart';
-import '../../../../models/stage_info.dart';
 import '../../../../services/propagation_service.dart';
 import '../sheets/add_propagation_sheet.dart';
 import '../sheets/propagation_details_sheet.dart';
@@ -35,22 +36,6 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
         PropagationService().watchPropagationsForPlant(widget.plantId);
   }
 
-  static String _daysLabel(int days) {
-    if (days == 0) return 'сегодня';
-    if (days == 1) return '1 день';
-    if (days >= 2 && days <= 4) return '$days дня';
-    return '$days дней';
-  }
-
-  static String _stageTitle(int value) {
-    return stageInfos
-        .firstWhere(
-          (stage) => stage.value == value,
-          orElse: () => stageInfos[1],
-        )
-        .title;
-  }
-
   Future<void> _openAdd(BuildContext context) async {
     await showModalBottomSheet(
       context: context,
@@ -78,15 +63,18 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final dateLocale = Localizations.localeOf(context).toString();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            const Expanded(
+            Expanded(
               child: Text(
-                'Размножение',
-                style: TextStyle(
+                l10n.propagationTitle,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: AppColors.heading,
@@ -96,7 +84,7 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
             TextButton.icon(
               onPressed: () => _openAdd(context),
               icon: const Icon(Icons.add, size: 18),
-              label: const Text('Добавить'),
+              label: Text(l10n.commonAdd),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.goldAccent,
               ),
@@ -126,9 +114,9 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
                   color: AppColors.dark2,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Text(
-                  'Нет активных размножений',
-                  style: TextStyle(color: AppColors.textSecondary),
+                child: Text(
+                  l10n.propagationEmptyActive,
+                  style: const TextStyle(color: AppColors.textSecondary),
                 ),
               );
             }
@@ -155,7 +143,7 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '${_stageTitle(item.stage)} · ${_daysLabel(item.daysSinceStart)}',
+                                  '${l10n.stageTitle(item.stage)} · ${l10n.daysCount(item.daysSinceStart)}',
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
@@ -165,7 +153,7 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${item.quantityAlive} ${item.method.pluralLabel} · ${DateFormat('d MMM y').format(item.startedAt)}',
+                                  '${l10n.propagationAliveWithMethod(item.quantityAlive, l10n.propagationMethodPlural(item.method))} · ${DateFormat('d MMM y', dateLocale).format(item.startedAt)}',
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(

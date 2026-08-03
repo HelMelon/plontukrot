@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../theme/app_colors.dart';
 
@@ -11,8 +12,8 @@ Future<String?> showPromptTextDialog({
   String initial = '',
   String? hintText,
   String? labelText,
-  String confirmLabel = 'Сохранить',
-  String cancelLabel = 'Отмена',
+  String? confirmLabel,
+  String? cancelLabel,
   bool allowEmpty = false,
   TextInputType? keyboardType,
   List<TextInputFormatter>? inputFormatters,
@@ -40,8 +41,8 @@ class _PromptTextDialog extends StatefulWidget {
   final String initial;
   final String? hintText;
   final String? labelText;
-  final String confirmLabel;
-  final String cancelLabel;
+  final String? confirmLabel;
+  final String? cancelLabel;
   final bool allowEmpty;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
@@ -83,7 +84,9 @@ class _PromptTextDialogState extends State<_PromptTextDialog> {
   void _submit() {
     final value = _controller.text.trim();
     if (!widget.allowEmpty && value.isEmpty) {
-      setState(() => _errorText = 'Поле не может быть пустым');
+      setState(
+        () => _errorText = AppLocalizations.of(context).promptEmptyNotAllowed,
+      );
       return;
     }
     Navigator.pop(context, value);
@@ -91,6 +94,7 @@ class _PromptTextDialogState extends State<_PromptTextDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final media = MediaQuery.of(context);
     final maxContentHeight =
         (media.size.height - media.viewInsets.bottom) * 0.4;
@@ -132,11 +136,11 @@ class _PromptTextDialogState extends State<_PromptTextDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(widget.cancelLabel),
+          child: Text(widget.cancelLabel ?? l10n.commonCancel),
         ),
         FilledButton(
           onPressed: _submit,
-          child: Text(widget.confirmLabel),
+          child: Text(widget.confirmLabel ?? l10n.commonSave),
         ),
       ],
     );

@@ -13,18 +13,6 @@ enum Variegation {
 
   String get storageValue => name;
 
-  String get label => switch (this) {
-        Variegation.none => 'Нет',
-        Variegation.aurea => 'Аурея',
-        Variegation.alba => 'Альба',
-        Variegation.pink => 'Пинк',
-        Variegation.splash => 'Сплеш',
-        Variegation.mint => 'Минт',
-        Variegation.multicolor => 'Мультиколор',
-        Variegation.tricolor => 'Триколор',
-        Variegation.unknown => 'Неизвестно',
-      };
-
   IconData get icon => switch (this) {
         Variegation.aurea ||
         Variegation.alba ||
