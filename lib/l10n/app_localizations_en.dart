@@ -213,6 +213,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeFertilizing => 'Fertilizing';
 
   @override
+  String get homeRepotting => 'Repotting';
+
+  @override
   String get homeUpdateFamily => 'Update family';
 
   @override
@@ -223,6 +226,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeFertilizeSelectedTitle => 'Fertilize selected plants';
+
+  @override
+  String get homeRepotSelectedTitle => 'Repot selected plants';
 
   @override
   String get homeDeleteSelectedTitle => 'Delete selected plants?';
@@ -333,6 +339,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get plantBotanicalData => 'Botanical data';
 
   @override
+  String get plantDateAddedLabel => 'Date added';
+
+  @override
   String get plantJournal => 'Journal';
 
   @override
@@ -357,6 +366,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plantPropagation => 'Propagation';
+
+  @override
+  String get plantInitialLeafCount => 'Initial leaf count';
+
+  @override
+  String get plantInvalidInitialLeafCount => 'Invalid initial leaf count';
+
+  @override
+  String get plantLeafAdd => 'Add leaf';
+
+  @override
+  String get plantLeafRemove => 'Remove leaf';
+
+  @override
+  String get plantLeafStatsAnchor => 'Leaf statistics';
+
+  @override
+  String get plantLeafStatsTitle => 'Leaf growth';
+
+  @override
+  String plantLeafStatsMonthLine(String month, int count) {
+    return '$month: $count';
+  }
 
   @override
   String get stageUnknown => '🌱 Unknown';
@@ -856,7 +888,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get propagationDeleteTitle => 'Delete propagation';
 
   @override
-  String get propagationDeleteConfirm => 'Delete this propagation batch?';
+  String get propagationDeleteConfirm =>
+      'The propagation batch and all stage history will be permanently deleted. Continue?';
 
   @override
   String get propagationDeleteHistoryEntry => 'Delete history entry?';
@@ -1005,12 +1038,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String propagationDeleteStartStageBody(String stageName) {
-    return 'Deleting the \"$stageName\" stage will delete the entire propagation batch and all other stages.';
+    return 'Deleting the \"$stageName\" stage will permanently delete the entire propagation batch and all other stages. Continue?';
   }
 
   @override
   String get propagationDeleteStageEntryBody =>
       'Only this stage entry will be deleted. Others will remain.';
+
+  @override
+  String get propagationDeleteLastEntryBody =>
+      'This is the last history entry. The propagation batch will be permanently deleted. Continue?';
 
   @override
   String get deleteEntryConfirm => 'Delete this entry?';

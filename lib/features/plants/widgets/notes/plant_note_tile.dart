@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
@@ -8,26 +7,15 @@ import '../../../../models/note.dart';
 import '../../../../services/note_service.dart';
 import '../sheets/update_note_sheet.dart';
 
-class PlantNoteTile extends StatefulWidget {
+class PlantNoteTile extends StatelessWidget {
   final String plantId;
   final Note note;
-  final bool isOpened;
-  final ValueChanged<bool> onOpenChanged;
 
   const PlantNoteTile({
     super.key,
     required this.plantId,
     required this.note,
-    required this.isOpened,
-    required this.onOpenChanged,
   });
-
-  @override
-  State<PlantNoteTile> createState() => _PlantNoteTileState();
-}
-
-class _PlantNoteTileState extends State<PlantNoteTile> {
-  bool get isDesktop => kIsWeb;
 
   Future<void> _deleteNote(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
@@ -72,8 +60,8 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
 
     if (confirmed == true && context.mounted) {
       await NoteService().deleteNote(
-        plantId: widget.plantId,
-        noteId: widget.note.id,
+        plantId: plantId,
+        noteId: note.id,
       );
     }
   }
@@ -84,148 +72,89 @@ class _PlantNoteTileState extends State<PlantNoteTile> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => UpdateNoteSheet(
-        plantId: widget.plantId,
-        noteId: widget.note.id,
-        initialText: widget.note.text,
+        plantId: plantId,
+        noteId: note.id,
+        initialText: note.text,
       ),
     );
   }
 
   String _formatDate() {
-    final date = widget.note.createdAt;
+    final date = note.createdAt;
     if (date == null) return '';
     return DateFormat.yMd().format(date);
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool showActions = widget.isOpened;
+    final l10n = AppLocalizations.of(context);
+    final date = _formatDate();
 
-    final noteBody = Container(
-      padding: const EdgeInsets.all(18),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
         color: AppColors.dark2,
-        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            _formatDate(),
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.textSecondary,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  date.isEmpty ? '—' : date,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    height: 1.2,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+                width: 28,
+                child: IconButton(
+                  tooltip: l10n.commonEdit,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(
+                    width: 28,
+                    height: 20,
+                  ),
+                  visualDensity: VisualDensity.compact,
+                  iconSize: 16,
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: () => _editNote(context),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+                width: 28,
+                child: IconButton(
+                  tooltip: l10n.commonDelete,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(
+                    width: 28,
+                    height: 20,
+                  ),
+                  visualDensity: VisualDensity.compact,
+                  iconSize: 16,
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () => _deleteNote(context),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Text(
-            widget.note.text,
+            note.text,
             style: const TextStyle(
               fontSize: 15,
               height: 1.6,
               color: AppColors.textPrimary,
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (isDesktop) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(child: noteBody),
-          const SizedBox(width: 10),
-          Column(
-            children: [
-              IconButton(
-                onPressed: () => _editNote(context),
-                icon: const Icon(
-                  Icons.edit_rounded,
-                  color: AppColors.goldAccent,
-                ),
-              ),
-              IconButton(
-                onPressed: () => _deleteNote(context),
-                icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-              ),
-            ],
-          ),
-        ],
-      );
-    }
-
-    return GestureDetector(
-      onHorizontalDragEnd: (details) {
-        if (details.primaryVelocity! < 0) {
-          widget.onOpenChanged(true);
-        }
-
-        if (details.primaryVelocity! > 0) {
-          widget.onOpenChanged(false);
-        }
-      },
-      onTap: () {
-        if (showActions) {
-          widget.onOpenChanged(false);
-        }
-      },
-      child: Row(
-        children: [
-          Expanded(child: noteBody),
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOut,
-            width: showActions ? 120 : 0,
-            child: AnimatedOpacity(
-              opacity: showActions ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 150),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const NeverScrollableScrollPhysics(),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 12),
-                    SizedBox(
-                      width: 44,
-                      height: 44,
-                      child: IconButton(
-                        onPressed:
-                            showActions ? () => _editNote(context) : null,
-                        icon: const Icon(
-                          Icons.edit_rounded,
-                          color: Colors.amber,
-                          size: 20,
-                        ),
-                        style: IconButton.styleFrom(
-                          backgroundColor: Colors.amber.withValues(alpha: 0.15),
-                          padding: EdgeInsets.zero,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    SizedBox(
-                      width: 44,
-                      height: 44,
-                      child: IconButton(
-                        onPressed:
-                            showActions ? () => _deleteNote(context) : null,
-                        icon: const Icon(
-                          Icons.delete_outline_rounded,
-                          color: Colors.redAccent,
-                          size: 20,
-                        ),
-                        style: IconButton.styleFrom(
-                          backgroundColor:
-                              Colors.redAccent.withValues(alpha: 0.15),
-                          padding: EdgeInsets.zero,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                  ],
-                ),
-              ),
             ),
           ),
         ],

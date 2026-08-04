@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/watering_entry.dart';
+import 'growth_event_service.dart';
 
 class WateringService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -73,6 +74,8 @@ class WateringService {
     }
 
     await batch.commit();
+
+    await GrowthEventService().addWateringEvent(plantId, at: wateredAt);
   }
 
   /// Bulk watering without per-plant plant-document reads when maps are supplied.
@@ -112,6 +115,10 @@ class WateringService {
       }
 
       await batch.commit();
+
+      for (final plantId in chunk) {
+        await GrowthEventService().addWateringEvent(plantId, at: wateredAt);
+      }
     }
   }
 

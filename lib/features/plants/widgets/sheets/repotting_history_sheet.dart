@@ -49,7 +49,9 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) => AddRepottingSheet(plantId: widget.plantId),
+      backgroundColor: Colors.transparent,
+      enableDrag: true,
+      builder: (_) => AddRepottingSheet.forPlant(plantId: widget.plantId),
     );
   }
 
@@ -57,6 +59,8 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      enableDrag: true,
       builder: (_) => AddRepottingSheet.edit(
         plantId: widget.plantId,
         entry: entry,

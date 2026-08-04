@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/prompt_text_dialog.dart';
 import '../../../../models/catalog_component.dart';
 import '../../../../models/component.dart';
+import '../../../../models/plant.dart';
 import '../../../../models/repotting_entry.dart';
 import '../../../../models/soil.dart';
 import '../../../../services/component_service.dart';
@@ -19,21 +20,43 @@ import 'manage_components_sheet.dart';
 enum _SoilMode { saved, newMix }
 
 class AddRepottingSheet extends StatefulWidget {
-  final String plantId;
+  final List<String> plantIds;
+  final List<Plant> plants;
+  final String? title;
   final RepottingEntry? entry;
 
   const AddRepottingSheet({
     super.key,
-    required this.plantId,
+    required this.plantIds,
+    this.plants = const [],
+    this.title,
     this.entry,
   });
+
+  factory AddRepottingSheet.forPlant({
+    Key? key,
+    required String plantId,
+    Plant? plant,
+  }) {
+    return AddRepottingSheet(
+      key: key,
+      plantIds: [plantId],
+      plants: plant == null ? const [] : [plant],
+    );
+  }
 
   factory AddRepottingSheet.edit({
     Key? key,
     required String plantId,
     required RepottingEntry entry,
+    Plant? plant,
   }) {
-    return AddRepottingSheet(key: key, plantId: plantId, entry: entry);
+    return AddRepottingSheet(
+      key: key,
+      plantIds: [plantId],
+      plants: plant == null ? const [] : [plant],
+      entry: entry,
+    );
   }
 
   bool get isEditing => entry != null;
@@ -234,7 +257,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
       final entry = widget.entry;
       if (entry != null && entry.id != null) {
         await _repottingService.updateRepotting(
-          plantId: widget.plantId,
+          plantId: widget.plantIds.first,
           repottingId: entry.id!,
           repottedAt: _selectedDate,
           components: components,
@@ -242,9 +265,25 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
           soilName: soilName,
           slowReleaseFertilizer: _slowReleaseFertilizer,
         );
+      } else if (widget.plantIds.length > 1) {
+        final plantsById = {
+          for (final plant in widget.plants) plant.id: plant,
+        };
+        await _repottingService.addRepottings(
+          plantIds: widget.plantIds,
+          repottedAt: _selectedDate,
+          components: components,
+          soilId: soilId,
+          soilName: soilName,
+          slowReleaseFertilizer: _slowReleaseFertilizer,
+          lastRepottedAtByPlantId: {
+            for (final id in widget.plantIds)
+              id: plantsById[id]?.lastRepottedAt,
+          },
+        );
       } else {
         await _repottingService.addRepotting(
-          plantId: widget.plantId,
+          plantId: widget.plantIds.first,
           repottedAt: _selectedDate,
           components: components,
           soilId: soilId,
@@ -263,241 +302,284 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final media = MediaQuery.of(context);
+    final maxHeight = media.size.height * 0.85;
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: bottomInset),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade400,
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                widget.isEditing ? l10n.repottingEdit : l10n.repottingAdd,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.calendar_today),
-                title: Text(DateFormat('d MMM y').format(_selectedDate)),
-                onTap: _pickDate,
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: OutlinedButton(
-                  onPressed: () =>
-                      setState(() => _selectedDate = DateTime.now()),
-                  child: Text(l10n.commonToday),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeOut,
+      padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: maxHeight),
+          child: Material(
+            color: AppColors.backgroundSecondary,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            clipBehavior: Clip.antiAlias,
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ChoiceChip(
-                    label: Text(l10n.fertilizingSaved),
-                    selected: _mode == _SoilMode.saved,
-                    onSelected: (_) {
-                      setState(() => _mode = _SoilMode.saved);
-                    },
+                  const SizedBox(height: 12),
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade400,
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                    ),
                   ),
-                  ChoiceChip(
-                    label: Text(l10n.fertilizingNewMix),
-                    selected: _mode == _SoilMode.newMix,
-                    onSelected: (_) {
-                      setState(() {
-                        _mode = _SoilMode.newMix;
-                        _selectedSoilId = null;
-                        _saveMix = false;
-                      });
-                    },
+                  Flexible(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            widget.title ??
+                                (widget.isEditing
+                                    ? l10n.repottingEdit
+                                    : l10n.repottingAdd),
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const Icon(Icons.calendar_today),
+                            title: Text(
+                                DateFormat('d MMM y').format(_selectedDate)),
+                            onTap: _pickDate,
+                          ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: OutlinedButton(
+                              onPressed: () => setState(
+                                  () => _selectedDate = DateTime.now()),
+                              child: Text(l10n.commonToday),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              ChoiceChip(
+                                label: Text(l10n.fertilizingSaved),
+                                selected: _mode == _SoilMode.saved,
+                                onSelected: (_) {
+                                  setState(() => _mode = _SoilMode.saved);
+                                },
+                              ),
+                              ChoiceChip(
+                                label: Text(l10n.fertilizingNewMix),
+                                selected: _mode == _SoilMode.newMix,
+                                onSelected: (_) {
+                                  setState(() {
+                                    _mode = _SoilMode.newMix;
+                                    _selectedSoilId = null;
+                                    _saveMix = false;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          if (_mode == _SoilMode.saved)
+                            StreamBuilder<List<Soil>>(
+                              stream: _soilService.getSoils(),
+                              builder: (context, snapshot) {
+                                final soils = snapshot.data ?? const <Soil>[];
+
+                                if (snapshot.connectionState ==
+                                        ConnectionState.waiting &&
+                                    !snapshot.hasData) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                }
+
+                                if (soils.isEmpty) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        l10n.repottingEmptySoils,
+                                        style: const TextStyle(
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(
+                                              () => _mode = _SoilMode.newMix);
+                                        },
+                                        child: Text(l10n.fertilizingGoToNewMix),
+                                      ),
+                                    ],
+                                  );
+                                }
+
+                                return Row(
+                                  children: [
+                                    Expanded(
+                                      child: DropdownButton<String>(
+                                        value: soils.any(
+                                                (s) => s.id == _selectedSoilId)
+                                            ? _selectedSoilId
+                                            : null,
+                                        hint: Text(
+                                          _selectedSoilId != null &&
+                                                  widget.entry != null
+                                              ? l10n.soilDisplayName(
+                                                  widget.entry!.soilName,
+                                                )
+                                              : l10n.repottingSelectSoil,
+                                        ),
+                                        isExpanded: true,
+                                        items: soils
+                                            .map(
+                                              (soil) => DropdownMenuItem(
+                                                value: soil.id,
+                                                child: Text(soil.name),
+                                              ),
+                                            )
+                                            .toList(),
+                                        onChanged: (value) {
+                                          if (value == null) return;
+                                          final soil = soils
+                                              .firstWhere((s) => s.id == value);
+                                          _applySavedSoil(soil);
+                                        },
+                                      ),
+                                    ),
+                                    IconButton(
+                                      tooltip: l10n.fertilizingViewComposition,
+                                      onPressed: _selectedSoilId == null &&
+                                              _components.isEmpty
+                                          ? null
+                                          : () =>
+                                              _showSelectedComposition(soils),
+                                      icon: const Icon(Icons.info_outline),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          if (_mode == _SoilMode.newMix) ...[
+                            Row(
+                              children: [
+                                Text(
+                                  l10n.commonComposition,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                const Spacer(),
+                                TextButton.icon(
+                                  onPressed: _openManageComponents,
+                                  icon: const Icon(Icons.edit_outlined,
+                                      size: 18),
+                                  label: Text(l10n.commonManage),
+                                ),
+                              ],
+                            ),
+                            StreamBuilder<List<CatalogComponent>>(
+                              stream: _componentService.getComponents(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) {
+                                  return Text(snapshot.error.toString());
+                                }
+                                if (!snapshot.hasData) {
+                                  return const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 16),
+                                    child: Center(
+                                        child: CircularProgressIndicator()),
+                                  );
+                                }
+
+                                final catalog = snapshot.data!;
+                                _catalogNames =
+                                    catalog.map((c) => c.name).toList();
+
+                                return SoilComponentTags(
+                                  availableComponents: _catalogNames,
+                                  selected: _components,
+                                  onChanged: (next) =>
+                                      setState(() => _components = next),
+                                  onAddCustom: _addCustomComponent,
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              l10n.repottingSoilTapHint,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            CheckboxListTile(
+                              contentPadding: EdgeInsets.zero,
+                              value: _saveMix,
+                              onChanged: (value) {
+                                setState(() => _saveMix = value ?? false);
+                              },
+                              title: Text(l10n.fertilizingSaveThisMix),
+                              controlAffinity: ListTileControlAffinity.leading,
+                            ),
+                            if (_saveMix)
+                              TextField(
+                                controller: _mixNameController,
+                                decoration: InputDecoration(
+                                  labelText: l10n.fertilizingMixName,
+                                  hintText: l10n.repottingMixNameHint,
+                                ),
+                                onChanged: (_) => setState(() {}),
+                              ),
+                          ],
+                          const SizedBox(height: 12),
+                          CheckboxListTile(
+                            contentPadding: EdgeInsets.zero,
+                            value: _slowReleaseFertilizer,
+                            onChanged: (value) {
+                              setState(
+                                  () => _slowReleaseFertilizer = value ?? false);
+                            },
+                            title: Text(l10n.repottingSlowRelease),
+                            subtitle: Text(
+                              l10n.repottingSlowReleaseSubtitle,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                            controlAffinity: ListTileControlAffinity.leading,
+                          ),
+                          const SizedBox(height: 20),
+                          FilledButton(
+                            onPressed: _canSave ? _save : null,
+                            child: _saving
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
+                                  )
+                                : Text(l10n.commonSave),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              if (_mode == _SoilMode.saved)
-                StreamBuilder<List<Soil>>(
-                  stream: _soilService.getSoils(),
-                  builder: (context, snapshot) {
-                    final soils = snapshot.data ?? const <Soil>[];
-
-                    if (snapshot.connectionState == ConnectionState.waiting &&
-                        !snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    if (soils.isEmpty) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.repottingEmptySoils,
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              setState(() => _mode = _SoilMode.newMix);
-                            },
-                            child: Text(l10n.fertilizingGoToNewMix),
-                          ),
-                        ],
-                      );
-                    }
-
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButton<String>(
-                            value: soils.any((s) => s.id == _selectedSoilId)
-                                ? _selectedSoilId
-                                : null,
-                            hint: Text(
-                              _selectedSoilId != null && widget.entry != null
-                                  ? l10n.soilDisplayName(
-                                      widget.entry!.soilName,
-                                    )
-                                  : l10n.repottingSelectSoil,
-                            ),
-                            isExpanded: true,
-                            items: soils
-                                .map(
-                                  (soil) => DropdownMenuItem(
-                                    value: soil.id,
-                                    child: Text(soil.name),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (value) {
-                              if (value == null) return;
-                              final soil =
-                                  soils.firstWhere((s) => s.id == value);
-                              _applySavedSoil(soil);
-                            },
-                          ),
-                        ),
-                        IconButton(
-                          tooltip: l10n.fertilizingViewComposition,
-                          onPressed:
-                              _selectedSoilId == null && _components.isEmpty
-                                  ? null
-                                  : () => _showSelectedComposition(soils),
-                          icon: const Icon(Icons.info_outline),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              if (_mode == _SoilMode.newMix) ...[
-                Row(
-                  children: [
-                    Text(
-                      l10n.commonComposition,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    const Spacer(),
-                    TextButton.icon(
-                      onPressed: _openManageComponents,
-                      icon: const Icon(Icons.edit_outlined, size: 18),
-                      label: Text(l10n.commonManage),
-                    ),
-                  ],
-                ),
-                StreamBuilder<List<CatalogComponent>>(
-                  stream: _componentService.getComponents(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Text(snapshot.error.toString());
-                    }
-                    if (!snapshot.hasData) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Center(child: CircularProgressIndicator()),
-                      );
-                    }
-
-                    final catalog = snapshot.data!;
-                    _catalogNames = catalog.map((c) => c.name).toList();
-
-                    return SoilComponentTags(
-                      availableComponents: _catalogNames,
-                      selected: _components,
-                      onChanged: (next) => setState(() => _components = next),
-                      onAddCustom: _addCustomComponent,
-                    );
-                  },
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.repottingSoilTapHint,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  value: _saveMix,
-                  onChanged: (value) {
-                    setState(() => _saveMix = value ?? false);
-                  },
-                  title: Text(l10n.fertilizingSaveThisMix),
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
-                if (_saveMix)
-                  TextField(
-                    controller: _mixNameController,
-                    decoration: InputDecoration(
-                      labelText: l10n.fertilizingMixName,
-                      hintText: l10n.repottingMixNameHint,
-                    ),
-                    onChanged: (_) => setState(() {}),
-                  ),
-              ],
-              const SizedBox(height: 12),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                value: _slowReleaseFertilizer,
-                onChanged: (value) {
-                  setState(() => _slowReleaseFertilizer = value ?? false);
-                },
-                title: Text(l10n.repottingSlowRelease),
-                subtitle: Text(
-                  l10n.repottingSlowReleaseSubtitle,
-                  style: const TextStyle(fontSize: 12),
-                ),
-                controlAffinity: ListTileControlAffinity.leading,
-              ),
-              const SizedBox(height: 20),
-              FilledButton(
-                onPressed: _canSave ? _save : null,
-                child: _saving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(l10n.commonSave),
-              ),
-            ],
+            ),
           ),
         ),
       ),

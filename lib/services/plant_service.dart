@@ -47,6 +47,7 @@ class PlantService {
       'imageUrl': null,
       'imageThumbUrl': null,
       'wateringFrequency': null,
+      'initialLeafCount': 0,
       'createdAt': FieldValue.serverTimestamp(),
       'careHistoryMigrated': true,
       'botanicalFieldsMigrated': true,
@@ -182,6 +183,7 @@ class PlantService {
     String tradingName = '',
     required String nickname,
     int? wateringFrequency,
+    int initialLeafCount = 0,
     required int stage,
   }) async {
     final trimmedGenus = genus.trim();
@@ -189,6 +191,8 @@ class PlantService {
     final trimmedCultivar = cultivar?.trim();
     final trimmedFamily = plantFamily?.trim();
     final trimmedTradingName = tradingName.trim();
+    final safeInitialLeafCount =
+        initialLeafCount < 0 ? 0 : initialLeafCount;
 
     await _plantsRef.doc(plantId).update({
       'genus': trimmedGenus,
@@ -203,6 +207,7 @@ class PlantService {
       'tradingName': trimmedTradingName,
       'nickname': nickname,
       'wateringFrequency': wateringFrequency,
+      'initialLeafCount': safeInitialLeafCount,
       'stage': stage,
       'botanicalFieldsMigrated': true,
       'name': FieldValue.delete(),
@@ -259,6 +264,7 @@ class PlantService {
     await _deleteQueryInBatches(plantRef.collection('fertilizing'));
     await _deleteQueryInBatches(plantRef.collection('repotting'));
     await _deleteQueryInBatches(plantRef.collection('notes'));
+    await _deleteQueryInBatches(plantRef.collection('growthEvents'));
 
     final propagations = await _firestore
         .collection('users')

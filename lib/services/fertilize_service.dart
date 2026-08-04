@@ -6,6 +6,7 @@ import '../models/fertilizer_application_method.dart';
 import '../models/fertilizer_dose.dart';
 import '../models/fertilizer_ingredient.dart';
 import '../models/fertilizing_entry.dart';
+import 'growth_event_service.dart';
 import 'watering_service.dart';
 
 class FertilizeService {
@@ -202,6 +203,8 @@ class FertilizeService {
 
     await batch.commit();
 
+    await GrowthEventService().addFertilizingEvent(plantId, at: appliedAt);
+
     await WateringService().addWateringIfMissingBeforeFertilizing(
       plantId: plantId,
       fertilizedAt: appliedAt,
@@ -263,6 +266,10 @@ class FertilizeService {
       }
 
       await batch.commit();
+
+      for (final plantId in chunk) {
+        await GrowthEventService().addFertilizingEvent(plantId, at: appliedAt);
+      }
     }
 
     for (final plantId in ids) {

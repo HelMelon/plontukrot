@@ -90,6 +90,7 @@ users/{uid}
     fertilizing/{id}
     repotting/{id}
     notes/{id}
+    growthEvents/{id}
   fertilizers/{id}
   fertilizerComponents/{id}
   soils/{id}
@@ -113,6 +114,8 @@ When writing care history, services must keep plant doc in sync:
 - `lastWateredAt`
 - `lastFertilizedAt` / `lastFertilizerName`
 - `lastRepottedAt`
+
+Leaf growth baseline (not care denorm): `initialLeafCount` — edited via `PlantService.updatePlant`, not derived from `growthEvents`.
 
 Migration flags (temporary): `careHistoryMigrated`, `botanicalFieldsMigrated`.
 
@@ -173,6 +176,7 @@ Details: [data-model.md](data-model.md).
 | `FertilizeService` | fertilizers, fertilizerComponents, fertilizing |
 | `RepottingService` | repotting + denorm |
 | `NoteService` | notes |
+| `GrowthEventService` | growthEvents (+ client purge by `expiresAt`) |
 | `ComponentService` | components |
 | `SoilService` | soils |
 | `PropagationService` | propagations + stageHistory |

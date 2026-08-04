@@ -14,6 +14,7 @@ import '../../../models/stage_info.dart';
 import '../../../services/auth_service.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
 import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
+import '../../plants/widgets/sheets/add_repotting_sheet.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../../services/watering_service.dart';
@@ -24,6 +25,7 @@ import '../../plants/widgets/search/plant_search_delegate.dart';
 import '../../propagations/pages/propagations_page.dart';
 import '../../settings/pages/settings_page.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 enum _PlantSortField {
   species,
@@ -33,8 +35,6 @@ enum _PlantSortField {
   createdAt,
   plantFamily,
 }
-
-enum _SelectionMenuAction { updateFamily, delete }
 
 class HomePage extends StatefulWidget {
   final AppUser user;
@@ -636,6 +636,25 @@ class _HomePageState extends State<HomePage> {
     if (applied == true && mounted) _exitSelectionMode();
   }
 
+  Future<void> _showRepottingSheet() async {
+    final l10n = AppLocalizations.of(context);
+    final selectedPlants = _latestPlants
+        .where((plant) => _selectedPlantIds.contains(plant.id))
+        .toList();
+    final applied = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      enableDrag: true,
+      builder: (_) => AddRepottingSheet(
+        plantIds: _selectedPlantIds.toList(),
+        plants: selectedPlants,
+        title: l10n.homeRepotSelectedTitle,
+      ),
+    );
+    if (applied == true && mounted) _exitSelectionMode();
+  }
+
   Future<void> _deletePlants() async {
     final l10n = AppLocalizations.of(context);
     final count = _selectedPlantIds.length;
@@ -677,50 +696,58 @@ class _HomePageState extends State<HomePage> {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      actions: [
-        IconButton(
-          tooltip:
-              allVisibleSelected ? l10n.homeClearSelection : l10n.homeSelectAll,
-          onPressed: _selectAll,
-          icon: Icon(
-            allVisibleSelected ? Icons.deselect : Icons.select_all,
-          ),
-        ),
-        IconButton(
-          tooltip: l10n.homeWatering,
-          onPressed: _addWatering,
-          icon: const Icon(Icons.water_drop_outlined),
-        ),
-        IconButton(
-          tooltip: l10n.homeFertilizing,
-          onPressed: _showFertilizingSheet,
-          icon: const Icon(Icons.science_outlined),
-        ),
-        PopupMenuButton<_SelectionMenuAction>(
-          tooltip: l10n.commonMore,
-          onSelected: (action) {
-            switch (action) {
-              case _SelectionMenuAction.updateFamily:
-                _updateFamily();
-              case _SelectionMenuAction.delete:
-                _deletePlants();
-            }
-          },
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: _SelectionMenuAction.updateFamily,
-              child: Text(l10n.homeUpdateFamily),
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(48),
+        child: Row(
+          children: [
+            Expanded(
+              child: IconButton(
+                tooltip: allVisibleSelected
+                    ? l10n.homeClearSelection
+                    : l10n.homeSelectAll,
+                onPressed: _selectAll,
+                icon: Icon(
+                  allVisibleSelected ? Icons.deselect : Icons.select_all,
+                ),
+              ),
             ),
-            PopupMenuItem(
-              value: _SelectionMenuAction.delete,
-              child: Text(l10n.commonDelete),
+            Expanded(
+              child: IconButton(
+                tooltip: l10n.homeWatering,
+                onPressed: _addWatering,
+                icon: const Icon(Icons.water_drop_outlined),
+              ),
+            ),
+            Expanded(
+              child: IconButton(
+                tooltip: l10n.homeFertilizing,
+                onPressed: _showFertilizingSheet,
+                icon: const Icon(Icons.science_outlined),
+              ),
+            ),
+            Expanded(
+              child: IconButton(
+                tooltip: l10n.homeRepotting,
+                onPressed: _showRepottingSheet,
+                icon: const Icon(Icons.flaky),
+              ),
+            ),
+            Expanded(
+              child: IconButton(
+                tooltip: l10n.homeUpdateFamily,
+                onPressed: _updateFamily,
+                icon: const Icon(Icons.park_outlined),
+              ),
+            ),
+            Expanded(
+              child: IconButton(
+                tooltip: l10n.commonDelete,
+                onPressed: _deletePlants,
+                icon: const Icon(Icons.delete_outline),
+              ),
             ),
           ],
         ),
-      ],
-      bottom: const PreferredSize(
-        preferredSize: Size.fromHeight(64),
-        child: SizedBox(),
       ),
     );
   }
@@ -751,112 +778,121 @@ class _HomePageState extends State<HomePage> {
                       fontSize: 36),
                 ),
               ),
-              actions: [
-                IconButton(
-                  tooltip: l10n.homePropagation,
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const PropagationsPage(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(
-                    Icons.spa_outlined,
-                    color: AppColors.accentLight,
-                  ),
-                ),
-                IconButton(
-                  tooltip: l10n.settingsTitle,
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const SettingsPage(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(
-                    Icons.settings,
-                    color: AppColors.accentLight,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: ClipOval(
-                          child: widget.user.photoUrl != null &&
-                                  widget.user.photoUrl!.isNotEmpty
-                              ? Image.network(
-                                  widget.user.photoUrl!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => const Icon(
-                                    Icons.person,
-                                    color: AppColors.heading,
-                                  ),
-                                )
-                              : const Icon(Icons.person,
-                                  color: AppColors.heading),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        tooltip: l10n.authSignOut,
-                        onPressed: () async {
-                          await authService.signOut();
-                        },
-                        icon: const Icon(Icons.logout,
-                            color: AppColors.accentLight),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
               bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(64.0),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 16.0,
-                    right: 16.0,
-                    bottom: 12.0,
-                  ),
-                  child: GestureDetector(
-                    onTap: () {
-                      showSearch(
-                        context: context,
-                        delegate: PlantSearchDelegate(
-                          userId: widget.user.uid,
-                          plantsStream: _plantsStream,
-                          searchFieldLabel: l10n.homeSearchHint,
-                        ),
-                      );
-                    },
-                    child: AbsorbPointer(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: l10n.homeSearchHint,
-                          hintStyle:
-                              const TextStyle(color: AppColors.textSecondary),
-                          prefixIcon: const Icon(
-                            Icons.search,
-                            color: AppColors.textSecondary,
+                preferredSize: const Size.fromHeight(120),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: IconButton(
+                            tooltip: l10n.homePropagation,
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const PropagationsPage(),
+                                ),
+                              );
+                            },
+                            icon: const HugeIcon(
+                              icon: HugeIcons.strokeRoundedEcoLab01,
+                              color: AppColors.accentLight,
+                            ),
                           ),
-                          filled: true,
-                          fillColor: AppColors.heading.withValues(alpha: 0.05),
-                          contentPadding:
-                              const EdgeInsets.symmetric(vertical: 12),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
+                        ),
+                        Expanded(
+                          child: IconButton(
+                            tooltip: l10n.settingsTitle,
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const SettingsPage(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.settings,
+                              color: AppColors.accentLight,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: SizedBox(
+                              width: 40,
+                              height: 40,
+                              child: ClipOval(
+                                child: widget.user.photoUrl != null &&
+                                        widget.user.photoUrl!.isNotEmpty
+                                    ? Image.network(
+                                        widget.user.photoUrl!,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) =>
+                                            const Icon(
+                                          Icons.person,
+                                          color: AppColors.heading,
+                                        ),
+                                      )
+                                    : const Icon(Icons.person,
+                                        color: AppColors.heading),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: IconButton(
+                            tooltip: l10n.authSignOut,
+                            onPressed: () async {
+                              await authService.signOut();
+                            },
+                            icon: const Icon(Icons.logout,
+                                color: AppColors.accentLight),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16.0,
+                        right: 16.0,
+                        bottom: 12.0,
+                      ),
+                      child: GestureDetector(
+                        onTap: () {
+                          showSearch(
+                            context: context,
+                            delegate: PlantSearchDelegate(
+                              userId: widget.user.uid,
+                              plantsStream: _plantsStream,
+                              searchFieldLabel: l10n.homeSearchHint,
+                            ),
+                          );
+                        },
+                        child: AbsorbPointer(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: l10n.homeSearchHint,
+                              hintStyle: const TextStyle(
+                                  color: AppColors.textSecondary),
+                              prefixIcon: const Icon(
+                                Icons.search,
+                                color: AppColors.textSecondary,
+                              ),
+                              filled: true,
+                              fillColor:
+                                  AppColors.heading.withValues(alpha: 0.05),
+                              contentPadding:
+                                  const EdgeInsets.symmetric(vertical: 12),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
@@ -1012,8 +1048,9 @@ class _HomePageState extends State<HomePage> {
                                               l10n.homePropagation,
                                               overflow: TextOverflow.ellipsis,
                                             ),
-                                            avatar: Icon(
-                                              Icons.spa_outlined,
+                                            avatar: HugeIcon(
+                                              icon: HugeIcons
+                                                  .strokeRoundedEcoLab01,
                                               size: 16,
                                               color: _filterPropagatingOnly
                                                   ? AppColors.dark1

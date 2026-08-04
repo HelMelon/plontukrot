@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/component.dart';
 import '../models/repotting_entry.dart';
+import 'growth_event_service.dart';
 
 class RepottingService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -38,10 +39,15 @@ class RepottingService {
     String? soilId,
     String? soilName,
     bool slowReleaseFertilizer = false,
+    DateTime? lastRepottedAt,
+    bool skipPlantFetch = false,
   }) async {
-    final plantDoc = await _plantsCollection.doc(plantId).get();
-    final plantData = plantDoc.data();
-    final lastRepottedAt = plantData?['lastRepottedAt'] as Timestamp?;
+    DateTime? last = lastRepottedAt;
+    if (!skipPlantFetch && last == null) {
+      final plantDoc = await _plantsCollection.doc(plantId).get();
+      final plantData = plantDoc.data();
+      last = (plantData?['lastRepottedAt'] as Timestamp?)?.toDate();
+    }
 
     await _repottingRef(plantId).add({
       'repottedAt': Timestamp.fromDate(repottedAt),
@@ -52,11 +58,58 @@ class RepottingService {
       'slowReleaseFertilizer': slowReleaseFertilizer,
     });
 
-    if (lastRepottedAt == null || repottedAt.isAfter(lastRepottedAt.toDate())) {
+    if (last == null || repottedAt.isAfter(last)) {
       await _plantsCollection.doc(plantId).update({
         'lastRepottedAt': Timestamp.fromDate(repottedAt),
         'careHistoryMigrated': true,
       });
+    }
+
+    await GrowthEventService().addRepottingEvent(plantId, at: repottedAt);
+  }
+
+  /// Bulk repotting using known plant denorm fields (no plant doc reads).
+  Future<void> addRepottings({
+    required Iterable<String> plantIds,
+    required DateTime repottedAt,
+    required List<SoilComponent> components,
+    String? soilId,
+    String? soilName,
+    bool slowReleaseFertilizer = false,
+    Map<String, DateTime?> lastRepottedAtByPlantId = const {},
+  }) async {
+    final ids = plantIds.toList();
+    const chunkSize = 200;
+    final componentMaps = components.map((e) => e.toMap()).toList();
+
+    for (var i = 0; i < ids.length; i += chunkSize) {
+      final chunk = ids.skip(i).take(chunkSize);
+      final batch = _db.batch();
+
+      for (final plantId in chunk) {
+        final last = lastRepottedAtByPlantId[plantId];
+        batch.set(_repottingRef(plantId).doc(), {
+          'repottedAt': Timestamp.fromDate(repottedAt),
+          'createdAt': FieldValue.serverTimestamp(),
+          if (soilId != null) 'soilId': soilId,
+          if (soilName != null) 'soilName': soilName,
+          'components': componentMaps,
+          'slowReleaseFertilizer': slowReleaseFertilizer,
+        });
+
+        if (last == null || repottedAt.isAfter(last)) {
+          batch.update(_plantsCollection.doc(plantId), {
+            'lastRepottedAt': Timestamp.fromDate(repottedAt),
+            'careHistoryMigrated': true,
+          });
+        }
+      }
+
+      await batch.commit();
+
+      for (final plantId in chunk) {
+        await GrowthEventService().addRepottingEvent(plantId, at: repottedAt);
+      }
     }
   }
 

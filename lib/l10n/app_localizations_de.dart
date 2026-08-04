@@ -215,6 +215,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get homeFertilizing => 'Düngung';
 
   @override
+  String get homeRepotting => 'Umtopfen';
+
+  @override
   String get homeUpdateFamily => 'Familie ändern';
 
   @override
@@ -225,6 +228,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get homeFertilizeSelectedTitle => 'Ausgewählte Pflanzen düngen';
+
+  @override
+  String get homeRepotSelectedTitle => 'Ausgewählte Pflanzen umtopfen';
 
   @override
   String get homeDeleteSelectedTitle => 'Ausgewählte Pflanzen löschen?';
@@ -335,6 +341,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get plantBotanicalData => 'Botanische Daten';
 
   @override
+  String get plantDateAddedLabel => 'Hinzufügungsdatum';
+
+  @override
   String get plantJournal => 'Journal';
 
   @override
@@ -361,6 +370,29 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get plantPropagation => 'Vermehrung';
+
+  @override
+  String get plantInitialLeafCount => 'Anfängliche Blattzahl';
+
+  @override
+  String get plantInvalidInitialLeafCount => 'Ungültige anfängliche Blattzahl';
+
+  @override
+  String get plantLeafAdd => 'Blatt hinzufügen';
+
+  @override
+  String get plantLeafRemove => 'Blatt entfernen';
+
+  @override
+  String get plantLeafStatsAnchor => 'Blattstatistik';
+
+  @override
+  String get plantLeafStatsTitle => 'Blattwachstum';
+
+  @override
+  String plantLeafStatsMonthLine(String month, int count) {
+    return '$month: $count';
+  }
 
   @override
   String get stageUnknown => '🌱 Unbekannt';
@@ -862,7 +894,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get propagationDeleteTitle => 'Vermehrung löschen';
 
   @override
-  String get propagationDeleteConfirm => 'Diese Vermehrungscharge löschen?';
+  String get propagationDeleteConfirm =>
+      'Die Vermehrungscharge und der gesamte Stufenverlauf werden unwiderruflich gelöscht. Fortfahren?';
 
   @override
   String get propagationDeleteHistoryEntry => 'Verlaufseintrag löschen?';
@@ -1011,12 +1044,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String propagationDeleteStartStageBody(String stageName) {
-    return 'Das Löschen der Stufe „$stageName“ entfernt die gesamte Vermehrungscharge und alle anderen Stufen.';
+    return 'Das Löschen der Stufe „$stageName“ entfernt unwiderruflich die gesamte Vermehrungscharge und alle anderen Stufen. Fortfahren?';
   }
 
   @override
   String get propagationDeleteStageEntryBody =>
       'Es wird nur dieser Stadieneintrag gelöscht. Die übrigen bleiben erhalten.';
+
+  @override
+  String get propagationDeleteLastEntryBody =>
+      'Dies ist der letzte Verlaufseintrag. Die Vermehrungscharge wird unwiderruflich gelöscht. Fortfahren?';
 
   @override
   String get deleteEntryConfirm => 'Diesen Eintrag löschen?';

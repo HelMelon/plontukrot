@@ -6,6 +6,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/propagation.dart';
 import '../../../../services/propagation_service.dart';
+import '../common/expandable_side_scroll_list.dart';
 import '../sheets/add_propagation_sheet.dart';
 import '../sheets/propagation_details_sheet.dart';
 
@@ -58,6 +59,65 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => PropagationDetailsSheet(propagation: propagation),
+    );
+  }
+
+  Widget _propagationTile(
+    BuildContext context,
+    Propagation item,
+    AppLocalizations l10n,
+    String dateLocale,
+  ) {
+    return Material(
+      color: AppColors.dark2,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: () => _openDetails(context, item),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.greenDeep),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${l10n.stageTitle(item.stage)} · ${l10n.daysCount(item.daysSinceStart)}',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${l10n.propagationAliveWithMethod(item.quantityAlive, l10n.propagationMethodPlural(item.method))} · ${DateFormat('d MMM y', dateLocale).format(item.startedAt)}',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right,
+                color: AppColors.textSecondary,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -121,59 +181,19 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
               );
             }
 
-            return Column(
-              children: items.map((item) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: InkWell(
-                    onTap: () => _openDetails(context, item),
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: AppColors.dark2,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.greenDeep),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${l10n.stageTitle(item.stage)} · ${l10n.daysCount(item.daysSinceStart)}',
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${l10n.propagationAliveWithMethod(item.quantityAlive, l10n.propagationMethodPlural(item.method))} · ${DateFormat('d MMM y', dateLocale).format(item.startedAt)}',
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: AppColors.textSecondary,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Icon(
-                            Icons.chevron_right,
-                            color: AppColors.textSecondary,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+            return ExpandableSideScrollList(
+              itemCount: items.length,
+              collapsedVisible: 3,
+              expandedViewport: 5,
+              itemExtent: 88,
+              itemBuilder: (context, index) {
+                return _propagationTile(
+                  context,
+                  items[index],
+                  l10n,
+                  dateLocale,
                 );
-              }).toList(),
+              },
             );
           },
         ),

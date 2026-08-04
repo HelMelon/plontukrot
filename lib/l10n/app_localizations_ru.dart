@@ -213,6 +213,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeFertilizing => 'Подкормка';
 
   @override
+  String get homeRepotting => 'Пересадка';
+
+  @override
   String get homeUpdateFamily => 'Изменить семейство';
 
   @override
@@ -223,6 +226,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get homeFertilizeSelectedTitle => 'Подкормить выбранные растения';
+
+  @override
+  String get homeRepotSelectedTitle => 'Пересадить выбранные растения';
 
   @override
   String get homeDeleteSelectedTitle => 'Удалить выбранные растения?';
@@ -335,6 +341,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get plantBotanicalData => 'Ботанические данные';
 
   @override
+  String get plantDateAddedLabel => 'Дата добавления';
+
+  @override
   String get plantJournal => 'Журнал';
 
   @override
@@ -359,6 +368,30 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plantPropagation => 'Размножение';
+
+  @override
+  String get plantInitialLeafCount => 'Начальное число листьев';
+
+  @override
+  String get plantInvalidInitialLeafCount =>
+      'Некорректное начальное число листьев';
+
+  @override
+  String get plantLeafAdd => 'Добавить лист';
+
+  @override
+  String get plantLeafRemove => 'Убрать лист';
+
+  @override
+  String get plantLeafStatsAnchor => 'Статистика листьев';
+
+  @override
+  String get plantLeafStatsTitle => 'Рост листьев';
+
+  @override
+  String plantLeafStatsMonthLine(String month, int count) {
+    return '$month: $count';
+  }
 
   @override
   String get stageUnknown => '🌱 Неизвестно';
@@ -859,7 +892,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get propagationDeleteTitle => 'Удалить размножение';
 
   @override
-  String get propagationDeleteConfirm => 'Удалить эту партию размножения?';
+  String get propagationDeleteConfirm =>
+      'Партия размножения и вся история стадий будут удалены безвозвратно. Продолжить?';
 
   @override
   String get propagationDeleteHistoryEntry => 'Удалить запись истории?';
@@ -1010,12 +1044,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String propagationDeleteStartStageBody(String stageName) {
-    return 'Удаление стадии «$stageName» удалит всю партию размножения и все остальные стадии.';
+    return 'Удаление стадии «$stageName» безвозвратно удалит всю партию размножения и все остальные стадии. Продолжить?';
   }
 
   @override
   String get propagationDeleteStageEntryBody =>
       'Будет удалена только эта запись стадии. Остальные останутся.';
+
+  @override
+  String get propagationDeleteLastEntryBody =>
+      'Это последняя запись истории. Партия размножения будет удалена безвозвратно. Продолжить?';
 
   @override
   String get deleteEntryConfirm => 'Удалить эту запись?';

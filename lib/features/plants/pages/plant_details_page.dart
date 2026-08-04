@@ -4,7 +4,9 @@ import 'dart:typed_data';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../models/growth_event.dart';
 import '../../../models/plant.dart';
+import '../../../services/growth_event_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/storage_service.dart';
 import '../widgets/sheets/update_plant_sheet.dart';
@@ -15,6 +17,9 @@ import '../widgets/sheets/add_repotting_sheet.dart';
 import '../widgets/sheets/add_fertilizing_sheet.dart';
 import '../widgets/cards/plant_image_card.dart';
 import '../widgets/cards/plant_info_card.dart';
+import '../widgets/growth/plant_leaf_counter.dart';
+import '../widgets/growth/plant_vine_painter.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 class PlantDetailsPage extends StatefulWidget {
   final String plantId;
@@ -27,14 +32,21 @@ class PlantDetailsPage extends StatefulWidget {
 
 class _PlantDetailsPageState extends State<PlantDetailsPage> {
   bool isUploading = false;
+  bool _growthBusy = false;
   late final PlantService _plantService;
+  late final GrowthEventService _growthEventService;
   late final Stream<Plant?> _plantStream;
+  late final Stream<List<GrowthEvent>> _growthStream;
+  final GlobalKey _growthStatsKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     _plantService = PlantService();
+    _growthEventService = GrowthEventService();
     _plantStream = _plantService.watchPlant(widget.plantId);
+    _growthStream = _growthEventService.watchGrowthEvents(widget.plantId);
+    _growthEventService.purgeExpired(widget.plantId);
   }
 
   Future<ImageSource?> selectImageSource() async {
@@ -131,7 +143,9 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) => AddRepottingSheet(plantId: widget.plantId),
+      backgroundColor: Colors.transparent,
+      enableDrag: true,
+      builder: (_) => AddRepottingSheet.forPlant(plantId: widget.plantId),
     );
   }
 
@@ -143,9 +157,8 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
       backgroundColor: Colors.transparent,
       builder: (_) => AddPropagationSheet(
         parentPlantId: widget.plantId,
-        parentPlantName: plant.species.isNotEmpty
-            ? plant.species
-            : l10n.commonUntitled,
+        parentPlantName:
+            plant.species.isNotEmpty ? plant.species : l10n.commonUntitled,
         parentPlantFamily: plant.plantFamily ?? '',
       ),
     );
@@ -170,14 +183,150 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
     );
   }
 
+  Future<void> _scrollToGrowthStats() async {
+    final targetContext = _growthStatsKey.currentContext;
+    if (targetContext == null) return;
+
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOutCubic,
+      alignment: 0.05,
+    );
+  }
+
+  Future<void> _addLeaf() async {
+    if (_growthBusy) return;
+    setState(() => _growthBusy = true);
+    try {
+      await _growthEventService.addNewLeaf(widget.plantId);
+    } catch (e) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commonError(e.toString()))),
+      );
+    } finally {
+      if (mounted) setState(() => _growthBusy = false);
+    }
+  }
+
+  Future<void> _removeLeaf(int displayCount) async {
+    if (_growthBusy || displayCount <= 0) return;
+    setState(() => _growthBusy = true);
+    try {
+      await _growthEventService.removeLeaf(
+        widget.plantId,
+        currentDisplayCount: displayCount,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commonError(e.toString()))),
+      );
+    } finally {
+      if (mounted) setState(() => _growthBusy = false);
+    }
+  }
+
+  Widget _buildDetailsBody({
+    required Plant plant,
+    required List<GrowthEvent> growthEvents,
+    required bool isWide,
+  }) {
+    final displayCount = GrowthEvent.displayLeafCount(
+      initialLeafCount: plant.initialLeafCount,
+      events: growthEvents,
+    );
+    final monthlyLeafStats = GrowthEvent.newLeavesByMonth(growthEvents);
+    final imageUrl = plant.imageUrl;
+
+    final infoCard = PlantInfoCard(
+      plant: plant,
+      plantId: widget.plantId,
+      growthStatsKey: _growthStatsKey,
+      monthlyLeafStats: monthlyLeafStats,
+    );
+
+    final counter = PlantLeafCounter(
+      count: displayCount,
+      busy: _growthBusy,
+      onIncrement: _addLeaf,
+      onDecrement: () => _removeLeaf(displayCount),
+      onScrollToStats: _scrollToGrowthStats,
+    );
+
+    final vineAndBelow = PlantVineStrip(
+      leafCount: displayCount,
+      belowFirstRow: isWide
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 12),
+                counter,
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 12),
+                counter,
+                const SizedBox(height: 16),
+                infoCard,
+              ],
+            ),
+    );
+
+    if (isWide) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                PlantImageCard(
+                  imageUrl: imageUrl,
+                  onTap: pickAndUploadImage,
+                  isUploading: isUploading,
+                  aspectRatio: 0.75,
+                ),
+                const SizedBox(height: 8),
+                vineAndBelow,
+              ],
+            ),
+          ),
+          const SizedBox(width: 20),
+          Expanded(flex: 5, child: infoCard),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        PlantImageCard(
+          imageUrl: imageUrl,
+          onTap: pickAndUploadImage,
+          isUploading: isUploading,
+          aspectRatio: 1.0,
+        ),
+        const SizedBox(height: 8),
+        vineAndBelow,
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
     return StreamBuilder<Plant?>(
       stream: _plantStream,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data == null) {
+      builder: (context, plantSnapshot) {
+        if (!plantSnapshot.hasData || plantSnapshot.data == null) {
           return const Scaffold(
             backgroundColor: Colors.transparent,
             body: Center(
@@ -186,8 +335,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
           );
         }
 
-        final plant = snapshot.data!;
-        final imageUrl = plant.imageUrl;
+        final plant = plantSnapshot.data!;
         final title =
             plant.nickname.isNotEmpty ? plant.nickname : l10n.plantDefaultTitle;
 
@@ -200,118 +348,100 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
             title: Text(
               title,
               maxLines: 1,
+              softWrap: false,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: AppColors.heading,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            actions: [
-              IconButton(
-                tooltip: l10n.watering,
-                onPressed: _openWateringHistory,
-                icon: const Icon(Icons.water_drop, color: AppColors.goldAccent),
-              ),
-              IconButton(
-                tooltip: l10n.fertilizing,
-                onPressed: _openFertilizing,
-                icon: const Icon(
-                  Icons.science_outlined,
-                  color: AppColors.goldAccent,
-                ),
-              ),
-              IconButton(
-                tooltip: l10n.repotting,
-                onPressed: _openRepotting,
-                icon: const Icon(Icons.flaky, color: AppColors.goldAccent),
-              ),
-              PopupMenuButton<_PlantDetailsMenuAction>(
-                tooltip: l10n.commonMore,
-                icon: const Icon(Icons.more_vert, color: AppColors.goldAccent),
-                onSelected: (action) {
-                  switch (action) {
-                    case _PlantDetailsMenuAction.propagation:
-                      _openPropagation(plant);
-                    case _PlantDetailsMenuAction.edit:
-                      _openUpdatePlant(plant);
-                    case _PlantDetailsMenuAction.note:
-                      _openAddNote();
-                  }
-                },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: _PlantDetailsMenuAction.propagation,
-                    child: Text(l10n.plantPropagation),
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(48),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: IconButton(
+                      tooltip: l10n.watering,
+                      onPressed: _openWateringHistory,
+                      icon: const Icon(Icons.water_drop_outlined,
+                          color: AppColors.goldAccent),
+                    ),
                   ),
-                  PopupMenuItem(
-                    value: _PlantDetailsMenuAction.edit,
-                    child: Text(l10n.commonEdit),
+                  Expanded(
+                    child: IconButton(
+                      tooltip: l10n.fertilizing,
+                      onPressed: _openFertilizing,
+                      icon: const Icon(
+                        Icons.science_outlined,
+                        color: AppColors.goldAccent,
+                      ),
+                    ),
                   ),
-                  PopupMenuItem(
-                    value: _PlantDetailsMenuAction.note,
-                    child: Text(l10n.plantNote),
+                  Expanded(
+                    child: IconButton(
+                      tooltip: l10n.repotting,
+                      onPressed: _openRepotting,
+                      icon: const HugeIcon(
+                        icon: HugeIcons.strokeRoundedShovel,
+                        color: AppColors.goldAccent,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: IconButton(
+                      tooltip: l10n.plantPropagation,
+                      onPressed: () => _openPropagation(plant),
+                      icon: const HugeIcon(
+                        icon: HugeIcons.strokeRoundedEcoLab01,
+                        color: AppColors.goldAccent,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: IconButton(
+                      tooltip: l10n.commonEdit,
+                      onPressed: () => _openUpdatePlant(plant),
+                      icon: const Icon(Icons.edit, color: AppColors.goldAccent),
+                    ),
+                  ),
+                  Expanded(
+                    child: IconButton(
+                      tooltip: l10n.plantNote,
+                      onPressed: _openAddNote,
+                      icon: const HugeIcon(
+                        icon: HugeIcons.strokeRoundedNoteEdit,
+                        color: AppColors.goldAccent,
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              final isWide = constraints.maxWidth >= 700;
+          body: StreamBuilder<List<GrowthEvent>>(
+            stream: _growthStream,
+            builder: (context, growthSnapshot) {
+              final growthEvents = growthSnapshot.data ?? const <GrowthEvent>[];
 
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1200),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (isWide)
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                flex: 3,
-                                child: PlantImageCard(
-                                  imageUrl: imageUrl,
-                                  onTap: pickAndUploadImage,
-                                  isUploading: isUploading,
-                                  aspectRatio: 0.75,
-                                ),
-                              ),
-                              const SizedBox(width: 20),
-                              Expanded(
-                                flex: 5,
-                                child: PlantInfoCard(
-                                  plant: plant,
-                                  plantId: widget.plantId,
-                                ),
-                              ),
-                            ],
-                          )
-                        else
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              PlantImageCard(
-                                imageUrl: imageUrl,
-                                onTap: pickAndUploadImage,
-                                isUploading: isUploading,
-                                aspectRatio: 1.0,
-                              ),
-                              const SizedBox(height: 24),
-                              PlantInfoCard(
-                                plant: plant,
-                                plantId: widget.plantId,
-                              ),
-                            ],
-                          ),
-                      ],
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  final isWide = constraints.maxWidth >= 700;
+
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1200),
+                        child: _buildDetailsBody(
+                          plant: plant,
+                          growthEvents: growthEvents,
+                          isWide: isWide,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
               );
             },
           ),
@@ -320,5 +450,3 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
     );
   }
 }
-
-enum _PlantDetailsMenuAction { propagation, edit, note }

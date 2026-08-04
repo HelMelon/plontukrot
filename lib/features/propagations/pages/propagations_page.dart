@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
@@ -178,7 +179,7 @@ class _PropagationsPageState extends State<PropagationsPage>
   }
 
   Widget _emptyState({
-    required IconData icon,
+    required Widget icon,
     required String title,
     required String subtitle,
   }) {
@@ -194,7 +195,7 @@ class _PropagationsPageState extends State<PropagationsPage>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 48, color: AppColors.accentLight),
+            icon,
             const SizedBox(height: 12),
             Text(
               title,
@@ -352,7 +353,14 @@ class _PropagationsPageState extends State<PropagationsPage>
     final items = snapshot.data!;
     if (items.isEmpty) {
       return _emptyState(
-        icon: archived ? Icons.inventory_2_outlined : Icons.spa_outlined,
+        icon: archived
+            ? const Icon(Icons.inventory_2_outlined,
+                size: 48, color: AppColors.accentLight)
+            : const HugeIcon(
+                icon: HugeIcons.strokeRoundedEcoLab01,
+                size: 48,
+                color: AppColors.accentLight,
+              ),
         title: archived
             ? l10n.propagationEmptyArchive
             : l10n.propagationEmptyActive,

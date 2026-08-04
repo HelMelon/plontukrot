@@ -92,10 +92,12 @@
   "homeClearSelection": "Clear selection",
   "homeWatering": "Watering",
   "homeFertilizing": "Fertilizing",
+  "homeRepotting": "Repotting",
   "homeUpdateFamily": "Update family",
   "homeUpdateFamilyTitle": "Update family",
   "homeFamilyLabel": "Family",
   "homeFertilizeSelectedTitle": "Fertilize selected plants",
+  "homeRepotSelectedTitle": "Repot selected plants",
   "homeDeleteSelectedTitle": "Delete selected plants?",
   "homeDeleteSelectedBody": "This will permanently delete {count} plant(s).",
   "@homeDeleteSelectedBody": {
@@ -158,6 +160,7 @@
     }
   },
   "plantBotanicalData": "Botanical data",
+  "plantDateAddedLabel": "Date added",
   "plantJournal": "Journal",
   "plantGallery": "Gallery",
   "plantCamera": "Camera",
@@ -171,6 +174,19 @@
   "plantEmptyGenus": "No plants of this genus in the collection yet",
   "plantNote": "Note",
   "plantPropagation": "Propagation",
+  "plantInitialLeafCount": "Initial leaf count",
+  "plantInvalidInitialLeafCount": "Invalid initial leaf count",
+  "plantLeafAdd": "Add leaf",
+  "plantLeafRemove": "Remove leaf",
+  "plantLeafStatsAnchor": "Leaf statistics",
+  "plantLeafStatsTitle": "Leaf growth",
+  "plantLeafStatsMonthLine": "{month}: {count}",
+  "@plantLeafStatsMonthLine": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
 
   "stageUnknown": "🌱 Unknown",
   "stageStart": "🌱 Start",
@@ -445,7 +461,7 @@
     }
   },
   "propagationDeleteTitle": "Delete propagation",
-  "propagationDeleteConfirm": "Delete this propagation batch?",
+  "propagationDeleteConfirm": "The propagation batch and all stage history will be permanently deleted. Continue?",
   "propagationDeleteHistoryEntry": "Delete history entry?",
   "propagationTimelineEmpty": "No stage history yet",
   "daysCount": "{count, plural, =0{today} =1{1 day} other{{count} days}}",
@@ -536,13 +552,14 @@
       "count": {"type": "int"}
     }
   },
-  "propagationDeleteStartStageBody": "Deleting the \"{stageName}\" stage will delete the entire propagation batch and all other stages.",
+  "propagationDeleteStartStageBody": "Deleting the \"{stageName}\" stage will permanently delete the entire propagation batch and all other stages. Continue?",
   "@propagationDeleteStartStageBody": {
     "placeholders": {
       "stageName": {"type": "String"}
     }
   },
   "propagationDeleteStageEntryBody": "Only this stage entry will be deleted. Others will remain.",
+  "propagationDeleteLastEntryBody": "This is the last history entry. The propagation batch will be permanently deleted. Continue?",
 
   "deleteEntryConfirm": "Delete this entry?",
   "promptEmptyNotAllowed": "Value cannot be empty",

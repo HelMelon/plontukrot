@@ -492,6 +492,12 @@ abstract class AppLocalizations {
   /// **'Fertilizing'**
   String get homeFertilizing;
 
+  /// No description provided for @homeRepotting.
+  ///
+  /// In en, this message translates to:
+  /// **'Repotting'**
+  String get homeRepotting;
+
   /// No description provided for @homeUpdateFamily.
   ///
   /// In en, this message translates to:
@@ -515,6 +521,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fertilize selected plants'**
   String get homeFertilizeSelectedTitle;
+
+  /// No description provided for @homeRepotSelectedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Repot selected plants'**
+  String get homeRepotSelectedTitle;
 
   /// No description provided for @homeDeleteSelectedTitle.
   ///
@@ -696,6 +708,12 @@ abstract class AppLocalizations {
   /// **'Botanical data'**
   String get plantBotanicalData;
 
+  /// No description provided for @plantDateAddedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date added'**
+  String get plantDateAddedLabel;
+
   /// No description provided for @plantJournal.
   ///
   /// In en, this message translates to:
@@ -743,6 +761,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Propagation'**
   String get plantPropagation;
+
+  /// No description provided for @plantInitialLeafCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Initial leaf count'**
+  String get plantInitialLeafCount;
+
+  /// No description provided for @plantInvalidInitialLeafCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid initial leaf count'**
+  String get plantInvalidInitialLeafCount;
+
+  /// No description provided for @plantLeafAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add leaf'**
+  String get plantLeafAdd;
+
+  /// No description provided for @plantLeafRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove leaf'**
+  String get plantLeafRemove;
+
+  /// No description provided for @plantLeafStatsAnchor.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaf statistics'**
+  String get plantLeafStatsAnchor;
+
+  /// No description provided for @plantLeafStatsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaf growth'**
+  String get plantLeafStatsTitle;
+
+  /// No description provided for @plantLeafStatsMonthLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{month}: {count}'**
+  String plantLeafStatsMonthLine(String month, int count);
 
   /// No description provided for @stageUnknown.
   ///
@@ -1647,7 +1707,7 @@ abstract class AppLocalizations {
   /// No description provided for @propagationDeleteConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Delete this propagation batch?'**
+  /// **'The propagation batch and all stage history will be permanently deleted. Continue?'**
   String get propagationDeleteConfirm;
 
   /// No description provided for @propagationDeleteHistoryEntry.
@@ -1893,7 +1953,7 @@ abstract class AppLocalizations {
   /// No description provided for @propagationDeleteStartStageBody.
   ///
   /// In en, this message translates to:
-  /// **'Deleting the \"{stageName}\" stage will delete the entire propagation batch and all other stages.'**
+  /// **'Deleting the \"{stageName}\" stage will permanently delete the entire propagation batch and all other stages. Continue?'**
   String propagationDeleteStartStageBody(String stageName);
 
   /// No description provided for @propagationDeleteStageEntryBody.
@@ -1901,6 +1961,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Only this stage entry will be deleted. Others will remain.'**
   String get propagationDeleteStageEntryBody;
+
+  /// No description provided for @propagationDeleteLastEntryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the last history entry. The propagation batch will be permanently deleted. Continue?'**
+  String get propagationDeleteLastEntryBody;
 
   /// No description provided for @deleteEntryConfirm.
   ///

@@ -61,9 +61,10 @@ Stages: `stage_info.dart` (`stageInfos`, stages 0–4).
 
 | Model | Mapping notes |
 |-------|----------------|
-| `Plant` | `fromMap` / `fromFirestore` / `fromDocument` / `toMap`; legacy keys `name`, `family` |
+| `Plant` | `fromMap` / `fromFirestore` / `fromDocument` / `toMap`; legacy keys `name`, `family`; `initialLeafCount` defaults to `0` |
 | `PlantSpecies` | Global catalog mapping |
 | `Note` | `fromMap` / `fromFirestore`; **no** `toMap` (write maps in service) |
+| `GrowthEvent` | `fromMap` / `fromFirestore`; helpers `displayLeafCount`, `newLeavesByMonth`; types include leaf + care events; **no** `toMap` |
 | `WateringEntry` | `fromMap` / `fromFirestore`; **no** `toMap` |
 | `FertilizingEntry` | `fromMap` / `fromFirestoreData`; nested dose maps |
 | `RepottingEntry` | `fromMap` / `fromFirestore` / `toMap` |

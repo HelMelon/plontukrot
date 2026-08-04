@@ -9,36 +9,42 @@ class AppTheme {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.goldAccent,
+        foregroundColor: AppColors.dark1,
         minimumSize: const Size(64, buttonHeight),
         maximumSize: const Size(double.infinity, buttonHeight),
         padding: const EdgeInsets.symmetric(horizontal: 16),
         textStyle: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w700,
+          color: AppColors.dark1,
         ),
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         backgroundColor: AppColors.goldAccent,
+        foregroundColor: AppColors.dark1,
         minimumSize: const Size(64, buttonHeight),
         maximumSize: const Size(double.infinity, buttonHeight),
         padding: const EdgeInsets.symmetric(horizontal: 16),
         textStyle: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
+          color: AppColors.dark1,
         ),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         backgroundColor: AppColors.goldAccent,
+        foregroundColor: AppColors.dark1,
         minimumSize: const Size(64, buttonHeight),
         maximumSize: const Size(double.infinity, buttonHeight),
         padding: const EdgeInsets.symmetric(horizontal: 16),
         textStyle: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
+          color: AppColors.dark1,
         ),
       ),
     ),

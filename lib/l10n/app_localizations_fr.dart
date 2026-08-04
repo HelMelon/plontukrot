@@ -216,6 +216,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeFertilizing => 'Fertilisation';
 
   @override
+  String get homeRepotting => 'Rempotage';
+
+  @override
   String get homeUpdateFamily => 'Modifier la famille';
 
   @override
@@ -227,6 +230,9 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get homeFertilizeSelectedTitle =>
       'Fertiliser les plantes sélectionnées';
+
+  @override
+  String get homeRepotSelectedTitle => 'Rempoter les plantes sélectionnées';
 
   @override
   String get homeDeleteSelectedTitle => 'Supprimer les plantes sélectionnées ?';
@@ -337,6 +343,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get plantBotanicalData => 'Données botaniques';
 
   @override
+  String get plantDateAddedLabel => 'Date d’ajout';
+
+  @override
   String get plantJournal => 'Journal';
 
   @override
@@ -363,6 +372,30 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get plantPropagation => 'Multiplication';
+
+  @override
+  String get plantInitialLeafCount => 'Nombre initial de feuilles';
+
+  @override
+  String get plantInvalidInitialLeafCount =>
+      'Nombre initial de feuilles invalide';
+
+  @override
+  String get plantLeafAdd => 'Ajouter une feuille';
+
+  @override
+  String get plantLeafRemove => 'Retirer une feuille';
+
+  @override
+  String get plantLeafStatsAnchor => 'Statistiques des feuilles';
+
+  @override
+  String get plantLeafStatsTitle => 'Croissance des feuilles';
+
+  @override
+  String plantLeafStatsMonthLine(String month, int count) {
+    return '$month: $count';
+  }
 
   @override
   String get stageUnknown => '🌱 Inconnu';
@@ -865,7 +898,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get propagationDeleteTitle => 'Supprimer la multiplication';
 
   @override
-  String get propagationDeleteConfirm => 'Supprimer ce lot de multiplication ?';
+  String get propagationDeleteConfirm =>
+      'Le lot de multiplication et tout l’historique des stades seront définitivement supprimés. Continuer ?';
 
   @override
   String get propagationDeleteHistoryEntry =>
@@ -1016,12 +1050,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String propagationDeleteStartStageBody(String stageName) {
-    return 'Supprimer le stade « $stageName » supprimera tout le lot de multiplication et les autres stades.';
+    return 'Supprimer le stade « $stageName » supprimera définitivement tout le lot de multiplication et les autres stades. Continuer ?';
   }
 
   @override
   String get propagationDeleteStageEntryBody =>
       'Seule cette entrée de stade sera supprimée. Les autres resteront.';
+
+  @override
+  String get propagationDeleteLastEntryBody =>
+      'Ceci est la dernière entrée d’historique. Le lot de multiplication sera définitivement supprimé. Continuer ?';
 
   @override
   String get deleteEntryConfirm => 'Supprimer cette entrée ?';

@@ -4,6 +4,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/note.dart';
 import '../../../../services/note_service.dart';
+import '../common/expandable_side_scroll_list.dart';
 import 'plant_note_tile.dart';
 
 class PlantNotesSection extends StatefulWidget {
@@ -16,32 +17,15 @@ class PlantNotesSection extends StatefulWidget {
 }
 
 class _PlantNotesSectionState extends State<PlantNotesSection> {
-  static const int _pageSize = 20;
+  static const int _streamLimit = 50;
 
-  bool showAll = false;
-  int _limit = _pageSize;
   late Stream<List<Note>> _notesStream;
-
-  String? _openedNoteId;
 
   @override
   void initState() {
     super.initState();
-    _notesStream = NoteService().notesStream(widget.plantId, limit: _limit);
-  }
-
-  void _handleNoteOpen(String? noteId) {
-    setState(() {
-      _openedNoteId = noteId;
-    });
-  }
-
-  void _loadMore() {
-    setState(() {
-      _limit += _pageSize;
-      showAll = true;
-      _notesStream = NoteService().notesStream(widget.plantId, limit: _limit);
-    });
+    _notesStream =
+        NoteService().notesStream(widget.plantId, limit: _streamLimit);
   }
 
   @override
@@ -86,67 +70,17 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
           );
         }
 
-        final visibleNotes = showAll ? notes : notes.take(3).toList();
-        final canLoadMore = notes.length >= _limit;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ...visibleNotes.map(
-              (note) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: PlantNoteTile(
-                  plantId: widget.plantId,
-                  note: note,
-                  isOpened: _openedNoteId == note.id,
-                  onOpenChanged: (isOpen) {
-                    _handleNoteOpen(isOpen ? note.id : null);
-                  },
-                ),
-              ),
-            ),
-            if (!showAll && notes.length > 3)
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    showAll = true;
-                  });
-                },
-                child: Text(
-                  l10n.commonShowMore,
-                  style: const TextStyle(
-                    color: AppColors.goldAccent,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              )
-            else if (showAll && canLoadMore)
-              TextButton(
-                onPressed: _loadMore,
-                child: Text(
-                  l10n.commonLoadMore,
-                  style: const TextStyle(
-                    color: AppColors.goldAccent,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              )
-            else if (showAll && notes.length > 3)
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    showAll = false;
-                  });
-                },
-                child: Text(
-                  l10n.commonCollapse,
-                  style: const TextStyle(
-                    color: AppColors.goldAccent,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-          ],
+        return ExpandableSideScrollList(
+          itemCount: notes.length,
+          collapsedVisible: 3,
+          expandedViewport: 5,
+          itemExtent: 120,
+          itemBuilder: (context, index) {
+            return PlantNoteTile(
+              plantId: widget.plantId,
+              note: notes[index],
+            );
+          },
         );
       },
     );

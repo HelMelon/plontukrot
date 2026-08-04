@@ -4,10 +4,12 @@ import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../models/growth_event.dart';
 import '../../../../models/plant.dart';
 import '../../../../models/stage_info.dart';
 import '../../../../models/variegation.dart';
 import '../../pages/plant_genus_details_page.dart';
+import '../growth/plant_growth_stats_section.dart';
 import '../notes/plant_notes_section.dart';
 import '../propagations/plant_propagations_section.dart';
 import '../sheets/add_note_sheet.dart';
@@ -19,8 +21,16 @@ import 'info_card.dart';
 class PlantInfoCard extends StatefulWidget {
   final Plant plant;
   final String plantId;
+  final GlobalKey? growthStatsKey;
+  final List<MonthlyLeafStat> monthlyLeafStats;
 
-  const PlantInfoCard({super.key, required this.plant, required this.plantId});
+  const PlantInfoCard({
+    super.key,
+    required this.plant,
+    required this.plantId,
+    this.growthStatsKey,
+    this.monthlyLeafStats = const [],
+  });
 
   @override
   State<PlantInfoCard> createState() => _PlantInfoCardState();
@@ -28,6 +38,8 @@ class PlantInfoCard extends StatefulWidget {
 
 class _PlantInfoCardState extends State<PlantInfoCard> {
   final GlobalKey _botanicalDetailsKey = GlobalKey();
+
+  static const double _sectionGap = 16;
 
   static Widget _icon(String asset) {
     return Image.asset(
@@ -42,6 +54,20 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     fontSize: 20,
     color: AppColors.heading,
   );
+
+  Widget _section({Key? key, required Widget child}) {
+    return Container(
+      key: key,
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundSecondary,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: AppColors.greenDeep),
+      ),
+      child: child,
+    );
+  }
 
   Widget? _botanicalLine(String label, String? value) {
     final trimmed = value?.trim() ?? '';
@@ -83,23 +109,60 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     final speciesTrimmed = plant.species.trim();
     final cultivarTrimmed = plant.cultivar?.trim() ?? '';
     final tradingNameTrimmed = plant.tradingName.trim();
-    final plantFamilyLine = _botanicalLine(l10n.plantFamilyLabel, plant.plantFamily);
+    final plantFamilyLine =
+        _botanicalLine(l10n.plantFamilyLabel, plant.plantFamily);
     final tradingNameLine =
         _botanicalLine(l10n.plantTradingNameLabel, tradingNameTrimmed);
     final variegation = plant.variegation;
     final variegationLabel = l10n.variegationLabelOf(variegation);
+    final dateLocale = Localizations.localeOf(context).toString();
+    final createdAtLabel = plant.createdAt == null
+        ? null
+        : DateFormat('d MMM y', dateLocale).format(plant.createdAt!);
+    final dateAddedLine =
+        _botanicalLine(l10n.plantDateAddedLabel, createdAtLabel);
     final hasBotanicalDetails = plantFamilyLine != null ||
         plant.genus.trim().isNotEmpty ||
         tradingNameLine != null ||
-        variegation != Variegation.none;
+        variegation != Variegation.none ||
+        dateAddedLine != null;
 
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppColors.backgroundSecondary,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.greenDeep),
-      ),
+    String careDateLabel(DateTime? date) {
+      if (date == null) return l10n.commonNoData;
+      return DateFormat('d MMM y').format(date);
+    }
+
+    void openWateringHistory() {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        enableDrag: true,
+        builder: (_) => WateringHistorySheet(plantId: plantId),
+      );
+    }
+
+    void openFertilizingHistory() {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        enableDrag: true,
+        builder: (_) => FertilizingHistorySheet(plantId: plantId),
+      );
+    }
+
+    void openRepottingHistory() {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        enableDrag: true,
+        builder: (_) => RepottingHistorySheet(plantId: plantId),
+      );
+    }
+
+    final mainInfo = _section(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -192,95 +255,70 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
               ),
             ),
           ],
-          const SizedBox(height: 12),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              const spacing = 8.0;
-              final stackVertically = constraints.maxWidth < 340;
-              final itemWidth = stackVertically
-                  ? constraints.maxWidth
-                  : (constraints.maxWidth - spacing * 2) / 3;
+        ],
+      ),
+    );
 
-              Widget wrapItem(Widget child) {
-                return SizedBox(width: itemWidth, child: child);
-              }
+    final careHistory = _section(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          const spacing = 8.0;
+          final stackVertically = constraints.maxWidth < 340;
+          final itemWidth = stackVertically
+              ? constraints.maxWidth
+              : (constraints.maxWidth - spacing * 2) / 3;
 
-              String careDateLabel(DateTime? date) {
-                if (date == null) return l10n.commonNoData;
-                return DateFormat('d MMM y').format(date);
-              }
+          Widget wrapItem(Widget child) {
+            return SizedBox(width: itemWidth, child: child);
+          }
 
-              void openWateringHistory() {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  enableDrag: true,
-                  builder: (_) => WateringHistorySheet(plantId: plantId),
-                );
-              }
+          return Wrap(
+            spacing: spacing,
+            runSpacing: spacing,
+            children: [
+              wrapItem(
+                InfoCard(
+                  icon: _icon('assets/icons/watering.png'),
+                  title: l10n.watering,
+                  value: careDateLabel(plant.lastWateredAt),
+                  onTap: openWateringHistory,
+                ),
+              ),
+              wrapItem(
+                InfoCard(
+                  icon: _icon('assets/icons/fertilize.png'),
+                  title: l10n.fertilizing,
+                  value: careDateLabel(plant.lastFertilizedAt),
+                  onTap: openFertilizingHistory,
+                ),
+              ),
+              wrapItem(
+                InfoCard(
+                  icon: _icon('assets/icons/potting.png'),
+                  title: l10n.repotting,
+                  value: careDateLabel(plant.lastRepottedAt),
+                  onTap: openRepottingHistory,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
 
-              void openFertilizingHistory() {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  enableDrag: true,
-                  builder: (_) => FertilizingHistorySheet(plantId: plantId),
-                );
-              }
+    final propagation = _section(
+      child: PlantPropagationsSection(
+        plantId: plantId,
+        plantName:
+            plant.species.isNotEmpty ? plant.species : l10n.commonUntitled,
+        plantFamily: plant.plantFamily ?? '',
+      ),
+    );
 
-              void openRepottingHistory() {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  enableDrag: true,
-                  builder: (_) => RepottingHistorySheet(plantId: plantId),
-                );
-              }
-
-              return Wrap(
-                spacing: spacing,
-                runSpacing: spacing,
-                children: [
-                  wrapItem(
-                    InfoCard(
-                      icon: _icon('assets/icons/watering.png'),
-                      title: l10n.watering,
-                      value: careDateLabel(plant.lastWateredAt),
-                      onTap: openWateringHistory,
-                    ),
-                  ),
-                  wrapItem(
-                    InfoCard(
-                      icon: _icon('assets/icons/fertilize.png'),
-                      title: l10n.fertilizing,
-                      value: careDateLabel(plant.lastFertilizedAt),
-                      onTap: openFertilizingHistory,
-                    ),
-                  ),
-                  wrapItem(
-                    InfoCard(
-                      icon: _icon('assets/icons/potting.png'),
-                      title: l10n.repotting,
-                      value: careDateLabel(plant.lastRepottedAt),
-                      onTap: openRepottingHistory,
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 32),
-          PlantPropagationsSection(
-            plantId: plantId,
-            plantName: plant.species.isNotEmpty
-                ? plant.species
-                : l10n.commonUntitled,
-            plantFamily: plant.plantFamily ?? '',
-          ),
-          const SizedBox(height: 32),
+    final journal = _section(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Row(
             children: [
               Expanded(
@@ -313,88 +351,115 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
           ),
           const SizedBox(height: 8),
           PlantNotesSection(plantId: plantId),
-          if (hasBotanicalDetails) ...[
-            const SizedBox(height: 32),
-            KeyedSubtree(
-              key: _botanicalDetailsKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.plantBotanicalData,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.heading,
-                    ),
+        ],
+      ),
+    );
+
+    final botanical = !hasBotanicalDetails
+        ? null
+        : _section(
+            key: _botanicalDetailsKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.plantBotanicalData,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.heading,
                   ),
-                  const SizedBox(height: 12),
-                  if (plantFamilyLine != null) plantFamilyLine,
-                  if (plant.genus.trim().isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(l10n.plantGenusPrefix, style: _botanicalStyle),
-                          Flexible(
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => PlantGenusDetailsPage(
-                                      genus: plant.genus.trim(),
-                                    ),
-                                  ),
-                                );
-                              },
-                              borderRadius: BorderRadius.circular(8),
-                              child: Text(
-                                plant.genus.trim(),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: _botanicalStyle.copyWith(
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: AppColors.heading
-                                      .withValues(alpha: 0.4),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                ),
+                const SizedBox(height: 12),
+                if (plantFamilyLine != null) plantFamilyLine,
+                if (plant.genus.trim().isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(l10n.plantGenusPrefix, style: _botanicalStyle),
                         Flexible(
-                          child: Text(
-                            l10n.plantVariegationLabel(variegationLabel),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: _botanicalStyle,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => PlantGenusDetailsPage(
+                                    genus: plant.genus.trim(),
+                                  ),
+                                ),
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            child: Text(
+                              plant.genus.trim(),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: _botanicalStyle.copyWith(
+                                decoration: TextDecoration.underline,
+                                decorationColor:
+                                    AppColors.heading.withValues(alpha: 0.4),
+                              ),
+                            ),
                           ),
                         ),
-                        if (variegation != Variegation.none) ...[
-                          const SizedBox(width: 8),
-                          Icon(
-                            variegation.icon,
-                            color: variegation.iconColor,
-                            size: 22,
-                          ),
-                        ],
                       ],
                     ),
                   ),
-                  if (tradingNameLine != null) tradingNameLine,
-                ],
-              ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          l10n.plantVariegationLabel(variegationLabel),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: _botanicalStyle,
+                        ),
+                      ),
+                      if (variegation != Variegation.none) ...[
+                        const SizedBox(width: 8),
+                        Icon(
+                          variegation.icon,
+                          color: variegation.iconColor,
+                          size: 22,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                if (tradingNameLine != null) tradingNameLine,
+                if (dateAddedLine != null) dateAddedLine,
+              ],
             ),
-          ],
-        ],
+          );
+
+    final leafStats = _section(
+      key: widget.growthStatsKey,
+      child: PlantGrowthStatsSection(
+        monthlyStats: widget.monthlyLeafStats,
       ),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        mainInfo,
+        const SizedBox(height: _sectionGap),
+        careHistory,
+        const SizedBox(height: _sectionGap),
+        propagation,
+        const SizedBox(height: _sectionGap),
+        journal,
+        if (botanical != null) ...[
+          const SizedBox(height: _sectionGap),
+          botanical,
+        ],
+        const SizedBox(height: _sectionGap),
+        leafStats,
+      ],
     );
   }
 }

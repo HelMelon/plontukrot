@@ -58,34 +58,47 @@ class PropagationDetailsSheet extends StatelessWidget {
   Future<void> _confirmDeleteStage(
     BuildContext context,
     Propagation current,
-    PropagationStageEntry entry,
-  ) async {
+    PropagationStageEntry entry, {
+    required int historyLength,
+  }) async {
     final l10n = AppLocalizations.of(context);
     final entryId = entry.id;
     if (entryId == null) return;
 
-    final isStart = entry.stage <= 1;
+    final deletesStartStage = entry.stage <= 1;
+    final deletesEntireBatch = deletesStartStage || historyLength <= 1;
+
+    final String title;
+    final String body;
+    if (deletesStartStage) {
+      title = l10n.propagationDeleteTitle;
+      body = l10n.propagationDeleteStartStageBody(l10n.stageTitle(1));
+    } else if (deletesEntireBatch) {
+      title = l10n.propagationDeleteTitle;
+      body = l10n.propagationDeleteLastEntryBody;
+    } else {
+      title = l10n.propagationDeleteHistoryEntry;
+      body = l10n.propagationDeleteStageEntryBody;
+    }
+
     final confirmed = await showDialog<bool>(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppColors.backgroundSecondary,
-          title: Text(
-            isStart
-                ? l10n.propagationDeleteTitle
-                : l10n.propagationDeleteHistoryEntry,
-          ),
-          content: Text(
-            isStart
-                ? l10n.propagationDeleteStartStageBody(l10n.stageTitle(1))
-                : l10n.propagationDeleteStageEntryBody,
-          ),
+          title: Text(title),
+          content: Text(body),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
               child: Text(l10n.commonCancel),
             ),
             FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+              ),
               onPressed: () => Navigator.pop(context, true),
               child: Text(l10n.commonDelete),
             ),
@@ -103,7 +116,7 @@ class PropagationDetailsSheet extends StatelessWidget {
     );
 
     if (!context.mounted) return;
-    if (isStart) {
+    if (deletesEntireBatch) {
       Navigator.pop(context);
     }
   }
@@ -291,6 +304,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                                         context,
                                         shown,
                                         entry,
+                                        historyLength: history.length,
                                       ),
                                       icon: const Icon(
                                         Icons.delete_outline,

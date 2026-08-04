@@ -32,6 +32,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   final tradingNameController = TextEditingController();
   final nickNameController = TextEditingController();
   final wateringFrequencyController = TextEditingController();
+  final initialLeafCountController = TextEditingController();
 
   bool isLoading = false;
   int selectedStage = 0;
@@ -55,6 +56,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
         wateringFrequencyController.text == 'null') {
       wateringFrequencyController.text = '';
     }
+    initialLeafCountController.text = widget.plant.initialLeafCount.toString();
     selectedStage = widget.plant.stage;
     selectedVariegation = widget.plant.variegation;
   }
@@ -68,6 +70,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     tradingNameController.dispose();
     nickNameController.dispose();
     wateringFrequencyController.dispose();
+    initialLeafCountController.dispose();
     super.dispose();
   }
 
@@ -112,6 +115,9 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     final wateringRaw = wateringFrequencyController.text.trim();
     final wateringFrequency =
         wateringRaw.isEmpty ? null : int.tryParse(wateringRaw);
+    final initialLeafRaw = initialLeafCountController.text.trim();
+    final initialLeafCount =
+        initialLeafRaw.isEmpty ? 0 : int.tryParse(initialLeafRaw);
 
     String? nextGenusError;
     String? nextSpeciesError;
@@ -136,6 +142,13 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
       return;
     }
 
+    if (initialLeafCount == null || initialLeafCount < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.plantInvalidInitialLeafCount)),
+      );
+      return;
+    }
+
     setState(() {
       isLoading = true;
       genusError = null;
@@ -153,6 +166,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
         tradingName: tradingName,
         nickname: nickname,
         wateringFrequency: wateringFrequency,
+        initialLeafCount: initialLeafCount,
         stage: selectedStage,
       );
 
@@ -312,6 +326,20 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             decoration: _fieldDecoration(
                               labelText: l10n.plantWateringFrequency,
                               icon: Icons.water_drop,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          TextField(
+                            controller: initialLeafCountController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            style:
+                                const TextStyle(color: AppColors.textPrimary),
+                            decoration: _fieldDecoration(
+                              labelText: l10n.plantInitialLeafCount,
+                              icon: Icons.eco_outlined,
                             ),
                           ),
                           const SizedBox(height: 18),
