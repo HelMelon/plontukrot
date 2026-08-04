@@ -123,13 +123,18 @@
   "plantInvalidInitialLeafCount": "Некорректное начальное число листьев",
   "plantLeafAdd": "Добавить лист",
   "plantLeafRemove": "Убрать лист",
+  "plantLeafRemoveTitle": "Куда делся лист?",
+  "plantLeafRemoveCut": "Срезала (на укоренение)",
+  "plantLeafRemoveEaten": "Скушал",
+  "plantLeafRemoveDried": "Отсушил",
   "plantLeafStatsAnchor": "Статистика листьев",
   "plantLeafStatsTitle": "Рост листьев",
-  "plantLeafStatsMonthLine": "{month}: {count}",
+  "plantLeafStatsMonthLine": "{month}: прибыло {gained}, убыло {lost}",
   "@plantLeafStatsMonthLine": {
     "placeholders": {
       "month": {"type": "String"},
-      "count": {"type": "int"}
+      "gained": {"type": "int"},
+      "lost": {"type": "int"}
     }
   },
 

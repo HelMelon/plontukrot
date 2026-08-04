@@ -383,14 +383,26 @@ class AppLocalizationsRu extends AppLocalizations {
   String get plantLeafRemove => 'Убрать лист';
 
   @override
+  String get plantLeafRemoveTitle => 'Куда делся лист?';
+
+  @override
+  String get plantLeafRemoveCut => 'Срезала (на укоренение)';
+
+  @override
+  String get plantLeafRemoveEaten => 'Скушал';
+
+  @override
+  String get plantLeafRemoveDried => 'Отсушил';
+
+  @override
   String get plantLeafStatsAnchor => 'Статистика листьев';
 
   @override
   String get plantLeafStatsTitle => 'Рост листьев';
 
   @override
-  String plantLeafStatsMonthLine(String month, int count) {
-    return '$month: $count';
+  String plantLeafStatsMonthLine(String month, int gained, int lost) {
+    return '$month: прибыло $gained, убыло $lost';
   }
 
   @override

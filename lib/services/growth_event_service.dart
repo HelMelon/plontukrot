@@ -33,12 +33,14 @@ class GrowthEventService {
     required String plantId,
     required GrowthEventType type,
     DateTime? at,
+    LeafRemovalReason? reason,
   }) async {
     final when = at ?? DateTime.now();
     await _growthEventsRef(plantId).add({
       'type': type.code,
       'createdAt': Timestamp.fromDate(when),
       'expiresAt': Timestamp.fromDate(when.add(retention)),
+      if (reason != null) 'reason': reason.code,
     });
   }
 
@@ -46,13 +48,19 @@ class GrowthEventService {
     return addEvent(plantId: plantId, type: GrowthEventType.newLeaf);
   }
 
-  /// Adds one [GrowthEventType.leafRemoved]. No-op when [currentDisplayCount] ≤ 0.
+  /// Adds one [GrowthEventType.leafRemoved] with [reason].
+  /// No-op when [currentDisplayCount] ≤ 0.
   Future<void> removeLeaf(
     String plantId, {
     required int currentDisplayCount,
+    required LeafRemovalReason reason,
   }) async {
     if (currentDisplayCount <= 0) return;
-    await addEvent(plantId: plantId, type: GrowthEventType.leafRemoved);
+    await addEvent(
+      plantId: plantId,
+      type: GrowthEventType.leafRemoved,
+      reason: reason,
+    );
   }
 
   Future<void> addWateringEvent(String plantId, {DateTime? at}) {

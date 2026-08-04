@@ -19,6 +19,7 @@ import '../widgets/cards/plant_image_card.dart';
 import '../widgets/cards/plant_info_card.dart';
 import '../widgets/growth/plant_leaf_counter.dart';
 import '../widgets/growth/plant_vine_painter.dart';
+import '../widgets/growth/leaf_removal_reason_sheet.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 class PlantDetailsPage extends StatefulWidget {
@@ -211,14 +212,22 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
     }
   }
 
-  Future<void> _removeLeaf(int displayCount) async {
+  Future<void> _removeLeaf(Plant plant, int displayCount) async {
     if (_growthBusy || displayCount <= 0) return;
+    final reason = await showLeafRemovalReasonSheet(context);
+    if (reason == null || !mounted) return;
+
     setState(() => _growthBusy = true);
     try {
       await _growthEventService.removeLeaf(
         widget.plantId,
         currentDisplayCount: displayCount,
+        reason: reason,
       );
+      if (!mounted) return;
+      if (reason == LeafRemovalReason.cutForRooting) {
+        _openPropagation(plant);
+      }
     } catch (e) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context);
@@ -239,7 +248,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
       initialLeafCount: plant.initialLeafCount,
       events: growthEvents,
     );
-    final monthlyLeafStats = GrowthEvent.newLeavesByMonth(growthEvents);
+    final monthlyLeafStats = GrowthEvent.leafStatsByMonth(growthEvents);
     final imageUrl = plant.imageUrl;
 
     final infoCard = PlantInfoCard(
@@ -253,7 +262,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
       count: displayCount,
       busy: _growthBusy,
       onIncrement: _addLeaf,
-      onDecrement: () => _removeLeaf(displayCount),
+      onDecrement: () => _removeLeaf(plant, displayCount),
       onScrollToStats: _scrollToGrowthStats,
     );
 

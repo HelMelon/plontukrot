@@ -43,8 +43,9 @@ class PlantGrowthStatsSection extends StatelessWidget {
               l10n.plantLeafStatsMonthLine(
                 _monthLabel(stat.monthStart, locale),
                 stat.newLeafCount,
+                stat.removedLeafCount,
               ),
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 20,

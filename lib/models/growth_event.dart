@@ -21,14 +21,33 @@ enum GrowthEventType {
   }
 }
 
-/// New-leaf count for a calendar month (`monthStart` = first day of month).
+/// Why a leaf was removed. Stored on `leafRemoved` events as `reason`.
+enum LeafRemovalReason {
+  cutForRooting,
+  eaten,
+  dried;
+
+  String get code => name;
+
+  static LeafRemovalReason? fromCode(String? code) {
+    if (code == null) return null;
+    for (final reason in LeafRemovalReason.values) {
+      if (reason.name == code) return reason;
+    }
+    return null;
+  }
+}
+
+/// Leaf gained/lost counts for a calendar month (`monthStart` = first day).
 class MonthlyLeafStat {
   final DateTime monthStart;
   final int newLeafCount;
+  final int removedLeafCount;
 
   const MonthlyLeafStat({
     required this.monthStart,
     required this.newLeafCount,
+    required this.removedLeafCount,
   });
 }
 
@@ -37,12 +56,14 @@ class GrowthEvent {
   final GrowthEventType type;
   final DateTime? createdAt;
   final DateTime? expiresAt;
+  final LeafRemovalReason? reason;
 
   const GrowthEvent({
     required this.id,
     required this.type,
     this.createdAt,
     this.expiresAt,
+    this.reason,
   });
 
   factory GrowthEvent.fromMap(String id, Map<String, dynamic> data) {
@@ -51,6 +72,7 @@ class GrowthEvent {
       type: GrowthEventType.fromCode(data['type'] as String?),
       createdAt: readTimestamp(data['createdAt']),
       expiresAt: readTimestamp(data['expiresAt']),
+      reason: LeafRemovalReason.fromCode(data['reason'] as String?),
     );
   }
 
@@ -85,9 +107,9 @@ class GrowthEvent {
     return total < 0 ? 0 : total;
   }
 
-  /// New leaves per calendar month, starting from [now]'s month going back
-  /// [months] months (newest first).
-  static List<MonthlyLeafStat> newLeavesByMonth(
+  /// New and removed leaves per calendar month, starting from [now]'s month
+  /// going back [months] months (newest first).
+  static List<MonthlyLeafStat> leafStatsByMonth(
     Iterable<GrowthEvent> events, {
     int months = 3,
     DateTime? now,
@@ -100,18 +122,44 @@ class GrowthEvent {
       final start = DateTime(monthDate.year, monthDate.month, 1);
       final end = DateTime(monthDate.year, monthDate.month + 1, 1);
 
-      var count = 0;
+      var gained = 0;
+      var lost = 0;
       for (final event in events) {
-        if (event.type != GrowthEventType.newLeaf) continue;
         final createdAt = event.createdAt;
         if (createdAt == null) continue;
         if (createdAt.isBefore(start) || !createdAt.isBefore(end)) continue;
-        count++;
+        switch (event.type) {
+          case GrowthEventType.newLeaf:
+            gained++;
+          case GrowthEventType.leafRemoved:
+            lost++;
+          case GrowthEventType.watering:
+          case GrowthEventType.fertilizing:
+          case GrowthEventType.repotting:
+          case GrowthEventType.trimming:
+          case GrowthEventType.pinching:
+            break;
+        }
       }
 
-      result.add(MonthlyLeafStat(monthStart: start, newLeafCount: count));
+      result.add(
+        MonthlyLeafStat(
+          monthStart: start,
+          newLeafCount: gained,
+          removedLeafCount: lost,
+        ),
+      );
     }
 
     return result;
+  }
+
+  /// Alias kept for call sites that only need the monthly list shape.
+  static List<MonthlyLeafStat> newLeavesByMonth(
+    Iterable<GrowthEvent> events, {
+    int months = 3,
+    DateTime? now,
+  }) {
+    return leafStatsByMonth(events, months: months, now: now);
   }
 }

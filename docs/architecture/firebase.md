@@ -117,6 +117,8 @@ When writing care history, services must keep plant doc in sync:
 
 Leaf growth baseline (not care denorm): `initialLeafCount` — edited via `PlantService.updatePlant`, not derived from `growthEvents`.
 
+`growthEvents` documents: `type`, `createdAt`, `expiresAt`; for `leafRemoved` also optional `reason` (`cutForRooting` | `eaten` | `dried`). Monthly stats count `newLeaf` as gained and all `leafRemoved` as lost.
+
 Migration flags (temporary): `careHistoryMigrated`, `botanicalFieldsMigrated`.
 
 ### Timestamps

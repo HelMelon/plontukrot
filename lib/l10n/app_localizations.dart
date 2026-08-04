@@ -786,6 +786,30 @@ abstract class AppLocalizations {
   /// **'Remove leaf'**
   String get plantLeafRemove;
 
+  /// No description provided for @plantLeafRemoveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What happened to the leaf?'**
+  String get plantLeafRemoveTitle;
+
+  /// No description provided for @plantLeafRemoveCut.
+  ///
+  /// In en, this message translates to:
+  /// **'Cut (for rooting)'**
+  String get plantLeafRemoveCut;
+
+  /// No description provided for @plantLeafRemoveEaten.
+  ///
+  /// In en, this message translates to:
+  /// **'Eaten'**
+  String get plantLeafRemoveEaten;
+
+  /// No description provided for @plantLeafRemoveDried.
+  ///
+  /// In en, this message translates to:
+  /// **'Dried out'**
+  String get plantLeafRemoveDried;
+
   /// No description provided for @plantLeafStatsAnchor.
   ///
   /// In en, this message translates to:
@@ -801,8 +825,8 @@ abstract class AppLocalizations {
   /// No description provided for @plantLeafStatsMonthLine.
   ///
   /// In en, this message translates to:
-  /// **'{month}: {count}'**
-  String plantLeafStatsMonthLine(String month, int count);
+  /// **'{month}: gained {gained}, lost {lost}'**
+  String plantLeafStatsMonthLine(String month, int gained, int lost);
 
   /// No description provided for @stageUnknown.
   ///

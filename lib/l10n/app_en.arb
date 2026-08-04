@@ -178,13 +178,18 @@
   "plantInvalidInitialLeafCount": "Invalid initial leaf count",
   "plantLeafAdd": "Add leaf",
   "plantLeafRemove": "Remove leaf",
+  "plantLeafRemoveTitle": "What happened to the leaf?",
+  "plantLeafRemoveCut": "Cut (for rooting)",
+  "plantLeafRemoveEaten": "Eaten",
+  "plantLeafRemoveDried": "Dried out",
   "plantLeafStatsAnchor": "Leaf statistics",
   "plantLeafStatsTitle": "Leaf growth",
-  "plantLeafStatsMonthLine": "{month}: {count}",
+  "plantLeafStatsMonthLine": "{month}: gained {gained}, lost {lost}",
   "@plantLeafStatsMonthLine": {
     "placeholders": {
       "month": {"type": "String"},
-      "count": {"type": "int"}
+      "gained": {"type": "int"},
+      "lost": {"type": "int"}
     }
   },
 

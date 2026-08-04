@@ -17,11 +17,35 @@ void main() {
       final events = [
         const GrowthEvent(id: '1', type: GrowthEventType.newLeaf),
         const GrowthEvent(id: '2', type: GrowthEventType.newLeaf),
-        const GrowthEvent(id: '3', type: GrowthEventType.leafRemoved),
+        const GrowthEvent(
+          id: '3',
+          type: GrowthEventType.leafRemoved,
+          reason: LeafRemovalReason.eaten,
+        ),
       ];
       expect(
         GrowthEvent.displayLeafCount(initialLeafCount: 3, events: events),
         4,
+      );
+    });
+
+    test('counts leafRemoved regardless of reason', () {
+      final events = [
+        const GrowthEvent(
+          id: '1',
+          type: GrowthEventType.leafRemoved,
+          reason: LeafRemovalReason.cutForRooting,
+        ),
+        const GrowthEvent(
+          id: '2',
+          type: GrowthEventType.leafRemoved,
+          reason: LeafRemovalReason.dried,
+        ),
+        const GrowthEvent(id: '3', type: GrowthEventType.leafRemoved),
+      ];
+      expect(
+        GrowthEvent.displayLeafCount(initialLeafCount: 5, events: events),
+        2,
       );
     });
 
@@ -52,10 +76,10 @@ void main() {
     });
   });
 
-  group('GrowthEvent.newLeavesByMonth', () {
+  group('GrowthEvent.leafStatsByMonth', () {
     final now = DateTime(2026, 8, 15);
 
-    test('splits newLeaf counts across current and previous months', () {
+    test('splits gained and lost across current and previous months', () {
       final events = [
         GrowthEvent(
           id: '1',
@@ -85,24 +109,33 @@ void main() {
         GrowthEvent(
           id: '6',
           type: GrowthEventType.leafRemoved,
+          reason: LeafRemovalReason.eaten,
           createdAt: DateTime(2026, 8, 5),
         ),
         GrowthEvent(
           id: '7',
+          type: GrowthEventType.leafRemoved,
+          createdAt: DateTime(2026, 7, 2),
+        ),
+        GrowthEvent(
+          id: '8',
           type: GrowthEventType.watering,
           createdAt: DateTime(2026, 8, 5),
         ),
       ];
 
-      final stats = GrowthEvent.newLeavesByMonth(events, now: now);
+      final stats = GrowthEvent.leafStatsByMonth(events, now: now);
 
       expect(stats.length, 3);
       expect(stats[0].monthStart, DateTime(2026, 8, 1));
       expect(stats[0].newLeafCount, 2);
+      expect(stats[0].removedLeafCount, 1);
       expect(stats[1].monthStart, DateTime(2026, 7, 1));
       expect(stats[1].newLeafCount, 1);
+      expect(stats[1].removedLeafCount, 1);
       expect(stats[2].monthStart, DateTime(2026, 6, 1));
       expect(stats[2].newLeafCount, 1);
+      expect(stats[2].removedLeafCount, 0);
     });
   });
 }

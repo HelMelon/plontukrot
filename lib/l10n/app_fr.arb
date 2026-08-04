@@ -123,13 +123,18 @@
   "plantInvalidInitialLeafCount": "Nombre initial de feuilles invalide",
   "plantLeafAdd": "Ajouter une feuille",
   "plantLeafRemove": "Retirer une feuille",
+  "plantLeafRemoveTitle": "Qu'est-il arrivé à la feuille ?",
+  "plantLeafRemoveCut": "Coupée (pour enracinement)",
+  "plantLeafRemoveEaten": "Mangé",
+  "plantLeafRemoveDried": "Séchée",
   "plantLeafStatsAnchor": "Statistiques des feuilles",
   "plantLeafStatsTitle": "Croissance des feuilles",
-  "plantLeafStatsMonthLine": "{month}: {count}",
+  "plantLeafStatsMonthLine": "{month} : gagné {gained}, perdu {lost}",
   "@plantLeafStatsMonthLine": {
     "placeholders": {
       "month": {"type": "String"},
-      "count": {"type": "int"}
+      "gained": {"type": "int"},
+      "lost": {"type": "int"}
     }
   },
 

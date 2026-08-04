@@ -123,13 +123,18 @@
   "plantInvalidInitialLeafCount": "Ungültige anfängliche Blattzahl",
   "plantLeafAdd": "Blatt hinzufügen",
   "plantLeafRemove": "Blatt entfernen",
+  "plantLeafRemoveTitle": "Was ist mit dem Blatt passiert?",
+  "plantLeafRemoveCut": "Abgeschnitten (zum Bewurzeln)",
+  "plantLeafRemoveEaten": "Gefressen",
+  "plantLeafRemoveDried": "Eingetrocknet",
   "plantLeafStatsAnchor": "Blattstatistik",
   "plantLeafStatsTitle": "Blattwachstum",
-  "plantLeafStatsMonthLine": "{month}: {count}",
+  "plantLeafStatsMonthLine": "{month}: dazugekommen {gained}, verloren {lost}",
   "@plantLeafStatsMonthLine": {
     "placeholders": {
       "month": {"type": "String"},
-      "count": {"type": "int"}
+      "gained": {"type": "int"},
+      "lost": {"type": "int"}
     }
   },
 

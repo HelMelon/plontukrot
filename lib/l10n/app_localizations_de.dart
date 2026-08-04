@@ -384,14 +384,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String get plantLeafRemove => 'Blatt entfernen';
 
   @override
+  String get plantLeafRemoveTitle => 'Was ist mit dem Blatt passiert?';
+
+  @override
+  String get plantLeafRemoveCut => 'Abgeschnitten (zum Bewurzeln)';
+
+  @override
+  String get plantLeafRemoveEaten => 'Gefressen';
+
+  @override
+  String get plantLeafRemoveDried => 'Eingetrocknet';
+
+  @override
   String get plantLeafStatsAnchor => 'Blattstatistik';
 
   @override
   String get plantLeafStatsTitle => 'Blattwachstum';
 
   @override
-  String plantLeafStatsMonthLine(String month, int count) {
-    return '$month: $count';
+  String plantLeafStatsMonthLine(String month, int gained, int lost) {
+    return '$month: dazugekommen $gained, verloren $lost';
   }
 
   @override
