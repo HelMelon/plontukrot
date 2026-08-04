@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'firestore_helpers.dart';
+import 'propagation_outcome.dart';
 
 class PropagationStageEntry {
   final String? id;
@@ -8,6 +9,7 @@ class PropagationStageEntry {
   final DateTime changedAt;
   final int? quantityAlive;
   final String? note;
+  final PropagationOutcome? outcome;
 
   const PropagationStageEntry({
     this.id,
@@ -15,15 +17,20 @@ class PropagationStageEntry {
     required this.changedAt,
     this.quantityAlive,
     this.note,
+    this.outcome,
   });
 
   factory PropagationStageEntry.fromMap(String? id, Map<String, dynamic> data) {
+    final outcomeCode = data['outcome'] as String?;
     return PropagationStageEntry(
       id: id,
       stage: data['stage'] as int? ?? 1,
       changedAt: readTimestamp(data['changedAt']) ?? DateTime.now(),
       quantityAlive: data['quantityAlive'] as int?,
       note: data['note'] as String?,
+      outcome: outcomeCode == null
+          ? null
+          : PropagationOutcome.fromCode(outcomeCode),
     );
   }
 
@@ -40,6 +47,7 @@ class PropagationStageEntry {
       'changedAt': Timestamp.fromDate(changedAt),
       if (quantityAlive != null) 'quantityAlive': quantityAlive,
       if (note != null && note!.trim().isNotEmpty) 'note': note!.trim(),
+      if (outcome != null) 'outcome': outcome!.code,
     };
   }
 }

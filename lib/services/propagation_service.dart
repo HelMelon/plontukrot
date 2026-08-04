@@ -4,7 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/propagation.dart';
+import '../models/propagation_initial_stage.dart';
 import '../models/propagation_method.dart';
+import '../models/propagation_outcome.dart';
 import '../models/propagation_stage_entry.dart';
 import '../models/propagation_status.dart';
 import '../models/propagation_year_stats.dart';
@@ -44,8 +46,11 @@ class PropagationService {
     required PropagationMethod method,
     required int quantity,
     required DateTime startedAt,
-    int stage = 1,
+    int? divisionStage,
+    int? stage,
   }) async {
+    final resolvedStage = stage ??
+        initialStageFor(method, divisionStage: divisionStage);
     final docRef = _propagationsRef.doc();
 
     final batch = _db.batch();
@@ -57,15 +62,17 @@ class PropagationService {
       'quantity': quantity,
       'quantityAlive': quantity,
       'soldQuantity': 0,
+      'giftedQuantity': 0,
+      'tradedQuantity': 0,
       'lostQuantity': 0,
-      'stage': stage,
+      'stage': resolvedStage,
       'status': PropagationStatus.active.code,
       'startedAt': Timestamp.fromDate(startedAt),
       'createdAt': FieldValue.serverTimestamp(),
     });
 
     batch.set(_stageHistoryRef(docRef.id).doc(), {
-      'stage': stage,
+      'stage': resolvedStage,
       'changedAt': Timestamp.fromDate(startedAt),
       'quantityAlive': quantity,
     });
@@ -94,6 +101,8 @@ class PropagationService {
           'status',
           whereIn: [
             PropagationStatus.sold.code,
+            PropagationStatus.gifted.code,
+            PropagationStatus.traded.code,
             PropagationStatus.lost.code,
           ],
         )
@@ -204,10 +213,17 @@ class PropagationService {
     return _stageHistoryRef(propagationId)
         .orderBy('changedAt', descending: false)
         .snapshots()
-        .map(
-          (snapshot) =>
-              snapshot.docs.map(PropagationStageEntry.fromFirestore).toList(),
-        );
+        .map((snapshot) {
+          final entries =
+              snapshot.docs.map(PropagationStageEntry.fromFirestore).toList();
+          // Secondary sort by document id keeps same-timestamp order stable.
+          entries.sort((a, b) {
+            final byTime = a.changedAt.compareTo(b.changedAt);
+            if (byTime != 0) return byTime;
+            return (a.id ?? '').compareTo(b.id ?? '');
+          });
+          return entries;
+        });
   }
 
   Future<void> changeStage({
@@ -226,18 +242,26 @@ class PropagationService {
     final alive = quantityAlive ?? previousAlive;
     final previousLost = data['lostQuantity'] as int? ?? 0;
     final lostDelta = previousAlive > alive ? previousAlive - alive : 0;
+    final newLost = previousLost + lostDelta;
 
     final updates = <String, dynamic>{
       'stage': stage,
       'quantityAlive': alive,
-      if (lostDelta > 0) 'lostQuantity': previousLost + lostDelta,
+      if (lostDelta > 0) 'lostQuantity': newLost,
     };
 
     if (alive <= 0) {
       final sold = data['soldQuantity'] as int? ?? 0;
+      final gifted = data['giftedQuantity'] as int? ?? 0;
+      final traded = data['tradedQuantity'] as int? ?? 0;
       updates.addAll(
         _archiveFields(
-          status: sold > 0 ? PropagationStatus.sold : PropagationStatus.lost,
+          status: PropagationStatus.archiveFromCounters(
+            soldQuantity: sold,
+            giftedQuantity: gifted,
+            tradedQuantity: traded,
+            lostQuantity: newLost,
+          ),
           at: changedAt,
         ),
       );
@@ -259,10 +283,11 @@ class PropagationService {
     await batch.commit();
   }
 
-  Future<void> sell({
+  Future<void> markOutcome({
     required String propagationId,
+    required PropagationOutcome outcome,
     required int quantity,
-    required DateTime soldAt,
+    required DateTime at,
     String? note,
   }) async {
     if (quantity < 1) return;
@@ -273,67 +298,33 @@ class PropagationService {
 
     final data = current.data()!;
     final alive = data['quantityAlive'] as int? ?? 0;
-    final sold = data['soldQuantity'] as int? ?? 0;
     final stage = data['stage'] as int? ?? 1;
-    final sellCount = quantity > alive ? alive : quantity;
-    if (sellCount < 1) return;
+    final count = quantity > alive ? alive : quantity;
+    if (count < 1) return;
 
-    final newAlive = alive - sellCount;
+    final newAlive = alive - count;
+    final field = switch (outcome) {
+      PropagationOutcome.sold => 'soldQuantity',
+      PropagationOutcome.gifted => 'giftedQuantity',
+      PropagationOutcome.traded => 'tradedQuantity',
+      PropagationOutcome.lost => 'lostQuantity',
+    };
+    final previous = data[field] as int? ?? 0;
+
     final updates = <String, dynamic>{
       'quantityAlive': newAlive,
-      'soldQuantity': sold + sellCount,
-      'soldAt': Timestamp.fromDate(soldAt),
+      field: previous + count,
     };
 
-    if (newAlive <= 0) {
-      updates.addAll(
-        _archiveFields(status: PropagationStatus.sold, at: soldAt),
-      );
+    if (outcome == PropagationOutcome.sold) {
+      updates['soldAt'] = Timestamp.fromDate(at);
     }
-
-    final batch = _db.batch();
-    batch.update(docRef, updates);
-    batch.set(_stageHistoryRef(propagationId).doc(), {
-      'stage': stage,
-      'changedAt': Timestamp.fromDate(soldAt),
-      'quantityAlive': newAlive,
-      if (note?.trim().isNotEmpty == true) 'note': note!.trim(),
-    });
-
-    await batch.commit();
-  }
-
-  Future<void> markLost({
-    required String propagationId,
-    required int quantity,
-    required DateTime lostAt,
-    String? note,
-  }) async {
-    if (quantity < 1) return;
-
-    final docRef = _propagationsRef.doc(propagationId);
-    final current = await docRef.get();
-    if (!current.exists) return;
-
-    final data = current.data()!;
-    final alive = data['quantityAlive'] as int? ?? 0;
-    final lost = data['lostQuantity'] as int? ?? 0;
-    final sold = data['soldQuantity'] as int? ?? 0;
-    final stage = data['stage'] as int? ?? 1;
-    final loseCount = quantity > alive ? alive : quantity;
-    if (loseCount < 1) return;
-
-    final newAlive = alive - loseCount;
-    final updates = <String, dynamic>{
-      'quantityAlive': newAlive,
-      'lostQuantity': lost + loseCount,
-    };
 
     if (newAlive <= 0) {
       updates.addAll(
         _archiveFields(
-          status: sold > 0 ? PropagationStatus.sold : PropagationStatus.lost,
-          at: lostAt,
+          status: PropagationStatus.archiveForOutcome(outcome),
+          at: at,
         ),
       );
     }
@@ -342,12 +333,73 @@ class PropagationService {
     batch.update(docRef, updates);
     batch.set(_stageHistoryRef(propagationId).doc(), {
       'stage': stage,
-      'changedAt': Timestamp.fromDate(lostAt),
+      'changedAt': Timestamp.fromDate(at),
       'quantityAlive': newAlive,
+      'outcome': outcome.code,
       if (note?.trim().isNotEmpty == true) 'note': note!.trim(),
     });
 
     await batch.commit();
+  }
+
+  Future<void> sell({
+    required String propagationId,
+    required int quantity,
+    required DateTime soldAt,
+    String? note,
+  }) {
+    return markOutcome(
+      propagationId: propagationId,
+      outcome: PropagationOutcome.sold,
+      quantity: quantity,
+      at: soldAt,
+      note: note,
+    );
+  }
+
+  Future<void> markGifted({
+    required String propagationId,
+    required int quantity,
+    required DateTime at,
+    String? note,
+  }) {
+    return markOutcome(
+      propagationId: propagationId,
+      outcome: PropagationOutcome.gifted,
+      quantity: quantity,
+      at: at,
+      note: note,
+    );
+  }
+
+  Future<void> markTraded({
+    required String propagationId,
+    required int quantity,
+    required DateTime at,
+    String? note,
+  }) {
+    return markOutcome(
+      propagationId: propagationId,
+      outcome: PropagationOutcome.traded,
+      quantity: quantity,
+      at: at,
+      note: note,
+    );
+  }
+
+  Future<void> markLost({
+    required String propagationId,
+    required int quantity,
+    required DateTime lostAt,
+    String? note,
+  }) {
+    return markOutcome(
+      propagationId: propagationId,
+      outcome: PropagationOutcome.lost,
+      quantity: quantity,
+      at: lostAt,
+      note: note,
+    );
   }
 
   Future<void> updateQuantityAlive({
@@ -385,7 +437,8 @@ class PropagationService {
     final historyRef = _stageHistoryRef(propagationId);
     await historyRef.doc(entryId).delete();
 
-    final remaining = await historyRef.orderBy('changedAt', descending: true).get();
+    final remaining =
+        await historyRef.orderBy('changedAt', descending: true).get();
     if (remaining.docs.isEmpty) {
       await deletePropagation(propagationId);
       return;

@@ -13,6 +13,8 @@ class Propagation {
   final int quantity;
   final int quantityAlive;
   final int soldQuantity;
+  final int giftedQuantity;
+  final int tradedQuantity;
   final int lostQuantity;
   final int stage;
   final PropagationStatus status;
@@ -31,6 +33,8 @@ class Propagation {
     required this.quantity,
     required this.quantityAlive,
     required this.soldQuantity,
+    this.giftedQuantity = 0,
+    this.tradedQuantity = 0,
     required this.lostQuantity,
     required this.stage,
     required this.status,
@@ -43,8 +47,7 @@ class Propagation {
 
   bool get isActive => status == PropagationStatus.active && quantityAlive > 0;
 
-  bool get isArchived =>
-      status == PropagationStatus.sold || status == PropagationStatus.lost;
+  bool get isArchived => status.isArchivedStatus;
 
   bool get isArchiveVisible {
     if (!isArchived) return false;
@@ -73,6 +76,8 @@ class Propagation {
       quantity: quantity,
       quantityAlive: quantityAlive,
       soldQuantity: data['soldQuantity'] as int? ?? 0,
+      giftedQuantity: data['giftedQuantity'] as int? ?? 0,
+      tradedQuantity: data['tradedQuantity'] as int? ?? 0,
       lostQuantity: data['lostQuantity'] as int? ?? 0,
       stage: data['stage'] as int? ?? 1,
       status: PropagationStatus.fromCode(data['status'] as String?),
@@ -97,6 +102,8 @@ class Propagation {
       'quantity': quantity,
       'quantityAlive': quantityAlive,
       'soldQuantity': soldQuantity,
+      'giftedQuantity': giftedQuantity,
+      'tradedQuantity': tradedQuantity,
       'lostQuantity': lostQuantity,
       'stage': stage,
       'status': status.code,

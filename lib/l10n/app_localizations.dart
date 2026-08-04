@@ -1437,7 +1437,7 @@ abstract class AppLocalizations {
   /// No description provided for @propagationEmptyArchiveHint.
   ///
   /// In en, this message translates to:
-  /// **'Sold and lost batches are kept for 1 year'**
+  /// **'Completed batches are kept for 1 year'**
   String get propagationEmptyArchiveHint;
 
   /// No description provided for @propagationAdd.
@@ -1455,14 +1455,38 @@ abstract class AppLocalizations {
   /// No description provided for @propagationSell.
   ///
   /// In en, this message translates to:
-  /// **'Sell'**
+  /// **'Sold'**
   String get propagationSell;
+
+  /// No description provided for @propagationGift.
+  ///
+  /// In en, this message translates to:
+  /// **'Gifted'**
+  String get propagationGift;
+
+  /// No description provided for @propagationTrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Traded'**
+  String get propagationTrade;
 
   /// No description provided for @propagationLose.
   ///
   /// In en, this message translates to:
-  /// **'Mark as lost'**
+  /// **'Lost'**
   String get propagationLose;
+
+  /// No description provided for @propagationInitialStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Initial stage'**
+  String get propagationInitialStage;
+
+  /// No description provided for @propagationParentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent: {name}'**
+  String propagationParentLabel(String name);
 
   /// No description provided for @propagationDetails.
   ///
@@ -1500,6 +1524,18 @@ abstract class AppLocalizations {
   /// **'Enter a quantity to sell'**
   String get propagationSellQuantityRequired;
 
+  /// No description provided for @propagationGiftQuantityRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a quantity'**
+  String get propagationGiftQuantityRequired;
+
+  /// No description provided for @propagationTradeQuantityRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a quantity'**
+  String get propagationTradeQuantityRequired;
+
   /// No description provided for @propagationLoseQuantityRequired.
   ///
   /// In en, this message translates to:
@@ -1530,6 +1566,18 @@ abstract class AppLocalizations {
   /// **'sold {count}'**
   String propagationSoldCount(int count);
 
+  /// No description provided for @propagationGiftedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'gifted {count}'**
+  String propagationGiftedCount(int count);
+
+  /// No description provided for @propagationTradedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'traded {count}'**
+  String propagationTradedCount(int count);
+
   /// No description provided for @propagationLostCount.
   ///
   /// In en, this message translates to:
@@ -1541,6 +1589,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sold: {count} {unit}'**
   String propagationSoldLabel(int count, String unit);
+
+  /// No description provided for @propagationGiftedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gifted: {count} {unit}'**
+  String propagationGiftedLabel(int count, String unit);
+
+  /// No description provided for @propagationTradedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Traded: {count} {unit}'**
+  String propagationTradedLabel(int count, String unit);
 
   /// No description provided for @propagationLostLabel.
   ///
@@ -1710,6 +1770,18 @@ abstract class AppLocalizations {
   /// **'Sold'**
   String get propagationStatusSold;
 
+  /// No description provided for @propagationStatusGifted.
+  ///
+  /// In en, this message translates to:
+  /// **'Gifted'**
+  String get propagationStatusGifted;
+
+  /// No description provided for @propagationStatusTraded.
+  ///
+  /// In en, this message translates to:
+  /// **'Traded'**
+  String get propagationStatusTraded;
+
   /// No description provided for @propagationStatusLost.
   ///
   /// In en, this message translates to:
@@ -1746,6 +1818,18 @@ abstract class AppLocalizations {
   /// **'Quantity to sell'**
   String get propagationSellQuantity;
 
+  /// No description provided for @propagationGiftQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity to gift'**
+  String get propagationGiftQuantity;
+
+  /// No description provided for @propagationTradeQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity to trade'**
+  String get propagationTradeQuantity;
+
   /// No description provided for @propagationLoseQuantity.
   ///
   /// In en, this message translates to:
@@ -1758,6 +1842,18 @@ abstract class AppLocalizations {
   /// **'Write off'**
   String get propagationWriteOff;
 
+  /// No description provided for @propagationConfirmGift.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift'**
+  String get propagationConfirmGift;
+
+  /// No description provided for @propagationConfirmTrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Trade'**
+  String get propagationConfirmTrade;
+
   /// No description provided for @propagationTimeline.
   ///
   /// In en, this message translates to:
@@ -1769,6 +1865,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sold: {count}'**
   String propagationSoldCountLabel(int count);
+
+  /// No description provided for @propagationGiftedCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gifted: {count}'**
+  String propagationGiftedCountLabel(int count);
+
+  /// No description provided for @propagationTradedCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Traded: {count}'**
+  String propagationTradedCountLabel(int count);
 
   /// No description provided for @propagationLostCountLabel.
   ///

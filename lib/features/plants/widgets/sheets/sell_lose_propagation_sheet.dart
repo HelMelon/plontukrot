@@ -1,247 +1,133 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
+import '../../../../core/date_time_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../models/propagation.dart';
+import '../../../../models/propagation_outcome.dart';
 import '../../../../services/propagation_service.dart';
 
-class SellPropagationSheet extends StatefulWidget {
+class MarkPropagationOutcomeSheet extends StatefulWidget {
   final Propagation propagation;
+  final PropagationOutcome outcome;
 
-  const SellPropagationSheet({super.key, required this.propagation});
-
-  @override
-  State<SellPropagationSheet> createState() => _SellPropagationSheetState();
-}
-
-class _SellPropagationSheetState extends State<SellPropagationSheet> {
-  final _service = PropagationService();
-  final _noteController = TextEditingController();
-  late final TextEditingController _quantityController;
-
-  DateTime _soldAt = DateTime.now();
-  bool _saving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _quantityController = TextEditingController(
-      text: '${widget.propagation.quantityAlive}',
-    );
-  }
-
-  @override
-  void dispose() {
-    _quantityController.dispose();
-    _noteController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _soldAt,
-      firstDate: widget.propagation.startedAt,
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) setState(() => _soldAt = picked);
-  }
-
-  Future<void> _save() async {
-    final l10n = AppLocalizations.of(context);
-    final quantity = int.tryParse(_quantityController.text.trim());
-    if (quantity == null || quantity < 1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.propagationSellQuantityRequired)),
-      );
-      return;
-    }
-    if (quantity > widget.propagation.quantityAlive) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.propagationQuantityExceedsAlive(
-              widget.propagation.quantityAlive,
-            ),
-          ),
-        ),
-      );
-      return;
-    }
-
-    setState(() => _saving = true);
-    try {
-      await _service.sell(
-        propagationId: widget.propagation.id,
-        quantity: quantity,
-        soldAt: _soldAt,
-        note: _noteController.text.trim(),
-      );
-      if (mounted) Navigator.pop(context, true);
-    } catch (e) {
-      if (mounted) {
-        setState(() => _saving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.commonError('$e'))),
-        );
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
-    return _QuantityActionSheet(
-      title: l10n.propagationSell,
-      subtitle: l10n.propagationAliveWithPlant(
-        widget.propagation.quantityAlive,
-        widget.propagation.parentPlantName,
-      ),
-      quantityController: _quantityController,
-      quantityLabel: l10n.propagationSellQuantity,
-      date: _soldAt,
-      onPickDate: _pickDate,
-      noteController: _noteController,
-      saving: _saving,
-      onSave: _save,
-      buttonLabel: l10n.propagationSell,
-    );
-  }
-}
-
-class LosePropagationSheet extends StatefulWidget {
-  final Propagation propagation;
-
-  const LosePropagationSheet({super.key, required this.propagation});
-
-  @override
-  State<LosePropagationSheet> createState() => _LosePropagationSheetState();
-}
-
-class _LosePropagationSheetState extends State<LosePropagationSheet> {
-  final _service = PropagationService();
-  final _noteController = TextEditingController();
-  late final TextEditingController _quantityController;
-
-  DateTime _lostAt = DateTime.now();
-  bool _saving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _quantityController = TextEditingController(
-      text: '${widget.propagation.quantityAlive}',
-    );
-  }
-
-  @override
-  void dispose() {
-    _quantityController.dispose();
-    _noteController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _lostAt,
-      firstDate: widget.propagation.startedAt,
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) setState(() => _lostAt = picked);
-  }
-
-  Future<void> _save() async {
-    final l10n = AppLocalizations.of(context);
-    final quantity = int.tryParse(_quantityController.text.trim());
-    if (quantity == null || quantity < 1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.propagationLoseQuantityRequired)),
-      );
-      return;
-    }
-    if (quantity > widget.propagation.quantityAlive) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.propagationQuantityExceedsAlive(
-              widget.propagation.quantityAlive,
-            ),
-          ),
-        ),
-      );
-      return;
-    }
-
-    setState(() => _saving = true);
-    try {
-      await _service.markLost(
-        propagationId: widget.propagation.id,
-        quantity: quantity,
-        lostAt: _lostAt,
-        note: _noteController.text.trim(),
-      );
-      if (mounted) Navigator.pop(context, true);
-    } catch (e) {
-      if (mounted) {
-        setState(() => _saving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.commonError('$e'))),
-        );
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
-    return _QuantityActionSheet(
-      title: l10n.propagationStatusLost,
-      subtitle: l10n.propagationAliveWithPlant(
-        widget.propagation.quantityAlive,
-        widget.propagation.parentPlantName,
-      ),
-      quantityController: _quantityController,
-      quantityLabel: l10n.propagationLoseQuantity,
-      date: _lostAt,
-      onPickDate: _pickDate,
-      noteController: _noteController,
-      saving: _saving,
-      onSave: _save,
-      buttonLabel: l10n.propagationWriteOff,
-    );
-  }
-}
-
-class _QuantityActionSheet extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final TextEditingController quantityController;
-  final String quantityLabel;
-  final DateTime date;
-  final VoidCallback onPickDate;
-  final TextEditingController noteController;
-  final bool saving;
-  final VoidCallback onSave;
-  final String buttonLabel;
-
-  const _QuantityActionSheet({
-    required this.title,
-    required this.subtitle,
-    required this.quantityController,
-    required this.quantityLabel,
-    required this.date,
-    required this.onPickDate,
-    required this.noteController,
-    required this.saving,
-    required this.onSave,
-    required this.buttonLabel,
+  const MarkPropagationOutcomeSheet({
+    super.key,
+    required this.propagation,
+    required this.outcome,
   });
+
+  @override
+  State<MarkPropagationOutcomeSheet> createState() =>
+      _MarkPropagationOutcomeSheetState();
+}
+
+class _MarkPropagationOutcomeSheetState
+    extends State<MarkPropagationOutcomeSheet> {
+  final _service = PropagationService();
+  final _noteController = TextEditingController();
+  late final TextEditingController _quantityController;
+
+  DateTime _at = DateTime.now();
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _quantityController = TextEditingController(
+      text: '${widget.propagation.quantityAlive}',
+    );
+  }
+
+  @override
+  void dispose() {
+    _quantityController.dispose();
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _at,
+      firstDate: widget.propagation.startedAt,
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) setState(() => _at = dateWithCurrentTime(picked));
+  }
+
+  String _quantityRequiredMessage(AppLocalizations l10n) {
+    return switch (widget.outcome) {
+      PropagationOutcome.sold => l10n.propagationSellQuantityRequired,
+      PropagationOutcome.gifted => l10n.propagationGiftQuantityRequired,
+      PropagationOutcome.traded => l10n.propagationTradeQuantityRequired,
+      PropagationOutcome.lost => l10n.propagationLoseQuantityRequired,
+    };
+  }
+
+  String _quantityLabel(AppLocalizations l10n) {
+    return switch (widget.outcome) {
+      PropagationOutcome.sold => l10n.propagationSellQuantity,
+      PropagationOutcome.gifted => l10n.propagationGiftQuantity,
+      PropagationOutcome.traded => l10n.propagationTradeQuantity,
+      PropagationOutcome.lost => l10n.propagationLoseQuantity,
+    };
+  }
+
+  String _buttonLabel(AppLocalizations l10n) {
+    return switch (widget.outcome) {
+      PropagationOutcome.sold => l10n.propagationSell,
+      PropagationOutcome.gifted => l10n.propagationConfirmGift,
+      PropagationOutcome.traded => l10n.propagationConfirmTrade,
+      PropagationOutcome.lost => l10n.propagationWriteOff,
+    };
+  }
+
+  Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
+    final quantity = int.tryParse(_quantityController.text.trim());
+    if (quantity == null || quantity < 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_quantityRequiredMessage(l10n))),
+      );
+      return;
+    }
+    if (quantity > widget.propagation.quantityAlive) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            l10n.propagationQuantityExceedsAlive(
+              widget.propagation.quantityAlive,
+            ),
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _saving = true);
+    try {
+      await _service.markOutcome(
+        propagationId: widget.propagation.id,
+        outcome: widget.outcome,
+        quantity: quantity,
+        at: _at,
+        note: _noteController.text.trim(),
+      );
+      if (mounted) Navigator.pop(context, true);
+    } catch (e) {
+      if (mounted) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.commonError('$e'))),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -278,7 +164,7 @@ class _QuantityActionSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 28),
                   Text(
-                    title,
+                    l10n.propagationOutcomeLabel(widget.outcome),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -290,7 +176,10 @@ class _QuantityActionSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    subtitle,
+                    l10n.propagationAliveWithPlant(
+                      widget.propagation.quantityAlive,
+                      widget.propagation.parentPlantName,
+                    ),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -300,12 +189,12 @@ class _QuantityActionSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   TextField(
-                    controller: quantityController,
+                    controller: _quantityController,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     style: const TextStyle(color: AppColors.textPrimary),
                     decoration: InputDecoration(
-                      labelText: quantityLabel,
+                      labelText: _quantityLabel(l10n),
                       labelStyle:
                           const TextStyle(color: AppColors.textSecondary),
                       filled: true,
@@ -330,7 +219,7 @@ class _QuantityActionSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   InkWell(
-                    onTap: onPickDate,
+                    onTap: _pickDate,
                     borderRadius: BorderRadius.circular(20),
                     child: Container(
                       width: double.infinity,
@@ -354,7 +243,7 @@ class _QuantityActionSheet extends StatelessWidget {
                           Expanded(
                             child: Text(
                               l10n.propagationDate(
-                                DateFormat('d MMM y').format(date),
+                                DateFormat('d MMM y').format(_at),
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -370,7 +259,7 @@ class _QuantityActionSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   TextField(
-                    controller: noteController,
+                    controller: _noteController,
                     maxLines: 2,
                     style: const TextStyle(color: AppColors.textPrimary),
                     decoration: InputDecoration(
@@ -402,7 +291,7 @@ class _QuantityActionSheet extends StatelessWidget {
                     width: double.infinity,
                     height: AppTheme.buttonHeight,
                     child: ElevatedButton(
-                      onPressed: saving ? null : onSave,
+                      onPressed: _saving ? null : _save,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.goldAccent,
                         foregroundColor: AppColors.dark1,
@@ -411,7 +300,7 @@ class _QuantityActionSheet extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      child: saving
+                      child: _saving
                           ? const SizedBox(
                               width: 22,
                               height: 22,
@@ -421,7 +310,7 @@ class _QuantityActionSheet extends StatelessWidget {
                               ),
                             )
                           : Text(
-                              buttonLabel,
+                              _buttonLabel(l10n),
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
@@ -437,4 +326,15 @@ class _QuantityActionSheet extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Backwards-compatible aliases used by existing call sites.
+class SellPropagationSheet extends MarkPropagationOutcomeSheet {
+  const SellPropagationSheet({super.key, required super.propagation})
+      : super(outcome: PropagationOutcome.sold);
+}
+
+class LosePropagationSheet extends MarkPropagationOutcomeSheet {
+  const LosePropagationSheet({super.key, required super.propagation})
+      : super(outcome: PropagationOutcome.lost);
 }

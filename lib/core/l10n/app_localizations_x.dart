@@ -4,6 +4,7 @@ import '../../models/fertilizer.dart';
 import '../../models/fertilizer_application_method.dart';
 import '../../models/fertilizer_dose.dart';
 import '../../models/propagation_method.dart';
+import '../../models/propagation_outcome.dart';
 import '../../models/propagation_status.dart';
 import '../../models/stage_info.dart';
 import '../../models/variegation.dart';
@@ -76,7 +77,18 @@ extension AppLocalizationsStage on AppLocalizations {
     return switch (status) {
       PropagationStatus.active => propagationStatusActive,
       PropagationStatus.sold => propagationStatusSold,
+      PropagationStatus.gifted => propagationStatusGifted,
+      PropagationStatus.traded => propagationStatusTraded,
       PropagationStatus.lost => propagationStatusLost,
+    };
+  }
+
+  String propagationOutcomeLabel(PropagationOutcome outcome) {
+    return switch (outcome) {
+      PropagationOutcome.sold => propagationSell,
+      PropagationOutcome.gifted => propagationGift,
+      PropagationOutcome.traded => propagationTrade,
+      PropagationOutcome.lost => propagationLose,
     };
   }
 

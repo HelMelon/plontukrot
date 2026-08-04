@@ -5,6 +5,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../models/propagation.dart';
+import '../../../../models/propagation_outcome.dart';
 import '../../../../models/propagation_stage_entry.dart';
 import '../../../../models/stage_info.dart';
 import '../../../../services/propagation_service.dart';
@@ -38,21 +39,19 @@ class PropagationDetailsSheet extends StatelessWidget {
     );
   }
 
-  Future<void> _openSell(BuildContext context, Propagation current) async {
+  Future<void> _openOutcome(
+    BuildContext context,
+    Propagation current,
+    PropagationOutcome outcome,
+  ) async {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => SellPropagationSheet(propagation: current),
-    );
-  }
-
-  Future<void> _openLose(BuildContext context, Propagation current) async {
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => LosePropagationSheet(propagation: current),
+      builder: (_) => MarkPropagationOutcomeSheet(
+        propagation: current,
+        outcome: outcome,
+      ),
     );
   }
 
@@ -188,17 +187,24 @@ class PropagationDetailsSheet extends StatelessWidget {
                     color: AppColors.accentLight,
                   ),
                 ),
-                if (shown.soldQuantity > 0 || shown.lostQuantity > 0) ...[
+                if (shown.soldQuantity > 0 ||
+                    shown.giftedQuantity > 0 ||
+                    shown.tradedQuantity > 0 ||
+                    shown.lostQuantity > 0) ...[
                   const SizedBox(height: 4),
                   Text(
                     [
                       if (shown.soldQuantity > 0)
                         l10n.propagationSoldCountLabel(shown.soldQuantity),
+                      if (shown.giftedQuantity > 0)
+                        l10n.propagationGiftedCountLabel(shown.giftedQuantity),
+                      if (shown.tradedQuantity > 0)
+                        l10n.propagationTradedCountLabel(shown.tradedQuantity),
                       if (shown.lostQuantity > 0)
                         l10n.propagationLostCountLabel(shown.lostQuantity),
                       l10n.propagationOfTotal(shown.quantity),
                     ].join(' · '),
-                    maxLines: 2,
+                    maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 14,
@@ -293,6 +299,17 @@ class PropagationDetailsSheet extends StatelessWidget {
                                     ),
                                   ],
                                 ),
+                                if (entry.outcome != null) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    l10n.propagationOutcomeLabel(entry.outcome!),
+                                    style: const TextStyle(
+                                      color: AppColors.accentLight,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                                 if (entry.quantityAlive != null) ...[
                                   const SizedBox(height: 4),
                                   Text(
@@ -353,7 +370,11 @@ class PropagationDetailsSheet extends StatelessWidget {
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                          onPressed: () => _openSell(context, shown),
+                          onPressed: () => _openOutcome(
+                            context,
+                            shown,
+                            PropagationOutcome.sold,
+                          ),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.goldAccent,
                             side: const BorderSide(color: AppColors.goldAccent),
@@ -362,13 +383,48 @@ class PropagationDetailsSheet extends StatelessWidget {
                               borderRadius: BorderRadius.circular(18),
                             ),
                           ),
-                          child: Text(l10n.propagationSell),
+                          child: Text(
+                            l10n.propagationSell,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: OutlinedButton(
-                          onPressed: () => _openLose(context, shown),
+                          onPressed: () => _openOutcome(
+                            context,
+                            shown,
+                            PropagationOutcome.gifted,
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.goldAccent,
+                            side: const BorderSide(color: AppColors.goldAccent),
+                            minimumSize: const Size.fromHeight(48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                          ),
+                          child: Text(
+                            l10n.propagationGift,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => _openOutcome(
+                            context,
+                            shown,
+                            PropagationOutcome.traded,
+                          ),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.textSecondary,
                             side: const BorderSide(color: AppColors.greenDeep),
@@ -377,7 +433,34 @@ class PropagationDetailsSheet extends StatelessWidget {
                               borderRadius: BorderRadius.circular(18),
                             ),
                           ),
-                          child: Text(l10n.propagationStatusLost),
+                          child: Text(
+                            l10n.propagationTrade,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => _openOutcome(
+                            context,
+                            shown,
+                            PropagationOutcome.lost,
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.textSecondary,
+                            side: const BorderSide(color: AppColors.greenDeep),
+                            minimumSize: const Size.fromHeight(48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                          ),
+                          child: Text(
+                            l10n.propagationLose,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                     ],

@@ -320,17 +320,28 @@
   "propagationEmptyActive": "No active propagations",
   "propagationEmptyArchive": "Archive is empty",
   "propagationEmptyActiveHint": "Add a batch from a plant page",
-  "propagationEmptyArchiveHint": "Sold and lost batches are kept for 1 year",
+  "propagationEmptyArchiveHint": "Completed batches are kept for 1 year",
   "propagationAdd": "Add propagation",
   "propagationChangeStage": "Change stage",
-  "propagationSell": "Sell",
-  "propagationLose": "Mark as lost",
+  "propagationSell": "Sold",
+  "propagationGift": "Gifted",
+  "propagationTrade": "Traded",
+  "propagationLose": "Lost",
+  "propagationInitialStage": "Initial stage",
+  "propagationParentLabel": "Parent: {name}",
+  "@propagationParentLabel": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "propagationDetails": "Propagation details",
   "propagationQuantity": "Quantity",
   "propagationQuantityMin": "Enter a quantity (minimum 1)",
   "propagationAliveNow": "Alive now",
   "propagationAliveRequired": "Enter the number alive",
   "propagationSellQuantityRequired": "Enter a quantity to sell",
+  "propagationGiftQuantityRequired": "Enter a quantity",
+  "propagationTradeQuantityRequired": "Enter a quantity",
   "propagationLoseQuantityRequired": "Enter a quantity",
   "propagationQuantityExceedsAlive": "Cannot exceed alive count ({count})",
   "@propagationQuantityExceedsAlive": {
@@ -356,6 +367,18 @@
       "count": {"type": "int"}
     }
   },
+  "propagationGiftedCount": "gifted {count}",
+  "@propagationGiftedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationTradedCount": "traded {count}",
+  "@propagationTradedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "propagationLostCount": "lost {count}",
   "@propagationLostCount": {
     "placeholders": {
@@ -364,6 +387,20 @@
   },
   "propagationSoldLabel": "Sold: {count} {unit}",
   "@propagationSoldLabel": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "unit": {"type": "String"}
+    }
+  },
+  "propagationGiftedLabel": "Gifted: {count} {unit}",
+  "@propagationGiftedLabel": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "unit": {"type": "String"}
+    }
+  },
+  "propagationTradedLabel": "Traded: {count} {unit}",
+  "@propagationTradedLabel": {
     "placeholders": {
       "count": {"type": "int"},
       "unit": {"type": "String"}
@@ -442,6 +479,8 @@
 
   "propagationStatusActive": "Active",
   "propagationStatusSold": "Sold",
+  "propagationStatusGifted": "Gifted",
+  "propagationStatusTraded": "Traded",
   "propagationStatusLost": "Lost",
 
   "propagationStartRooting": "Start rooting",
@@ -460,11 +499,27 @@
     }
   },
   "propagationSellQuantity": "Quantity to sell",
+  "propagationGiftQuantity": "Quantity to gift",
+  "propagationTradeQuantity": "Quantity to trade",
   "propagationLoseQuantity": "Quantity lost",
   "propagationWriteOff": "Write off",
+  "propagationConfirmGift": "Gift",
+  "propagationConfirmTrade": "Trade",
   "propagationTimeline": "Timeline",
   "propagationSoldCountLabel": "Sold: {count}",
   "@propagationSoldCountLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationGiftedCountLabel": "Gifted: {count}",
+  "@propagationGiftedCountLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationTradedCountLabel": "Traded: {count}",
+  "@propagationTradedCountLabel": {
     "placeholders": {
       "count": {"type": "int"}
     }

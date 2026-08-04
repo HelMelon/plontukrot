@@ -7,6 +7,8 @@ class PropagationYearStats {
   final int startedBatches;
   final int startedQuantity;
   final int soldQuantity;
+  final int giftedQuantity;
+  final int tradedQuantity;
   final int lostQuantity;
   final Map<PropagationMethod, int> byMethod;
   final Map<String, int> byFamily;
@@ -16,6 +18,8 @@ class PropagationYearStats {
     required this.startedBatches,
     required this.startedQuantity,
     required this.soldQuantity,
+    this.giftedQuantity = 0,
+    this.tradedQuantity = 0,
     required this.lostQuantity,
     required this.byMethod,
     required this.byFamily,
@@ -28,6 +32,8 @@ class PropagationYearStats {
     var startedBatches = 0;
     var startedQuantity = 0;
     var soldQuantity = 0;
+    var giftedQuantity = 0;
+    var tradedQuantity = 0;
     var lostQuantity = 0;
     final byMethod = <PropagationMethod, int>{};
     final byFamily = <String, int>{};
@@ -53,10 +59,8 @@ class PropagationYearStats {
         );
       }
 
-      // Cumulative sold/lost attributed to current year if event/archive falls in year,
-      // otherwise if still active, count known sold/lost totals started this year.
-      final soldAt = item.soldAt;
       final archivedAt = item.archivedAt;
+      final soldAt = item.soldAt;
 
       if (soldAt != null &&
           !soldAt.isBefore(yearStart) &&
@@ -67,6 +71,24 @@ class PropagationYearStats {
           item.status == PropagationStatus.active) {
         soldQuantity += item.soldQuantity;
       }
+
+      giftedQuantity += _outcomeInYear(
+        quantity: item.giftedQuantity,
+        startedInYear: startedInYear,
+        archivedAt: archivedAt,
+        yearStart: yearStart,
+        yearEnd: yearEnd,
+        status: item.status,
+      );
+
+      tradedQuantity += _outcomeInYear(
+        quantity: item.tradedQuantity,
+        startedInYear: startedInYear,
+        archivedAt: archivedAt,
+        yearStart: yearStart,
+        yearEnd: yearEnd,
+        status: item.status,
+      );
 
       if (item.lostQuantity > 0) {
         final lostInYear = (archivedAt != null &&
@@ -84,9 +106,27 @@ class PropagationYearStats {
       startedBatches: startedBatches,
       startedQuantity: startedQuantity,
       soldQuantity: soldQuantity,
+      giftedQuantity: giftedQuantity,
+      tradedQuantity: tradedQuantity,
       lostQuantity: lostQuantity,
       byMethod: byMethod,
       byFamily: byFamily,
     );
+  }
+
+  static int _outcomeInYear({
+    required int quantity,
+    required bool startedInYear,
+    required DateTime? archivedAt,
+    required DateTime yearStart,
+    required DateTime yearEnd,
+    required PropagationStatus status,
+  }) {
+    if (quantity <= 0) return 0;
+    final inYear = (archivedAt != null &&
+            !archivedAt.isBefore(yearStart) &&
+            archivedAt.isBefore(yearEnd)) ||
+        (startedInYear && status == PropagationStatus.active);
+    return inYear ? quantity : 0;
   }
 }

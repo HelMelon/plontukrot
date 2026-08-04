@@ -720,8 +720,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Добавьте партию со страницы растения';
 
   @override
-  String get propagationEmptyArchiveHint =>
-      'Проданные и погибшие партии хранятся 1 год';
+  String get propagationEmptyArchiveHint => 'Завершённые партии хранятся 1 год';
 
   @override
   String get propagationAdd => 'Добавить размножение';
@@ -730,10 +729,24 @@ class AppLocalizationsRu extends AppLocalizations {
   String get propagationChangeStage => 'Изменить стадию';
 
   @override
-  String get propagationSell => 'Продать';
+  String get propagationSell => 'Продала';
 
   @override
-  String get propagationLose => 'Отметить как погибшее';
+  String get propagationGift => 'Подарила';
+
+  @override
+  String get propagationTrade => 'Обменяла';
+
+  @override
+  String get propagationLose => 'Погибли';
+
+  @override
+  String get propagationInitialStage => 'Начальная стадия';
+
+  @override
+  String propagationParentLabel(String name) {
+    return 'Родитель: $name';
+  }
 
   @override
   String get propagationDetails => 'Детали размножения';
@@ -752,6 +765,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get propagationSellQuantityRequired => 'Укажите количество на продажу';
+
+  @override
+  String get propagationGiftQuantityRequired => 'Укажите количество';
+
+  @override
+  String get propagationTradeQuantityRequired => 'Укажите количество';
 
   @override
   String get propagationLoseQuantityRequired => 'Укажите количество';
@@ -777,6 +796,16 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String propagationGiftedCount(int count) {
+    return 'подарено $count';
+  }
+
+  @override
+  String propagationTradedCount(int count) {
+    return 'обменяно $count';
+  }
+
+  @override
   String propagationLostCount(int count) {
     return 'погибло $count';
   }
@@ -784,6 +813,16 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String propagationSoldLabel(int count, String unit) {
     return 'Продано: $count $unit';
+  }
+
+  @override
+  String propagationGiftedLabel(int count, String unit) {
+    return 'Подарено: $count $unit';
+  }
+
+  @override
+  String propagationTradedLabel(int count, String unit) {
+    return 'Обменяно: $count $unit';
   }
 
   @override
@@ -896,6 +935,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get propagationStatusSold => 'Продано';
 
   @override
+  String get propagationStatusGifted => 'Подарено';
+
+  @override
+  String get propagationStatusTraded => 'Обменяно';
+
+  @override
   String get propagationStatusLost => 'Погибло';
 
   @override
@@ -918,10 +963,22 @@ class AppLocalizationsRu extends AppLocalizations {
   String get propagationSellQuantity => 'Сколько продать';
 
   @override
+  String get propagationGiftQuantity => 'Сколько подарить';
+
+  @override
+  String get propagationTradeQuantity => 'Сколько обменять';
+
+  @override
   String get propagationLoseQuantity => 'Сколько погибло';
 
   @override
   String get propagationWriteOff => 'Списать';
+
+  @override
+  String get propagationConfirmGift => 'Подарить';
+
+  @override
+  String get propagationConfirmTrade => 'Обменять';
 
   @override
   String get propagationTimeline => 'Таймлайн';
@@ -929,6 +986,16 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String propagationSoldCountLabel(int count) {
     return 'Продано: $count';
+  }
+
+  @override
+  String propagationGiftedCountLabel(int count) {
+    return 'Подарено: $count';
+  }
+
+  @override
+  String propagationTradedCountLabel(int count) {
+    return 'Обменяно: $count';
   }
 
   @override

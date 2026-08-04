@@ -725,7 +725,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get propagationEmptyArchiveHint =>
-      'Les lots vendus et perdus sont conservés 1 an';
+      'Les lots terminés sont conservés 1 an';
 
   @override
   String get propagationAdd => 'Ajouter une multiplication';
@@ -734,10 +734,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get propagationChangeStage => 'Changer de stade';
 
   @override
-  String get propagationSell => 'Vendre';
+  String get propagationSell => 'Vendue';
 
   @override
-  String get propagationLose => 'Marquer comme perdu';
+  String get propagationGift => 'Offerte';
+
+  @override
+  String get propagationTrade => 'Échangée';
+
+  @override
+  String get propagationLose => 'Perdues';
+
+  @override
+  String get propagationInitialStage => 'Stade initial';
+
+  @override
+  String propagationParentLabel(String name) {
+    return 'Parent : $name';
+  }
 
   @override
   String get propagationDetails => 'Détails de la multiplication';
@@ -757,6 +771,12 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get propagationSellQuantityRequired =>
       'Indiquez une quantité à vendre';
+
+  @override
+  String get propagationGiftQuantityRequired => 'Indiquez une quantité';
+
+  @override
+  String get propagationTradeQuantityRequired => 'Indiquez une quantité';
 
   @override
   String get propagationLoseQuantityRequired => 'Indiquez une quantité';
@@ -782,6 +802,16 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String propagationGiftedCount(int count) {
+    return 'offert $count';
+  }
+
+  @override
+  String propagationTradedCount(int count) {
+    return 'échangé $count';
+  }
+
+  @override
   String propagationLostCount(int count) {
     return 'perdu $count';
   }
@@ -789,6 +819,16 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String propagationSoldLabel(int count, String unit) {
     return 'Vendu : $count $unit';
+  }
+
+  @override
+  String propagationGiftedLabel(int count, String unit) {
+    return 'Offert : $count $unit';
+  }
+
+  @override
+  String propagationTradedLabel(int count, String unit) {
+    return 'Échangé : $count $unit';
   }
 
   @override
@@ -901,6 +941,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get propagationStatusSold => 'Vendu';
 
   @override
+  String get propagationStatusGifted => 'Offert';
+
+  @override
+  String get propagationStatusTraded => 'Échangé';
+
+  @override
   String get propagationStatusLost => 'Perdu';
 
   @override
@@ -923,10 +969,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get propagationSellQuantity => 'Quantité à vendre';
 
   @override
+  String get propagationGiftQuantity => 'Quantité à offrir';
+
+  @override
+  String get propagationTradeQuantity => 'Quantité à échanger';
+
+  @override
   String get propagationLoseQuantity => 'Quantité perdue';
 
   @override
   String get propagationWriteOff => 'Radier';
+
+  @override
+  String get propagationConfirmGift => 'Offrir';
+
+  @override
+  String get propagationConfirmTrade => 'Échanger';
 
   @override
   String get propagationTimeline => 'Chronologie';
@@ -934,6 +992,16 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String propagationSoldCountLabel(int count) {
     return 'Vendu : $count';
+  }
+
+  @override
+  String propagationGiftedCountLabel(int count) {
+    return 'Offert : $count';
+  }
+
+  @override
+  String propagationTradedCountLabel(int count) {
+    return 'Échangé : $count';
   }
 
   @override

@@ -4,8 +4,11 @@ import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../models/plant.dart';
 import '../../../models/propagation.dart';
+import '../../../models/propagation_parent_label.dart';
 import '../../../models/propagation_year_stats.dart';
+import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../plants/widgets/sheets/propagation_details_sheet.dart';
 
@@ -20,16 +23,20 @@ class _PropagationsPageState extends State<PropagationsPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   late final PropagationService _service;
+  late final PlantService _plantService;
   late final Stream<List<Propagation>> _activeStream;
   late final Stream<List<Propagation>> _archivedStream;
+  late final Stream<List<Plant>> _plantsStream;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _service = PropagationService();
+    _plantService = PlantService();
     _activeStream = _service.watchActivePropagations();
     _archivedStream = _service.watchArchivedPropagations();
+    _plantsStream = _plantService.getPlants();
   }
 
   @override
@@ -48,6 +55,11 @@ class _PropagationsPageState extends State<PropagationsPage>
       backgroundColor: Colors.transparent,
       builder: (_) => PropagationDetailsSheet(propagation: propagation),
     );
+  }
+
+  Map<String, Plant> _plantsById(List<Plant>? plants) {
+    if (plants == null) return const {};
+    return {for (final plant in plants) plant.id: plant};
   }
 
   Widget _statsCard(PropagationYearStats stats) {
@@ -92,6 +104,26 @@ class _PropagationsPageState extends State<PropagationsPage>
             ),
             style: const TextStyle(color: AppColors.textPrimary),
           ),
+          if (stats.giftedQuantity > 0) ...[
+            const SizedBox(height: 4),
+            Text(
+              l10n.propagationGiftedLabel(
+                stats.giftedQuantity,
+                l10n.unitPiecesShort,
+              ),
+              style: const TextStyle(color: AppColors.textPrimary),
+            ),
+          ],
+          if (stats.tradedQuantity > 0) ...[
+            const SizedBox(height: 4),
+            Text(
+              l10n.propagationTradedLabel(
+                stats.tradedQuantity,
+                l10n.unitPiecesShort,
+              ),
+              style: const TextStyle(color: AppColors.textPrimary),
+            ),
+          ],
           const SizedBox(height: 4),
           Text(
             l10n.propagationLostLabel(
@@ -186,9 +218,19 @@ class _PropagationsPageState extends State<PropagationsPage>
     );
   }
 
-  Widget _propagationTile(Propagation item, {required bool archived}) {
+  Widget _propagationTile(
+    Propagation item, {
+    required bool archived,
+    required Map<String, Plant> plantsById,
+  }) {
     final l10n = AppLocalizations.of(context);
     final dateLocale = Localizations.localeOf(context).toString();
+    final parentLabel = l10n.propagationParentLabel(
+      propagationParentLabel(
+        propagation: item,
+        parent: plantsById[item.parentPlantId],
+      ),
+    );
     final subtitle = archived
         ? '${l10n.propagationStatusLabel(item.status)} · ${item.quantity} ${l10n.propagationMethodPlural(item.method)}'
         : '${l10n.propagationAliveWithMethod(item.quantityAlive, l10n.propagationMethodPlural(item.method))} · ${DateFormat('d MMM y', dateLocale).format(item.startedAt)}';
@@ -225,7 +267,7 @@ class _PropagationsPageState extends State<PropagationsPage>
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    item.parentPlantName,
+                    parentLabel,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -244,16 +286,23 @@ class _PropagationsPageState extends State<PropagationsPage>
                     ),
                   ),
                   if (archived &&
-                      (item.soldQuantity > 0 || item.lostQuantity > 0)) ...[
+                      (item.soldQuantity > 0 ||
+                          item.giftedQuantity > 0 ||
+                          item.tradedQuantity > 0 ||
+                          item.lostQuantity > 0)) ...[
                     const SizedBox(height: 4),
                     Text(
                       [
                         if (item.soldQuantity > 0)
                           l10n.propagationSoldCount(item.soldQuantity),
+                        if (item.giftedQuantity > 0)
+                          l10n.propagationGiftedCount(item.giftedQuantity),
+                        if (item.tradedQuantity > 0)
+                          l10n.propagationTradedCount(item.tradedQuantity),
                         if (item.lostQuantity > 0)
                           l10n.propagationLostCount(item.lostQuantity),
                       ].join(' · '),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: AppColors.accentLight,
@@ -277,6 +326,7 @@ class _PropagationsPageState extends State<PropagationsPage>
   Widget _propagationList(
     AsyncSnapshot<List<Propagation>> snapshot, {
     required bool archived,
+    required Map<String, Plant> plantsById,
   }) {
     final l10n = AppLocalizations.of(context);
 
@@ -317,7 +367,11 @@ class _PropagationsPageState extends State<PropagationsPage>
       itemCount: items.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
-        return _propagationTile(items[index], archived: archived);
+        return _propagationTile(
+          items[index],
+          archived: archived,
+          plantsById: plantsById,
+        );
       },
     );
   }
@@ -326,63 +380,81 @@ class _PropagationsPageState extends State<PropagationsPage>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return StreamBuilder<List<Propagation>>(
-      stream: _activeStream,
-      builder: (context, activeSnapshot) {
-        return StreamBuilder<List<Propagation>>(
-          stream: _archivedStream,
-          builder: (context, archivedSnapshot) {
-            final stats =
-                activeSnapshot.hasData && archivedSnapshot.hasData
-                    ? PropagationYearStats.fromList(
-                        DateTime.now().year,
-                        [...activeSnapshot.data!, ...archivedSnapshot.data!],
-                      )
-                    : null;
+    return StreamBuilder<List<Plant>>(
+      stream: _plantsStream,
+      builder: (context, plantsSnapshot) {
+        final plantsById = _plantsById(plantsSnapshot.data);
 
-            return Scaffold(
-              backgroundColor: Colors.transparent,
-              appBar: AppBar(
-                backgroundColor: AppColors.background,
-                surfaceTintColor: Colors.transparent,
-                elevation: 0,
-                title: Text(
-                  l10n.propagationTitle,
-                  style: const TextStyle(
-                    color: AppColors.heading,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                bottom: TabBar(
-                  controller: _tabController,
-                  indicatorColor: AppColors.goldAccent,
-                  labelColor: AppColors.goldAccent,
-                  unselectedLabelColor: AppColors.textSecondary,
-                  tabs: [
-                    Tab(text: l10n.propagationActiveTab),
-                    Tab(text: l10n.propagationArchiveTab),
-                  ],
-                ),
-              ),
-              body: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-                    child: stats == null
-                        ? const SizedBox(height: 8)
-                        : _statsCard(stats),
-                  ),
-                  Expanded(
-                    child: TabBarView(
+        return StreamBuilder<List<Propagation>>(
+          stream: _activeStream,
+          builder: (context, activeSnapshot) {
+            return StreamBuilder<List<Propagation>>(
+              stream: _archivedStream,
+              builder: (context, archivedSnapshot) {
+                final stats =
+                    activeSnapshot.hasData && archivedSnapshot.hasData
+                        ? PropagationYearStats.fromList(
+                            DateTime.now().year,
+                            [
+                              ...activeSnapshot.data!,
+                              ...archivedSnapshot.data!,
+                            ],
+                          )
+                        : null;
+
+                return Scaffold(
+                  backgroundColor: Colors.transparent,
+                  appBar: AppBar(
+                    backgroundColor: AppColors.background,
+                    surfaceTintColor: Colors.transparent,
+                    elevation: 0,
+                    title: Text(
+                      l10n.propagationTitle,
+                      style: const TextStyle(
+                        color: AppColors.heading,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    bottom: TabBar(
                       controller: _tabController,
-                      children: [
-                        _propagationList(activeSnapshot, archived: false),
-                        _propagationList(archivedSnapshot, archived: true),
+                      indicatorColor: AppColors.goldAccent,
+                      labelColor: AppColors.goldAccent,
+                      unselectedLabelColor: AppColors.textSecondary,
+                      tabs: [
+                        Tab(text: l10n.propagationActiveTab),
+                        Tab(text: l10n.propagationArchiveTab),
                       ],
                     ),
                   ),
-                ],
-              ),
+                  body: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                        child: stats == null
+                            ? const SizedBox(height: 8)
+                            : _statsCard(stats),
+                      ),
+                      Expanded(
+                        child: TabBarView(
+                          controller: _tabController,
+                          children: [
+                            _propagationList(
+                              activeSnapshot,
+                              archived: false,
+                              plantsById: plantsById,
+                            ),
+                            _propagationList(
+                              archivedSnapshot,
+                              archived: true,
+                              plantsById: plantsById,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             );
           },
         );

@@ -4,8 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
+import '../../../../core/date_time_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../models/propagation_initial_stage.dart';
 import '../../../../models/propagation_method.dart';
 import '../../../../services/propagation_service.dart';
 
@@ -30,6 +32,7 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
   final _service = PropagationService();
 
   PropagationMethod _method = PropagationMethod.leaf;
+  int _divisionStage = propagationStageBaby;
   DateTime _startedAt = DateTime.now();
   bool _saving = false;
 
@@ -47,7 +50,7 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
       lastDate: DateTime.now(),
     );
     if (picked != null) {
-      setState(() => _startedAt = picked);
+      setState(() => _startedAt = dateWithCurrentTime(picked));
     }
   }
 
@@ -71,6 +74,8 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
         method: _method,
         quantity: quantity,
         startedAt: _startedAt,
+        divisionStage:
+            requiresInitialStageChoice(_method) ? _divisionStage : null,
       );
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
@@ -86,6 +91,7 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final showDivisionStage = requiresInitialStageChoice(_method);
 
     return Container(
       decoration: const BoxDecoration(
@@ -166,6 +172,45 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
                   );
                 }).toList(),
               ),
+              if (showDivisionStage) ...[
+                const SizedBox(height: 24),
+                Text(
+                  l10n.propagationInitialStage,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.heading,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                for (final stage in [
+                  propagationStageBaby,
+                  propagationStageJuvenile,
+                ])
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      _divisionStage == stage
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_off,
+                      color: _divisionStage == stage
+                          ? AppColors.goldAccent
+                          : AppColors.textSecondary,
+                    ),
+                    title: Text(
+                      l10n.stageTitle(stage),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: _divisionStage == stage
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                      ),
+                    ),
+                    onTap: () => setState(() => _divisionStage = stage),
+                  ),
+              ],
               const SizedBox(height: 24),
               TextField(
                 controller: _quantityController,

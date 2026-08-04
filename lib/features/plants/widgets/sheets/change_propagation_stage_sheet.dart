@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
+import '../../../../core/date_time_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../models/propagation.dart';
@@ -59,7 +60,7 @@ class _ChangePropagationStageSheetState
       lastDate: DateTime.now(),
     );
     if (picked != null) {
-      setState(() => _changedAt = picked);
+      setState(() => _changedAt = dateWithCurrentTime(picked));
     }
   }
 
