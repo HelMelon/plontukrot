@@ -319,6 +319,8 @@
   "propagationMethodOffsetPlural": "деток",
   "propagationMethodCutting": "Черенок",
   "propagationMethodCuttingPlural": "черенков",
+  "propagationMethodMicrocloning": "Микроклонирование",
+  "propagationMethodMicrocloningPlural": "микроклонов",
 
   "propagationStatusActive": "Активно",
   "propagationStatusSold": "Продано",

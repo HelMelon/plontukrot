@@ -975,6 +975,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get propagationMethodCuttingPlural => 'черенков';
 
   @override
+  String get propagationMethodMicrocloning => 'Микроклонирование';
+
+  @override
+  String get propagationMethodMicrocloningPlural => 'микроклонов';
+
+  @override
   String get propagationStatusActive => 'Активно';
 
   @override

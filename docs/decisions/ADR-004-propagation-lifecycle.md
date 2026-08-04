@@ -20,9 +20,9 @@ Introducing per-offspring Firestore documents was rejected: the batch remains th
 Keep the **batch-centric** model. Extend it minimally:
 
 1. **Initial stage** is resolved by `initialStageFor(method, divisionStage:)`:
-   - `offset` (Детка) → stage 2 (Детка);
+   - `offset` (Детка) and `microcloning` → stage 2 (Детка);
    - `division` → user chooses stage 2 or 3;
-   - all other methods → stage 1 (Старт).
+   - all other methods (`leaf`, `leafFragment`, `rhizome`, `tuber`, `cutting`) → stage 1 (Старт).
    The chosen value is written as the first `stageHistory` entry and as `Propagation.stage`.
 
 2. **Stage and outcome stay separate.** Outcomes are quantity counters plus optional `outcome` on history rows. Current stage is never replaced by an outcome label. “Alive” remains `quantityAlive > 0` with no synthetic `active` outcome enum value.

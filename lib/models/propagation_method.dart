@@ -5,7 +5,8 @@ enum PropagationMethod {
   tuber,
   division,
   offset,
-  cutting;
+  cutting,
+  microcloning;
 
   String get code => name;
 

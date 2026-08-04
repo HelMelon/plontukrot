@@ -58,6 +58,7 @@ extension AppLocalizationsStage on AppLocalizations {
       PropagationMethod.division => propagationMethodDivision,
       PropagationMethod.offset => propagationMethodOffset,
       PropagationMethod.cutting => propagationMethodCutting,
+      PropagationMethod.microcloning => propagationMethodMicrocloning,
     };
   }
 
@@ -70,6 +71,7 @@ extension AppLocalizationsStage on AppLocalizations {
       PropagationMethod.division => propagationMethodDivisionPlural,
       PropagationMethod.offset => propagationMethodOffsetPlural,
       PropagationMethod.cutting => propagationMethodCuttingPlural,
+      PropagationMethod.microcloning => propagationMethodMicrocloningPlural,
     };
   }
 

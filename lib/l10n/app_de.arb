@@ -314,6 +314,8 @@
   "propagationMethodOffsetPlural": "Kindel",
   "propagationMethodCutting": "Steckling",
   "propagationMethodCuttingPlural": "Stecklinge",
+  "propagationMethodMicrocloning": "Mikroklonierung",
+  "propagationMethodMicrocloningPlural": "Mikroklone",
 
   "propagationStatusActive": "Aktiv",
   "propagationStatusSold": "Verkauft",

@@ -46,6 +46,13 @@ void main() {
       );
     });
 
+    test('microcloning starts at baby', () {
+      expect(
+        initialStageFor(PropagationMethod.microcloning),
+        propagationStageBaby,
+      );
+    });
+
     test('other methods start at start', () {
       for (final method in [
         PropagationMethod.leaf,

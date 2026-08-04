@@ -314,6 +314,8 @@
   "propagationMethodOffsetPlural": "rejets",
   "propagationMethodCutting": "Bouture",
   "propagationMethodCuttingPlural": "boutures",
+  "propagationMethodMicrocloning": "Microclonage",
+  "propagationMethodMicrocloningPlural": "microclones",
 
   "propagationStatusActive": "Active",
   "propagationStatusSold": "Vendu",

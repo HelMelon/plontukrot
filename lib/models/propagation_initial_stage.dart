@@ -20,6 +20,7 @@ int initialStageFor(
 }) {
   switch (method) {
     case PropagationMethod.offset:
+    case PropagationMethod.microcloning:
       return propagationStageBaby;
     case PropagationMethod.division:
       final stage = divisionStage ?? propagationStageBaby;

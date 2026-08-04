@@ -969,6 +969,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get propagationMethodCuttingPlural => 'cuttings';
 
   @override
+  String get propagationMethodMicrocloning => 'Microcloning';
+
+  @override
+  String get propagationMethodMicrocloningPlural => 'microclones';
+
+  @override
   String get propagationStatusActive => 'Active';
 
   @override

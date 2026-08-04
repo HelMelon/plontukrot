@@ -497,6 +497,8 @@
   "propagationMethodOffsetPlural": "offsets",
   "propagationMethodCutting": "Cutting",
   "propagationMethodCuttingPlural": "cuttings",
+  "propagationMethodMicrocloning": "Microcloning",
+  "propagationMethodMicrocloningPlural": "microclones",
 
   "propagationStatusActive": "Active",
   "propagationStatusSold": "Sold",

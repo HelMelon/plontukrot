@@ -981,6 +981,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get propagationMethodCuttingPlural => 'boutures';
 
   @override
+  String get propagationMethodMicrocloning => 'Microclonage';
+
+  @override
+  String get propagationMethodMicrocloningPlural => 'microclones';
+
+  @override
   String get propagationStatusActive => 'Active';
 
   @override

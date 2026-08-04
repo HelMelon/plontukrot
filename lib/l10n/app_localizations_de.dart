@@ -975,6 +975,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get propagationMethodCuttingPlural => 'Stecklinge';
 
   @override
+  String get propagationMethodMicrocloning => 'Mikroklonierung';
+
+  @override
+  String get propagationMethodMicrocloningPlural => 'Mikroklone';
+
+  @override
   String get propagationStatusActive => 'Aktiv';
 
   @override

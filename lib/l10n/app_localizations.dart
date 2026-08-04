@@ -1842,6 +1842,18 @@ abstract class AppLocalizations {
   /// **'cuttings'**
   String get propagationMethodCuttingPlural;
 
+  /// No description provided for @propagationMethodMicrocloning.
+  ///
+  /// In en, this message translates to:
+  /// **'Microcloning'**
+  String get propagationMethodMicrocloning;
+
+  /// No description provided for @propagationMethodMicrocloningPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'microclones'**
+  String get propagationMethodMicrocloningPlural;
+
   /// No description provided for @propagationStatusActive.
   ///
   /// In en, this message translates to:
