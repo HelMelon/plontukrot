@@ -338,6 +338,58 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
         final plant = plantSnapshot.data!;
         final title =
             plant.nickname.isNotEmpty ? plant.nickname : l10n.plantDefaultTitle;
+        final isWideAppBar = MediaQuery.sizeOf(context).width >= 700;
+        final titleStyle = const TextStyle(
+          color: AppColors.heading,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        );
+
+        final actionButtons = <Widget>[
+          IconButton(
+            tooltip: l10n.watering,
+            onPressed: _openWateringHistory,
+            icon: const Icon(Icons.water_drop_outlined,
+                color: AppColors.goldAccent),
+          ),
+          IconButton(
+            tooltip: l10n.fertilizing,
+            onPressed: _openFertilizing,
+            icon: const Icon(
+              Icons.science_outlined,
+              color: AppColors.goldAccent,
+            ),
+          ),
+          IconButton(
+            tooltip: l10n.repotting,
+            onPressed: _openRepotting,
+            icon: const HugeIcon(
+              icon: HugeIcons.strokeRoundedShovel,
+              color: AppColors.goldAccent,
+            ),
+          ),
+          IconButton(
+            tooltip: l10n.plantPropagation,
+            onPressed: () => _openPropagation(plant),
+            icon: const HugeIcon(
+              icon: HugeIcons.strokeRoundedEcoLab01,
+              color: AppColors.goldAccent,
+            ),
+          ),
+          IconButton(
+            tooltip: l10n.commonEdit,
+            onPressed: () => _openUpdatePlant(plant),
+            icon: const Icon(Icons.edit, color: AppColors.goldAccent),
+          ),
+          IconButton(
+            tooltip: l10n.plantNote,
+            onPressed: _openAddNote,
+            icon: const HugeIcon(
+              icon: HugeIcons.strokeRoundedNoteEdit,
+              color: AppColors.goldAccent,
+            ),
+          ),
+        ];
 
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -350,74 +402,20 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               maxLines: 1,
               softWrap: false,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColors.heading,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: titleStyle,
             ),
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(48),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: IconButton(
-                      tooltip: l10n.watering,
-                      onPressed: _openWateringHistory,
-                      icon: const Icon(Icons.water_drop_outlined,
-                          color: AppColors.goldAccent),
+            actions: isWideAppBar ? actionButtons : null,
+            bottom: isWideAppBar
+                ? null
+                : PreferredSize(
+                    preferredSize: const Size.fromHeight(48),
+                    child: Row(
+                      children: [
+                        for (final button in actionButtons)
+                          Expanded(child: button),
+                      ],
                     ),
                   ),
-                  Expanded(
-                    child: IconButton(
-                      tooltip: l10n.fertilizing,
-                      onPressed: _openFertilizing,
-                      icon: const Icon(
-                        Icons.science_outlined,
-                        color: AppColors.goldAccent,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: IconButton(
-                      tooltip: l10n.repotting,
-                      onPressed: _openRepotting,
-                      icon: const HugeIcon(
-                        icon: HugeIcons.strokeRoundedShovel,
-                        color: AppColors.goldAccent,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: IconButton(
-                      tooltip: l10n.plantPropagation,
-                      onPressed: () => _openPropagation(plant),
-                      icon: const HugeIcon(
-                        icon: HugeIcons.strokeRoundedEcoLab01,
-                        color: AppColors.goldAccent,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: IconButton(
-                      tooltip: l10n.commonEdit,
-                      onPressed: () => _openUpdatePlant(plant),
-                      icon: const Icon(Icons.edit, color: AppColors.goldAccent),
-                    ),
-                  ),
-                  Expanded(
-                    child: IconButton(
-                      tooltip: l10n.plantNote,
-                      onPressed: _openAddNote,
-                      icon: const HugeIcon(
-                        icon: HugeIcons.strokeRoundedNoteEdit,
-                        color: AppColors.goldAccent,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ),
           body: StreamBuilder<List<GrowthEvent>>(
             stream: _growthStream,

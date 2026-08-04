@@ -681,9 +681,47 @@ class _HomePageState extends State<HomePage> {
     if (mounted) _exitSelectionMode();
   }
 
-  AppBar _buildSelectionAppBar(AppLocalizations l10n) {
+  static const double _wideBreakpoint = 700;
+
+  AppBar _buildSelectionAppBar(AppLocalizations l10n, {required bool isWide}) {
     final allVisibleSelected = _visiblePlantIds.isNotEmpty &&
         _visiblePlantIds.every(_selectedPlantIds.contains);
+
+    final actionButtons = <Widget>[
+      IconButton(
+        tooltip:
+            allVisibleSelected ? l10n.homeClearSelection : l10n.homeSelectAll,
+        onPressed: _selectAll,
+        icon: Icon(
+          allVisibleSelected ? Icons.deselect : Icons.select_all,
+        ),
+      ),
+      IconButton(
+        tooltip: l10n.homeWatering,
+        onPressed: _addWatering,
+        icon: const Icon(Icons.water_drop_outlined),
+      ),
+      IconButton(
+        tooltip: l10n.homeFertilizing,
+        onPressed: _showFertilizingSheet,
+        icon: const Icon(Icons.science_outlined),
+      ),
+      IconButton(
+        tooltip: l10n.homeRepotting,
+        onPressed: _showRepottingSheet,
+        icon: const Icon(Icons.flaky),
+      ),
+      IconButton(
+        tooltip: l10n.homeUpdateFamily,
+        onPressed: _updateFamily,
+        icon: const Icon(Icons.park_outlined),
+      ),
+      IconButton(
+        tooltip: l10n.commonDelete,
+        onPressed: _deletePlants,
+        icon: const Icon(Icons.delete_outline),
+      ),
+    ];
 
     return AppBar(
       backgroundColor: AppColors.background,
@@ -696,58 +734,166 @@ class _HomePageState extends State<HomePage> {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(48),
-        child: Row(
-          children: [
-            Expanded(
-              child: IconButton(
-                tooltip: allVisibleSelected
-                    ? l10n.homeClearSelection
-                    : l10n.homeSelectAll,
-                onPressed: _selectAll,
-                icon: Icon(
-                  allVisibleSelected ? Icons.deselect : Icons.select_all,
-                ),
+      actions: isWide ? actionButtons : null,
+      bottom: isWide
+          ? null
+          : PreferredSize(
+              preferredSize: const Size.fromHeight(48),
+              child: Row(
+                children: [
+                  for (final button in actionButtons) Expanded(child: button),
+                ],
               ),
             ),
-            Expanded(
-              child: IconButton(
-                tooltip: l10n.homeWatering,
-                onPressed: _addWatering,
-                icon: const Icon(Icons.water_drop_outlined),
+    );
+  }
+
+  Widget _buildHomeSearchField(AppLocalizations l10n) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 16.0,
+        right: 16.0,
+        bottom: 12.0,
+      ),
+      child: GestureDetector(
+        onTap: () {
+          showSearch(
+            context: context,
+            delegate: PlantSearchDelegate(
+              userId: widget.user.uid,
+              plantsStream: _plantsStream,
+              searchFieldLabel: l10n.homeSearchHint,
+            ),
+          );
+        },
+        child: AbsorbPointer(
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: l10n.homeSearchHint,
+              hintStyle: const TextStyle(color: AppColors.textSecondary),
+              prefixIcon: const Icon(
+                Icons.search,
+                color: AppColors.textSecondary,
+              ),
+              filled: true,
+              fillColor: AppColors.heading.withValues(alpha: 0.05),
+              contentPadding: const EdgeInsets.symmetric(vertical: 12),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
               ),
             ),
-            Expanded(
-              child: IconButton(
-                tooltip: l10n.homeFertilizing,
-                onPressed: _showFertilizingSheet,
-                icon: const Icon(Icons.science_outlined),
-              ),
-            ),
-            Expanded(
-              child: IconButton(
-                tooltip: l10n.homeRepotting,
-                onPressed: _showRepottingSheet,
-                icon: const Icon(Icons.flaky),
-              ),
-            ),
-            Expanded(
-              child: IconButton(
-                tooltip: l10n.homeUpdateFamily,
-                onPressed: _updateFamily,
-                icon: const Icon(Icons.park_outlined),
-              ),
-            ),
-            Expanded(
-              child: IconButton(
-                tooltip: l10n.commonDelete,
-                onPressed: _deletePlants,
-                icon: const Icon(Icons.delete_outline),
-              ),
-            ),
-          ],
+          ),
         ),
+      ),
+    );
+  }
+
+  List<Widget> _buildHomeNavActions(
+    AppLocalizations l10n,
+    AuthService authService,
+  ) {
+    return [
+      IconButton(
+        tooltip: l10n.homePropagation,
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const PropagationsPage(),
+            ),
+          );
+        },
+        icon: const HugeIcon(
+          icon: HugeIcons.strokeRoundedEcoLab01,
+          color: AppColors.accentLight,
+        ),
+      ),
+      IconButton(
+        tooltip: l10n.settingsTitle,
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const SettingsPage(),
+            ),
+          );
+        },
+        icon: const Icon(
+          Icons.settings,
+          color: AppColors.accentLight,
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Center(
+          child: SizedBox(
+            width: 40,
+            height: 40,
+            child: ClipOval(
+              child: widget.user.photoUrl != null &&
+                      widget.user.photoUrl!.isNotEmpty
+                  ? Image.network(
+                      widget.user.photoUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        Icons.person,
+                        color: AppColors.heading,
+                      ),
+                    )
+                  : const Icon(Icons.person, color: AppColors.heading),
+            ),
+          ),
+        ),
+      ),
+      IconButton(
+        tooltip: l10n.authSignOut,
+        onPressed: () async {
+          await authService.signOut();
+        },
+        icon: const Icon(Icons.logout, color: AppColors.accentLight),
+      ),
+    ];
+  }
+
+  AppBar _buildHomeAppBar(
+    AppLocalizations l10n,
+    AuthService authService, {
+    required bool isWide,
+  }) {
+    final navActions = _buildHomeNavActions(l10n, authService);
+
+    return AppBar(
+      backgroundColor: AppColors.background,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      centerTitle: false,
+      title: Align(
+        alignment: Alignment.centerLeft,
+        child: AutoSizeText(
+          'Plöntukrot',
+          minFontSize: 18,
+          maxFontSize: 36,
+          style: TextStyle(
+            fontFamily: 'NordicStyle',
+            color: AppColors.heading,
+            fontSize: 36,
+          ),
+        ),
+      ),
+      actions: isWide ? navActions : null,
+      bottom: PreferredSize(
+        preferredSize: Size.fromHeight(isWide ? 64 : 120),
+        child: isWide
+            ? _buildHomeSearchField(l10n)
+            : Column(
+                children: [
+                  Row(
+                    children: [
+                      for (final action in navActions) Expanded(child: action),
+                    ],
+                  ),
+                  _buildHomeSearchField(l10n),
+                ],
+              ),
       ),
     );
   }
@@ -756,146 +902,13 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final authService = AuthService();
     final l10n = AppLocalizations.of(context);
+    final isWide = MediaQuery.sizeOf(context).width >= _wideBreakpoint;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: _isSelectionMode
-          ? _buildSelectionAppBar(l10n)
-          : AppBar(
-              backgroundColor: AppColors.background,
-              surfaceTintColor: Colors.transparent,
-              elevation: 0,
-              centerTitle: false,
-              title: Align(
-                alignment: Alignment.centerLeft,
-                child: AutoSizeText(
-                  'Plöntukrot',
-                  minFontSize: 18,
-                  maxFontSize: 36,
-                  style: TextStyle(
-                      fontFamily: 'NordicStyle',
-                      color: AppColors.heading,
-                      fontSize: 36),
-                ),
-              ),
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(120),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: IconButton(
-                            tooltip: l10n.homePropagation,
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => const PropagationsPage(),
-                                ),
-                              );
-                            },
-                            icon: const HugeIcon(
-                              icon: HugeIcons.strokeRoundedEcoLab01,
-                              color: AppColors.accentLight,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: IconButton(
-                            tooltip: l10n.settingsTitle,
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => const SettingsPage(),
-                                ),
-                              );
-                            },
-                            icon: const Icon(
-                              Icons.settings,
-                              color: AppColors.accentLight,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Center(
-                            child: SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: ClipOval(
-                                child: widget.user.photoUrl != null &&
-                                        widget.user.photoUrl!.isNotEmpty
-                                    ? Image.network(
-                                        widget.user.photoUrl!,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) =>
-                                            const Icon(
-                                          Icons.person,
-                                          color: AppColors.heading,
-                                        ),
-                                      )
-                                    : const Icon(Icons.person,
-                                        color: AppColors.heading),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: IconButton(
-                            tooltip: l10n.authSignOut,
-                            onPressed: () async {
-                              await authService.signOut();
-                            },
-                            icon: const Icon(Icons.logout,
-                                color: AppColors.accentLight),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 16.0,
-                        right: 16.0,
-                        bottom: 12.0,
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          showSearch(
-                            context: context,
-                            delegate: PlantSearchDelegate(
-                              userId: widget.user.uid,
-                              plantsStream: _plantsStream,
-                              searchFieldLabel: l10n.homeSearchHint,
-                            ),
-                          );
-                        },
-                        child: AbsorbPointer(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: l10n.homeSearchHint,
-                              hintStyle: const TextStyle(
-                                  color: AppColors.textSecondary),
-                              prefixIcon: const Icon(
-                                Icons.search,
-                                color: AppColors.textSecondary,
-                              ),
-                              filled: true,
-                              fillColor:
-                                  AppColors.heading.withValues(alpha: 0.05),
-                              contentPadding:
-                                  const EdgeInsets.symmetric(vertical: 12),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          ? _buildSelectionAppBar(l10n, isWide: isWide)
+          : _buildHomeAppBar(l10n, authService, isWide: isWide),
       floatingActionButton: _isSelectionMode
           ? null
           : FloatingActionButton(
