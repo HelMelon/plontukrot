@@ -13,6 +13,7 @@ import '../../../services/storage_service.dart';
 import '../widgets/sheets/update_plant_sheet.dart';
 import '../widgets/sheets/add_note_sheet.dart';
 import '../widgets/sheets/add_propagation_sheet.dart';
+import '../widgets/sheets/archive_plant_sheet.dart';
 import '../widgets/sheets/watering_history_sheet.dart';
 import '../widgets/sheets/add_repotting_sheet.dart';
 import '../widgets/sheets/add_fertilizing_sheet.dart';
@@ -189,6 +190,22 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
       backgroundColor: Colors.transparent,
       builder: (_) => AddNoteSheet(plantId: widget.plantId),
     );
+  }
+
+  Future<void> _openDispose(Plant plant) async {
+    final archived = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => ArchivePlantSheet(plant: plant),
+    );
+    if (archived == true && mounted) {
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.plantDisposeArchived)),
+      );
+      Navigator.of(context).pop();
+    }
   }
 
   Future<void> _scrollToGrowthStats() async {
@@ -406,6 +423,12 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               color: actionIconColor,
             ),
           ),
+          if (!plant.isArchived)
+            IconButton(
+              tooltip: l10n.plantDispose,
+              onPressed: () => _openDispose(plant),
+              icon: Icon(Icons.archive_outlined, color: actionIconColor),
+            ),
         ];
 
         return Scaffold(

@@ -396,6 +396,12 @@ abstract class AppLocalizations {
   /// **'No plants with active propagation'**
   String get homeNoPropagatingPlants;
 
+  /// No description provided for @homeNoGroupPlants.
+  ///
+  /// In en, this message translates to:
+  /// **'No plant groups yet'**
+  String get homeNoGroupPlants;
+
   /// No description provided for @homeNoPlantsForFilter.
   ///
   /// In en, this message translates to:
@@ -431,6 +437,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Propagation'**
   String get homePropagation;
+
+  /// No description provided for @homeGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Groups'**
+  String get homeGroups;
+
+  /// No description provided for @homeArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get homeArchive;
+
+  /// No description provided for @homeMerge.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get homeMerge;
+
+  /// No description provided for @homeMergeNeedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Select 2 to 3 plants'**
+  String get homeMergeNeedCount;
+
+  /// No description provided for @homeMergeNeedSameGenus.
+  ///
+  /// In en, this message translates to:
+  /// **'Plants must share the same genus to merge'**
+  String get homeMergeNeedSameGenus;
 
   /// No description provided for @homeWishList.
   ///
@@ -2442,6 +2478,12 @@ abstract class AppLocalizations {
   /// **'Sale: {plantName} ×{quantity}'**
   String financesPropagationSaleTitle(String plantName, int quantity);
 
+  /// No description provided for @financesPlantSaleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plant sale: {plantName}'**
+  String financesPlantSaleTitle(String plantName);
+
   /// No description provided for @propagationTradeForWishList.
   ///
   /// In en, this message translates to:
@@ -2459,6 +2501,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Skip'**
   String get commonSkip;
+
+  /// No description provided for @plantMergeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge into a group'**
+  String get plantMergeTitle;
+
+  /// No description provided for @plantMergeMemberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cultivar {index}'**
+  String plantMergeMemberLabel(int index);
+
+  /// No description provided for @plantMergeMembersRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter at least two cultivars'**
+  String get plantMergeMembersRequired;
+
+  /// No description provided for @plantGroupMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Group cultivars'**
+  String get plantGroupMembers;
+
+  /// No description provided for @plantCultivarsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cultivars: {cultivars}'**
+  String plantCultivarsLabel(String cultivars);
+
+  /// No description provided for @plantArchiveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plant archive'**
+  String get plantArchiveTitle;
+
+  /// No description provided for @plantArchiveEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive is empty'**
+  String get plantArchiveEmpty;
+
+  /// No description provided for @plantArchiveEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Plants are kept in the archive for 2 years'**
+  String get plantArchiveEmptyHint;
+
+  /// No description provided for @plantArchiveReasonMerged.
+  ///
+  /// In en, this message translates to:
+  /// **'Merged'**
+  String get plantArchiveReasonMerged;
+
+  /// No description provided for @plantArchiveReasonDied.
+  ///
+  /// In en, this message translates to:
+  /// **'Died'**
+  String get plantArchiveReasonDied;
+
+  /// No description provided for @plantArchiveReasonSold.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold'**
+  String get plantArchiveReasonSold;
+
+  /// No description provided for @plantArchiveDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived on {date}'**
+  String plantArchiveDate(String date);
+
+  /// No description provided for @plantArchiveNoteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason: {note}'**
+  String plantArchiveNoteLabel(String note);
+
+  /// No description provided for @plantDispose.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from collection'**
+  String get plantDispose;
+
+  /// No description provided for @plantDisposeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove plant'**
+  String get plantDisposeTitle;
+
+  /// No description provided for @plantDisposeReasonDied.
+  ///
+  /// In en, this message translates to:
+  /// **'Died'**
+  String get plantDisposeReasonDied;
+
+  /// No description provided for @plantDisposeReasonSold.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold'**
+  String get plantDisposeReasonSold;
+
+  /// No description provided for @plantDisposeDeathNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Cause description'**
+  String get plantDisposeDeathNote;
+
+  /// No description provided for @plantDisposeDeathNoteRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe why the plant died'**
+  String get plantDisposeDeathNoteRequired;
+
+  /// No description provided for @plantDisposeSaleAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale amount'**
+  String get plantDisposeSaleAmount;
+
+  /// No description provided for @plantDisposeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to archive'**
+  String get plantDisposeConfirm;
+
+  /// No description provided for @plantDisposeArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Plant moved to archive'**
+  String get plantDisposeArchived;
 }
 
 class _AppLocalizationsDelegate

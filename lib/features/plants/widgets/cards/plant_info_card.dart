@@ -6,6 +6,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/growth_event.dart';
 import '../../../../models/plant.dart';
+import '../../../../models/plant_archive_reason.dart';
 import '../../../../models/stage_info.dart';
 import '../../../../models/variegation.dart';
 import '../../pages/plant_genus_details_page.dart';
@@ -111,13 +112,15 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     );
 
     final speciesTrimmed = plant.species.trim();
-    final cultivarTrimmed = plant.cultivar?.trim() ?? '';
+    final cultivarsDisplay = plant.cultivarsDisplay;
     final tradingNameTrimmed = plant.tradingName.trim();
     final plantFamilyLine =
         _botanicalLine(l10n.plantFamilyLabel, plant.plantFamily);
     final tradingNameLine =
         _botanicalLine(l10n.plantTradingNameLabel, tradingNameTrimmed);
-    final variegation = plant.variegation;
+    final variegation = plant.isGroup
+        ? Variegation.none
+        : plant.variegation;
     final variegationLabel = l10n.variegationLabelOf(variegation);
     final dateLocale = Localizations.localeOf(context).toString();
     final createdAtLabel = plant.createdAt == null
@@ -178,6 +181,31 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
               style: typography.titlePage,
             ),
           if (plant.nickname.trim().isNotEmpty) spacing.vXs,
+          if (plant.isArchived) ...[
+            Text(
+              switch (plant.archiveReason) {
+                PlantArchiveReason.merged => l10n.plantArchiveReasonMerged,
+                PlantArchiveReason.died => l10n.plantArchiveReasonDied,
+                PlantArchiveReason.sold => l10n.plantArchiveReasonSold,
+                null => l10n.homeArchive,
+              },
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: _botanicalStyle.copyWith(color: colors.textSecondary),
+            ),
+            if ((plant.archiveNote ?? '').trim().isNotEmpty)
+              Padding(
+                padding: EdgeInsets.only(top: spacing.xxs, bottom: spacing.xs),
+                child: Text(
+                  l10n.plantArchiveNoteLabel(plant.archiveNote!.trim()),
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
+                  style: _botanicalStyle,
+                ),
+              )
+            else
+              spacing.vXs,
+          ],
           if (speciesTrimmed.isNotEmpty)
             Padding(
               padding: EdgeInsets.only(bottom: spacing.xs),
@@ -206,16 +234,47 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                 ],
               ),
             ),
-          if (cultivarTrimmed.isNotEmpty)
+          if (cultivarsDisplay.isNotEmpty)
             Padding(
               padding: EdgeInsets.only(bottom: spacing.xs),
               child: Text(
-                l10n.plantCultivarLabel(cultivarTrimmed),
-                maxLines: 2,
+                plant.isGroup
+                    ? l10n.plantCultivarsLabel(cultivarsDisplay)
+                    : l10n.plantCultivarLabel(cultivarsDisplay),
+                maxLines: 3,
                 overflow: TextOverflow.ellipsis,
                 style: _botanicalStyle,
               ),
             ),
+          if (plant.isGroup && plant.members.isNotEmpty) ...[
+            for (final member in plant.members)
+              if (member.variegation != Variegation.none)
+                Padding(
+                  padding: EdgeInsets.only(bottom: spacing.xxs),
+                  child: Row(
+                    children: [
+                      Icon(
+                        member.variegation.icon,
+                        color: member.variegation.iconColor,
+                        size: spacing.xl,
+                      ),
+                      spacing.hXs,
+                      Expanded(
+                        child: Text(
+                          [
+                            if ((member.cultivar ?? '').trim().isNotEmpty)
+                              member.cultivar!.trim(),
+                            l10n.variegationLabelOf(member.variegation),
+                          ].join(' · '),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: _botanicalStyle,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+          ],
           if (stage.value != 0)
             Text(
               l10n.plantStageLabel(l10n.stageInfoTitle(stage)),

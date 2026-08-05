@@ -56,12 +56,18 @@
   "homeNoUserData": "Aucune donnée utilisateur",
   "homeNoPlantsYet": "Aucune plante ajoutée pour le moment",
   "homeNoPropagatingPlants": "Aucune plante en multiplication active",
+  "homeNoGroupPlants": "Aucun groupe de plantes",
   "homeNoPlantsForFilter": "Aucune plante ne correspond au filtre sélectionné",
   "homeAllFamilies": "Toutes les familles",
   "homeAllGenera": "Tous les genres",
   "homeAllStages": "Tous les stades",
   "homeNoFamily": "Sans famille",
   "homePropagation": "Multiplication",
+  "homeGroups": "Groupes",
+  "homeArchive": "Archives",
+  "homeMerge": "Fusionner",
+  "homeMergeNeedCount": "Sélectionnez 2 à 3 plantes",
+  "homeMergeNeedSameGenus": "Les plantes doivent avoir le même genre pour fusionner",
   "homeWishList": "WishLeafs",
   "homeFinances": "Finances",
   "homeSort": "Trier",
@@ -441,7 +447,58 @@
       "quantity": {"type": "int"}
     }
   },
+  "financesPlantSaleTitle": "Vente de plante : {plantName}",
+  "@financesPlantSaleTitle": {
+    "placeholders": {
+      "plantName": {"type": "String"}
+    }
+  },
   "propagationTradeForWishList": "Pour une plante de la liste",
   "commonContinue": "Continuer",
-  "commonSkip": "Passer"
+  "commonSkip": "Passer",
+
+  "plantMergeTitle": "Fusionner en un groupe",
+  "plantMergeMemberLabel": "Cultivar {index}",
+  "@plantMergeMemberLabel": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "plantMergeMembersRequired": "Indiquez au moins deux cultivars",
+  "plantGroupMembers": "Cultivars du groupe",
+  "plantCultivarsLabel": "Cultivars : {cultivars}",
+  "@plantCultivarsLabel": {
+    "placeholders": {
+      "cultivars": {"type": "String"}
+    }
+  },
+
+  "plantArchiveTitle": "Archives des plantes",
+  "plantArchiveEmpty": "Les archives sont vides",
+  "plantArchiveEmptyHint": "Les plantes restent 2 ans dans les archives",
+  "plantArchiveReasonMerged": "Fusionnée",
+  "plantArchiveReasonDied": "Morte",
+  "plantArchiveReasonSold": "Vendue",
+  "plantArchiveDate": "Archivée le {date}",
+  "@plantArchiveDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "plantArchiveNoteLabel": "Raison : {note}",
+  "@plantArchiveNoteLabel": {
+    "placeholders": {
+      "note": {"type": "String"}
+    }
+  },
+
+  "plantDispose": "Retirer de la collection",
+  "plantDisposeTitle": "Retirer la plante",
+  "plantDisposeReasonDied": "Morte",
+  "plantDisposeReasonSold": "Vendue",
+  "plantDisposeDeathNote": "Description des causes",
+  "plantDisposeDeathNoteRequired": "Décrivez la cause de la mort",
+  "plantDisposeSaleAmount": "Montant de la vente",
+  "plantDisposeConfirm": "Vers les archives",
+  "plantDisposeArchived": "Plante déplacée vers les archives"
 }

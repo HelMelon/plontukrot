@@ -42,6 +42,7 @@ class FinanceService {
     FinanceEntrySource source = FinanceEntrySource.manual,
     String? note,
     String? propagationId,
+    String? plantId,
     String? wishListItemId,
     int? quantity,
   }) async {
@@ -53,6 +54,7 @@ class FinanceService {
       'date': Timestamp.fromDate(date),
       if (note != null && note.trim().isNotEmpty) 'note': note.trim(),
       if (propagationId != null) 'propagationId': propagationId,
+      if (plantId != null) 'plantId': plantId,
       if (wishListItemId != null) 'wishListItemId': wishListItemId,
       if (quantity != null) 'quantity': quantity,
       'createdAt': FieldValue.serverTimestamp(),

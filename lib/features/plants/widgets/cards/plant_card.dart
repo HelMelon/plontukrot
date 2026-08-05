@@ -59,8 +59,9 @@ class PlantCard extends StatelessWidget {
     final speciesBase =
         (plant.species.isEmpty ? l10n.commonUntitled : plant.species)
             .toTitleCase();
-    final cultivar = (plant.cultivar ?? '').trim().toTitleCase();
-    final species = cultivar.isEmpty ? speciesBase : '$speciesBase · $cultivar';
+    final cultivars = plant.cultivarsDisplay.toTitleCase();
+    final species =
+        cultivars.isEmpty ? speciesBase : '$speciesBase · $cultivars';
     final nickname = plant.nickname.toTitleCase();
     final hasNickname = nickname.trim().isNotEmpty;
     final showSpeciesOnTop = preferSpeciesAsTitle || !hasNickname;

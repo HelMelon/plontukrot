@@ -19,6 +19,7 @@ enum FinanceEntryType {
 enum FinanceEntrySource {
   manual,
   propagationSale,
+  plantSale,
   wishListPurchase,
   soilComponent,
   fertilizer,
@@ -44,6 +45,7 @@ class FinanceEntry {
   final DateTime date;
   final String? note;
   final String? propagationId;
+  final String? plantId;
   final String? wishListItemId;
   final int? quantity;
   final DateTime? createdAt;
@@ -58,6 +60,7 @@ class FinanceEntry {
     required this.date,
     this.note,
     this.propagationId,
+    this.plantId,
     this.wishListItemId,
     this.quantity,
     this.createdAt,
@@ -77,6 +80,7 @@ class FinanceEntry {
       date: readTimestamp(data['date']) ?? DateTime.now(),
       note: data['note'] as String?,
       propagationId: data['propagationId'] as String?,
+      plantId: data['plantId'] as String?,
       wishListItemId: data['wishListItemId'] as String?,
       quantity: (data['quantity'] as num?)?.toInt(),
       createdAt: readTimestamp(data['createdAt']),
@@ -99,6 +103,7 @@ class FinanceEntry {
       'date': Timestamp.fromDate(date),
       if (note != null && note!.isNotEmpty) 'note': note,
       if (propagationId != null) 'propagationId': propagationId,
+      if (plantId != null) 'plantId': plantId,
       if (wishListItemId != null) 'wishListItemId': wishListItemId,
       if (quantity != null) 'quantity': quantity,
       if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),

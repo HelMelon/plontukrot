@@ -71,12 +71,18 @@
   "homeNoUserData": "No user data",
   "homeNoPlantsYet": "No plants added yet",
   "homeNoPropagatingPlants": "No plants with active propagation",
+  "homeNoGroupPlants": "No plant groups yet",
   "homeNoPlantsForFilter": "No plants match the selected filter",
   "homeAllFamilies": "All families",
   "homeAllGenera": "All genera",
   "homeAllStages": "All stages",
   "homeNoFamily": "No family",
   "homePropagation": "Propagation",
+  "homeGroups": "Groups",
+  "homeArchive": "Archive",
+  "homeMerge": "Merge",
+  "homeMergeNeedCount": "Select 2 to 3 plants",
+  "homeMergeNeedSameGenus": "Plants must share the same genus to merge",
   "homeWishList": "WishLeafs",
   "homeFinances": "Finances",
   "homeSort": "Sort",
@@ -675,7 +681,58 @@
       "quantity": {"type": "int"}
     }
   },
+  "financesPlantSaleTitle": "Plant sale: {plantName}",
+  "@financesPlantSaleTitle": {
+    "placeholders": {
+      "plantName": {"type": "String"}
+    }
+  },
   "propagationTradeForWishList": "For a wish-list plant",
   "commonContinue": "Continue",
-  "commonSkip": "Skip"
+  "commonSkip": "Skip",
+
+  "plantMergeTitle": "Merge into a group",
+  "plantMergeMemberLabel": "Cultivar {index}",
+  "@plantMergeMemberLabel": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "plantMergeMembersRequired": "Enter at least two cultivars",
+  "plantGroupMembers": "Group cultivars",
+  "plantCultivarsLabel": "Cultivars: {cultivars}",
+  "@plantCultivarsLabel": {
+    "placeholders": {
+      "cultivars": {"type": "String"}
+    }
+  },
+
+  "plantArchiveTitle": "Plant archive",
+  "plantArchiveEmpty": "Archive is empty",
+  "plantArchiveEmptyHint": "Plants are kept in the archive for 2 years",
+  "plantArchiveReasonMerged": "Merged",
+  "plantArchiveReasonDied": "Died",
+  "plantArchiveReasonSold": "Sold",
+  "plantArchiveDate": "Archived on {date}",
+  "@plantArchiveDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "plantArchiveNoteLabel": "Reason: {note}",
+  "@plantArchiveNoteLabel": {
+    "placeholders": {
+      "note": {"type": "String"}
+    }
+  },
+
+  "plantDispose": "Remove from collection",
+  "plantDisposeTitle": "Remove plant",
+  "plantDisposeReasonDied": "Died",
+  "plantDisposeReasonSold": "Sold",
+  "plantDisposeDeathNote": "Cause description",
+  "plantDisposeDeathNoteRequired": "Describe why the plant died",
+  "plantDisposeSaleAmount": "Sale amount",
+  "plantDisposeConfirm": "Move to archive",
+  "plantDisposeArchived": "Plant moved to archive"
 }

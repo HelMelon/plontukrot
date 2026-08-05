@@ -4,6 +4,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/plant.dart';
+import '../../../../models/plant_member.dart';
 import '../../../../models/variegation.dart';
 import '../../../../services/plant_service.dart';
 import '../selectors/plant_stage_selector.dart';
@@ -23,6 +24,20 @@ class UpdatePlantSheet extends StatefulWidget {
   State<UpdatePlantSheet> createState() => _UpdatePlantSheetState();
 }
 
+class _MemberEditors {
+  final TextEditingController cultivar;
+  Variegation variegation;
+  final String? sourcePlantId;
+
+  _MemberEditors({
+    required this.cultivar,
+    required this.variegation,
+    this.sourcePlantId,
+  });
+
+  void dispose() => cultivar.dispose();
+}
+
 class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   final genusController = TextEditingController();
   final speciesController = TextEditingController();
@@ -32,12 +47,15 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   final nickNameController = TextEditingController();
   final wateringFrequencyController = TextEditingController();
   final initialLeafCountController = TextEditingController();
+  late final List<_MemberEditors> _members;
 
   bool isLoading = false;
   int selectedStage = 0;
   Variegation selectedVariegation = Variegation.none;
   String? genusError;
   String? speciesError;
+
+  bool get _isGroup => widget.plant.isGroup;
 
   @override
   void initState() {
@@ -58,6 +76,14 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     initialLeafCountController.text = widget.plant.initialLeafCount.toString();
     selectedStage = widget.plant.stage;
     selectedVariegation = widget.plant.variegation;
+
+    _members = widget.plant.members.map((member) {
+      return _MemberEditors(
+        cultivar: TextEditingController(text: member.cultivar ?? ''),
+        variegation: member.variegation,
+        sourcePlantId: member.sourcePlantId,
+      );
+    }).toList();
   }
 
   @override
@@ -70,6 +96,9 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     nickNameController.dispose();
     wateringFrequencyController.dispose();
     initialLeafCountController.dispose();
+    for (final member in _members) {
+      member.dispose();
+    }
     super.dispose();
   }
 
@@ -133,6 +162,27 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
       return;
     }
 
+    List<PlantMember>? members;
+    if (_isGroup) {
+      members = _members
+          .map(
+            (m) => PlantMember(
+              cultivar: m.cultivar.text.trim().isEmpty
+                  ? null
+                  : m.cultivar.text.trim(),
+              variegation: m.variegation,
+              sourcePlantId: m.sourcePlantId,
+            ),
+          )
+          .toList();
+      if (members.length < 2) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.plantMergeMembersRequired)),
+        );
+        return;
+      }
+    }
+
     setState(() {
       isLoading = true;
       genusError = null;
@@ -144,14 +194,17 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
         plantId: widget.plantId,
         genus: genus,
         species: species,
-        cultivar: cultivar.isEmpty ? null : cultivar,
+        cultivar: _isGroup
+            ? null
+            : (cultivar.isEmpty ? null : cultivar),
         plantFamily: plantFamily.isEmpty ? null : plantFamily,
-        variegation: selectedVariegation,
+        variegation: _isGroup ? Variegation.none : selectedVariegation,
         tradingName: tradingName,
         nickname: nickname,
         wateringFrequency: wateringFrequency,
         initialLeafCount: initialLeafCount,
         stage: selectedStage,
+        members: members,
       );
 
       if (mounted) {
@@ -204,7 +257,8 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                       height: sheets.handleHeight,
                       decoration: BoxDecoration(
                         color: sheets.handleColor,
-                        borderRadius: BorderRadius.circular(sheets.handleRadius),
+                        borderRadius:
+                            BorderRadius.circular(sheets.handleRadius),
                       ),
                     ),
                   ),
@@ -263,21 +317,56 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             ),
                           ),
                           spacing.vMd,
-                          TextField(
-                            controller: cultivarController,
-                            style: inputs.textStyle,
-                            decoration: _fieldDecoration(
-                              labelText: l10n.plantCultivar,
-                              icon: Icons.spa_outlined,
+                          if (_isGroup) ...[
+                            Text(
+                              l10n.plantGroupMembers,
+                              style: typography.label.copyWith(
+                                color: colors.textSecondary,
+                              ),
                             ),
-                          ),
-                          spacing.vMd,
-                          PlantVariegationSelector(
-                            selected: selectedVariegation,
-                            onChanged: (value) {
-                              setState(() => selectedVariegation = value);
-                            },
-                          ),
+                            spacing.vSm,
+                            for (var i = 0; i < _members.length; i++) ...[
+                              Text(
+                                l10n.plantMergeMemberLabel(i + 1),
+                                style: typography.bodyMedium,
+                              ),
+                              spacing.vXs,
+                              TextField(
+                                controller: _members[i].cultivar,
+                                style: inputs.textStyle,
+                                decoration: _fieldDecoration(
+                                  labelText: l10n.plantCultivar,
+                                  icon: Icons.spa_outlined,
+                                ),
+                              ),
+                              spacing.vSm,
+                              PlantVariegationSelector(
+                                selected: _members[i].variegation,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _members[i].variegation = value;
+                                  });
+                                },
+                              ),
+                              if (i < _members.length - 1) spacing.vMd,
+                            ],
+                          ] else ...[
+                            TextField(
+                              controller: cultivarController,
+                              style: inputs.textStyle,
+                              decoration: _fieldDecoration(
+                                labelText: l10n.plantCultivar,
+                                icon: Icons.spa_outlined,
+                              ),
+                            ),
+                            spacing.vMd,
+                            PlantVariegationSelector(
+                              selected: selectedVariegation,
+                              onChanged: (value) {
+                                setState(() => selectedVariegation = value);
+                              },
+                            ),
+                          ],
                           spacing.vMd,
                           TextField(
                             controller: tradingNameController,
@@ -306,6 +395,20 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             ),
                           ),
                           spacing.vMd,
+                          Text(
+                            l10n.plantGrowthStage,
+                            style: typography.label.copyWith(
+                              color: colors.textSecondary,
+                            ),
+                          ),
+                          spacing.vXs,
+                          PlantStageSelector(
+                            selectedStage: selectedStage,
+                            onChanged: (value) {
+                              setState(() => selectedStage = value);
+                            },
+                          ),
+                          spacing.vMd,
                           TextField(
                             controller: wateringFrequencyController,
                             keyboardType: TextInputType.number,
@@ -328,24 +431,8 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantInitialLeafCount,
-                              icon: Icons.eco_outlined,
+                              icon: Icons.energy_savings_leaf_outlined,
                             ),
-                          ),
-                          spacing.vMd,
-                          Text(
-                            l10n.plantGrowthStage,
-                            style: typography.label.copyWith(
-                              color: colors.textSecondary,
-                            ),
-                          ),
-                          spacing.vXs,
-                          PlantStageSelector(
-                            selectedStage: selectedStage,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedStage = value;
-                              });
-                            },
                           ),
                         ],
                       ),
@@ -373,7 +460,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                                 ),
                               )
                             : Text(
-                                l10n.plantSaveChanges,
+                                l10n.commonSave,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),

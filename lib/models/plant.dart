@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'firestore_helpers.dart';
+import 'plant_archive_reason.dart';
+import 'plant_member.dart';
 import 'variegation.dart';
 
 class Plant {
@@ -24,6 +26,12 @@ class Plant {
   final int initialLeafCount;
   final bool careHistoryMigrated;
   final bool botanicalFieldsMigrated;
+  final List<PlantMember> members;
+  final DateTime? archivedAt;
+  final DateTime? expiresAt;
+  final PlantArchiveReason? archiveReason;
+  final String? archiveNote;
+  final String? mergedIntoPlantId;
 
   const Plant({
     required this.id,
@@ -46,7 +54,42 @@ class Plant {
     this.initialLeafCount = 0,
     this.careHistoryMigrated = false,
     this.botanicalFieldsMigrated = false,
+    this.members = const [],
+    this.archivedAt,
+    this.expiresAt,
+    this.archiveReason,
+    this.archiveNote,
+    this.mergedIntoPlantId,
   });
+
+  bool get isGroup => members.length >= 2;
+
+  bool get isArchived => archivedAt != null;
+
+  bool get isArchiveVisible {
+    if (!isArchived) return false;
+    final expires = expiresAt;
+    if (expires == null) return true;
+    return expires.isAfter(DateTime.now());
+  }
+
+  /// Cultivar labels for display: group members, else single cultivar.
+  List<String> get cultivarLabels {
+    if (isGroup) {
+      return members
+          .map((m) => (m.cultivar ?? '').trim())
+          .where((c) => c.isNotEmpty)
+          .toList();
+    }
+    final single = (cultivar ?? '').trim();
+    return single.isEmpty ? const [] : [single];
+  }
+
+  String get cultivarsDisplay {
+    final labels = cultivarLabels;
+    if (labels.isEmpty) return '';
+    return labels.join(' · ');
+  }
 
   /// Prefer thumb for lists/grids; fall back to full image.
   String? get listImageUrl {
@@ -61,6 +104,15 @@ class Plant {
     if (value == null) return null;
     final trimmed = value.trim();
     return trimmed.isEmpty ? null : trimmed;
+  }
+
+  static List<PlantMember> _readMembers(dynamic raw) {
+    if (raw is! List) return const [];
+    return raw
+        .whereType<Map>()
+        .map((e) => PlantMember.fromMap(Map<String, dynamic>.from(e)))
+        .take(3)
+        .toList();
   }
 
   factory Plant.fromMap(String id, Map<String, dynamic> data) {
@@ -87,6 +139,14 @@ class Plant {
       careHistoryMigrated: data['careHistoryMigrated'] as bool? ?? false,
       botanicalFieldsMigrated:
           data['botanicalFieldsMigrated'] as bool? ?? false,
+      members: _readMembers(data['members']),
+      archivedAt: readTimestamp(data['archivedAt']),
+      expiresAt: readTimestamp(data['expiresAt']),
+      archiveReason: PlantArchiveReason.fromCode(
+        data['archiveReason'] as String?,
+      ),
+      archiveNote: _nullableTrimmed(data['archiveNote'] as String?),
+      mergedIntoPlantId: data['mergedIntoPlantId'] as String?,
     );
   }
 
@@ -126,6 +186,12 @@ class Plant {
       'initialLeafCount': initialLeafCount,
       'careHistoryMigrated': careHistoryMigrated,
       'botanicalFieldsMigrated': botanicalFieldsMigrated,
+      if (members.isNotEmpty) 'members': members.map((m) => m.toMap()).toList(),
+      if (archivedAt != null) 'archivedAt': Timestamp.fromDate(archivedAt!),
+      if (expiresAt != null) 'expiresAt': Timestamp.fromDate(expiresAt!),
+      if (archiveReason != null) 'archiveReason': archiveReason!.code,
+      if (archiveNote != null) 'archiveNote': archiveNote,
+      if (mergedIntoPlantId != null) 'mergedIntoPlantId': mergedIntoPlantId,
     };
   }
 }

@@ -56,7 +56,13 @@
   "homeNoUserData": "Нет данных пользователя",
   "homeNoPlantsYet": "Растения ещё не добавлены",
   "homeNoPropagatingPlants": "Нет растений с активным размножением",
+  "homeNoGroupPlants": "Нет объединённых групп",
   "homeNoPlantsForFilter": "Нет растений по выбранному фильтру",
+  "homeGroups": "Группы",
+  "homeArchive": "Архив",
+  "homeMerge": "Объединить",
+  "homeMergeNeedCount": "Выберите от 2 до 3 растений",
+  "homeMergeNeedSameGenus": "Для объединения нужен одинаковый род",
   "homeAllFamilies": "Все семейства",
   "homeAllGenera": "Все роды",
   "homeAllStages": "Все стадии",
@@ -446,7 +452,58 @@
       "quantity": {"type": "int"}
     }
   },
+  "financesPlantSaleTitle": "Продажа растения: {plantName}",
+  "@financesPlantSaleTitle": {
+    "placeholders": {
+      "plantName": {"type": "String"}
+    }
+  },
   "propagationTradeForWishList": "На растение из вишлиста",
   "commonContinue": "Продолжить",
-  "commonSkip": "Пропустить"
+  "commonSkip": "Пропустить",
+
+  "plantMergeTitle": "Объединить в группу",
+  "plantMergeMemberLabel": "Сорт {index}",
+  "@plantMergeMemberLabel": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "plantMergeMembersRequired": "Укажите хотя бы два сорта",
+  "plantGroupMembers": "Сорта в группе",
+  "plantCultivarsLabel": "Сорта: {cultivars}",
+  "@plantCultivarsLabel": {
+    "placeholders": {
+      "cultivars": {"type": "String"}
+    }
+  },
+
+  "plantArchiveTitle": "Архив растений",
+  "plantArchiveEmpty": "Архив пуст",
+  "plantArchiveEmptyHint": "Растения хранятся в архиве 2 года",
+  "plantArchiveReasonMerged": "Объединено",
+  "plantArchiveReasonDied": "Умерло",
+  "plantArchiveReasonSold": "Продано",
+  "plantArchiveDate": "В архиве с {date}",
+  "@plantArchiveDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "plantArchiveNoteLabel": "Причина: {note}",
+  "@plantArchiveNoteLabel": {
+    "placeholders": {
+      "note": {"type": "String"}
+    }
+  },
+
+  "plantDispose": "Убрать из коллекции",
+  "plantDisposeTitle": "Убрать растение",
+  "plantDisposeReasonDied": "Умерло",
+  "plantDisposeReasonSold": "Продано",
+  "plantDisposeDeathNote": "Описание причин",
+  "plantDisposeDeathNoteRequired": "Опишите причину гибели",
+  "plantDisposeSaleAmount": "Сумма продажи",
+  "plantDisposeConfirm": "В архив",
+  "plantDisposeArchived": "Растение перемещено в архив"
 }

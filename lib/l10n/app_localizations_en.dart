@@ -163,6 +163,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeNoPropagatingPlants => 'No plants with active propagation';
 
   @override
+  String get homeNoGroupPlants => 'No plant groups yet';
+
+  @override
   String get homeNoPlantsForFilter => 'No plants match the selected filter';
 
   @override
@@ -179,6 +182,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homePropagation => 'Propagation';
+
+  @override
+  String get homeGroups => 'Groups';
+
+  @override
+  String get homeArchive => 'Archive';
+
+  @override
+  String get homeMerge => 'Merge';
+
+  @override
+  String get homeMergeNeedCount => 'Select 2 to 3 plants';
+
+  @override
+  String get homeMergeNeedSameGenus =>
+      'Plants must share the same genus to merge';
 
   @override
   String get homeWishList => 'WishLeafs';
@@ -1303,6 +1322,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String financesPlantSaleTitle(String plantName) {
+    return 'Plant sale: $plantName';
+  }
+
+  @override
   String get propagationTradeForWishList => 'For a wish-list plant';
 
   @override
@@ -1310,4 +1334,79 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonSkip => 'Skip';
+
+  @override
+  String get plantMergeTitle => 'Merge into a group';
+
+  @override
+  String plantMergeMemberLabel(int index) {
+    return 'Cultivar $index';
+  }
+
+  @override
+  String get plantMergeMembersRequired => 'Enter at least two cultivars';
+
+  @override
+  String get plantGroupMembers => 'Group cultivars';
+
+  @override
+  String plantCultivarsLabel(String cultivars) {
+    return 'Cultivars: $cultivars';
+  }
+
+  @override
+  String get plantArchiveTitle => 'Plant archive';
+
+  @override
+  String get plantArchiveEmpty => 'Archive is empty';
+
+  @override
+  String get plantArchiveEmptyHint =>
+      'Plants are kept in the archive for 2 years';
+
+  @override
+  String get plantArchiveReasonMerged => 'Merged';
+
+  @override
+  String get plantArchiveReasonDied => 'Died';
+
+  @override
+  String get plantArchiveReasonSold => 'Sold';
+
+  @override
+  String plantArchiveDate(String date) {
+    return 'Archived on $date';
+  }
+
+  @override
+  String plantArchiveNoteLabel(String note) {
+    return 'Reason: $note';
+  }
+
+  @override
+  String get plantDispose => 'Remove from collection';
+
+  @override
+  String get plantDisposeTitle => 'Remove plant';
+
+  @override
+  String get plantDisposeReasonDied => 'Died';
+
+  @override
+  String get plantDisposeReasonSold => 'Sold';
+
+  @override
+  String get plantDisposeDeathNote => 'Cause description';
+
+  @override
+  String get plantDisposeDeathNoteRequired => 'Describe why the plant died';
+
+  @override
+  String get plantDisposeSaleAmount => 'Sale amount';
+
+  @override
+  String get plantDisposeConfirm => 'Move to archive';
+
+  @override
+  String get plantDisposeArchived => 'Plant moved to archive';
 }

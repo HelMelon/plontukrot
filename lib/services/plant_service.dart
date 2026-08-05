@@ -2,11 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/plant.dart';
+import '../models/plant_archive_reason.dart';
+import '../models/plant_member.dart';
 import '../models/variegation.dart';
 import 'plant_species_service.dart';
 import 'storage_service.dart';
 
 class PlantService {
+  static const archiveRetention = Duration(days: 730);
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final PlantSpeciesService _plantSpeciesService = PlantSpeciesService();
 
@@ -64,7 +68,24 @@ class PlantService {
     return _plantsRef
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map(Plant.fromFirestore).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map(Plant.fromFirestore)
+              .where((plant) => !plant.isArchived)
+              .toList(),
+        );
+  }
+
+  Stream<List<Plant>> watchArchivedPlants() {
+    return _plantsRef
+        .orderBy('archivedAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map(Plant.fromFirestore)
+              .where((plant) => plant.isArchiveVisible)
+              .toList(),
+        );
   }
 
   Stream<Plant?> watchPlant(String plantId) {
@@ -72,6 +93,126 @@ class PlantService {
         .doc(plantId)
         .snapshots()
         .map((doc) => doc.exists ? Plant.fromDocument(doc) : null);
+  }
+
+  Map<String, dynamic> _archiveFields({
+    required PlantArchiveReason reason,
+    required DateTime at,
+    String? note,
+    String? mergedIntoPlantId,
+  }) {
+    final trimmedNote = note?.trim();
+    return {
+      'archivedAt': Timestamp.fromDate(at),
+      'expiresAt': Timestamp.fromDate(at.add(archiveRetention)),
+      'archiveReason': reason.code,
+      if (trimmedNote != null && trimmedNote.isNotEmpty)
+        'archiveNote': trimmedNote,
+      if (mergedIntoPlantId != null) 'mergedIntoPlantId': mergedIntoPlantId,
+    };
+  }
+
+  Future<void> archivePlant({
+    required String plantId,
+    required PlantArchiveReason reason,
+    DateTime? at,
+    String? note,
+    String? mergedIntoPlantId,
+  }) async {
+    final when = at ?? DateTime.now();
+    await _plantsRef.doc(plantId).update(
+          _archiveFields(
+            reason: reason,
+            at: when,
+            note: note,
+            mergedIntoPlantId: mergedIntoPlantId,
+          ),
+        );
+  }
+
+  Future<String> mergePlants({
+    required List<Plant> sources,
+    required String genus,
+    required String species,
+    String? plantFamily,
+    required List<PlantMember> members,
+    String tradingName = '',
+    String nickname = '',
+    required int stage,
+  }) async {
+    if (sources.length < 2 || sources.length > 3) {
+      throw ArgumentError('Merge requires 2–3 source plants');
+    }
+    if (members.length < 2 || members.length > 3) {
+      throw ArgumentError('Group must have 2–3 members');
+    }
+    final genera = sources.map((p) => p.genus.trim().toLowerCase()).toSet();
+    if (genera.length != 1) {
+      throw ArgumentError('All source plants must share the same genus');
+    }
+
+    final trimmedGenus = genus.trim();
+    final trimmedSpecies = species.trim();
+    final trimmedFamily = plantFamily?.trim();
+    final trimmedTradingName = tradingName.trim();
+    final now = DateTime.now();
+
+    final groupRef = _plantsRef.doc();
+    final batch = _firestore.batch();
+
+    batch.set(groupRef, {
+      'genus': trimmedGenus,
+      'species': trimmedSpecies,
+      'cultivar': null,
+      'plantFamily':
+          (trimmedFamily == null || trimmedFamily.isEmpty) ? null : trimmedFamily,
+      'variegation': Variegation.none.storageValue,
+      'tradingName': trimmedTradingName,
+      'nickname': nickname,
+      'stage': stage,
+      'imageUrl': null,
+      'imageThumbUrl': null,
+      'wateringFrequency': null,
+      'initialLeafCount': 0,
+      'createdAt': FieldValue.serverTimestamp(),
+      'careHistoryMigrated': true,
+      'botanicalFieldsMigrated': true,
+      'members': members.take(3).map((m) => m.toMap()).toList(),
+    });
+
+    for (final source in sources) {
+      batch.update(
+        _plantsRef.doc(source.id),
+        _archiveFields(
+          reason: PlantArchiveReason.merged,
+          at: now,
+          mergedIntoPlantId: groupRef.id,
+        ),
+      );
+    }
+
+    await batch.commit();
+
+    await _plantSpeciesService.ensureSpecies(
+      species: trimmedSpecies,
+      genus: trimmedGenus,
+      plantFamily: trimmedFamily,
+    );
+
+    return groupRef.id;
+  }
+
+  Future<void> purgeExpiredArchived() async {
+    final now = DateTime.now();
+    final snapshot = await _plantsRef
+        .where('expiresAt', isLessThan: Timestamp.fromDate(now))
+        .get();
+
+    for (final doc in snapshot.docs) {
+      final plant = Plant.fromFirestore(doc);
+      if (!plant.isArchived) continue;
+      await _deletePlantSubtree(plant.id);
+    }
   }
 
   Future<void> migrateCareDates(Iterable<Plant> plants) async {
@@ -151,7 +292,6 @@ class PlantService {
       if (species.isEmpty) continue;
       speciesSeed.putIfAbsent(species, () => plant);
     }
-    // Re-read migrated values: use in-memory plants with fallbacks already applied.
     for (final entry in speciesSeed.entries) {
       final plant = entry.value;
       await _plantSpeciesService.ensureSpecies(
@@ -185,6 +325,7 @@ class PlantService {
     int? wateringFrequency,
     int initialLeafCount = 0,
     required int stage,
+    List<PlantMember>? members,
   }) async {
     final trimmedGenus = genus.trim();
     final trimmedSpecies = species.trim();
@@ -194,7 +335,7 @@ class PlantService {
     final safeInitialLeafCount =
         initialLeafCount < 0 ? 0 : initialLeafCount;
 
-    await _plantsRef.doc(plantId).update({
+    final updates = <String, dynamic>{
       'genus': trimmedGenus,
       'species': trimmedSpecies,
       'cultivar':
@@ -212,7 +353,17 @@ class PlantService {
       'botanicalFieldsMigrated': true,
       'name': FieldValue.delete(),
       'family': FieldValue.delete(),
-    });
+    };
+
+    if (members != null) {
+      final capped = members.take(3).toList();
+      updates['members'] = capped.map((m) => m.toMap()).toList();
+      if (capped.length >= 2) {
+        updates['cultivar'] = null;
+      }
+    }
+
+    await _plantsRef.doc(plantId).update(updates);
 
     await _plantSpeciesService.ensureSpecies(
       species: trimmedSpecies,

@@ -164,6 +164,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get homeNoPropagatingPlants => 'Keine Pflanzen mit aktiver Vermehrung';
 
   @override
+  String get homeNoGroupPlants => 'Keine Pflanzengruppen';
+
+  @override
   String get homeNoPlantsForFilter =>
       'Keine Pflanzen passen zum gewählten Filter';
 
@@ -181,6 +184,22 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get homePropagation => 'Vermehrung';
+
+  @override
+  String get homeGroups => 'Gruppen';
+
+  @override
+  String get homeArchive => 'Archiv';
+
+  @override
+  String get homeMerge => 'Zusammenführen';
+
+  @override
+  String get homeMergeNeedCount => 'Wählen Sie 2 bis 3 Pflanzen';
+
+  @override
+  String get homeMergeNeedSameGenus =>
+      'Zum Zusammenführen muss die Gattung übereinstimmen';
 
   @override
   String get homeWishList => 'WishLeafs';
@@ -1311,6 +1330,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String financesPlantSaleTitle(String plantName) {
+    return 'Pflanzenverkauf: $plantName';
+  }
+
+  @override
   String get propagationTradeForWishList => 'Für Wunschlisten-Pflanze';
 
   @override
@@ -1318,4 +1342,79 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get commonSkip => 'Überspringen';
+
+  @override
+  String get plantMergeTitle => 'Zu einer Gruppe zusammenführen';
+
+  @override
+  String plantMergeMemberLabel(int index) {
+    return 'Sorte $index';
+  }
+
+  @override
+  String get plantMergeMembersRequired => 'Geben Sie mindestens zwei Sorten an';
+
+  @override
+  String get plantGroupMembers => 'Sorten in der Gruppe';
+
+  @override
+  String plantCultivarsLabel(String cultivars) {
+    return 'Sorten: $cultivars';
+  }
+
+  @override
+  String get plantArchiveTitle => 'Pflanzenarchiv';
+
+  @override
+  String get plantArchiveEmpty => 'Archiv ist leer';
+
+  @override
+  String get plantArchiveEmptyHint => 'Pflanzen bleiben 2 Jahre im Archiv';
+
+  @override
+  String get plantArchiveReasonMerged => 'Zusammengeführt';
+
+  @override
+  String get plantArchiveReasonDied => 'Abgestorben';
+
+  @override
+  String get plantArchiveReasonSold => 'Verkauft';
+
+  @override
+  String plantArchiveDate(String date) {
+    return 'Archiviert am $date';
+  }
+
+  @override
+  String plantArchiveNoteLabel(String note) {
+    return 'Grund: $note';
+  }
+
+  @override
+  String get plantDispose => 'Aus der Sammlung entfernen';
+
+  @override
+  String get plantDisposeTitle => 'Pflanze entfernen';
+
+  @override
+  String get plantDisposeReasonDied => 'Abgestorben';
+
+  @override
+  String get plantDisposeReasonSold => 'Verkauft';
+
+  @override
+  String get plantDisposeDeathNote => 'Ursachenbeschreibung';
+
+  @override
+  String get plantDisposeDeathNoteRequired =>
+      'Beschreiben Sie die Todesursache';
+
+  @override
+  String get plantDisposeSaleAmount => 'Verkaufsbetrag';
+
+  @override
+  String get plantDisposeConfirm => 'Ins Archiv';
+
+  @override
+  String get plantDisposeArchived => 'Pflanze ins Archiv verschoben';
 }

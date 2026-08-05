@@ -132,7 +132,7 @@ class PlantSearchDelegate extends SearchDelegate {
           final species = plant.species.trim().toLowerCase();
           final nickname = plant.nickname.trim().toLowerCase();
           final genus = plant.genus.trim().toLowerCase();
-          final cultivar = (plant.cultivar ?? '').trim().toLowerCase();
+          final cultivar = plant.cultivarsDisplay.toLowerCase();
 
           if (cleanQuery.isEmpty) return true;
 

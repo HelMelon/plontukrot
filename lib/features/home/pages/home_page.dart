@@ -21,9 +21,11 @@ import '../../../services/auth_service.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
 import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
 import '../../plants/widgets/sheets/add_repotting_sheet.dart';
+import '../../plants/widgets/sheets/merge_plant_sheet.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../../services/watering_service.dart';
+import '../../plants/pages/plant_archive_page.dart';
 import '../../plants/pages/plant_genus_details_page.dart';
 import '../../plants/pages/plant_stage_details_page.dart';
 import '../../plants/widgets/cards/plant_card.dart';
@@ -66,6 +68,7 @@ class _HomePageState extends State<HomePage> {
   bool _careMigrationStarted = false;
   bool _botanicalMigrationStarted = false;
   bool _filterPropagatingOnly = false;
+  bool _filterGroupsOnly = false;
   String? _filterPlantFamily;
   String? _filterGenus;
   int? _filterStage;
@@ -701,6 +704,37 @@ class _HomePageState extends State<HomePage> {
     if (mounted) _exitSelectionMode();
   }
 
+  Future<void> _mergePlants() async {
+    final l10n = AppLocalizations.of(context);
+    final selected = _latestPlants
+        .where((plant) => _selectedPlantIds.contains(plant.id))
+        .toList();
+
+    if (selected.length < 2 || selected.length > 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.homeMergeNeedCount)),
+      );
+      return;
+    }
+
+    final genera =
+        selected.map((p) => p.genus.trim().toLowerCase()).toSet();
+    if (genera.length != 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.homeMergeNeedSameGenus)),
+      );
+      return;
+    }
+
+    final merged = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => MergePlantSheet(sources: selected),
+    );
+    if (merged == true && mounted) _exitSelectionMode();
+  }
+
   static const double _wideBreakpoint = 700;
 
   AppBar _buildSelectionAppBar(AppLocalizations l10n, {required bool isWide}) {
@@ -735,6 +769,11 @@ class _HomePageState extends State<HomePage> {
         tooltip: l10n.homeUpdateFamily,
         onPressed: _updateFamily,
         icon: const Icon(Icons.park_outlined),
+      ),
+      IconButton(
+        tooltip: l10n.homeMerge,
+        onPressed: _mergePlants,
+        icon: const Icon(Icons.merge_type),
       ),
       IconButton(
         tooltip: l10n.commonDelete,
@@ -837,6 +876,17 @@ class _HomePageState extends State<HomePage> {
           icon: HugeIcons.strokeRoundedEcoLab01,
           color: colors.icon,
         ),
+      ),
+      IconButton(
+        tooltip: l10n.homeArchive,
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const PlantArchivePage(),
+            ),
+          );
+        },
+        icon: Icon(Icons.inventory_2_outlined, color: colors.icon),
       ),
       IconButton(
         tooltip: l10n.homeWishList,
@@ -1074,13 +1124,19 @@ class _HomePageState extends State<HomePage> {
                       builder: (context, propagatingSnapshot) {
                         final propagatingIds =
                             propagatingSnapshot.data ?? const <String>{};
-                        var workingPlants = _filterPropagatingOnly
-                            ? plants
-                                .where(
-                                  (plant) => propagatingIds.contains(plant.id),
-                                )
-                                .toList()
-                            : plants;
+                        var workingPlants = plants;
+                        if (_filterPropagatingOnly) {
+                          workingPlants = workingPlants
+                              .where(
+                                (plant) => propagatingIds.contains(plant.id),
+                              )
+                              .toList();
+                        }
+                        if (_filterGroupsOnly) {
+                          workingPlants = workingPlants
+                              .where((plant) => plant.isGroup)
+                              .toList();
+                        }
                         workingPlants = _applyBotanicalFilters(workingPlants);
                         final sortedPlants = _sortPlants(workingPlants);
                         _visiblePlantIds
@@ -1109,57 +1165,107 @@ class _HomePageState extends State<HomePage> {
                                   Row(
                                     children: [
                                       Flexible(
-                                        child: Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: FilterChip(
-                                            selected: _filterPropagatingOnly,
-                                            visualDensity:
-                                                VisualDensity.compact,
-                                            materialTapTargetSize:
-                                                MaterialTapTargetSize
-                                                    .shrinkWrap,
-                                            label: Text(
-                                              l10n.homePropagation,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            avatar: HugeIcon(
-                                              icon: HugeIcons
-                                                  .strokeRoundedEcoLab01,
-                                              size: dimensions.iconSm,
-                                              color: _filterPropagatingOnly
-                                                  ? chips.selectedForeground
-                                                  : colors.icon,
-                                            ),
-                                            selectedColor:
-                                                chips.selectedBackground,
-                                            checkmarkColor: chips.checkmark,
-                                            labelStyle:
-                                                chips.labelStyle.copyWith(
-                                              color: _filterPropagatingOnly
-                                                  ? chips.selectedForeground
-                                                  : chips
-                                                      .unselectedForeground,
-                                            ),
-                                            backgroundColor:
-                                                chips.unselectedBackground,
-                                            side: BorderSide(
-                                              color: _filterPropagatingOnly
-                                                  ? chips.selectedBorder
-                                                  : chips.unselectedBorder,
-                                            ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                chips.radius,
+                                        child: Wrap(
+                                          spacing: spacing.xs,
+                                          runSpacing: spacing.xs,
+                                          children: [
+                                            FilterChip(
+                                              selected: _filterPropagatingOnly,
+                                              visualDensity:
+                                                  VisualDensity.compact,
+                                              materialTapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                              label: Text(
+                                                l10n.homePropagation,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
+                                              avatar: HugeIcon(
+                                                icon: HugeIcons
+                                                    .strokeRoundedEcoLab01,
+                                                size: dimensions.iconSm,
+                                                color: _filterPropagatingOnly
+                                                    ? chips.selectedForeground
+                                                    : colors.icon,
+                                              ),
+                                              selectedColor:
+                                                  chips.selectedBackground,
+                                              checkmarkColor: chips.checkmark,
+                                              labelStyle:
+                                                  chips.labelStyle.copyWith(
+                                                color: _filterPropagatingOnly
+                                                    ? chips.selectedForeground
+                                                    : chips
+                                                        .unselectedForeground,
+                                              ),
+                                              backgroundColor:
+                                                  chips.unselectedBackground,
+                                              side: BorderSide(
+                                                color: _filterPropagatingOnly
+                                                    ? chips.selectedBorder
+                                                    : chips.unselectedBorder,
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  chips.radius,
+                                                ),
+                                              ),
+                                              onSelected: (selected) {
+                                                setState(() {
+                                                  _filterPropagatingOnly =
+                                                      selected;
+                                                });
+                                              },
                                             ),
-                                            onSelected: (selected) {
-                                              setState(() {
-                                                _filterPropagatingOnly =
-                                                    selected;
-                                              });
-                                            },
-                                          ),
+                                            FilterChip(
+                                              selected: _filterGroupsOnly,
+                                              visualDensity:
+                                                  VisualDensity.compact,
+                                              materialTapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                              label: Text(
+                                                l10n.homeGroups,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              avatar: Icon(
+                                                Icons.hub_outlined,
+                                                size: dimensions.iconSm,
+                                                color: _filterGroupsOnly
+                                                    ? chips.selectedForeground
+                                                    : colors.icon,
+                                              ),
+                                              selectedColor:
+                                                  chips.selectedBackground,
+                                              checkmarkColor: chips.checkmark,
+                                              labelStyle:
+                                                  chips.labelStyle.copyWith(
+                                                color: _filterGroupsOnly
+                                                    ? chips.selectedForeground
+                                                    : chips
+                                                        .unselectedForeground,
+                                              ),
+                                              backgroundColor:
+                                                  chips.unselectedBackground,
+                                              side: BorderSide(
+                                                color: _filterGroupsOnly
+                                                    ? chips.selectedBorder
+                                                    : chips.unselectedBorder,
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  chips.radius,
+                                                ),
+                                              ),
+                                              onSelected: (selected) {
+                                                setState(() {
+                                                  _filterGroupsOnly = selected;
+                                                });
+                                              },
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       spacing.hXs,
@@ -1233,6 +1339,7 @@ class _HomePageState extends State<HomePage> {
                                   spacing.vXs,
                                 ],
                                 if (_filterPropagatingOnly &&
+                                    !_filterGroupsOnly &&
                                     sortedPlants.isEmpty)
                                   Container(
                                     width: double.infinity,
@@ -1246,6 +1353,25 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     child: Text(
                                       l10n.homeNoPropagatingPlants,
+                                      textAlign: TextAlign.center,
+                                      style: typography.bodyMedium
+                                          .copyWith(color: colors.textSecondary),
+                                    ),
+                                  )
+                                else if (_filterGroupsOnly &&
+                                    sortedPlants.isEmpty)
+                                  Container(
+                                    width: double.infinity,
+                                    padding: EdgeInsets.all(spacing.xl),
+                                    decoration: BoxDecoration(
+                                      color: colors.modal,
+                                      borderRadius: radii.lgAll,
+                                      border: Border.all(
+                                        color: colors.outline,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      l10n.homeNoGroupPlants,
                                       textAlign: TextAlign.center,
                                       style: typography.bodyMedium
                                           .copyWith(color: colors.textSecondary),

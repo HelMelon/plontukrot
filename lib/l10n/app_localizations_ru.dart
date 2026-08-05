@@ -163,6 +163,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeNoPropagatingPlants => 'Нет растений с активным размножением';
 
   @override
+  String get homeNoGroupPlants => 'Нет объединённых групп';
+
+  @override
   String get homeNoPlantsForFilter => 'Нет растений по выбранному фильтру';
 
   @override
@@ -179,6 +182,21 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get homePropagation => 'Размножение';
+
+  @override
+  String get homeGroups => 'Группы';
+
+  @override
+  String get homeArchive => 'Архив';
+
+  @override
+  String get homeMerge => 'Объединить';
+
+  @override
+  String get homeMergeNeedCount => 'Выберите от 2 до 3 растений';
+
+  @override
+  String get homeMergeNeedSameGenus => 'Для объединения нужен одинаковый род';
 
   @override
   String get homeWishList => 'WishLeafs';
@@ -1311,6 +1329,11 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String financesPlantSaleTitle(String plantName) {
+    return 'Продажа растения: $plantName';
+  }
+
+  @override
   String get propagationTradeForWishList => 'На растение из вишлиста';
 
   @override
@@ -1318,4 +1341,78 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get commonSkip => 'Пропустить';
+
+  @override
+  String get plantMergeTitle => 'Объединить в группу';
+
+  @override
+  String plantMergeMemberLabel(int index) {
+    return 'Сорт $index';
+  }
+
+  @override
+  String get plantMergeMembersRequired => 'Укажите хотя бы два сорта';
+
+  @override
+  String get plantGroupMembers => 'Сорта в группе';
+
+  @override
+  String plantCultivarsLabel(String cultivars) {
+    return 'Сорта: $cultivars';
+  }
+
+  @override
+  String get plantArchiveTitle => 'Архив растений';
+
+  @override
+  String get plantArchiveEmpty => 'Архив пуст';
+
+  @override
+  String get plantArchiveEmptyHint => 'Растения хранятся в архиве 2 года';
+
+  @override
+  String get plantArchiveReasonMerged => 'Объединено';
+
+  @override
+  String get plantArchiveReasonDied => 'Умерло';
+
+  @override
+  String get plantArchiveReasonSold => 'Продано';
+
+  @override
+  String plantArchiveDate(String date) {
+    return 'В архиве с $date';
+  }
+
+  @override
+  String plantArchiveNoteLabel(String note) {
+    return 'Причина: $note';
+  }
+
+  @override
+  String get plantDispose => 'Убрать из коллекции';
+
+  @override
+  String get plantDisposeTitle => 'Убрать растение';
+
+  @override
+  String get plantDisposeReasonDied => 'Умерло';
+
+  @override
+  String get plantDisposeReasonSold => 'Продано';
+
+  @override
+  String get plantDisposeDeathNote => 'Описание причин';
+
+  @override
+  String get plantDisposeDeathNoteRequired => 'Опишите причину гибели';
+
+  @override
+  String get plantDisposeSaleAmount => 'Сумма продажи';
+
+  @override
+  String get plantDisposeConfirm => 'В архив';
+
+  @override
+  String get plantDisposeArchived => 'Растение перемещено в архив';
 }
