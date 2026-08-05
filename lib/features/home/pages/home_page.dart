@@ -28,6 +28,7 @@ import '../../plants/pages/plant_genus_details_page.dart';
 import '../../plants/pages/plant_stage_details_page.dart';
 import '../../plants/widgets/cards/plant_card.dart';
 import '../../plants/widgets/search/plant_search_delegate.dart';
+import '../../finances/pages/finances_page.dart';
 import '../../propagations/pages/propagations_page.dart';
 import '../../settings/pages/settings_page.dart';
 import '../../wish_list/pages/wish_list_page.dart';
@@ -848,6 +849,20 @@ class _HomePageState extends State<HomePage> {
         },
         icon: HugeIcon(
           icon: HugeIcons.strokeRoundedBookHeart,
+          color: colors.icon,
+        ),
+      ),
+      IconButton(
+        tooltip: l10n.homeFinances,
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const FinancesPage(),
+            ),
+          );
+        },
+        icon: HugeIcon(
+          icon: HugeIcons.strokeRoundedCoins01,
           color: colors.icon,
         ),
       ),

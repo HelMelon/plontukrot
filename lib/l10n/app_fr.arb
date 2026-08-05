@@ -46,6 +46,11 @@
   "settingsLanguageRussian": "Русский",
   "settingsLanguageGerman": "Deutsch",
   "settingsLanguageFrench": "Français",
+  "settingsCurrency": "Devise",
+  "settingsCurrencyUsd": "Dollar américain",
+  "settingsCurrencyEur": "Euro",
+  "settingsCurrencyRub": "Rouble russe",
+  "settingsCurrencyByn": "Rouble biélorusse",
 
   "homeSearchHint": "Rechercher des plantes…",
   "homeNoUserData": "Aucune donnée utilisateur",
@@ -58,6 +63,7 @@
   "homeNoFamily": "Sans famille",
   "homePropagation": "Multiplication",
   "homeWishList": "WishLeafs",
+  "homeFinances": "Finances",
   "homeSort": "Trier",
   "homeSortSpecies": "Espèce",
   "homeSortNickname": "Surnom",
@@ -382,6 +388,12 @@
   "wishListNameEnRequired": "Indiquez le nom anglais",
   "wishListNameAltRequired": "Indiquez un autre nom",
   "wishListBought": "Acheté",
+  "wishListExchanged": "Échangé",
+  "wishListAcquireTitle": "Comment l’avez-vous obtenue ?",
+  "wishListExchangeNoFinanceHint": "L’échange n’est pas enregistré dans les finances. Vous pourrez ensuite ajouter la plante à la collection.",
+  "wishListSelectForTrade": "Plante de la liste de souhaits",
+  "wishListSelectForTradeHint": "Choisissez la plante reçue en échange. Aucune entrée financière ne sera créée.",
+  "wishListAcquireContinue": "Continuer",
   "wishListExport": "Exporter",
   "wishListExportEmpty": "Rien à exporter",
   "wishListDeleteConfirm": "Retirer « {name} » de la liste de souhaits ?",
@@ -389,5 +401,47 @@
     "placeholders": {
       "name": {"type": "String"}
     }
-  }
+  },
+
+  "financesTitle": "Finances",
+  "financesAdd": "Ajouter une entrée",
+  "financesEdit": "Modifier l’entrée",
+  "financesEmpty": "Aucune entrée financière pour le moment",
+  "financesEmptyHint": "Suivez les revenus des ventes et les dépenses pour les plantes",
+  "financesIncome": "Revenus",
+  "financesExpense": "Dépenses",
+  "financesBalance": "Solde",
+  "financesAnalyticsTitle": "3 derniers mois",
+  "financesNoIncome": "Pas encore de revenus",
+  "financesNoExpense": "Pas encore de dépenses",
+  "financesTitleLabel": "Intitulé",
+  "financesTitleRequired": "Indiquez un intitulé",
+  "financesAmountLabel": "Montant ({symbol})",
+  "@financesAmountLabel": {
+    "placeholders": {
+      "symbol": {"type": "String"}
+    }
+  },
+  "financesAmountRequired": "Indiquez un montant valide",
+  "financesDeleteConfirm": "Supprimer « {title} » ?",
+  "@financesDeleteConfirm": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "financesAlsoAddToCatalog": "Ajouter aussi au catalogue",
+  "financesAsSoilComponent": "Composant de substrat",
+  "financesAsFertilizer": "Engrais",
+  "financesAsPurchasedFertilizer": "Engrais prêt à l'emploi",
+  "financesAsReadyMadeSoil": "Mélange de substrat prêt à l'emploi",
+  "financesPropagationSaleTitle": "Vente : {plantName} ×{quantity}",
+  "@financesPropagationSaleTitle": {
+    "placeholders": {
+      "plantName": {"type": "String"},
+      "quantity": {"type": "int"}
+    }
+  },
+  "propagationTradeForWishList": "Pour une plante de la liste",
+  "commonContinue": "Continuer",
+  "commonSkip": "Passer"
 }

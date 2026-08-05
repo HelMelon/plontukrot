@@ -11,8 +11,8 @@ import 'package:plontukrot/core/theme/theme_context.dart';
 
 import '../../../models/wish_list_item.dart';
 import '../../../services/wish_list_service.dart';
-import '../../plants/widgets/sheets/add_plant_sheet.dart';
 import '../widgets/sheets/add_wish_list_item_sheet.dart';
+import '../widgets/sheets/wish_list_acquire_sheet.dart';
 
 class WishListPage extends StatefulWidget {
   const WishListPage({super.key});
@@ -81,16 +81,7 @@ class _WishListPageState extends State<WishListPage> {
   }
 
   Future<void> _openBoughtSheet(WishListItem item) async {
-    await showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      enableDrag: true,
-      builder: (_) => AddPlantSheet(
-        initialTradingName: item.nameAlt,
-        wishListItemId: item.id,
-      ),
-    );
+    await openWishListAcquireFlow(context, item);
   }
 
   Future<void> _exportList() async {

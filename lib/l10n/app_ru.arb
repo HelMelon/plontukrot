@@ -46,6 +46,11 @@
   "settingsLanguageRussian": "Русский",
   "settingsLanguageGerman": "Deutsch",
   "settingsLanguageFrench": "Français",
+  "settingsCurrency": "Валюта",
+  "settingsCurrencyUsd": "Доллар США",
+  "settingsCurrencyEur": "Евро",
+  "settingsCurrencyRub": "Российский рубль",
+  "settingsCurrencyByn": "Белорусский рубль",
 
   "homeSearchHint": "Поиск растений…",
   "homeNoUserData": "Нет данных пользователя",
@@ -58,6 +63,7 @@
   "homeNoFamily": "Без семейства",
   "homePropagation": "Размножение",
   "homeWishList": "WishLeafs",
+  "homeFinances": "Финансы",
   "homeSort": "Сортировка",
   "homeSortSpecies": "Вид",
   "homeSortNickname": "Прозвище",
@@ -387,6 +393,12 @@
   "wishListNameEnRequired": "Укажите английское название",
   "wishListNameAltRequired": "Укажите другое название",
   "wishListBought": "Купила",
+  "wishListExchanged": "Обменяла",
+  "wishListAcquireTitle": "Как получили растение?",
+  "wishListExchangeNoFinanceHint": "Обмен не записывается в финансы. Дальше можно добавить растение в коллекцию.",
+  "wishListSelectForTrade": "Растение из вишлиста",
+  "wishListSelectForTradeHint": "Выберите растение, которое получили при обмене. Финансовая запись не создаётся.",
+  "wishListAcquireContinue": "Продолжить",
   "wishListExport": "Экспорт",
   "wishListExportEmpty": "Нечего экспортировать",
   "wishListDeleteConfirm": "Удалить «{name}» из списка желаний?",
@@ -394,5 +406,47 @@
     "placeholders": {
       "name": {"type": "String"}
     }
-  }
+  },
+
+  "financesTitle": "Финансы",
+  "financesAdd": "Добавить запись",
+  "financesEdit": "Изменить запись",
+  "financesEmpty": "Финансовых записей пока нет",
+  "financesEmptyHint": "Учитывайте доходы от продаж и расходы на растения",
+  "financesIncome": "Доходы",
+  "financesExpense": "Расходы",
+  "financesBalance": "Баланс",
+  "financesAnalyticsTitle": "Последние 3 месяца",
+  "financesNoIncome": "Доходов пока нет",
+  "financesNoExpense": "Расходов пока нет",
+  "financesTitleLabel": "Название",
+  "financesTitleRequired": "Укажите название",
+  "financesAmountLabel": "Сумма ({symbol})",
+  "@financesAmountLabel": {
+    "placeholders": {
+      "symbol": {"type": "String"}
+    }
+  },
+  "financesAmountRequired": "Укажите корректную сумму",
+  "financesDeleteConfirm": "Удалить «{title}»?",
+  "@financesDeleteConfirm": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "financesAlsoAddToCatalog": "Также добавить в каталог",
+  "financesAsSoilComponent": "Компонент грунта",
+  "financesAsFertilizer": "Удобрение",
+  "financesAsPurchasedFertilizer": "Готовое удобрение",
+  "financesAsReadyMadeSoil": "Готовый грунт",
+  "financesPropagationSaleTitle": "Продажа: {plantName} ×{quantity}",
+  "@financesPropagationSaleTitle": {
+    "placeholders": {
+      "plantName": {"type": "String"},
+      "quantity": {"type": "int"}
+    }
+  },
+  "propagationTradeForWishList": "На растение из вишлиста",
+  "commonContinue": "Продолжить",
+  "commonSkip": "Пропустить"
 }

@@ -137,6 +137,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsLanguageFrench => 'Français';
 
   @override
+  String get settingsCurrency => 'Währung';
+
+  @override
+  String get settingsCurrencyUsd => 'US-Dollar';
+
+  @override
+  String get settingsCurrencyEur => 'Euro';
+
+  @override
+  String get settingsCurrencyRub => 'Russischer Rubel';
+
+  @override
+  String get settingsCurrencyByn => 'Belarussischer Rubel';
+
+  @override
   String get homeSearchHint => 'Pflanzen suchen…';
 
   @override
@@ -169,6 +184,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get homeWishList => 'WishLeafs';
+
+  @override
+  String get homeFinances => 'Finanzen';
 
   @override
   String get homeSort => 'Sortieren';
@@ -1189,6 +1207,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String get wishListBought => 'Gekauft';
 
   @override
+  String get wishListExchanged => 'Getauscht';
+
+  @override
+  String get wishListAcquireTitle => 'Wie hast du sie bekommen?';
+
+  @override
+  String get wishListExchangeNoFinanceHint =>
+      'Tausch wird nicht in den Finanzen erfasst. Als Nächstes kannst du die Pflanze zur Sammlung hinzufügen.';
+
+  @override
+  String get wishListSelectForTrade => 'Pflanze von der Wunschliste';
+
+  @override
+  String get wishListSelectForTradeHint =>
+      'Wähle die Pflanze, die du im Tausch erhalten hast. Es wird kein Finanzeintrag erstellt.';
+
+  @override
+  String get wishListAcquireContinue => 'Weiter';
+
+  @override
   String get wishListExport => 'Exportieren';
 
   @override
@@ -1198,4 +1236,86 @@ class AppLocalizationsDe extends AppLocalizations {
   String wishListDeleteConfirm(String name) {
     return '„$name“ von der Wunschliste entfernen?';
   }
+
+  @override
+  String get financesTitle => 'Finanzen';
+
+  @override
+  String get financesAdd => 'Eintrag hinzufügen';
+
+  @override
+  String get financesEdit => 'Eintrag bearbeiten';
+
+  @override
+  String get financesEmpty => 'Noch keine Finanzeinträge';
+
+  @override
+  String get financesEmptyHint =>
+      'Erfasse Einnahmen aus Verkäufen und Ausgaben für Pflanzen';
+
+  @override
+  String get financesIncome => 'Einnahmen';
+
+  @override
+  String get financesExpense => 'Ausgaben';
+
+  @override
+  String get financesBalance => 'Saldo';
+
+  @override
+  String get financesAnalyticsTitle => 'Letzte 3 Monate';
+
+  @override
+  String get financesNoIncome => 'Noch keine Einnahmen';
+
+  @override
+  String get financesNoExpense => 'Noch keine Ausgaben';
+
+  @override
+  String get financesTitleLabel => 'Bezeichnung';
+
+  @override
+  String get financesTitleRequired => 'Bezeichnung angeben';
+
+  @override
+  String financesAmountLabel(String symbol) {
+    return 'Betrag ($symbol)';
+  }
+
+  @override
+  String get financesAmountRequired => 'Gültigen Betrag angeben';
+
+  @override
+  String financesDeleteConfirm(String title) {
+    return '„$title“ löschen?';
+  }
+
+  @override
+  String get financesAlsoAddToCatalog => 'Auch zum Katalog hinzufügen';
+
+  @override
+  String get financesAsSoilComponent => 'Substratkomponente';
+
+  @override
+  String get financesAsFertilizer => 'Dünger';
+
+  @override
+  String get financesAsPurchasedFertilizer => 'Fertiges Düngemittel';
+
+  @override
+  String get financesAsReadyMadeSoil => 'Fertige Substratmischung';
+
+  @override
+  String financesPropagationSaleTitle(String plantName, int quantity) {
+    return 'Verkauf: $plantName ×$quantity';
+  }
+
+  @override
+  String get propagationTradeForWishList => 'Für Wunschlisten-Pflanze';
+
+  @override
+  String get commonContinue => 'Weiter';
+
+  @override
+  String get commonSkip => 'Überspringen';
 }

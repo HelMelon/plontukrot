@@ -4,11 +4,26 @@ import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
+import '../../../../core/currency/app_currency_controller.dart';
 import '../../../../core/date_time_utils.dart';
 import '../../../../core/theme/theme_context.dart';
+import '../../../../models/finance_entry.dart';
 import '../../../../models/propagation.dart';
 import '../../../../models/propagation_outcome.dart';
+import '../../../../services/finance_service.dart';
 import '../../../../services/propagation_service.dart';
+
+/// Result of marking a propagation outcome.
+/// [linkWishList] is true only for trades where the user wants a wish-list plant.
+class MarkPropagationOutcomeResult {
+  final bool success;
+  final bool linkWishList;
+
+  const MarkPropagationOutcomeResult({
+    required this.success,
+    this.linkWishList = false,
+  });
+}
 
 class MarkPropagationOutcomeSheet extends StatefulWidget {
   final Propagation propagation;
@@ -28,11 +43,18 @@ class MarkPropagationOutcomeSheet extends StatefulWidget {
 class _MarkPropagationOutcomeSheetState
     extends State<MarkPropagationOutcomeSheet> {
   final _service = PropagationService();
+  final _financeService = FinanceService();
   final _noteController = TextEditingController();
   late final TextEditingController _quantityController;
+  final _amountController = TextEditingController();
 
   DateTime _at = DateTime.now();
   bool _saving = false;
+  bool _linkWishList = false;
+  String? _amountError;
+
+  bool get _isSold => widget.outcome == PropagationOutcome.sold;
+  bool get _isTraded => widget.outcome == PropagationOutcome.traded;
 
   @override
   void initState() {
@@ -45,6 +67,7 @@ class _MarkPropagationOutcomeSheetState
   @override
   void dispose() {
     _quantityController.dispose();
+    _amountController.dispose();
     _noteController.dispose();
     super.dispose();
   }
@@ -86,6 +109,11 @@ class _MarkPropagationOutcomeSheetState
     };
   }
 
+  double? _parseAmount() {
+    final raw = _amountController.text.trim().replaceAll(',', '.');
+    return double.tryParse(raw);
+  }
+
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context);
     final quantity = int.tryParse(_quantityController.text.trim());
@@ -108,7 +136,19 @@ class _MarkPropagationOutcomeSheetState
       return;
     }
 
-    setState(() => _saving = true);
+    double? saleAmount;
+    if (_isSold) {
+      saleAmount = _parseAmount();
+      if (saleAmount == null || saleAmount < 0) {
+        setState(() => _amountError = l10n.financesAmountRequired);
+        return;
+      }
+    }
+
+    setState(() {
+      _saving = true;
+      _amountError = null;
+    });
     try {
       await _service.markOutcome(
         propagationId: widget.propagation.id,
@@ -117,7 +157,29 @@ class _MarkPropagationOutcomeSheetState
         at: _at,
         note: _noteController.text.trim(),
       );
-      if (mounted) Navigator.pop(context, true);
+
+      if (_isSold && saleAmount != null) {
+        final plantName = widget.propagation.parentPlantName;
+        await _financeService.addEntry(
+          title: l10n.financesPropagationSaleTitle(plantName, quantity),
+          amount: saleAmount,
+          type: FinanceEntryType.income,
+          date: _at,
+          source: FinanceEntrySource.propagationSale,
+          propagationId: widget.propagation.id,
+          quantity: quantity,
+          note: _noteController.text.trim(),
+        );
+      }
+
+      if (!mounted) return;
+      Navigator.pop(
+        context,
+        MarkPropagationOutcomeResult(
+          success: true,
+          linkWishList: _isTraded && _linkWishList,
+        ),
+      );
     } catch (e) {
       if (mounted) {
         setState(() => _saving = false);
@@ -201,6 +263,35 @@ class _MarkPropagationOutcomeSheetState
                       labelText: _quantityLabel(l10n),
                     ),
                   ),
+                  if (_isSold) ...[
+                    spacing.vMd,
+                    TextField(
+                      controller: _amountController,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+                      ],
+                      style: inputs.textStyle,
+                      decoration: inputs
+                          .decoration(
+                            labelText: l10n.financesAmountLabel(
+                              AppCurrencyController.instance.currency.symbol,
+                            ),
+                          )
+                          .copyWith(errorText: _amountError),
+                    ),
+                  ],
+                  if (_isTraded) ...[
+                    spacing.vMd,
+                    FilterChip(
+                      label: Text(l10n.propagationTradeForWishList),
+                      selected: _linkWishList,
+                      onSelected: (selected) {
+                        setState(() => _linkWishList = selected);
+                      },
+                    ),
+                  ],
                   spacing.vMd,
                   InkWell(
                     onTap: _pickDate,

@@ -136,6 +136,21 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsLanguageFrench => 'Français';
 
   @override
+  String get settingsCurrency => 'Валюта';
+
+  @override
+  String get settingsCurrencyUsd => 'Доллар США';
+
+  @override
+  String get settingsCurrencyEur => 'Евро';
+
+  @override
+  String get settingsCurrencyRub => 'Российский рубль';
+
+  @override
+  String get settingsCurrencyByn => 'Белорусский рубль';
+
+  @override
   String get homeSearchHint => 'Поиск растений…';
 
   @override
@@ -167,6 +182,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get homeWishList => 'WishLeafs';
+
+  @override
+  String get homeFinances => 'Финансы';
 
   @override
   String get homeSort => 'Сортировка';
@@ -1189,6 +1207,26 @@ class AppLocalizationsRu extends AppLocalizations {
   String get wishListBought => 'Купила';
 
   @override
+  String get wishListExchanged => 'Обменяла';
+
+  @override
+  String get wishListAcquireTitle => 'Как получили растение?';
+
+  @override
+  String get wishListExchangeNoFinanceHint =>
+      'Обмен не записывается в финансы. Дальше можно добавить растение в коллекцию.';
+
+  @override
+  String get wishListSelectForTrade => 'Растение из вишлиста';
+
+  @override
+  String get wishListSelectForTradeHint =>
+      'Выберите растение, которое получили при обмене. Финансовая запись не создаётся.';
+
+  @override
+  String get wishListAcquireContinue => 'Продолжить';
+
+  @override
   String get wishListExport => 'Экспорт';
 
   @override
@@ -1198,4 +1236,86 @@ class AppLocalizationsRu extends AppLocalizations {
   String wishListDeleteConfirm(String name) {
     return 'Удалить «$name» из списка желаний?';
   }
+
+  @override
+  String get financesTitle => 'Финансы';
+
+  @override
+  String get financesAdd => 'Добавить запись';
+
+  @override
+  String get financesEdit => 'Изменить запись';
+
+  @override
+  String get financesEmpty => 'Финансовых записей пока нет';
+
+  @override
+  String get financesEmptyHint =>
+      'Учитывайте доходы от продаж и расходы на растения';
+
+  @override
+  String get financesIncome => 'Доходы';
+
+  @override
+  String get financesExpense => 'Расходы';
+
+  @override
+  String get financesBalance => 'Баланс';
+
+  @override
+  String get financesAnalyticsTitle => 'Последние 3 месяца';
+
+  @override
+  String get financesNoIncome => 'Доходов пока нет';
+
+  @override
+  String get financesNoExpense => 'Расходов пока нет';
+
+  @override
+  String get financesTitleLabel => 'Название';
+
+  @override
+  String get financesTitleRequired => 'Укажите название';
+
+  @override
+  String financesAmountLabel(String symbol) {
+    return 'Сумма ($symbol)';
+  }
+
+  @override
+  String get financesAmountRequired => 'Укажите корректную сумму';
+
+  @override
+  String financesDeleteConfirm(String title) {
+    return 'Удалить «$title»?';
+  }
+
+  @override
+  String get financesAlsoAddToCatalog => 'Также добавить в каталог';
+
+  @override
+  String get financesAsSoilComponent => 'Компонент грунта';
+
+  @override
+  String get financesAsFertilizer => 'Удобрение';
+
+  @override
+  String get financesAsPurchasedFertilizer => 'Готовое удобрение';
+
+  @override
+  String get financesAsReadyMadeSoil => 'Готовый грунт';
+
+  @override
+  String financesPropagationSaleTitle(String plantName, int quantity) {
+    return 'Продажа: $plantName ×$quantity';
+  }
+
+  @override
+  String get propagationTradeForWishList => 'На растение из вишлиста';
+
+  @override
+  String get commonContinue => 'Продолжить';
+
+  @override
+  String get commonSkip => 'Пропустить';
 }

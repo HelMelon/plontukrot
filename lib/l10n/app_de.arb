@@ -46,6 +46,11 @@
   "settingsLanguageRussian": "Русский",
   "settingsLanguageGerman": "Deutsch",
   "settingsLanguageFrench": "Français",
+  "settingsCurrency": "Währung",
+  "settingsCurrencyUsd": "US-Dollar",
+  "settingsCurrencyEur": "Euro",
+  "settingsCurrencyRub": "Russischer Rubel",
+  "settingsCurrencyByn": "Belarussischer Rubel",
 
   "homeSearchHint": "Pflanzen suchen…",
   "homeNoUserData": "Keine Nutzerdaten",
@@ -58,6 +63,7 @@
   "homeNoFamily": "Ohne Familie",
   "homePropagation": "Vermehrung",
   "homeWishList": "WishLeafs",
+  "homeFinances": "Finanzen",
   "homeSort": "Sortieren",
   "homeSortSpecies": "Art",
   "homeSortNickname": "Spitzname",
@@ -382,6 +388,12 @@
   "wishListNameEnRequired": "Englischen Namen angeben",
   "wishListNameAltRequired": "Anderen Namen angeben",
   "wishListBought": "Gekauft",
+  "wishListExchanged": "Getauscht",
+  "wishListAcquireTitle": "Wie hast du sie bekommen?",
+  "wishListExchangeNoFinanceHint": "Tausch wird nicht in den Finanzen erfasst. Als Nächstes kannst du die Pflanze zur Sammlung hinzufügen.",
+  "wishListSelectForTrade": "Pflanze von der Wunschliste",
+  "wishListSelectForTradeHint": "Wähle die Pflanze, die du im Tausch erhalten hast. Es wird kein Finanzeintrag erstellt.",
+  "wishListAcquireContinue": "Weiter",
   "wishListExport": "Exportieren",
   "wishListExportEmpty": "Nichts zu exportieren",
   "wishListDeleteConfirm": "„{name}“ von der Wunschliste entfernen?",
@@ -389,5 +401,47 @@
     "placeholders": {
       "name": {"type": "String"}
     }
-  }
+  },
+
+  "financesTitle": "Finanzen",
+  "financesAdd": "Eintrag hinzufügen",
+  "financesEdit": "Eintrag bearbeiten",
+  "financesEmpty": "Noch keine Finanzeinträge",
+  "financesEmptyHint": "Erfasse Einnahmen aus Verkäufen und Ausgaben für Pflanzen",
+  "financesIncome": "Einnahmen",
+  "financesExpense": "Ausgaben",
+  "financesBalance": "Saldo",
+  "financesAnalyticsTitle": "Letzte 3 Monate",
+  "financesNoIncome": "Noch keine Einnahmen",
+  "financesNoExpense": "Noch keine Ausgaben",
+  "financesTitleLabel": "Bezeichnung",
+  "financesTitleRequired": "Bezeichnung angeben",
+  "financesAmountLabel": "Betrag ({symbol})",
+  "@financesAmountLabel": {
+    "placeholders": {
+      "symbol": {"type": "String"}
+    }
+  },
+  "financesAmountRequired": "Gültigen Betrag angeben",
+  "financesDeleteConfirm": "„{title}“ löschen?",
+  "@financesDeleteConfirm": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "financesAlsoAddToCatalog": "Auch zum Katalog hinzufügen",
+  "financesAsSoilComponent": "Substratkomponente",
+  "financesAsFertilizer": "Dünger",
+  "financesAsPurchasedFertilizer": "Fertiges Düngemittel",
+  "financesAsReadyMadeSoil": "Fertige Substratmischung",
+  "financesPropagationSaleTitle": "Verkauf: {plantName} ×{quantity}",
+  "@financesPropagationSaleTitle": {
+    "placeholders": {
+      "plantName": {"type": "String"},
+      "quantity": {"type": "int"}
+    }
+  },
+  "propagationTradeForWishList": "Für Wunschlisten-Pflanze",
+  "commonContinue": "Weiter",
+  "commonSkip": "Überspringen"
 }

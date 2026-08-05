@@ -8,7 +8,10 @@ import '../../../../models/propagation.dart';
 import '../../../../models/propagation_outcome.dart';
 import '../../../../models/propagation_stage_entry.dart';
 import '../../../../models/stage_info.dart';
+import '../../../../models/wish_list_item.dart';
 import '../../../../services/propagation_service.dart';
+import '../../../wish_list/widgets/sheets/select_wish_list_item_sheet.dart';
+import 'add_plant_sheet.dart';
 import 'change_propagation_stage_sheet.dart';
 import 'sell_lose_propagation_sheet.dart';
 
@@ -44,13 +47,37 @@ class PropagationDetailsSheet extends StatelessWidget {
     Propagation current,
     PropagationOutcome outcome,
   ) async {
-    await showModalBottomSheet(
+    final result = await showModalBottomSheet<MarkPropagationOutcomeResult>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => MarkPropagationOutcomeSheet(
         propagation: current,
         outcome: outcome,
+      ),
+    );
+
+    if (result == null || !result.success || !result.linkWishList) return;
+    if (!context.mounted) return;
+
+    final wishItem = await showModalBottomSheet<WishListItem>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      enableDrag: true,
+      builder: (_) => const SelectWishListItemSheet(),
+    );
+
+    if (wishItem == null || !context.mounted) return;
+
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      enableDrag: true,
+      builder: (_) => AddPlantSheet(
+        initialTradingName: wishItem.nameAlt,
+        wishListItemId: wishItem.id,
       ),
     );
   }

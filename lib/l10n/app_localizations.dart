@@ -342,6 +342,36 @@ abstract class AppLocalizations {
   /// **'French'**
   String get settingsLanguageFrench;
 
+  /// No description provided for @settingsCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get settingsCurrency;
+
+  /// No description provided for @settingsCurrencyUsd.
+  ///
+  /// In en, this message translates to:
+  /// **'US dollar'**
+  String get settingsCurrencyUsd;
+
+  /// No description provided for @settingsCurrencyEur.
+  ///
+  /// In en, this message translates to:
+  /// **'Euro'**
+  String get settingsCurrencyEur;
+
+  /// No description provided for @settingsCurrencyRub.
+  ///
+  /// In en, this message translates to:
+  /// **'Russian ruble'**
+  String get settingsCurrencyRub;
+
+  /// No description provided for @settingsCurrencyByn.
+  ///
+  /// In en, this message translates to:
+  /// **'Belarusian ruble'**
+  String get settingsCurrencyByn;
+
   /// No description provided for @homeSearchHint.
   ///
   /// In en, this message translates to:
@@ -407,6 +437,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'WishLeafs'**
   String get homeWishList;
+
+  /// No description provided for @homeFinances.
+  ///
+  /// In en, this message translates to:
+  /// **'Finances'**
+  String get homeFinances;
 
   /// No description provided for @homeSort.
   ///
@@ -2220,6 +2256,42 @@ abstract class AppLocalizations {
   /// **'Bought'**
   String get wishListBought;
 
+  /// No description provided for @wishListExchanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchanged'**
+  String get wishListExchanged;
+
+  /// No description provided for @wishListAcquireTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How did you get it?'**
+  String get wishListAcquireTitle;
+
+  /// No description provided for @wishListExchangeNoFinanceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange is not recorded in finances. Next you can add the plant to your collection.'**
+  String get wishListExchangeNoFinanceHint;
+
+  /// No description provided for @wishListSelectForTrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Plant from wish list'**
+  String get wishListSelectForTrade;
+
+  /// No description provided for @wishListSelectForTradeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the plant you received in exchange. No finance entry will be created.'**
+  String get wishListSelectForTradeHint;
+
+  /// No description provided for @wishListAcquireContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get wishListAcquireContinue;
+
   /// No description provided for @wishListExport.
   ///
   /// In en, this message translates to:
@@ -2237,6 +2309,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove “{name}” from the wish list?'**
   String wishListDeleteConfirm(String name);
+
+  /// No description provided for @financesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Finances'**
+  String get financesTitle;
+
+  /// No description provided for @financesAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add entry'**
+  String get financesAdd;
+
+  /// No description provided for @financesEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit entry'**
+  String get financesEdit;
+
+  /// No description provided for @financesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No finance entries yet'**
+  String get financesEmpty;
+
+  /// No description provided for @financesEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Track income from sales and plant expenses'**
+  String get financesEmptyHint;
+
+  /// No description provided for @financesIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get financesIncome;
+
+  /// No description provided for @financesExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses'**
+  String get financesExpense;
+
+  /// No description provided for @financesBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance'**
+  String get financesBalance;
+
+  /// No description provided for @financesAnalyticsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 3 months'**
+  String get financesAnalyticsTitle;
+
+  /// No description provided for @financesNoIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'No income yet'**
+  String get financesNoIncome;
+
+  /// No description provided for @financesNoExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'No expenses yet'**
+  String get financesNoExpense;
+
+  /// No description provided for @financesTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get financesTitleLabel;
+
+  /// No description provided for @financesTitleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a title'**
+  String get financesTitleRequired;
+
+  /// No description provided for @financesAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount ({symbol})'**
+  String financesAmountLabel(String symbol);
+
+  /// No description provided for @financesAmountRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid amount'**
+  String get financesAmountRequired;
+
+  /// No description provided for @financesDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete “{title}”?'**
+  String financesDeleteConfirm(String title);
+
+  /// No description provided for @financesAlsoAddToCatalog.
+  ///
+  /// In en, this message translates to:
+  /// **'Also add to catalog'**
+  String get financesAlsoAddToCatalog;
+
+  /// No description provided for @financesAsSoilComponent.
+  ///
+  /// In en, this message translates to:
+  /// **'Soil component'**
+  String get financesAsSoilComponent;
+
+  /// No description provided for @financesAsFertilizer.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilizer'**
+  String get financesAsFertilizer;
+
+  /// No description provided for @financesAsPurchasedFertilizer.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready-made fertilizer'**
+  String get financesAsPurchasedFertilizer;
+
+  /// No description provided for @financesAsReadyMadeSoil.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready-made soil mix'**
+  String get financesAsReadyMadeSoil;
+
+  /// No description provided for @financesPropagationSaleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale: {plantName} ×{quantity}'**
+  String financesPropagationSaleTitle(String plantName, int quantity);
+
+  /// No description provided for @propagationTradeForWishList.
+  ///
+  /// In en, this message translates to:
+  /// **'For a wish-list plant'**
+  String get propagationTradeForWishList;
+
+  /// No description provided for @commonContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get commonContinue;
+
+  /// No description provided for @commonSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get commonSkip;
 }
 
 class _AppLocalizationsDelegate

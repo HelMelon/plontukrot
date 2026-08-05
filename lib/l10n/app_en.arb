@@ -61,6 +61,11 @@
   "settingsLanguageRussian": "Russian",
   "settingsLanguageGerman": "German",
   "settingsLanguageFrench": "French",
+  "settingsCurrency": "Currency",
+  "settingsCurrencyUsd": "US dollar",
+  "settingsCurrencyEur": "Euro",
+  "settingsCurrencyRub": "Russian ruble",
+  "settingsCurrencyByn": "Belarusian ruble",
 
   "homeSearchHint": "Search plants…",
   "homeNoUserData": "No user data",
@@ -73,6 +78,7 @@
   "homeNoFamily": "No family",
   "homePropagation": "Propagation",
   "homeWishList": "WishLeafs",
+  "homeFinances": "Finances",
   "homeSort": "Sort",
   "homeSortSpecies": "Species",
   "homeSortNickname": "Nickname",
@@ -616,6 +622,12 @@
   "wishListNameEnRequired": "Enter the English name",
   "wishListNameAltRequired": "Enter an alternative name",
   "wishListBought": "Bought",
+  "wishListExchanged": "Exchanged",
+  "wishListAcquireTitle": "How did you get it?",
+  "wishListExchangeNoFinanceHint": "Exchange is not recorded in finances. Next you can add the plant to your collection.",
+  "wishListSelectForTrade": "Plant from wish list",
+  "wishListSelectForTradeHint": "Choose the plant you received in exchange. No finance entry will be created.",
+  "wishListAcquireContinue": "Continue",
   "wishListExport": "Export",
   "wishListExportEmpty": "Nothing to export",
   "wishListDeleteConfirm": "Remove “{name}” from the wish list?",
@@ -623,5 +635,47 @@
     "placeholders": {
       "name": {"type": "String"}
     }
-  }
+  },
+
+  "financesTitle": "Finances",
+  "financesAdd": "Add entry",
+  "financesEdit": "Edit entry",
+  "financesEmpty": "No finance entries yet",
+  "financesEmptyHint": "Track income from sales and plant expenses",
+  "financesIncome": "Income",
+  "financesExpense": "Expenses",
+  "financesBalance": "Balance",
+  "financesAnalyticsTitle": "Last 3 months",
+  "financesNoIncome": "No income yet",
+  "financesNoExpense": "No expenses yet",
+  "financesTitleLabel": "Title",
+  "financesTitleRequired": "Enter a title",
+  "financesAmountLabel": "Amount ({symbol})",
+  "@financesAmountLabel": {
+    "placeholders": {
+      "symbol": {"type": "String"}
+    }
+  },
+  "financesAmountRequired": "Enter a valid amount",
+  "financesDeleteConfirm": "Delete “{title}”?",
+  "@financesDeleteConfirm": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "financesAlsoAddToCatalog": "Also add to catalog",
+  "financesAsSoilComponent": "Soil component",
+  "financesAsFertilizer": "Fertilizer",
+  "financesAsPurchasedFertilizer": "Ready-made fertilizer",
+  "financesAsReadyMadeSoil": "Ready-made soil mix",
+  "financesPropagationSaleTitle": "Sale: {plantName} ×{quantity}",
+  "@financesPropagationSaleTitle": {
+    "placeholders": {
+      "plantName": {"type": "String"},
+      "quantity": {"type": "int"}
+    }
+  },
+  "propagationTradeForWishList": "For a wish-list plant",
+  "commonContinue": "Continue",
+  "commonSkip": "Skip"
 }

@@ -5,6 +5,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
+import 'core/currency/app_currency_controller.dart';
 import 'core/locale/app_locale_controller.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_context.dart';
@@ -18,6 +19,7 @@ import 'services/auth_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppLocaleController.instance.load();
+  await AppCurrencyController.instance.load();
   runApp(const MyApp());
 }
 

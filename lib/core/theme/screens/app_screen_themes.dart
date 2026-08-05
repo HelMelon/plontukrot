@@ -222,6 +222,33 @@ class WishListScreenTheme {
 }
 
 @immutable
+class FinancesScreenTheme {
+  const FinancesScreenTheme({
+    required this.cardRadius,
+    required this.cardPadding,
+    required this.analyticsRadius,
+    required this.analyticsPadding,
+  });
+
+  factory FinancesScreenTheme.standard({
+    required AppSpacingTokens spacing,
+    required AppRadiiTokens radii,
+  }) {
+    return FinancesScreenTheme(
+      cardRadius: radii.md,
+      cardPadding: EdgeInsets.all(spacing.sm + 2),
+      analyticsRadius: radii.xl,
+      analyticsPadding: EdgeInsets.all(spacing.lg),
+    );
+  }
+
+  final double cardRadius;
+  final EdgeInsets cardPadding;
+  final double analyticsRadius;
+  final EdgeInsets analyticsPadding;
+}
+
+@immutable
 class AppScreenThemes {
   const AppScreenThemes({
     required this.splash,
@@ -234,6 +261,7 @@ class AppScreenThemes {
     required this.growth,
     required this.settings,
     required this.wishList,
+    required this.finances,
   });
 
   factory AppScreenThemes.standard({
@@ -275,6 +303,10 @@ class AppScreenThemes {
         spacing: spacing,
         radii: radii,
       ),
+      finances: FinancesScreenTheme.standard(
+        spacing: spacing,
+        radii: radii,
+      ),
     );
   }
 
@@ -288,4 +320,5 @@ class AppScreenThemes {
   final GrowthScreenTheme growth;
   final SettingsScreenTheme settings;
   final WishListScreenTheme wishList;
+  final FinancesScreenTheme finances;
 }
