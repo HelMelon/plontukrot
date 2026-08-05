@@ -201,6 +201,27 @@ class SettingsScreenTheme {
 }
 
 @immutable
+class WishListScreenTheme {
+  const WishListScreenTheme({
+    required this.cardRadius,
+    required this.cardPadding,
+  });
+
+  factory WishListScreenTheme.standard({
+    required AppSpacingTokens spacing,
+    required AppRadiiTokens radii,
+  }) {
+    return WishListScreenTheme(
+      cardRadius: radii.md,
+      cardPadding: EdgeInsets.all(spacing.sm + 2),
+    );
+  }
+
+  final double cardRadius;
+  final EdgeInsets cardPadding;
+}
+
+@immutable
 class AppScreenThemes {
   const AppScreenThemes({
     required this.splash,
@@ -212,6 +233,7 @@ class AppScreenThemes {
     required this.catalogBuilder,
     required this.growth,
     required this.settings,
+    required this.wishList,
   });
 
   factory AppScreenThemes.standard({
@@ -249,6 +271,10 @@ class AppScreenThemes {
       ),
       growth: GrowthScreenTheme.standard(radii),
       settings: SettingsScreenTheme.standard(colors),
+      wishList: WishListScreenTheme.standard(
+        spacing: spacing,
+        radii: radii,
+      ),
     );
   }
 
@@ -261,4 +287,5 @@ class AppScreenThemes {
   final CatalogBuilderScreenTheme catalogBuilder;
   final GrowthScreenTheme growth;
   final SettingsScreenTheme settings;
+  final WishListScreenTheme wishList;
 }

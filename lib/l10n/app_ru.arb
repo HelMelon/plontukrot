@@ -57,6 +57,7 @@
   "homeAllStages": "Все стадии",
   "homeNoFamily": "Без семейства",
   "homePropagation": "Размножение",
+  "homeWishList": "WishLeafs",
   "homeSort": "Сортировка",
   "homeSortSpecies": "Вид",
   "homeSortNickname": "Прозвище",
@@ -374,5 +375,24 @@
   "noComponents": "Нет компонентов",
   "doseAmountRequired": "Укажите количество",
   "doseInvalidNumber": "Некорректное число",
-  "doseRemove": "Убрать"
+  "doseRemove": "Убрать",
+
+  "wishListTitle": "WishLeafs",
+  "wishListAdd": "Добавить в список желаний",
+  "wishListEdit": "Изменить растение",
+  "wishListEmpty": "Список желаний пуст",
+  "wishListEmptyHint": "Добавьте растения, которые хотите купить",
+  "wishListNameEn": "Название (английский)",
+  "wishListNameAlt": "Другое название",
+  "wishListNameEnRequired": "Укажите английское название",
+  "wishListNameAltRequired": "Укажите другое название",
+  "wishListBought": "Купила",
+  "wishListExport": "Экспорт",
+  "wishListExportEmpty": "Нечего экспортировать",
+  "wishListDeleteConfirm": "Удалить «{name}» из списка желаний?",
+  "@wishListDeleteConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  }
 }

@@ -402,6 +402,12 @@ abstract class AppLocalizations {
   /// **'Propagation'**
   String get homePropagation;
 
+  /// No description provided for @homeWishList.
+  ///
+  /// In en, this message translates to:
+  /// **'WishLeafs'**
+  String get homeWishList;
+
   /// No description provided for @homeSort.
   ///
   /// In en, this message translates to:
@@ -2153,6 +2159,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove'**
   String get doseRemove;
+
+  /// No description provided for @wishListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WishLeafs'**
+  String get wishListTitle;
+
+  /// No description provided for @wishListAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to wish list'**
+  String get wishListAdd;
+
+  /// No description provided for @wishListEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit plant'**
+  String get wishListEdit;
+
+  /// No description provided for @wishListEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Wish list is empty'**
+  String get wishListEmpty;
+
+  /// No description provided for @wishListEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add plants you want to buy'**
+  String get wishListEmptyHint;
+
+  /// No description provided for @wishListNameEn.
+  ///
+  /// In en, this message translates to:
+  /// **'Name (English)'**
+  String get wishListNameEn;
+
+  /// No description provided for @wishListNameAlt.
+  ///
+  /// In en, this message translates to:
+  /// **'Alternative name'**
+  String get wishListNameAlt;
+
+  /// No description provided for @wishListNameEnRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the English name'**
+  String get wishListNameEnRequired;
+
+  /// No description provided for @wishListNameAltRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an alternative name'**
+  String get wishListNameAltRequired;
+
+  /// No description provided for @wishListBought.
+  ///
+  /// In en, this message translates to:
+  /// **'Bought'**
+  String get wishListBought;
+
+  /// No description provided for @wishListExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get wishListExport;
+
+  /// No description provided for @wishListExportEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to export'**
+  String get wishListExportEmpty;
+
+  /// No description provided for @wishListDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove “{name}” from the wish list?'**
+  String wishListDeleteConfirm(String name);
 }
 
 class _AppLocalizationsDelegate

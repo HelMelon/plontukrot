@@ -30,6 +30,7 @@ import '../../plants/widgets/cards/plant_card.dart';
 import '../../plants/widgets/search/plant_search_delegate.dart';
 import '../../propagations/pages/propagations_page.dart';
 import '../../settings/pages/settings_page.dart';
+import '../../wish_list/pages/wish_list_page.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:hugeicons/hugeicons.dart';
 
@@ -833,6 +834,20 @@ class _HomePageState extends State<HomePage> {
         },
         icon: HugeIcon(
           icon: HugeIcons.strokeRoundedEcoLab01,
+          color: colors.icon,
+        ),
+      ),
+      IconButton(
+        tooltip: l10n.homeWishList,
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const WishListPage(),
+            ),
+          );
+        },
+        icon: HugeIcon(
+          icon: HugeIcons.strokeRoundedBookHeart,
           color: colors.icon,
         ),
       ),

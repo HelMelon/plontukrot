@@ -57,6 +57,7 @@
   "homeAllStages": "Alle Stadien",
   "homeNoFamily": "Ohne Familie",
   "homePropagation": "Vermehrung",
+  "homeWishList": "WishLeafs",
   "homeSort": "Sortieren",
   "homeSortSpecies": "Art",
   "homeSortNickname": "Spitzname",
@@ -369,5 +370,24 @@
   "noComponents": "Keine Komponenten",
   "doseAmountRequired": "Menge angeben",
   "doseInvalidNumber": "Ungültige Zahl",
-  "doseRemove": "Entfernen"
+  "doseRemove": "Entfernen",
+
+  "wishListTitle": "WishLeafs",
+  "wishListAdd": "Zur Wunschliste hinzufügen",
+  "wishListEdit": "Pflanze bearbeiten",
+  "wishListEmpty": "Wunschliste ist leer",
+  "wishListEmptyHint": "Füge Pflanzen hinzu, die du kaufen möchtest",
+  "wishListNameEn": "Name (Englisch)",
+  "wishListNameAlt": "Anderer Name",
+  "wishListNameEnRequired": "Englischen Namen angeben",
+  "wishListNameAltRequired": "Anderen Namen angeben",
+  "wishListBought": "Gekauft",
+  "wishListExport": "Exportieren",
+  "wishListExportEmpty": "Nichts zu exportieren",
+  "wishListDeleteConfirm": "„{name}“ von der Wunschliste entfernen?",
+  "@wishListDeleteConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  }
 }

@@ -168,6 +168,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get homePropagation => 'Vermehrung';
 
   @override
+  String get homeWishList => 'WishLeafs';
+
+  @override
   String get homeSort => 'Sortieren';
 
   @override
@@ -1154,4 +1157,45 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get doseRemove => 'Entfernen';
+
+  @override
+  String get wishListTitle => 'WishLeafs';
+
+  @override
+  String get wishListAdd => 'Zur Wunschliste hinzufügen';
+
+  @override
+  String get wishListEdit => 'Pflanze bearbeiten';
+
+  @override
+  String get wishListEmpty => 'Wunschliste ist leer';
+
+  @override
+  String get wishListEmptyHint => 'Füge Pflanzen hinzu, die du kaufen möchtest';
+
+  @override
+  String get wishListNameEn => 'Name (Englisch)';
+
+  @override
+  String get wishListNameAlt => 'Anderer Name';
+
+  @override
+  String get wishListNameEnRequired => 'Englischen Namen angeben';
+
+  @override
+  String get wishListNameAltRequired => 'Anderen Namen angeben';
+
+  @override
+  String get wishListBought => 'Gekauft';
+
+  @override
+  String get wishListExport => 'Exportieren';
+
+  @override
+  String get wishListExportEmpty => 'Nichts zu exportieren';
+
+  @override
+  String wishListDeleteConfirm(String name) {
+    return '„$name“ von der Wunschliste entfernen?';
+  }
 }

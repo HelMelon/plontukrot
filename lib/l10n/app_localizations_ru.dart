@@ -166,6 +166,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homePropagation => 'Размножение';
 
   @override
+  String get homeWishList => 'WishLeafs';
+
+  @override
   String get homeSort => 'Сортировка';
 
   @override
@@ -1154,4 +1157,45 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get doseRemove => 'Убрать';
+
+  @override
+  String get wishListTitle => 'WishLeafs';
+
+  @override
+  String get wishListAdd => 'Добавить в список желаний';
+
+  @override
+  String get wishListEdit => 'Изменить растение';
+
+  @override
+  String get wishListEmpty => 'Список желаний пуст';
+
+  @override
+  String get wishListEmptyHint => 'Добавьте растения, которые хотите купить';
+
+  @override
+  String get wishListNameEn => 'Название (английский)';
+
+  @override
+  String get wishListNameAlt => 'Другое название';
+
+  @override
+  String get wishListNameEnRequired => 'Укажите английское название';
+
+  @override
+  String get wishListNameAltRequired => 'Укажите другое название';
+
+  @override
+  String get wishListBought => 'Купила';
+
+  @override
+  String get wishListExport => 'Экспорт';
+
+  @override
+  String get wishListExportEmpty => 'Нечего экспортировать';
+
+  @override
+  String wishListDeleteConfirm(String name) {
+    return 'Удалить «$name» из списка желаний?';
+  }
 }

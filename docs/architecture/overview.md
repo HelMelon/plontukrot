@@ -83,6 +83,9 @@ lib/
 │   ├── settings/pages/
 │   ├── splash/pages/
 │   ├── propagations/pages/
+│   ├── wish_list/
+│   │   ├── pages/
+│   │   └── widgets/sheets/
 │   └── plants/
 │       ├── pages/
 │       └── widgets/
@@ -155,6 +158,16 @@ HomePage / PlantDetailsPage
   → PropagationsPage or AddPropagationSheet / PropagationDetailsSheet
   → PropagationService
   → users/{uid}/propagations (+ stageHistory)
+```
+
+### Wish list flow
+
+```
+HomePage
+  → WishListPage
+  → WishListService / AddWishListItemSheet
+  → users/{uid}/wishList
+  → «Купила» → AddPlantSheet (tradingName ← nameAlt) → delete wish item on success
 ```
 
 ### Locale change
@@ -231,7 +244,7 @@ HomePage
 
 **Public API:** `HomePage({required AppUser user})`.
 
-**Accepted exception:** Imports plants widgets/pages and propagations/settings pages (hub composition).
+**Accepted exception:** Imports plants widgets/pages and propagations/wish_list/settings pages (hub composition).
 
 ---
 
@@ -292,6 +305,28 @@ PropagationsPage → PropagationService streams → Propagation / PropagationYea
 ```
 
 **Public API:** `PropagationsPage`.
+
+---
+
+### wish_list
+
+**Responsibility:** WishLeafs hub — plants the user wants to buy (English + alternative name), export, and handoff into the collection via «Купила».
+
+**Structure:**
+
+```
+features/wish_list/pages/wish_list_page.dart
+features/wish_list/widgets/sheets/add_wish_list_item_sheet.dart
+```
+
+**Data flow:**
+
+```
+WishListPage → WishListService → users/{uid}/wishList
+WishListPage «Купила» → AddPlantSheet → PlantService + WishListService.delete
+```
+
+**Public API:** `WishListPage`.
 
 ---
 
@@ -376,7 +411,7 @@ Do not introduce repositories unless there is a demonstrated need and an approve
 | `services` | Firebase SDKs, `models`, other services | Widgets / pages / `features` |
 | `main.dart` | All above, `firebase_core` | — |
 
-\*Exception: hub pages (`HomePage`) may compose pages/widgets from plants, propagations, settings.
+\*Exception: hub pages (`HomePage`) may compose pages/widgets from plants, propagations, wish_list, settings.
 
 ---
 

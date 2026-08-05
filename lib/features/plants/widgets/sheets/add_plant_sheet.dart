@@ -5,30 +5,51 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/variegation.dart';
 import '../../../../services/plant_service.dart';
+import '../../../../services/wish_list_service.dart';
 import '../selectors/plant_stage_selector.dart';
 import '../selectors/plant_variegation_selector.dart';
 
 class AddPlantSheet extends StatefulWidget {
-  const AddPlantSheet({super.key});
+  final String? initialTradingName;
+  final String? wishListItemId;
+
+  const AddPlantSheet({
+    super.key,
+    this.initialTradingName,
+    this.wishListItemId,
+  });
 
   @override
   State<AddPlantSheet> createState() => _AddPlantSheetState();
 }
 
 class _AddPlantSheetState extends State<AddPlantSheet> {
-  final genusController = TextEditingController();
-  final speciesController = TextEditingController();
-  final cultivarController = TextEditingController();
-  final plantFamilyController = TextEditingController();
-  final tradingNameController = TextEditingController();
+  late final TextEditingController genusController;
+  late final TextEditingController speciesController;
+  late final TextEditingController cultivarController;
+  late final TextEditingController plantFamilyController;
+  late final TextEditingController tradingNameController;
   final nickNameController = TextEditingController();
-  final wateringFrequencyController = TextEditingController();
+  late final TextEditingController wateringFrequencyController;
 
   bool isLoading = false;
   int selectedStage = 0;
   Variegation selectedVariegation = Variegation.none;
   String? genusError;
   String? speciesError;
+
+  @override
+  void initState() {
+    super.initState();
+    genusController = TextEditingController();
+    speciesController = TextEditingController();
+    cultivarController = TextEditingController();
+    plantFamilyController = TextEditingController();
+    tradingNameController = TextEditingController(
+      text: widget.initialTradingName ?? '',
+    );
+    wateringFrequencyController = TextEditingController();
+  }
 
   @override
   void dispose() {
@@ -101,6 +122,11 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
         nickname: nickname,
         stage: selectedStage,
       );
+
+      final wishListItemId = widget.wishListItemId;
+      if (wishListItemId != null) {
+        await WishListService().deleteItem(wishListItemId);
+      }
 
       if (mounted) {
         Navigator.pop(context);
