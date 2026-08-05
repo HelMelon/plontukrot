@@ -24,6 +24,29 @@ class ComponentService {
   CollectionReference<Map<String, dynamic>> get _componentsRef =>
       _db.collection('users').doc(_uid).collection('components');
 
+  Future<CatalogComponent?> findComponentByName(String name) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return null;
+
+    final lower = trimmed.toLowerCase();
+    final snapshot = await _componentsRef.get();
+    for (final doc in snapshot.docs) {
+      final existingName = (doc.data()['name'] as String?)?.trim() ?? '';
+      if (existingName.toLowerCase() == lower) {
+        return CatalogComponent.fromMap(doc.id, doc.data());
+      }
+    }
+    return null;
+  }
+
+  /// Creates a component, or returns the existing id if the name already exists
+  /// (case-insensitive).
+  Future<String> ensureComponent({required String name}) async {
+    final existing = await findComponentByName(name);
+    if (existing != null) return existing.id;
+    return addComponent(name: name);
+  }
+
   Future<String> addComponent({required String name}) async {
     final trimmed = name.trim();
     final doc = await _componentsRef.add({

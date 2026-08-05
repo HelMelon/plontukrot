@@ -43,6 +43,16 @@ class _ManageFertilizerIngredientsSheetState
     final l10n = AppLocalizations.of(context);
     final name = await _promptName(title: l10n.fertilizingAddIngredient);
     if (name == null) return;
+
+    final existing = await _service.findIngredientByName(name);
+    if (existing != null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.catalogItemAlreadyExists(name))),
+      );
+      return;
+    }
+
     await _service.addIngredient(name: name);
   }
 
@@ -53,6 +63,16 @@ class _ManageFertilizerIngredientsSheetState
       initial: ingredient.name,
     );
     if (name == null || name == ingredient.name) return;
+
+    final existing = await _service.findIngredientByName(name);
+    if (existing != null && existing.id != ingredient.id) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.catalogItemAlreadyExists(name))),
+      );
+      return;
+    }
+
     await _service.updateIngredient(
       ingredientId: ingredient.id,
       name: name,

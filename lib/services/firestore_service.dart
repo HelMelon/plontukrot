@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../core/currency/app_currency_controller.dart';
+import '../core/locale/app_locale_controller.dart';
+
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -18,6 +21,8 @@ class FirestoreService {
         'name': user.displayName,
         'email': user.email,
         'createdAt': FieldValue.serverTimestamp(),
+        'localeCode': AppLocaleController.instance.preferenceCode,
+        'currencyCode': AppCurrencyController.instance.currency.code,
       });
     }
   }

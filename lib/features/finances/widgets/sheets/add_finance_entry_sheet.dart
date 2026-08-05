@@ -137,19 +137,19 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
           switch (_catalogLink) {
             case _CatalogLink.soilComponent:
               source = FinanceEntrySource.soilComponent;
-              await _componentService.addComponent(name: title);
+              await _componentService.ensureComponent(name: title);
             case _CatalogLink.fertilizerIngredient:
               source = FinanceEntrySource.fertilizer;
-              await _fertilizeService.addIngredient(name: title);
+              await _fertilizeService.ensureIngredient(name: title);
             case _CatalogLink.purchasedFertilizer:
               source = FinanceEntrySource.purchasedFertilizer;
-              await _fertilizeService.addFertilizer(
+              await _fertilizeService.ensureFertilizer(
                 name: title,
                 kind: FertilizerKind.purchased,
               );
             case _CatalogLink.readyMadeSoil:
               source = FinanceEntrySource.soilMix;
-              await _soilService.addSoil(name: title, components: const []);
+              await _soilService.ensureSoil(name: title, components: const []);
             case _CatalogLink.none:
               break;
           }

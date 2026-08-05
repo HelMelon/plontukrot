@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/plant.dart';
 import '../models/plant_archive_reason.dart';
 import '../models/plant_member.dart';
+import '../models/plant_photo.dart';
 import '../models/variegation.dart';
 import 'plant_species_service.dart';
 import 'storage_service.dart';
@@ -50,6 +51,7 @@ class PlantService {
       'stage': stage,
       'imageUrl': null,
       'imageThumbUrl': null,
+      'images': <Map<String, dynamic>>[],
       'wateringFrequency': null,
       'initialLeafCount': 0,
       'createdAt': FieldValue.serverTimestamp(),
@@ -172,6 +174,7 @@ class PlantService {
       'stage': stage,
       'imageUrl': null,
       'imageThumbUrl': null,
+      'images': <Map<String, dynamic>>[],
       'wateringFrequency': null,
       'initialLeafCount': 0,
       'createdAt': FieldValue.serverTimestamp(),
@@ -313,6 +316,82 @@ class PlantService {
     });
   }
 
+  /// Appends a gallery photo. If the plant already has
+  /// [Plant.maxGalleryPhotos], the oldest photo is deleted first.
+  Future<void> addPlantPhoto({
+    required String plantId,
+    required String photoId,
+    required String imageUrl,
+    required String imageThumbUrl,
+    DateTime? addedAt,
+  }) async {
+    final doc = await _plantsRef.doc(plantId).get();
+    if (!doc.exists) {
+      throw StateError('Plant $plantId not found');
+    }
+    final plant = Plant.fromDocument(doc);
+    final photos = List<PlantPhoto>.from(plant.galleryPhotos);
+    final storage = StorageService();
+    final evicted = <PlantPhoto>[];
+
+    while (photos.length >= Plant.maxGalleryPhotos) {
+      evicted.add(photos.removeAt(0));
+    }
+
+    photos.add(
+      PlantPhoto(
+        id: photoId,
+        imageUrl: imageUrl,
+        imageThumbUrl: imageThumbUrl,
+        addedAt: addedAt ?? DateTime.now(),
+      ),
+    );
+
+    await _plantsRef.doc(plantId).update(_galleryWritePayload(photos));
+
+    for (final old in evicted) {
+      await storage.deletePlantPhoto(plantId, old.id);
+    }
+  }
+
+  Future<void> removePlantPhoto({
+    required String plantId,
+    required String photoId,
+  }) async {
+    final doc = await _plantsRef.doc(plantId).get();
+    if (!doc.exists) {
+      throw StateError('Plant $plantId not found');
+    }
+    final plant = Plant.fromDocument(doc);
+    final photos = List<PlantPhoto>.from(plant.galleryPhotos);
+    final removed = photos.where((p) => p.id == photoId).toList();
+    if (removed.isEmpty) return;
+
+    photos.removeWhere((p) => p.id == photoId);
+    await _plantsRef.doc(plantId).update(_galleryWritePayload(photos));
+
+    final storage = StorageService();
+    for (final photo in removed) {
+      await storage.deletePlantPhoto(plantId, photo.id);
+    }
+  }
+
+  Map<String, dynamic> _galleryWritePayload(List<PlantPhoto> photos) {
+    if (photos.isEmpty) {
+      return {
+        'images': <Map<String, dynamic>>[],
+        'imageUrl': null,
+        'imageThumbUrl': null,
+      };
+    }
+    final newest = photos.last;
+    return {
+      'images': photos.map((p) => p.toMap()).toList(),
+      'imageUrl': newest.imageUrl,
+      'imageThumbUrl': newest.imageThumbUrl,
+    };
+  }
+
   Future<void> updatePlant({
     required String plantId,
     required String genus,
@@ -410,6 +489,8 @@ class PlantService {
 
   Future<void> _deletePlantSubtree(String plantId) async {
     final plantRef = _plantsRef.doc(plantId);
+    final plantSnap = await plantRef.get();
+    final plant = plantSnap.exists ? Plant.fromDocument(plantSnap) : null;
 
     await _deleteQueryInBatches(plantRef.collection('watering'));
     await _deleteQueryInBatches(plantRef.collection('fertilizing'));
@@ -429,7 +510,10 @@ class PlantService {
       await prop.reference.delete();
     }
 
-    await StorageService().deletePlantImage(plantId);
+    await StorageService().deleteAllPlantImages(
+      plantId: plantId,
+      photoIds: plant?.galleryPhotos.map((p) => p.id) ?? const <String>[],
+    );
     await plantRef.delete();
   }
 

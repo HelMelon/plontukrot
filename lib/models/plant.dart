@@ -3,9 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firestore_helpers.dart';
 import 'plant_archive_reason.dart';
 import 'plant_member.dart';
+import 'plant_photo.dart';
 import 'variegation.dart';
 
 class Plant {
+  static const maxGalleryPhotos = 5;
+
   final String id;
   final String genus;
   final String species;
@@ -17,6 +20,7 @@ class Plant {
   final int stage;
   final String? imageUrl;
   final String? imageThumbUrl;
+  final List<PlantPhoto> images;
   final int? wateringFrequency;
   final DateTime? createdAt;
   final DateTime? lastWateredAt;
@@ -45,6 +49,7 @@ class Plant {
     required this.stage,
     this.imageUrl,
     this.imageThumbUrl,
+    this.images = const [],
     this.wateringFrequency,
     this.createdAt,
     this.lastWateredAt,
@@ -100,6 +105,23 @@ class Plant {
     return null;
   }
 
+  /// Gallery for UI: persisted `images`, or a single legacy cover photo.
+  List<PlantPhoto> get galleryPhotos {
+    if (images.isNotEmpty) return images;
+    final full = imageUrl?.trim();
+    if (full == null || full.isEmpty) return const [];
+    final thumb = imageThumbUrl?.trim();
+    return [
+      PlantPhoto(
+        id: PlantPhoto.legacyId,
+        imageUrl: full,
+        imageThumbUrl:
+            (thumb != null && thumb.isNotEmpty) ? thumb : full,
+        addedAt: createdAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+      ),
+    ];
+  }
+
   static String? _nullableTrimmed(String? value) {
     if (value == null) return null;
     final trimmed = value.trim();
@@ -113,6 +135,18 @@ class Plant {
         .map((e) => PlantMember.fromMap(Map<String, dynamic>.from(e)))
         .take(3)
         .toList();
+  }
+
+  static List<PlantPhoto> _readImages(dynamic raw) {
+    if (raw is! List) return const [];
+    final photos = raw
+        .whereType<Map>()
+        .map((e) => PlantPhoto.fromMap(Map<String, dynamic>.from(e)))
+        .where((p) => p.id.isNotEmpty && p.imageUrl.isNotEmpty)
+        .toList();
+    photos.sort((a, b) => a.addedAt.compareTo(b.addedAt));
+    if (photos.length <= maxGalleryPhotos) return photos;
+    return photos.sublist(photos.length - maxGalleryPhotos);
   }
 
   factory Plant.fromMap(String id, Map<String, dynamic> data) {
@@ -129,6 +163,7 @@ class Plant {
       stage: data['stage'] as int? ?? 0,
       imageUrl: data['imageUrl'] as String?,
       imageThumbUrl: data['imageThumbUrl'] as String?,
+      images: _readImages(data['images']),
       wateringFrequency: data['wateringFrequency'] as int?,
       createdAt: readTimestamp(data['createdAt']),
       lastWateredAt: readTimestamp(data['lastWateredAt']),
@@ -173,6 +208,7 @@ class Plant {
       'stage': stage,
       'imageUrl': imageUrl,
       'imageThumbUrl': imageThumbUrl,
+      'images': images.map((p) => p.toMap()).toList(),
       'wateringFrequency': wateringFrequency,
       if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
       if (lastWateredAt != null)

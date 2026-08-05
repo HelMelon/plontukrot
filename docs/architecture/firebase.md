@@ -139,13 +139,15 @@ Writes typically use `FieldValue.serverTimestamp()` or stored `Timestamp` values
 | Concern | Owner |
 |---------|--------|
 | Upload / delete plant images | `StorageService` |
-| Persist URLs on plant | `PlantService.updatePlantImage` / delete hooks |
+| Persist gallery + cover URLs | `PlantService.addPlantPhoto` / `removePlantPhoto` / delete hooks |
 
 **Paths**
 
 ```
-plants/{uid}/{plantId}.jpg
-plants/{uid}/{plantId}_thumb.jpg
+plants/{uid}/{plantId}.jpg                 # legacy single cover
+plants/{uid}/{plantId}_thumb.jpg           # legacy thumb
+plants/{uid}/{plantId}/{photoId}.jpg       # gallery full
+plants/{uid}/{plantId}/{photoId}_thumb.jpg # gallery thumb
 ```
 
 Compression via `flutter_image_compress` inside `StorageService`. UI uses `image_picker`, then calls the service — UI must not talk to Storage SDK directly.

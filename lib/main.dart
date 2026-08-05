@@ -165,11 +165,47 @@ class AuthGate extends StatelessWidget {
         }
 
         if (snapshot.hasData && snapshot.data != null) {
-          return HomePage(user: snapshot.data!);
+          return _AuthenticatedShell(user: snapshot.data!);
         }
 
         return const LoginPage();
       },
     );
+  }
+}
+
+/// Syncs locale/currency from Firestore once the user is signed in.
+class _AuthenticatedShell extends StatefulWidget {
+  final AppUser user;
+
+  const _AuthenticatedShell({required this.user});
+
+  @override
+  State<_AuthenticatedShell> createState() => _AuthenticatedShellState();
+}
+
+class _AuthenticatedShellState extends State<_AuthenticatedShell> {
+  @override
+  void initState() {
+    super.initState();
+    _syncPreferences();
+  }
+
+  @override
+  void didUpdateWidget(covariant _AuthenticatedShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.user.uid != widget.user.uid) {
+      _syncPreferences();
+    }
+  }
+
+  Future<void> _syncPreferences() async {
+    await AppLocaleController.instance.syncWithCloud();
+    await AppCurrencyController.instance.syncWithCloud();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return HomePage(user: widget.user);
   }
 }

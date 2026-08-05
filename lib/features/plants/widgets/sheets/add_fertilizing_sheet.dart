@@ -133,12 +133,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
 
     if (name == null || name.isEmpty) return;
 
-    final exists = _catalogNames.any(
-      (n) => n.toLowerCase() == name.toLowerCase(),
-    );
-    if (!exists) {
-      await _service.addIngredient(name: name);
-    }
+    await _service.ensureIngredient(name: name);
 
     if (!mounted) return;
 

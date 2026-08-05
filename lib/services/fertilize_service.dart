@@ -31,6 +31,29 @@ class FertilizeService {
 
   // --- Ingredient catalog ---
 
+  Future<FertilizerIngredient?> findIngredientByName(String name) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return null;
+
+    final lower = trimmed.toLowerCase();
+    final snapshot = await _ingredientsRef.get();
+    for (final doc in snapshot.docs) {
+      final existingName = (doc.data()['name'] as String?)?.trim() ?? '';
+      if (existingName.toLowerCase() == lower) {
+        return FertilizerIngredient.fromMap(doc.id, doc.data());
+      }
+    }
+    return null;
+  }
+
+  /// Creates an ingredient, or returns the existing id if the name already
+  /// exists (case-insensitive).
+  Future<String> ensureIngredient({required String name}) async {
+    final existing = await findIngredientByName(name);
+    if (existing != null) return existing.id;
+    return addIngredient(name: name);
+  }
+
   Future<String> addIngredient({required String name}) async {
     final doc = await _ingredientsRef.add({
       'name': name.trim(),
@@ -60,6 +83,39 @@ class FertilizeService {
   }
 
   // --- Fertilizer catalog (named mixes) ---
+
+  Future<Fertilizer?> findFertilizerByName(String name) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return null;
+
+    final lower = trimmed.toLowerCase();
+    final snapshot = await _fertilizersRef.get();
+    for (final doc in snapshot.docs) {
+      final existingName = (doc.data()['name'] as String?)?.trim() ?? '';
+      if (existingName.toLowerCase() == lower) {
+        return Fertilizer.fromMap(doc.id, doc.data());
+      }
+    }
+    return null;
+  }
+
+  /// Creates a fertilizer, or returns the existing id if the name already
+  /// exists (case-insensitive). Does not overwrite an existing entry.
+  Future<String> ensureFertilizer({
+    required String name,
+    FertilizerKind kind = FertilizerKind.mix,
+    int waterMl = 250,
+    List<FertilizerDose> components = const [],
+  }) async {
+    final existing = await findFertilizerByName(name);
+    if (existing != null) return existing.id;
+    return addFertilizer(
+      name: name,
+      kind: kind,
+      waterMl: waterMl,
+      components: components,
+    );
+  }
 
   Future<String> addFertilizer({
     required String name,

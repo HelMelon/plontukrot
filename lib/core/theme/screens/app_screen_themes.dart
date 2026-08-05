@@ -86,6 +86,13 @@ class PlantDetailsScreenTheme {
   const PlantDetailsScreenTheme({
     required this.sectionGap,
     required this.actionIconColor,
+    required this.galleryDateScrim,
+    required this.galleryDateText,
+    required this.galleryDotActive,
+    required this.galleryDotInactive,
+    required this.galleryActionBackground,
+    required this.galleryDotSize,
+    required this.galleryDotGap,
   });
 
   factory PlantDetailsScreenTheme.standard({
@@ -95,11 +102,25 @@ class PlantDetailsScreenTheme {
     return PlantDetailsScreenTheme(
       sectionGap: spacing.xl,
       actionIconColor: colors.icon,
+      galleryDateScrim: colors.screen.withValues(alpha: 0.55),
+      galleryDateText: colors.onPrimary,
+      galleryDotActive: colors.primaryHover,
+      galleryDotInactive: colors.onPrimary.withValues(alpha: 0.35),
+      galleryActionBackground: colors.screen.withValues(alpha: 0.45),
+      galleryDotSize: spacing.sm,
+      galleryDotGap: spacing.xs,
     );
   }
 
   final double sectionGap;
   final Color actionIconColor;
+  final Color galleryDateScrim;
+  final Color galleryDateText;
+  final Color galleryDotActive;
+  final Color galleryDotInactive;
+  final Color galleryActionBackground;
+  final double galleryDotSize;
+  final double galleryDotGap;
 }
 
 @immutable

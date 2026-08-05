@@ -396,6 +396,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get plantPhotoDeleteTitle => 'Delete photo';
+
+  @override
+  String get plantPhotoDeleteConfirm => 'Delete this plant photo?';
+
+  @override
   String get plantCropTitle => 'Crop photo';
 
   @override
@@ -1164,6 +1170,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String catalogItemDeleteConfirm(String name) {
     return 'Remove \"$name\" from the catalog?';
+  }
+
+  @override
+  String catalogItemAlreadyExists(String name) {
+    return '\"$name\" is already in the catalog';
   }
 
   @override

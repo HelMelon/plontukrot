@@ -4,11 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
+import '../models/plant_photo.dart';
+
 class PlantImageUploadResult {
+  final String photoId;
   final String imageUrl;
   final String imageThumbUrl;
 
   const PlantImageUploadResult({
+    required this.photoId,
     required this.imageUrl,
     required this.imageThumbUrl,
   });
@@ -22,12 +26,30 @@ class StorageService {
   static const int thumbMaxPx = 400;
   static const int thumbQuality = 70;
 
-  Reference _plantImageRef(String plantId) {
+  Reference _legacyPlantImageRef(String plantId) {
     return _storage.ref().child('plants').child(uid).child('$plantId.jpg');
   }
 
-  Reference _plantThumbRef(String plantId) {
+  Reference _legacyPlantThumbRef(String plantId) {
     return _storage.ref().child('plants').child(uid).child('${plantId}_thumb.jpg');
+  }
+
+  Reference _plantPhotoRef(String plantId, String photoId) {
+    return _storage
+        .ref()
+        .child('plants')
+        .child(uid)
+        .child(plantId)
+        .child('$photoId.jpg');
+  }
+
+  Reference _plantPhotoThumbRef(String plantId, String photoId) {
+    return _storage
+        .ref()
+        .child('plants')
+        .child(uid)
+        .child(plantId)
+        .child('${photoId}_thumb.jpg');
   }
 
   Future<Uint8List> _buildThumbBytes(Uint8List imageBytes) async {
@@ -42,13 +64,18 @@ class StorageService {
     return Uint8List.fromList(compressed);
   }
 
-  Future<PlantImageUploadResult> uploadPlantImages({
+  /// Upload a gallery photo under `plants/{uid}/{plantId}/{photoId}.jpg`.
+  Future<PlantImageUploadResult> uploadPlantPhoto({
     required Uint8List imageBytes,
     required String plantId,
+    String? photoId,
   }) async {
+    final id = (photoId != null && photoId.trim().isNotEmpty)
+        ? photoId.trim()
+        : DateTime.now().microsecondsSinceEpoch.toString();
     final metadata = SettableMetadata(contentType: 'image/jpeg');
-    final fullRef = _plantImageRef(plantId);
-    final thumbRef = _plantThumbRef(plantId);
+    final fullRef = _plantPhotoRef(plantId, id);
+    final thumbRef = _plantPhotoThumbRef(plantId, id);
     final thumbBytes = await _buildThumbBytes(imageBytes);
 
     await Future.wait([
@@ -62,6 +89,34 @@ class StorageService {
     ]);
 
     return PlantImageUploadResult(
+      photoId: id,
+      imageUrl: urls[0],
+      imageThumbUrl: urls[1],
+    );
+  }
+
+  /// Legacy single-file upload kept for older callers.
+  Future<PlantImageUploadResult> uploadPlantImages({
+    required Uint8List imageBytes,
+    required String plantId,
+  }) async {
+    final metadata = SettableMetadata(contentType: 'image/jpeg');
+    final fullRef = _legacyPlantImageRef(plantId);
+    final thumbRef = _legacyPlantThumbRef(plantId);
+    final thumbBytes = await _buildThumbBytes(imageBytes);
+
+    await Future.wait([
+      fullRef.putData(imageBytes, metadata),
+      thumbRef.putData(thumbBytes, metadata),
+    ]);
+
+    final urls = await Future.wait([
+      fullRef.getDownloadURL(),
+      thumbRef.getDownloadURL(),
+    ]);
+
+    return PlantImageUploadResult(
+      photoId: PlantPhoto.legacyId,
       imageUrl: urls[0],
       imageThumbUrl: urls[1],
     );
@@ -79,10 +134,33 @@ class StorageService {
     return result.imageUrl;
   }
 
+  Future<void> deletePlantPhoto(String plantId, String photoId) async {
+    if (photoId == PlantPhoto.legacyId) {
+      await deletePlantImage(plantId);
+      return;
+    }
+    await Future.wait([
+      _deleteQuietly(_plantPhotoRef(plantId, photoId)),
+      _deleteQuietly(_plantPhotoThumbRef(plantId, photoId)),
+    ]);
+  }
+
   Future<void> deletePlantImage(String plantId) async {
     await Future.wait([
-      _deleteQuietly(_plantImageRef(plantId)),
-      _deleteQuietly(_plantThumbRef(plantId)),
+      _deleteQuietly(_legacyPlantImageRef(plantId)),
+      _deleteQuietly(_legacyPlantThumbRef(plantId)),
+    ]);
+  }
+
+  /// Deletes gallery photos and legacy cover files for a plant.
+  Future<void> deleteAllPlantImages({
+    required String plantId,
+    required Iterable<String> photoIds,
+  }) async {
+    final uniqueIds = photoIds.toSet();
+    await Future.wait([
+      for (final id in uniqueIds) deletePlantPhoto(plantId, id),
+      deletePlantImage(plantId),
     ]);
   }
 

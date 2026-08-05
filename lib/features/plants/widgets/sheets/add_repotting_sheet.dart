@@ -134,12 +134,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
 
     if (name == null || name.isEmpty) return;
 
-    final exists = _catalogNames.any(
-      (n) => n.toLowerCase() == name.toLowerCase(),
-    );
-    if (!exists) {
-      await _componentService.addComponent(name: name);
-    }
+    await _componentService.ensureComponent(name: name);
 
     setState(() {
       if (!_components.any((c) => c.component == name)) {

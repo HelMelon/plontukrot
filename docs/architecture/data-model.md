@@ -104,7 +104,7 @@ Always trim user strings in **services** before write when the neighbor methods 
 3. Writes: either `model.toMap()` or hand-built `Map` in the service method.
 4. IDs: document id is model `id`; not stored as a field inside the map unless needed.
 
-Images: Storage download URLs stored on plant as `imageUrl` / `imageThumbUrl`. Lists prefer `Plant.listImageUrl` (thumb first).
+Images: plant gallery is `images: [{ id, imageUrl, imageThumbUrl, addedAt }]` (max 5). Cover fields `imageUrl` / `imageThumbUrl` stay in sync with the newest photo for lists (`Plant.listImageUrl`). Legacy plants with only cover fields are exposed via `Plant.galleryPhotos` without a batch migration.
 
 ---
 

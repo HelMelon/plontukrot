@@ -7,6 +7,7 @@ import 'package:plontukrot/core/theme/theme_context.dart';
 
 import '../../../models/growth_event.dart';
 import '../../../models/plant.dart';
+import '../../../models/plant_photo.dart';
 import '../../../services/growth_event_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/storage_service.dart';
@@ -111,13 +112,14 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
     setState(() => isUploading = true);
 
     try {
-      final upload = await StorageService().uploadPlantImages(
+      final upload = await StorageService().uploadPlantPhoto(
         imageBytes: croppedBytes,
         plantId: widget.plantId,
       );
 
-      await _plantService.updatePlantImage(
+      await _plantService.addPlantPhoto(
         plantId: widget.plantId,
+        photoId: upload.photoId,
         imageUrl: upload.imageUrl,
         imageThumbUrl: upload.imageThumbUrl,
       );
@@ -137,6 +139,43 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
       );
     } finally {
       setState(() => isUploading = false);
+    }
+  }
+
+  Future<void> _deleteCurrentPhoto(PlantPhoto photo) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.plantPhotoDeleteTitle),
+        content: Text(l10n.plantPhotoDeleteConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.commonCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.commonDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => isUploading = true);
+    try {
+      await _plantService.removePlantPhoto(
+        plantId: widget.plantId,
+        photoId: photo.id,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commonError(e.toString()))),
+      );
+    } finally {
+      if (mounted) setState(() => isUploading = false);
     }
   }
 
@@ -284,7 +323,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
       events: growthEvents,
     );
     final monthlyLeafStats = GrowthEvent.leafStatsByMonth(growthEvents);
-    final imageUrl = plant.imageUrl;
+    final photos = plant.galleryPhotos;
 
     final infoCard = PlantInfoCard(
       plant: plant,
@@ -332,8 +371,9 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 PlantImageCard(
-                  imageUrl: imageUrl,
-                  onTap: pickAndUploadImage,
+                  photos: photos,
+                  onAdd: pickAndUploadImage,
+                  onDelete: _deleteCurrentPhoto,
                   isUploading: isUploading,
                   aspectRatio: 0.75,
                 ),
@@ -352,8 +392,9 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         PlantImageCard(
-          imageUrl: imageUrl,
-          onTap: pickAndUploadImage,
+          photos: photos,
+          onAdd: pickAndUploadImage,
+          onDelete: _deleteCurrentPhoto,
           isUploading: isUploading,
           aspectRatio: 1.0,
         ),

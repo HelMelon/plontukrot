@@ -41,6 +41,16 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
     final l10n = AppLocalizations.of(context);
     final name = await _promptName(title: l10n.componentAddTitle);
     if (name == null) return;
+
+    final existing = await _service.findComponentByName(name);
+    if (existing != null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.catalogItemAlreadyExists(name))),
+      );
+      return;
+    }
+
     await _service.addComponent(name: name);
   }
 
@@ -51,6 +61,16 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
       initial: component.name,
     );
     if (name == null || name == component.name) return;
+
+    final existing = await _service.findComponentByName(name);
+    if (existing != null && existing.id != component.id) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.catalogItemAlreadyExists(name))),
+      );
+      return;
+    }
+
     await _service.updateComponent(
       componentId: component.id,
       name: name,

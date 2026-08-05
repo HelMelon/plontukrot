@@ -12,6 +12,32 @@ class SoilService {
   CollectionReference<Map<String, dynamic>> get _soilsRef =>
       _db.collection('users').doc(_uid).collection('soils');
 
+  Future<Soil?> findSoilByName(String name) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return null;
+
+    final lower = trimmed.toLowerCase();
+    final snapshot = await _soilsRef.get();
+    for (final doc in snapshot.docs) {
+      final existingName = (doc.data()['name'] as String?)?.trim() ?? '';
+      if (existingName.toLowerCase() == lower) {
+        return Soil.fromMap(doc.id, doc.data());
+      }
+    }
+    return null;
+  }
+
+  /// Creates a soil mix, or returns the existing id if the name already exists
+  /// (case-insensitive). Does not overwrite an existing mix.
+  Future<String> ensureSoil({
+    required String name,
+    required List<SoilComponent> components,
+  }) async {
+    final existing = await findSoilByName(name);
+    if (existing != null) return existing.id;
+    return addSoil(name: name, components: components);
+  }
+
   Future<String> addSoil({
     required String name,
     required List<SoilComponent> components,

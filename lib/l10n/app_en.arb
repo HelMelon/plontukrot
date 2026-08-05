@@ -183,6 +183,8 @@
       "error": {"type": "String"}
     }
   },
+  "plantPhotoDeleteTitle": "Delete photo",
+  "plantPhotoDeleteConfirm": "Delete this plant photo?",
   "plantCropTitle": "Crop photo",
   "plantCropConfirm": "Done",
   "plantCropError": "Crop error: {error}",
@@ -606,6 +608,12 @@
   "componentAddTitle": "Add component",
   "catalogItemDeleteConfirm": "Remove \"{name}\" from the catalog?",
   "@catalogItemDeleteConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "catalogItemAlreadyExists": "\"{name}\" is already in the catalog",
+  "@catalogItemAlreadyExists": {
     "placeholders": {
       "name": {"type": "String"}
     }

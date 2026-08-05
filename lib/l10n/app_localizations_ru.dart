@@ -397,6 +397,12 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get plantPhotoDeleteTitle => 'Удалить фото';
+
+  @override
+  String get plantPhotoDeleteConfirm => 'Удалить это фото растения?';
+
+  @override
   String get plantCropTitle => 'Кадрирование';
 
   @override
@@ -1170,6 +1176,11 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String catalogItemDeleteConfirm(String name) {
     return 'Удалить «$name» из каталога?';
+  }
+
+  @override
+  String catalogItemAlreadyExists(String name) {
+    return '«$name» уже есть в каталоге';
   }
 
   @override

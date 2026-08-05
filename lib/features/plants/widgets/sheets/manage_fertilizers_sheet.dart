@@ -35,6 +35,15 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
     );
     if (result == null) return;
 
+    final existing = await _service.findFertilizerByName(result.name);
+    if (existing != null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.catalogItemAlreadyExists(result.name))),
+      );
+      return;
+    }
+
     await _service.addFertilizer(
       name: result.name,
       kind: result.kind,
@@ -57,6 +66,15 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
       ),
     );
     if (result == null) return;
+
+    final existing = await _service.findFertilizerByName(result.name);
+    if (existing != null && existing.id != fertilizer.id) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.catalogItemAlreadyExists(result.name))),
+      );
+      return;
+    }
 
     await _service.updateFertilizer(
       fertilizerId: fertilizer.id,

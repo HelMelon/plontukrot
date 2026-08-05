@@ -816,6 +816,18 @@ abstract class AppLocalizations {
   /// **'Upload error: {error}'**
   String plantUploadError(String error);
 
+  /// No description provided for @plantPhotoDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete photo'**
+  String get plantPhotoDeleteTitle;
+
+  /// No description provided for @plantPhotoDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this plant photo?'**
+  String get plantPhotoDeleteConfirm;
+
   /// No description provided for @plantCropTitle.
   ///
   /// In en, this message translates to:
@@ -2189,6 +2201,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove \"{name}\" from the catalog?'**
   String catalogItemDeleteConfirm(String name);
+
+  /// No description provided for @catalogItemAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{name}\" is already in the catalog'**
+  String catalogItemAlreadyExists(String name);
 
   /// No description provided for @manageFertilizersHint.
   ///
