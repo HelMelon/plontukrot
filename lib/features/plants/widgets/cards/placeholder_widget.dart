@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/theme_context.dart';
+
 class PlaceholderWithIcon extends StatelessWidget {
   const PlaceholderWithIcon({super.key});
 
@@ -17,8 +19,12 @@ class PlaceholderWithIcon extends StatelessWidget {
             height: double.infinity,
           ),
         ),
-        const Center(
-          child: Icon(Icons.add_a_photo, color: Colors.white, size: 40.0),
+        Center(
+          child: Icon(
+            Icons.add_a_photo,
+            color: context.colors.onPrimary,
+            size: context.dimensions.photoPlaceholder,
+          ),
         ),
       ],
     );

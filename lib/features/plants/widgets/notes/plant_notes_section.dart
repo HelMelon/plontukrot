@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/note.dart';
 import '../../../../services/note_service.dart';
 import '../common/expandable_side_scroll_list.dart';
@@ -31,6 +31,8 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final typography = context.typography;
 
     return StreamBuilder<List<Note>>(
       stream: _notesStream,
@@ -39,16 +41,16 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
           return Center(
             child: Text(
               l10n.commonError(snapshot.error.toString()),
-              style: const TextStyle(color: Colors.red),
+              style: typography.error,
             ),
           );
         }
 
         if (!snapshot.hasData) {
-          return const SizedBox(
+          return SizedBox(
             height: 100,
             child: Center(
-              child: CircularProgressIndicator(color: AppColors.goldAccent),
+              child: CircularProgressIndicator(color: colors.primary),
             ),
           );
         }
@@ -58,14 +60,14 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
         if (notes.isEmpty) {
           return Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
+            padding: context.spacing.allLg,
             decoration: BoxDecoration(
-              color: AppColors.dark2,
-              borderRadius: BorderRadius.circular(20),
+              color: colors.card,
+              borderRadius: BorderRadius.circular(context.radii.lg),
             ),
             child: Text(
               l10n.notesEmpty,
-              style: const TextStyle(color: AppColors.textSecondary),
+              style: typography.bodySmall,
             ),
           );
         }

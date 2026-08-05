@@ -3,8 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/fertilizing_entry.dart';
 import '../../../../services/fertilize_service.dart';
 import '../dialogs/fertilizer_composition_dialog.dart';
@@ -99,28 +98,32 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final sheetHeight = MediaQuery.of(context).size.height * 0.7;
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final sheets = context.components.sheets;
+    final typography = context.typography;
 
     return Material(
-      color: AppColors.backgroundSecondary,
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      color: colors.modal,
+      borderRadius: sheets.topBorderRadius,
       clipBehavior: Clip.antiAlias,
       child: SafeArea(
         top: false,
         child: SizedBox(
           height: sheetHeight,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: spacing.allMd,
             child: Column(
               children: [
                 Container(
-                  width: 40,
-                  height: 4,
+                  width: sheets.handleWidth,
+                  height: sheets.handleHeight,
                   decoration: BoxDecoration(
-                    color: AppColors.greenSoft,
-                    borderRadius: BorderRadius.circular(99),
+                    color: sheets.handleColor,
+                    borderRadius: BorderRadius.circular(sheets.handleRadius),
                   ),
                 ),
-                const SizedBox(height: 16),
+                spacing.vMd,
                 Row(
                   children: [
                     Expanded(
@@ -128,29 +131,38 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                         l10n.fertilizingHistory,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.heading,
-                        ),
+                        style: typography.titleMedium,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    spacing.hXs,
                     SizedBox(
-                      height: AppTheme.buttonHeight,
-                      child: FilledButton.icon(
-                        onPressed: _showAddSheet,
-                        icon: const Icon(Icons.add, size: 18),
-                        label: Text(
-                          l10n.commonAdd,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      width: context.dimensions.buttonHeight,
+                      height: context.dimensions.buttonHeight,
+                      child: Tooltip(
+                        message: l10n.commonAdd,
+                        child: FilledButton(
+                          onPressed: _showAddSheet,
+                          style: FilledButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size(
+                              context.dimensions.buttonHeight,
+                              context.dimensions.buttonHeight,
+                            ),
+                            maximumSize: Size(
+                              context.dimensions.buttonHeight,
+                              context.dimensions.buttonHeight,
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.add,
+                            size: context.dimensions.iconXl,
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                spacing.vLg,
                 Expanded(
                   child: StreamBuilder<List<FertilizingEntry>>(
                     stream: _historyStream,
@@ -169,9 +181,7 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                         return Center(
                           child: Text(
                             l10n.fertilizingEmpty,
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
-                            ),
+                            style: typography.bodySmall,
                           ),
                         );
                       }
@@ -180,17 +190,14 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
 
                       return ListView.separated(
                         itemCount: items.length + (canLoadMore ? 1 : 0),
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        separatorBuilder: (_, __) => spacing.vSm,
                         itemBuilder: (context, index) {
                           if (index == items.length) {
                             return TextButton(
                               onPressed: _loadMore,
                               child: Text(
                                 l10n.commonShowMore,
-                                style: const TextStyle(
-                                  color: AppColors.goldAccent,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: typography.link,
                               ),
                             );
                           }
@@ -202,7 +209,7 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                           );
 
                           return InkWell(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(context.radii.md),
                             onTap: () {
                               showFertilizerCompositionDialog(
                                 context: context,
@@ -212,18 +219,18 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                               );
                             },
                             child: Container(
-                              padding: const EdgeInsets.all(16),
+                              padding: spacing.allMd,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                color: AppColors.dark2,
+                                borderRadius: BorderRadius.circular(context.radii.md),
+                                color: colors.card,
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.science,
-                                    color: AppColors.accentLight,
+                                    color: colors.icon,
                                   ),
-                                  const SizedBox(width: 12),
+                                  spacing.hSm,
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
@@ -233,20 +240,16 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                                           displayName,
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 16,
+                                          style: typography.bodyLarge.copyWith(
                                             fontWeight: FontWeight.w600,
-                                            color: AppColors.textPrimary,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
+                                        spacing.vXxs,
                                         Text(
                                           '${l10n.applicationMethodLabel(item.applicationMethod)} · ${DateFormat.yMMMMd().format(item.appliedAt)}',
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            color: AppColors.textSecondary,
-                                          ),
+                                          style: typography.bodySmall,
                                         ),
                                       ],
                                     ),

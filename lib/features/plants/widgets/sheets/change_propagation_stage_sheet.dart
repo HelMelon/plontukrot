@@ -5,8 +5,7 @@ import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/date_time_utils.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/propagation.dart';
 import '../../../../models/stage_info.dart';
 import '../../../../services/propagation_service.dart';
@@ -114,15 +113,24 @@ class _ChangePropagationStageSheetState
     final keyboard = media.viewInsets.bottom;
     final maxHeight =
         (media.size.height - keyboard - 72).clamp(160.0, media.size.height);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final radii = context.radii;
+    final sheets = context.components.sheets;
+    final inputs = context.components.inputs;
+    final typography = context.typography;
+    final dimensions = context.dimensions;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.backgroundSecondary,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      decoration: BoxDecoration(
+        color: colors.modal,
+        borderRadius: sheets.topBorderRadius,
       ),
       child: SafeArea(
         child: Padding(
-          padding: EdgeInsets.fromLTRB(22, 22, 22, 24 + keyboard),
+          padding: sheets.contentPadding.copyWith(
+            bottom: spacing.xl + keyboard,
+          ),
           child: ConstrainedBox(
             constraints: BoxConstraints(maxHeight: maxHeight),
             child: SingleChildScrollView(
@@ -132,37 +140,33 @@ class _ChangePropagationStageSheetState
                 children: [
                   Center(
                     child: Container(
-                      width: 50,
-                      height: 5,
+                      width: sheets.handleWidth,
+                      height: sheets.handleHeight,
                       decoration: BoxDecoration(
-                        color: AppColors.greenSoft,
-                        borderRadius: BorderRadius.circular(20),
+                        color: sheets.handleColor,
+                        borderRadius: BorderRadius.circular(sheets.handleRadius),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  spacing.vXxl,
                   Text(
                     l10n.propagationChangeStage,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
+                    style: typography.titleLarge.copyWith(
                       letterSpacing: -1,
-                      color: AppColors.heading,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  spacing.vXs,
                   Text(
                     '${l10n.propagationAliveWithMethod(widget.propagation.quantityAlive, l10n.propagationMethodPlural(widget.propagation.method))} · ${widget.propagation.parentPlantName}',
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textSecondary,
+                    style: typography.bodyLarge.copyWith(
+                      color: colors.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  spacing.vXl,
                   ..._stages.map((stage) {
                     final selected = _stage == stage.value;
                     return ListTile(
@@ -171,16 +175,13 @@ class _ChangePropagationStageSheetState
                         selected
                             ? Icons.radio_button_checked
                             : Icons.radio_button_off,
-                        color: selected
-                            ? AppColors.goldAccent
-                            : AppColors.textSecondary,
+                        color: selected ? colors.primary : colors.textSecondary,
                       ),
                       title: Text(
                         l10n.stageInfoTitle(stage),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: AppColors.textPrimary,
+                        style: typography.bodyLarge.copyWith(
                           fontWeight:
                               selected ? FontWeight.w700 : FontWeight.w500,
                         ),
@@ -188,59 +189,39 @@ class _ChangePropagationStageSheetState
                       onTap: () => setState(() => _stage = stage.value),
                     );
                   }),
-                  const SizedBox(height: 8),
+                  spacing.vXs,
                   TextField(
                     controller: _quantityController,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    style: const TextStyle(color: AppColors.textPrimary),
-                    decoration: InputDecoration(
+                    style: inputs.textStyle,
+                    decoration: inputs.decoration(
                       labelText: l10n.propagationAliveNow,
-                      labelStyle:
-                          const TextStyle(color: AppColors.textSecondary),
-                      filled: true,
-                      fillColor: AppColors.dark2,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide:
-                            const BorderSide(color: AppColors.greenDeep),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: const BorderSide(
-                          color: AppColors.goldAccent,
-                          width: 1.5,
-                        ),
-                      ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  spacing.vMd,
                   InkWell(
                     onTap: _pickDate,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(radii.lg),
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 18,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: spacing.md,
+                        vertical: spacing.md,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.dark2,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: AppColors.greenDeep),
+                        color: colors.card,
+                        borderRadius: BorderRadius.circular(radii.lg),
+                        border: Border.all(color: colors.outline),
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.calendar_today_outlined,
-                            color: AppColors.accentLight,
-                            size: 20,
+                            color: colors.icon,
+                            size: dimensions.iconLg,
                           ),
-                          const SizedBox(width: 12),
+                          spacing.hSm,
                           Expanded(
                             child: Text(
                               l10n.propagationDate(
@@ -248,9 +229,8 @@ class _ChangePropagationStageSheetState
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: AppColors.textPrimary,
-                                fontSize: 16,
+                              style: typography.bodyLarge.copyWith(
+                                color: colors.textPrimary,
                               ),
                             ),
                           ),
@@ -258,65 +238,31 @@ class _ChangePropagationStageSheetState
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  spacing.vMd,
                   TextField(
                     controller: _noteController,
                     maxLines: 2,
-                    style: const TextStyle(color: AppColors.textPrimary),
-                    decoration: InputDecoration(
+                    style: inputs.textStyle,
+                    decoration: inputs.decoration(
                       labelText: l10n.notesOptional,
-                      labelStyle:
-                          const TextStyle(color: AppColors.textSecondary),
-                      filled: true,
-                      fillColor: AppColors.dark2,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide:
-                            const BorderSide(color: AppColors.greenDeep),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: const BorderSide(
-                          color: AppColors.goldAccent,
-                          width: 1.5,
-                        ),
-                      ),
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  spacing.vXxxl,
                   SizedBox(
                     width: double.infinity,
-                    height: AppTheme.buttonHeight,
+                    height: dimensions.buttonHeight,
                     child: ElevatedButton(
                       onPressed: _saving ? null : _save,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.goldAccent,
-                        foregroundColor: AppColors.dark1,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
                       child: _saving
-                          ? const SizedBox(
-                              width: 22,
-                              height: 22,
+                          ? SizedBox(
+                              width: dimensions.iconXl,
+                              height: dimensions.iconXl,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: AppColors.dark1,
+                                color: colors.onPrimary,
                               ),
                             )
-                          : Text(
-                              l10n.commonSave,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                          : Text(l10n.commonSave),
                     ),
                   ),
                 ],

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/watering_entry.dart';
 import '../../../../services/watering_service.dart';
 
@@ -49,38 +48,38 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
     DateTime selectedDate = initialDate ?? DateTime.now();
     final isEditing = wateringId != null;
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final sheets = context.components.sheets;
+    final typography = context.typography;
 
     await showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.backgroundSecondary,
+      backgroundColor: colors.modal,
       enableDrag: true,
       builder: (sheetContext) {
         return StatefulBuilder(
           builder: (context, setModalState) {
             return SafeArea(
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: spacing.allLg,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 40,
-                      height: 4,
+                      width: sheets.handleWidth,
+                      height: sheets.handleHeight,
                       decoration: BoxDecoration(
-                        color: AppColors.greenSoft,
-                        borderRadius: BorderRadius.circular(99),
+                        color: sheets.handleColor,
+                        borderRadius: BorderRadius.circular(sheets.handleRadius),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    spacing.vLg,
                     Text(
                       isEditing ? l10n.wateringEdit : l10n.wateringAdd,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.heading,
-                      ),
+                      style: typography.titleMedium,
                     ),
-                    const SizedBox(height: 20),
+                    spacing.vLg,
                     ListTile(
                       leading: const Icon(Icons.calendar_today),
                       title: Text(DateFormat.yMMMMd().format(selectedDate)),
@@ -99,12 +98,12 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                         }
                       },
                     ),
-                    const SizedBox(height: 16),
+                    spacing.vMd,
                     Row(
                       children: [
                         Expanded(
                           child: SizedBox(
-                            height: AppTheme.buttonHeight,
+                            height: context.dimensions.buttonHeight,
                             child: OutlinedButton(
                               onPressed: () {
                                 setModalState(() {
@@ -119,10 +118,10 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        spacing.hSm,
                         Expanded(
                           child: SizedBox(
-                            height: AppTheme.buttonHeight,
+                            height: context.dimensions.buttonHeight,
                             child: FilledButton(
                               onPressed: () async {
                                 if (isEditing) {
@@ -195,28 +194,32 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final sheetHeight = MediaQuery.of(context).size.height * 0.7;
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final sheets = context.components.sheets;
+    final typography = context.typography;
 
     return Material(
-      color: AppColors.backgroundSecondary,
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      color: colors.modal,
+      borderRadius: sheets.topBorderRadius,
       clipBehavior: Clip.antiAlias,
       child: SafeArea(
         top: false,
         child: SizedBox(
           height: sheetHeight,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: spacing.allMd,
             child: Column(
               children: [
                 Container(
-                  width: 40,
-                  height: 4,
+                  width: sheets.handleWidth,
+                  height: sheets.handleHeight,
                   decoration: BoxDecoration(
-                    color: AppColors.greenSoft,
-                    borderRadius: BorderRadius.circular(99),
+                    color: sheets.handleColor,
+                    borderRadius: BorderRadius.circular(sheets.handleRadius),
                   ),
                 ),
-                const SizedBox(height: 16),
+                spacing.vMd,
                 Row(
                   children: [
                     Expanded(
@@ -224,29 +227,38 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                         l10n.wateringHistory,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.heading,
-                        ),
+                        style: typography.titleMedium,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    spacing.hXs,
                     SizedBox(
-                      height: AppTheme.buttonHeight,
-                      child: FilledButton.icon(
-                        onPressed: () => _showWateringEditor(),
-                        icon: const Icon(Icons.add, size: 18),
-                        label: Text(
-                          l10n.commonAdd,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      width: context.dimensions.buttonHeight,
+                      height: context.dimensions.buttonHeight,
+                      child: Tooltip(
+                        message: l10n.commonAdd,
+                        child: FilledButton(
+                          onPressed: () => _showWateringEditor(),
+                          style: FilledButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size(
+                              context.dimensions.buttonHeight,
+                              context.dimensions.buttonHeight,
+                            ),
+                            maximumSize: Size(
+                              context.dimensions.buttonHeight,
+                              context.dimensions.buttonHeight,
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.add,
+                            size: context.dimensions.iconXl,
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                spacing.vLg,
                 Expanded(
                   child: StreamBuilder<List<WateringEntry>>(
                     stream: _historyStream,
@@ -265,9 +277,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                         return Center(
                           child: Text(
                             l10n.wateringEmpty,
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
-                            ),
+                            style: typography.bodySmall,
                           ),
                         );
                       }
@@ -276,17 +286,14 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
 
                       return ListView.separated(
                         itemCount: items.length + (canLoadMore ? 1 : 0),
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        separatorBuilder: (_, __) => spacing.vSm,
                         itemBuilder: (context, index) {
                           if (index == items.length) {
                             return TextButton(
                               onPressed: _loadMore,
                               child: Text(
                                 l10n.commonShowMore,
-                                style: const TextStyle(
-                                  color: AppColors.goldAccent,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: typography.link,
                               ),
                             );
                           }
@@ -300,27 +307,25 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                           }
 
                           return Container(
-                            padding: const EdgeInsets.all(16),
+                            padding: spacing.allMd,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              color: AppColors.dark2,
+                              borderRadius: BorderRadius.circular(context.radii.md),
+                              color: colors.card,
                             ),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.water_drop_rounded,
-                                  color: AppColors.accentLight,
+                                  color: colors.icon,
                                 ),
-                                const SizedBox(width: 12),
+                                spacing.hSm,
                                 Expanded(
                                   child: Text(
                                     DateFormat.yMMMMd().format(wateredAt),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 16,
+                                    style: typography.bodyLarge.copyWith(
                                       fontWeight: FontWeight.w600,
-                                      color: AppColors.textPrimary,
                                     ),
                                   ),
                                 ),

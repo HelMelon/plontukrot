@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
+import 'package:plontukrot/core/theme/theme_context.dart';
 
 /// Bootstrap while Firebase and other startup work runs.
 /// App logo centered + progress bar at the bottom.
@@ -44,12 +44,20 @@ class _AppBootstrapPageState extends State<AppBootstrapPage>
   @override
   Widget build(BuildContext context) {
     final clamped = widget.progress.clamp(0.0, 1.0);
+    final spacing = context.spacing;
+    final radii = context.radii;
+    final splash = context.screens.splash;
 
     return Scaffold(
-      backgroundColor: AppColors.dark1,
+      backgroundColor: splash.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(32, 24, 32, 48),
+          padding: EdgeInsets.fromLTRB(
+            spacing.xxxl,
+            spacing.xl,
+            spacing.xxxl,
+            spacing.xxxl + spacing.md,
+          ),
           child: Column(
             children: [
               Expanded(
@@ -80,20 +88,17 @@ class _AppBootstrapPageState extends State<AppBootstrapPage>
                 Text(
                   widget.statusText!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 14,
-                  ),
+                  style: splash.captionStyle,
                 ),
-                const SizedBox(height: 12),
+                spacing.vSm,
               ],
               ClipRRect(
-                borderRadius: BorderRadius.circular(99),
+                borderRadius: radii.pillAll,
                 child: LinearProgressIndicator(
                   value: clamped <= 0 ? null : clamped,
-                  minHeight: 8,
-                  backgroundColor: AppColors.greenDeep,
-                  color: AppColors.goldAccent,
+                  minHeight: spacing.xs,
+                  backgroundColor: splash.progressTrack,
+                  color: splash.progressIndicator,
                 ),
               ),
             ],
@@ -150,8 +155,10 @@ class _SplashCarouselPageState extends State<SplashCarouselPage> {
 
   @override
   Widget build(BuildContext context) {
+    final splash = context.screens.splash;
+
     return Scaffold(
-      backgroundColor: AppColors.dark1,
+      backgroundColor: splash.background,
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 200),
         switchInCurve: Curves.easeInOut,
@@ -159,14 +166,14 @@ class _SplashCarouselPageState extends State<SplashCarouselPage> {
         // contain: same framing for every splash, full art + text visible
         child: ColoredBox(
           key: ValueKey(_order[_index]),
-          color: AppColors.dark1,
+          color: splash.background,
           child: SizedBox.expand(
             child: Image.asset(
               _order[_index],
               fit: BoxFit.cover,
               alignment: Alignment.centerLeft,
               errorBuilder: (_, __, ___) =>
-                  const ColoredBox(color: AppColors.dark1),
+                  ColoredBox(color: splash.background),
             ),
           ),
         ),

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../services/note_service.dart';
 
 class UpdateNoteSheet extends StatefulWidget {
@@ -76,18 +75,26 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final sheets = context.components.sheets;
+    final inputs = context.components.inputs;
+    final dimensions = context.dimensions;
+    final media = MediaQuery.of(context);
+    final maxHeight = media.size.height -
+        media.viewInsets.bottom -
+        media.padding.top -
+        media.padding.bottom;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.backgroundSecondary,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      decoration: BoxDecoration(
+        color: colors.modal,
+        borderRadius: sheets.topBorderRadius,
       ),
       child: Padding(
-        padding: EdgeInsets.only(
-          left: 22,
-          right: 22,
-          top: 22,
-          bottom: MediaQuery.of(context).viewInsets.bottom,
+        padding: sheets.contentPadding.copyWith(
+          bottom: media.viewInsets.bottom + sheets.contentPadding.bottom,
         ),
         child: SingleChildScrollView(
           child: Column(
@@ -95,18 +102,16 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
             children: [
               TextField(
                 controller: controller,
-                maxLines: 8,
-                style: const TextStyle(color: AppColors.textPrimary),
-                decoration: InputDecoration(
+                maxLines: 4,
+                style: inputs.textStyle,
+                decoration: inputs.decoration(
                   labelText: l10n.notesEditLabel,
-                  filled: true,
-                  fillColor: AppColors.dark2,
                 ),
               ),
-              const SizedBox(height: 20),
+              spacing.vLg,
               SizedBox(
                 width: double.infinity,
-                height: AppTheme.buttonHeight,
+                height: dimensions.buttonHeight,
                 child: ElevatedButton(
                   onPressed: isLoading ? null : save,
                   child: Text(

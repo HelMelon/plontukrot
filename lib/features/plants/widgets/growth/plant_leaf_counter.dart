@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 
 class PlantLeafCounter extends StatelessWidget {
   final int count;
@@ -22,17 +22,25 @@ class PlantLeafCounter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final growth = context.screens.growth;
+    final dimensions = context.dimensions;
     final canDecrement = !busy && count > 0 && onDecrement != null;
     final canIncrement = !busy && onIncrement != null;
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.dark1.withValues(alpha: 0.72),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.greenDeep.withValues(alpha: 0.8)),
+        color: colors.screen.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(growth.counterRadius),
+        border: Border.all(color: colors.outline.withValues(alpha: 0.8)),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: spacing.md,
+          vertical: spacing.sm,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -45,15 +53,15 @@ class PlantLeafCounter extends StatelessWidget {
                   onPressed: canDecrement ? onDecrement : null,
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: spacing.lg),
                   child: Text(
                     '$count',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 32,
+                    style: typography.titleLarge.copyWith(
+                      fontSize: spacing.xxxl,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.heading,
+                      color: colors.heading,
                     ),
                   ),
                 ),
@@ -65,13 +73,15 @@ class PlantLeafCounter extends StatelessWidget {
               ],
             ),
             if (onScrollToStats != null) ...[
-              const SizedBox(height: 8),
+              spacing.vXs,
               InkWell(
                 onTap: onScrollToStats,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(context.radii.sm),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                  padding: EdgeInsets.symmetric(
+                    vertical: spacing.xxs,
+                    horizontal: spacing.xs,
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -80,18 +90,16 @@ class PlantLeafCounter extends StatelessWidget {
                           l10n.plantLeafStatsAnchor,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            color: AppColors.goldAccent,
-                            fontWeight: FontWeight.w600,
+                          style: typography.bodyEmphasis.copyWith(
+                            color: colors.primary,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      const Icon(
+                      spacing.hXxs,
+                      Icon(
                         Icons.arrow_downward,
-                        size: 16,
-                        color: AppColors.goldAccent,
+                        size: dimensions.iconSm,
+                        color: colors.icon,
                       ),
                     ],
                   ),
@@ -118,24 +126,26 @@ class _RoundControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final size = context.dimensions.minTapTarget + 4;
     return Tooltip(
       message: tooltip,
       child: Material(
-        color: AppColors.backgroundSecondary,
-        shape: const CircleBorder(
-          side: BorderSide(color: AppColors.greenDeep),
+        color: colors.modal,
+        shape: CircleBorder(
+          side: BorderSide(color: colors.outline),
         ),
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: onPressed,
           child: SizedBox(
-            width: 44,
-            height: 44,
+            width: size,
+            height: size,
             child: Icon(
               icon,
               color: onPressed == null
-                  ? AppColors.textSecondary.withValues(alpha: 0.4)
-                  : AppColors.goldAccent,
+                  ? colors.textSecondary.withValues(alpha: 0.4)
+                  : colors.icon,
             ),
           ),
         ),

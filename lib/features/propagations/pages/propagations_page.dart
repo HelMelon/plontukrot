@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../core/theme/app_colors.dart';
+import 'package:plontukrot/core/theme/theme_context.dart';
+
 import '../../../models/plant.dart';
 import '../../../models/propagation.dart';
 import '../../../models/propagation_parent_label.dart';
@@ -65,6 +66,10 @@ class _PropagationsPageState extends State<PropagationsPage>
 
   Widget _statsCard(PropagationYearStats stats) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final propTheme = context.screens.propagations;
     final methodParts = stats.byMethod.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     final familyParts = stats.byFamily.entries.toList()
@@ -72,69 +77,65 @@ class _PropagationsPageState extends State<PropagationsPage>
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: propTheme.cardPadding,
       decoration: BoxDecoration(
-        color: AppColors.backgroundSecondary,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.greenDeep),
+        color: colors.modal,
+        borderRadius: BorderRadius.circular(propTheme.cardRadius),
+        border: Border.all(color: colors.outline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.propagationStatsTitle(stats.year),
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.heading,
-            ),
+            style: typography.titleSmall,
           ),
-          const SizedBox(height: 12),
+          spacing.vSm,
           Text(
             l10n.propagationStartedLabel(
               stats.startedBatches,
               stats.startedQuantity,
             ),
-            style: const TextStyle(color: AppColors.textPrimary),
+            style: typography.bodyLarge,
           ),
-          const SizedBox(height: 4),
+          spacing.vXxs,
           Text(
             l10n.propagationSoldLabel(
               stats.soldQuantity,
               l10n.unitPiecesShort,
             ),
-            style: const TextStyle(color: AppColors.textPrimary),
+            style: typography.bodyLarge,
           ),
           if (stats.giftedQuantity > 0) ...[
-            const SizedBox(height: 4),
+            spacing.vXxs,
             Text(
               l10n.propagationGiftedLabel(
                 stats.giftedQuantity,
                 l10n.unitPiecesShort,
               ),
-              style: const TextStyle(color: AppColors.textPrimary),
+              style: typography.bodyLarge,
             ),
           ],
           if (stats.tradedQuantity > 0) ...[
-            const SizedBox(height: 4),
+            spacing.vXxs,
             Text(
               l10n.propagationTradedLabel(
                 stats.tradedQuantity,
                 l10n.unitPiecesShort,
               ),
-              style: const TextStyle(color: AppColors.textPrimary),
+              style: typography.bodyLarge,
             ),
           ],
-          const SizedBox(height: 4),
+          spacing.vXxs,
           Text(
             l10n.propagationLostLabel(
               stats.lostQuantity,
               l10n.unitPiecesShort,
             ),
-            style: const TextStyle(color: AppColors.textPrimary),
+            style: typography.bodyLarge,
           ),
           if (methodParts.isNotEmpty) ...[
-            const SizedBox(height: 10),
+            spacing.vSm,
             Text(
               l10n.propagationByMethods(
                 methodParts
@@ -147,14 +148,11 @@ class _PropagationsPageState extends State<PropagationsPage>
               ),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 13,
-              ),
+              style: typography.bodySmall,
             ),
           ],
           if (familyParts.isNotEmpty) ...[
-            const SizedBox(height: 4),
+            spacing.vXxs,
             Text(
               l10n.propagationByFamilies(
                 familyParts
@@ -167,10 +165,7 @@ class _PropagationsPageState extends State<PropagationsPage>
               ),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 13,
-              ),
+              style: typography.bodySmall,
             ),
           ],
         ],
@@ -183,35 +178,36 @@ class _PropagationsPageState extends State<PropagationsPage>
     required String title,
     required String subtitle,
   }) {
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final propTheme = context.screens.propagations;
+
     return Center(
       child: Container(
-        margin: const EdgeInsets.all(24),
-        padding: const EdgeInsets.all(28),
+        margin: spacing.allXl,
+        padding: propTheme.cardPadding,
         decoration: BoxDecoration(
-          color: AppColors.backgroundSecondary,
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: AppColors.greenDeep),
+          color: colors.modal,
+          borderRadius: BorderRadius.circular(propTheme.cardRadius),
+          border: Border.all(color: colors.outline),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             icon,
-            const SizedBox(height: 12),
+            spacing.vSm,
             Text(
               title,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 16,
-              ),
+              style: typography.bodyLarge
+                  .copyWith(color: colors.textSecondary),
             ),
-            const SizedBox(height: 8),
+            spacing.vXs,
             Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.warmGray,
-                fontSize: 14,
-              ),
+              style: typography.bodyMedium
+                  .copyWith(color: colors.textSecondary),
             ),
           ],
         ),
@@ -225,6 +221,10 @@ class _PropagationsPageState extends State<PropagationsPage>
     required Map<String, Plant> plantsById,
   }) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final propTheme = context.screens.propagations;
     final dateLocale = Localizations.localeOf(context).toString();
     final parentLabel = l10n.propagationParentLabel(
       propagationParentLabel(
@@ -242,13 +242,13 @@ class _PropagationsPageState extends State<PropagationsPage>
 
     return InkWell(
       onTap: () => _openDetails(context, item),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(propTheme.cardRadius),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: propTheme.cardPadding,
         decoration: BoxDecoration(
-          color: AppColors.backgroundSecondary,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.greenDeep),
+          color: colors.modal,
+          borderRadius: BorderRadius.circular(propTheme.cardRadius),
+          border: Border.all(color: colors.outline),
         ),
         child: Row(
           children: [
@@ -260,38 +260,32 @@ class _PropagationsPageState extends State<PropagationsPage>
                     title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: typography.bodyLarge.copyWith(
                       fontWeight: FontWeight.w700,
-                      fontSize: 16,
-                      color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  spacing.vXxs,
                   Text(
                     parentLabel,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.heading,
-                      fontSize: 15,
+                    style: typography.bodyLarge.copyWith(
+                      color: colors.heading,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  spacing.vXxs,
                   Text(
                     subtitle,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 13,
-                    ),
+                    style: typography.bodySmall,
                   ),
                   if (archived &&
                       (item.soldQuantity > 0 ||
                           item.giftedQuantity > 0 ||
                           item.tradedQuantity > 0 ||
                           item.lostQuantity > 0)) ...[
-                    const SizedBox(height: 4),
+                    spacing.vXxs,
                     Text(
                       [
                         if (item.soldQuantity > 0)
@@ -305,18 +299,16 @@ class _PropagationsPageState extends State<PropagationsPage>
                       ].join(' · '),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppColors.accentLight,
-                        fontSize: 12,
-                      ),
+                      style: typography.caption
+                          .copyWith(color: colors.icon),
                     ),
                   ],
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right,
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
             ),
           ],
         ),
@@ -330,36 +322,39 @@ class _PropagationsPageState extends State<PropagationsPage>
     required Map<String, Plant> plantsById,
   }) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
 
     if (snapshot.hasError) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: spacing.allXl,
           child: Text(
             l10n.commonError('${snapshot.error}'),
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.textSecondary),
+            style: typography.bodyMedium.copyWith(color: colors.textSecondary),
           ),
         ),
       );
     }
 
     if (!snapshot.hasData) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.goldAccent),
+      return Center(
+        child: CircularProgressIndicator(color: colors.primary),
       );
     }
 
     final items = snapshot.data!;
     if (items.isEmpty) {
+      final iconSize = context.dimensions.avatar + context.spacing.xs;
       return _emptyState(
         icon: archived
-            ? const Icon(Icons.inventory_2_outlined,
-                size: 48, color: AppColors.accentLight)
-            : const HugeIcon(
+            ? Icon(Icons.inventory_2_outlined, size: iconSize, color: colors.icon)
+            : HugeIcon(
                 icon: HugeIcons.strokeRoundedEcoLab01,
-                size: 48,
-                color: AppColors.accentLight,
+                size: iconSize,
+                color: colors.icon,
               ),
         title: archived
             ? l10n.propagationEmptyArchive
@@ -371,9 +366,9 @@ class _PropagationsPageState extends State<PropagationsPage>
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.all(20),
+      padding: spacing.allLg,
       itemCount: items.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, __) => spacing.vSm,
       itemBuilder: (context, index) {
         return _propagationTile(
           items[index],
@@ -387,6 +382,9 @@ class _PropagationsPageState extends State<PropagationsPage>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
 
     return StreamBuilder<List<Plant>>(
       stream: _plantsStream,
@@ -413,21 +411,18 @@ class _PropagationsPageState extends State<PropagationsPage>
                 return Scaffold(
                   backgroundColor: Colors.transparent,
                   appBar: AppBar(
-                    backgroundColor: AppColors.background,
+                    backgroundColor: colors.screen,
                     surfaceTintColor: Colors.transparent,
                     elevation: 0,
                     title: Text(
                       l10n.propagationTitle,
-                      style: const TextStyle(
-                        color: AppColors.heading,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: typography.titleMedium,
                     ),
                     bottom: TabBar(
                       controller: _tabController,
-                      indicatorColor: AppColors.goldAccent,
-                      labelColor: AppColors.goldAccent,
-                      unselectedLabelColor: AppColors.textSecondary,
+                      indicatorColor: colors.primary,
+                      labelColor: colors.primary,
+                      unselectedLabelColor: colors.textSecondary,
                       tabs: [
                         Tab(text: l10n.propagationActiveTab),
                         Tab(text: l10n.propagationArchiveTab),
@@ -437,9 +432,14 @@ class _PropagationsPageState extends State<PropagationsPage>
                   body: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                        padding: EdgeInsets.fromLTRB(
+                          spacing.lg,
+                          spacing.md,
+                          spacing.lg,
+                          0,
+                        ),
                         child: stats == null
-                            ? const SizedBox(height: 8)
+                            ? spacing.vXs
                             : _statsCard(stats),
                       ),
                       Expanded(

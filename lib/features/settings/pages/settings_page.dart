@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
+import 'package:plontukrot/core/theme/theme_context.dart';
+
 import '../../../core/locale/app_locale_controller.dart';
-import '../../../core/theme/app_colors.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -11,6 +12,7 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final controller = AppLocaleController.instance;
+    final checkIconColor = context.screens.settings.checkIconColor;
 
     final options = <({String code, String label})>[
       (code: AppLocaleController.systemCode, label: l10n.settingsLanguageSystem),
@@ -37,7 +39,7 @@ class SettingsPage extends StatelessWidget {
                 ListTile(
                   title: Text(option.label),
                   trailing: selected == option.code
-                      ? const Icon(Icons.check, color: AppColors.goldAccent)
+                      ? Icon(Icons.check, color: checkIconColor)
                       : null,
                   onTap: () => controller.setPreference(option.code),
                 ),

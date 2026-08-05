@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/growth_event.dart';
 import '../../../../models/plant.dart';
 import '../../../../models/stage_info.dart';
@@ -39,31 +39,31 @@ class PlantInfoCard extends StatefulWidget {
 class _PlantInfoCardState extends State<PlantInfoCard> {
   final GlobalKey _botanicalDetailsKey = GlobalKey();
 
-  static const double _sectionGap = 16;
+  double get _sectionGap => context.spacing.md;
 
-  static Widget _icon(String asset) {
+  static Widget _icon(BuildContext context, String asset) {
+    final size = context.dimensions.avatar - 8;
     return Image.asset(
       asset,
-      width: 32,
-      height: 32,
+      width: size,
+      height: size,
       fit: BoxFit.contain,
     );
   }
 
-  static const TextStyle _botanicalStyle = TextStyle(
-    fontSize: 20,
-    color: AppColors.heading,
-  );
+  TextStyle get _botanicalStyle => context.typography.titleMedium.copyWith(
+        fontWeight: FontWeight.normal,
+        color: context.colors.heading,
+      );
 
   Widget _section({Key? key, required Widget child}) {
+    final cards = context.components.cards;
     return Container(
       key: key,
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppColors.backgroundSecondary,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.greenDeep),
+      padding: cards.padding,
+      decoration: cards.decoration.copyWith(
+        color: context.colors.modal,
       ),
       child: child,
     );
@@ -73,7 +73,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     final trimmed = value?.trim() ?? '';
     if (trimmed.isEmpty) return null;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: EdgeInsets.only(bottom: context.spacing.xs),
       child: Text(
         '$label: $trimmed',
         maxLines: 2,
@@ -98,6 +98,10 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final radii = context.radii;
+    final typography = context.typography;
     final plant = widget.plant;
     final plantId = widget.plantId;
 
@@ -171,16 +175,12 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
               plant.nickname,
               maxLines: 4,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
+              style: typography.titlePage,
             ),
-          if (plant.nickname.trim().isNotEmpty) const SizedBox(height: 8),
+          if (plant.nickname.trim().isNotEmpty) spacing.vXs,
           if (speciesTrimmed.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(bottom: 8),
+              padding: EdgeInsets.only(bottom: spacing.xs),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -193,13 +193,13 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                     ),
                   ),
                   if (variegation.showIconNearSpecies) ...[
-                    const SizedBox(width: 8),
+                    spacing.hXs,
                     Tooltip(
                       message: variegationLabel,
                       child: Icon(
                         variegation.icon,
                         color: variegation.iconColor,
-                        size: 24,
+                        size: spacing.xl,
                       ),
                     ),
                   ],
@@ -208,7 +208,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
             ),
           if (cultivarTrimmed.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(bottom: 8),
+              padding: EdgeInsets.only(bottom: spacing.xs),
               child: Text(
                 l10n.plantCultivarLabel(cultivarTrimmed),
                 maxLines: 2,
@@ -221,34 +221,29 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
               l10n.plantStageLabel(l10n.stageInfoTitle(stage)),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 20,
-                color: AppColors.heading,
-              ),
+              style: _botanicalStyle,
             ),
           if (hasBotanicalDetails) ...[
-            const SizedBox(height: 8),
+            spacing.vXs,
             InkWell(
               onTap: _scrollToBotanicalDetails,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(radii.sm),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
+                padding: EdgeInsets.symmetric(vertical: spacing.xxs),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       l10n.plantBotanicalData,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: AppColors.goldAccent,
-                        fontWeight: FontWeight.w600,
+                      style: typography.bodyEmphasis.copyWith(
+                        color: colors.primary,
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    const Icon(
+                    spacing.hXxs,
+                    Icon(
                       Icons.arrow_downward,
-                      size: 16,
-                      color: AppColors.goldAccent,
+                      size: context.dimensions.iconSm,
+                      color: colors.icon,
                     ),
                   ],
                 ),
@@ -260,49 +255,29 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     );
 
     final careHistory = _section(
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          const spacing = 8.0;
-          final stackVertically = constraints.maxWidth < 340;
-          final itemWidth = stackVertically
-              ? constraints.maxWidth
-              : (constraints.maxWidth - spacing * 2) / 3;
-
-          Widget wrapItem(Widget child) {
-            return SizedBox(width: itemWidth, child: child);
-          }
-
-          return Wrap(
-            spacing: spacing,
-            runSpacing: spacing,
-            children: [
-              wrapItem(
-                InfoCard(
-                  icon: _icon('assets/icons/watering.png'),
-                  title: l10n.watering,
-                  value: careDateLabel(plant.lastWateredAt),
-                  onTap: openWateringHistory,
-                ),
-              ),
-              wrapItem(
-                InfoCard(
-                  icon: _icon('assets/icons/fertilize.png'),
-                  title: l10n.fertilizing,
-                  value: careDateLabel(plant.lastFertilizedAt),
-                  onTap: openFertilizingHistory,
-                ),
-              ),
-              wrapItem(
-                InfoCard(
-                  icon: _icon('assets/icons/potting.png'),
-                  title: l10n.repotting,
-                  value: careDateLabel(plant.lastRepottedAt),
-                  onTap: openRepottingHistory,
-                ),
-              ),
-            ],
-          );
-        },
+      child: Column(
+        children: [
+          InfoCard(
+            icon: _icon(context, 'assets/icons/watering.png'),
+            title: l10n.watering,
+            value: careDateLabel(plant.lastWateredAt),
+            onTap: openWateringHistory,
+          ),
+          spacing.vXs,
+          InfoCard(
+            icon: _icon(context, 'assets/icons/fertilize.png'),
+            title: l10n.fertilizing,
+            value: careDateLabel(plant.lastFertilizedAt),
+            onTap: openFertilizingHistory,
+          ),
+          spacing.vXs,
+          InfoCard(
+            icon: _icon(context, 'assets/icons/potting.png'),
+            title: l10n.repotting,
+            value: careDateLabel(plant.lastRepottedAt),
+            onTap: openRepottingHistory,
+          ),
+        ],
       ),
     );
 
@@ -324,10 +299,8 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
               Expanded(
                 child: Text(
                   l10n.plantJournal,
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: typography.sectionTitle.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.heading,
                   ),
                 ),
               ),
@@ -341,15 +314,15 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                     builder: (_) => AddNoteSheet(plantId: plantId),
                   );
                 },
-                icon: const Icon(Icons.add, size: 18),
+                icon: Icon(Icons.add, size: context.dimensions.iconMd),
                 label: Text(l10n.commonAdd),
                 style: TextButton.styleFrom(
-                  foregroundColor: AppColors.goldAccent,
+                  foregroundColor: colors.primary,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          spacing.vXs,
           PlantNotesSection(plantId: plantId),
         ],
       ),
@@ -364,17 +337,15 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
               children: [
                 Text(
                   l10n.plantBotanicalData,
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: typography.sectionTitle.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.heading,
                   ),
                 ),
-                const SizedBox(height: 12),
+                spacing.vSm,
                 if (plantFamilyLine != null) plantFamilyLine,
                 if (plant.genus.trim().isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
+                    padding: EdgeInsets.only(bottom: spacing.xs),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -391,7 +362,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                                 ),
                               );
                             },
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(radii.sm),
                             child: Text(
                               plant.genus.trim(),
                               maxLines: 2,
@@ -399,7 +370,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                               style: _botanicalStyle.copyWith(
                                 decoration: TextDecoration.underline,
                                 decorationColor:
-                                    AppColors.heading.withValues(alpha: 0.4),
+                                    colors.heading.withValues(alpha: 0.4),
                               ),
                             ),
                           ),
@@ -408,7 +379,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                     ),
                   ),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.only(bottom: spacing.xs),
                   child: Row(
                     children: [
                       Flexible(
@@ -420,11 +391,11 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                         ),
                       ),
                       if (variegation != Variegation.none) ...[
-                        const SizedBox(width: 8),
+                        spacing.hXs,
                         Icon(
                           variegation.icon,
                           color: variegation.iconColor,
-                          size: 22,
+                          size: context.dimensions.iconXl,
                         ),
                       ],
                     ],
@@ -447,17 +418,17 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         mainInfo,
-        const SizedBox(height: _sectionGap),
+        SizedBox(height: _sectionGap),
         careHistory,
-        const SizedBox(height: _sectionGap),
+        SizedBox(height: _sectionGap),
         propagation,
-        const SizedBox(height: _sectionGap),
+        SizedBox(height: _sectionGap),
         journal,
         if (botanical != null) ...[
-          const SizedBox(height: _sectionGap),
+          SizedBox(height: _sectionGap),
           botanical,
         ],
-        const SizedBox(height: _sectionGap),
+        SizedBox(height: _sectionGap),
         leafStats,
       ],
     );

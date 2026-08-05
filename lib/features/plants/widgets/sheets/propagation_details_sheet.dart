@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/propagation.dart';
 import '../../../../models/propagation_outcome.dart';
 import '../../../../models/propagation_stage_entry.dart';
@@ -81,12 +81,13 @@ class PropagationDetailsSheet extends StatelessWidget {
       body = l10n.propagationDeleteStageEntryBody;
     }
 
+    final colors = context.colors;
     final confirmed = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: AppColors.backgroundSecondary,
+          backgroundColor: colors.modal,
           title: Text(title),
           content: Text(body),
           actions: [
@@ -96,8 +97,8 @@ class PropagationDetailsSheet extends StatelessWidget {
             ),
             FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: Colors.redAccent,
-                foregroundColor: Colors.white,
+                backgroundColor: colors.error,
+                foregroundColor: colors.onPrimary,
               ),
               onPressed: () => Navigator.pop(context, true),
               child: Text(l10n.commonDelete),
@@ -125,14 +126,21 @@ class PropagationDetailsSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final service = PropagationService();
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final radii = context.radii;
+    final sheets = context.components.sheets;
+    final buttons = context.components.buttons;
+    final typography = context.typography;
+    final dimensions = context.dimensions;
 
     return Container(
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
-      decoration: const BoxDecoration(
-        color: AppColors.backgroundSecondary,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      decoration: BoxDecoration(
+        color: colors.modal,
+        borderRadius: sheets.topBorderRadius,
       ),
       child: StreamBuilder<Propagation?>(
         stream: service.watchPropagation(propagation.id),
@@ -142,7 +150,7 @@ class PropagationDetailsSheet extends StatelessWidget {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (context.mounted) Navigator.pop(context);
             });
-            return const SizedBox(height: 120);
+            return SizedBox(height: dimensions.buttonHeight * 2);
           }
 
           final shown = current ?? propagation;
@@ -151,60 +159,54 @@ class PropagationDetailsSheet extends StatelessWidget {
           final startedAtLabel = DateFormat('d MMM y').format(shown.startedAt);
 
           return Padding(
-            padding: const EdgeInsets.fromLTRB(22, 22, 22, 24),
+            padding: sheets.contentPadding.copyWith(bottom: spacing.xl),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(
                   child: Container(
-                    width: 50,
-                    height: 5,
+                    width: sheets.handleWidth,
+                    height: sheets.handleHeight,
                     decoration: BoxDecoration(
-                      color: AppColors.greenSoft,
-                      borderRadius: BorderRadius.circular(20),
+                      color: sheets.handleColor,
+                      borderRadius: BorderRadius.circular(sheets.handleRadius),
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                spacing.vXl,
                 Text(
                   shown.parentPlantName,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.heading,
-                  ),
+                  style: typography.titleLarge,
                 ),
-                const SizedBox(height: 6),
+                spacing.vXxs,
                 Text(
                   isActive
                       ? '${l10n.propagationAliveWithMethod(shown.quantityAlive, l10n.propagationMethodPlural(shown.method))} · ${l10n.propagationMethodLabel(shown.method)}'
                       : '${l10n.propagationMethodLabel(shown.method)} · ${l10n.propagationStatusLabel(shown.status)}',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: AppColors.textSecondary,
+                  style: typography.bodyLarge.copyWith(
+                    color: colors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                spacing.vXxs,
                 Text(
                   isActive
                       ? '${l10n.stageInfoTitle(stage)} · ${l10n.daysCount(shown.daysSinceStart)} · ${l10n.propagationSinceDate(startedAtLabel)}'
                       : '${l10n.stageInfoTitle(stage)} · ${l10n.propagationSinceDate(startedAtLabel)}',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    color: AppColors.accentLight,
+                  style: typography.bodyMedium.copyWith(
+                    color: colors.icon,
                   ),
                 ),
                 if (shown.soldQuantity > 0 ||
                     shown.giftedQuantity > 0 ||
                     shown.tradedQuantity > 0 ||
                     shown.lostQuantity > 0) ...[
-                  const SizedBox(height: 4),
+                  spacing.vXxs,
                   Text(
                     [
                       if (shown.soldQuantity > 0)
@@ -219,30 +221,25 @@ class PropagationDetailsSheet extends StatelessWidget {
                     ].join(' · '),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textSecondary,
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.textSecondary,
                     ),
                   ),
                 ],
-                const SizedBox(height: 24),
+                spacing.vXl,
                 Text(
                   l10n.propagationTimeline,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.heading,
-                  ),
+                  style: typography.sectionTitle,
                 ),
-                const SizedBox(height: 12),
+                spacing.vSm,
                 Expanded(
                   child: StreamBuilder<List<PropagationStageEntry>>(
                     stream: service.watchStageHistory(shown.id),
                     builder: (context, historySnapshot) {
                       if (!historySnapshot.hasData) {
-                        return const Center(
+                        return Center(
                           child: CircularProgressIndicator(
-                            color: AppColors.goldAccent,
+                            color: colors.primary,
                           ),
                         );
                       }
@@ -251,24 +248,22 @@ class PropagationDetailsSheet extends StatelessWidget {
                       if (history.isEmpty) {
                         return Text(
                           l10n.propagationTimelineEmpty,
-                          style: const TextStyle(
-                            color: AppColors.textSecondary,
-                          ),
+                          style: typography.bodySmall,
                         );
                       }
 
                       return ListView.separated(
                         itemCount: history.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        separatorBuilder: (_, __) => spacing.vSm,
                         itemBuilder: (context, index) {
                           final entry = history[index];
                           final entryStage = _stageInfo(entry.stage);
                           return Container(
-                            padding: const EdgeInsets.all(14),
+                            padding: spacing.allMd,
                             decoration: BoxDecoration(
-                              color: AppColors.dark2,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: AppColors.greenDeep),
+                              color: colors.card,
+                              borderRadius: BorderRadius.circular(radii.md),
+                              border: Border.all(color: colors.outline),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,22 +275,18 @@ class PropagationDetailsSheet extends StatelessWidget {
                                         l10n.stageInfoTitle(entryStage),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
+                                        style: typography.bodyMedium.copyWith(
                                           fontWeight: FontWeight.w700,
-                                          color: AppColors.textPrimary,
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
+                                    spacing.hXs,
                                     Text(
                                       DateFormat('d MMM y')
                                           .format(entry.changedAt),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: AppColors.textSecondary,
-                                        fontSize: 13,
-                                      ),
+                                      style: typography.bodySmall,
                                     ),
                                     IconButton(
                                       tooltip: l10n.commonDelete,
@@ -306,44 +297,41 @@ class PropagationDetailsSheet extends StatelessWidget {
                                         entry,
                                         historyLength: history.length,
                                       ),
-                                      icon: const Icon(
+                                      icon: Icon(
                                         Icons.delete_outline,
-                                        color: AppColors.textSecondary,
+                                        color: colors.textSecondary,
                                       ),
                                     ),
                                   ],
                                 ),
                                 if (entry.outcome != null) ...[
-                                  const SizedBox(height: 4),
+                                  spacing.vXxs,
                                   Text(
                                     l10n.propagationOutcomeLabel(entry.outcome!),
-                                    style: const TextStyle(
-                                      color: AppColors.accentLight,
-                                      fontSize: 13,
+                                    style: typography.bodySmall.copyWith(
+                                      color: colors.icon,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ],
                                 if (entry.quantityAlive != null) ...[
-                                  const SizedBox(height: 4),
+                                  spacing.vXxs,
                                   Text(
                                     l10n.propagationQuantityPieces(
                                       entry.quantityAlive!,
                                     ),
-                                    style: const TextStyle(
-                                      color: AppColors.accentLight,
-                                      fontSize: 13,
+                                    style: typography.bodySmall.copyWith(
+                                      color: colors.icon,
                                     ),
                                   ),
                                 ],
                                 if (entry.note != null &&
                                     entry.note!.isNotEmpty) ...[
-                                  const SizedBox(height: 6),
+                                  spacing.vXxs,
                                   Text(
                                     entry.note!,
-                                    style: const TextStyle(
-                                      color: AppColors.textSecondary,
-                                      fontSize: 14,
+                                    style: typography.bodyMedium.copyWith(
+                                      color: colors.textSecondary,
                                     ),
                                   ),
                                 ],
@@ -356,30 +344,16 @@ class PropagationDetailsSheet extends StatelessWidget {
                   ),
                 ),
                 if (isActive) ...[
-                  const SizedBox(height: 16),
+                  spacing.vMd,
                   SizedBox(
                     width: double.infinity,
-                    height: 52,
+                    height: dimensions.buttonHeight,
                     child: ElevatedButton(
                       onPressed: () => _openChangeStage(context, shown),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.goldAccent,
-                        foregroundColor: AppColors.dark1,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                      ),
-                      child: Text(
-                        l10n.propagationChangeStage,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                      child: Text(l10n.propagationChangeStage),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  spacing.vSm,
                   Row(
                     children: [
                       Expanded(
@@ -390,11 +364,11 @@ class PropagationDetailsSheet extends StatelessWidget {
                             PropagationOutcome.sold,
                           ),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.goldAccent,
-                            side: const BorderSide(color: AppColors.goldAccent),
-                            minimumSize: const Size.fromHeight(48),
+                            foregroundColor: colors.primary,
+                            side: BorderSide(color: colors.primary),
+                            minimumSize: Size.fromHeight(buttons.height),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
+                              borderRadius: BorderRadius.circular(buttons.radius),
                             ),
                           ),
                           child: Text(
@@ -404,7 +378,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      spacing.hSm,
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () => _openOutcome(
@@ -413,11 +387,11 @@ class PropagationDetailsSheet extends StatelessWidget {
                             PropagationOutcome.gifted,
                           ),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.goldAccent,
-                            side: const BorderSide(color: AppColors.goldAccent),
-                            minimumSize: const Size.fromHeight(48),
+                            foregroundColor: colors.primary,
+                            side: BorderSide(color: colors.primary),
+                            minimumSize: Size.fromHeight(buttons.height),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
+                              borderRadius: BorderRadius.circular(buttons.radius),
                             ),
                           ),
                           child: Text(
@@ -429,7 +403,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  spacing.vSm,
                   Row(
                     children: [
                       Expanded(
@@ -440,11 +414,11 @@ class PropagationDetailsSheet extends StatelessWidget {
                             PropagationOutcome.traded,
                           ),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.textSecondary,
-                            side: const BorderSide(color: AppColors.greenDeep),
-                            minimumSize: const Size.fromHeight(48),
+                            foregroundColor: colors.textSecondary,
+                            side: BorderSide(color: colors.outline),
+                            minimumSize: Size.fromHeight(buttons.height),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
+                              borderRadius: BorderRadius.circular(buttons.radius),
                             ),
                           ),
                           child: Text(
@@ -454,7 +428,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      spacing.hSm,
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () => _openOutcome(
@@ -463,11 +437,11 @@ class PropagationDetailsSheet extends StatelessWidget {
                             PropagationOutcome.lost,
                           ),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.textSecondary,
-                            side: const BorderSide(color: AppColors.greenDeep),
-                            minimumSize: const Size.fromHeight(48),
+                            foregroundColor: colors.textSecondary,
+                            side: BorderSide(color: colors.outline),
+                            minimumSize: Size.fromHeight(buttons.height),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
+                              borderRadius: BorderRadius.circular(buttons.radius),
                             ),
                           ),
                           child: Text(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/fertilizer_dose.dart';
 
 Future<void> showFertilizerCompositionDialog({
@@ -17,16 +17,20 @@ Future<void> showFertilizerCompositionDialog({
       final l10n = AppLocalizations.of(context);
       final media = MediaQuery.of(context);
       final maxHeight = (media.size.height - media.viewInsets.bottom) * 0.5;
+      final dialogs = context.components.dialogs;
+      final spacing = context.spacing;
+      final colors = context.colors;
 
       return AlertDialog(
-        backgroundColor: AppColors.backgroundSecondary,
+        backgroundColor: dialogs.background,
         title: Text(
           title,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
+          style: dialogs.titleStyle,
         ),
         content: components.isEmpty && waterMl == null
-            ? Text(l10n.noComponents)
+            ? Text(l10n.noComponents, style: dialogs.bodyStyle)
             : ConstrainedBox(
                 constraints: BoxConstraints(maxHeight: maxHeight),
                 child: SingleChildScrollView(
@@ -36,25 +40,27 @@ Future<void> showFertilizerCompositionDialog({
                     children: [
                       if (waterMl != null)
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
+                          padding: EdgeInsets.only(bottom: spacing.xs),
                           child: Text(
                             l10n.fertilizerWaterLine(waterMl),
-                            style: const TextStyle(
-                              color: AppColors.heading,
+                            style: dialogs.bodyStyle.copyWith(
+                              color: colors.heading,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
                       if (components.isEmpty)
-                        Text(l10n.noComponents)
+                        Text(l10n.noComponents, style: dialogs.bodyStyle)
                       else
                         ...components.map(
                           (c) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            padding: EdgeInsets.symmetric(
+                              vertical: spacing.xxs,
+                            ),
                             child: Text(
                               l10n.fertilizerDoseLabel(c),
-                              style: const TextStyle(
-                                color: AppColors.textPrimary,
+                              style: dialogs.bodyStyle.copyWith(
+                                color: colors.textPrimary,
                               ),
                             ),
                           ),

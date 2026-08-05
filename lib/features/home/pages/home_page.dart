@@ -6,7 +6,13 @@ import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../core/theme/app_colors.dart';
+import 'package:plontukrot/core/theme/theme_context.dart';
+import 'package:plontukrot/core/theme/tokens/app_color_tokens.dart';
+import 'package:plontukrot/core/theme/tokens/app_dimension_tokens.dart';
+import 'package:plontukrot/core/theme/tokens/app_radii_tokens.dart';
+import 'package:plontukrot/core/theme/tokens/app_spacing_tokens.dart';
+import 'package:plontukrot/core/theme/tokens/app_typography_tokens.dart';
+import 'package:plontukrot/core/theme/screens/app_screen_themes.dart';
 import '../../../core/widgets/prompt_text_dialog.dart';
 import '../../../models/app_user.dart';
 import '../../../models/plant.dart';
@@ -61,6 +67,13 @@ class _HomePageState extends State<HomePage> {
   String? _filterPlantFamily;
   String? _filterGenus;
   int? _filterStage;
+
+  AppColorTokens get _colors => context.colors;
+  AppSpacingTokens get _spacing => context.spacing;
+  AppRadiiTokens get _radii => context.radii;
+  AppTypographyTokens get _typography => context.typography;
+  AppDimensionTokens get _dimensions => context.dimensions;
+  HomeScreenTheme get _homeTheme => context.screens.home;
 
   @override
   void initState() {
@@ -261,48 +274,48 @@ class _HomePageState extends State<HomePage> {
     int crossAxisCount, {
     required String Function(String key) titleForKey,
   }) {
+    final colors = _colors;
+    final spacing = _spacing;
+    final radii = _radii;
+    final typography = _typography;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: groups.entries.map((entry) {
         final isCollapsed = _collapsedLetterGroups.contains(entry.key);
         return Padding(
-          padding: const EdgeInsets.only(bottom: 20),
+          padding: EdgeInsets.only(bottom: spacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InkWell(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: radii.smAll,
                 onTap: () => _toggleGroup(entry.key),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 4,
-                    vertical: 8,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: spacing.xxs,
+                    vertical: spacing.xs,
                   ),
                   child: Row(
                     children: [
                       Expanded(
                         child: Text(
                           titleForKey(entry.key),
-                          style: const TextStyle(
-                            color: AppColors.heading,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: typography.titleMedium,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      spacing.hXs,
                       Text(
                         '${entry.value.length}',
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
-                        ),
+                        style: typography.bodyMedium
+                            .copyWith(color: colors.textSecondary),
                       ),
-                      const SizedBox(width: 8),
+                      spacing.hXs,
                       Icon(
                         isCollapsed
                             ? Icons.keyboard_arrow_down
                             : Icons.keyboard_arrow_up,
-                        color: AppColors.heading,
+                        color: colors.icon,
                       ),
                     ],
                   ),
@@ -332,8 +345,8 @@ class _HomePageState extends State<HomePage> {
       itemCount: plants.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 16,
+        crossAxisSpacing: _spacing.sm,
+        mainAxisSpacing: _spacing.md,
         childAspectRatio: childAspectRatio,
       ),
       itemBuilder: (context, index) {
@@ -428,8 +441,9 @@ class _HomePageState extends State<HomePage> {
     required ValueChanged<bool> onSelected,
     VoidCallback? onLongPress,
   }) {
+    final chips = context.components.chips;
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
+      padding: EdgeInsets.only(right: _spacing.xs),
       child: GestureDetector(
         onLongPress: onLongPress,
         child: FilterChip(
@@ -440,15 +454,19 @@ class _HomePageState extends State<HomePage> {
             label,
             overflow: TextOverflow.ellipsis,
           ),
-          selectedColor: AppColors.goldAccent,
-          checkmarkColor: AppColors.dark1,
-          labelStyle: TextStyle(
-            fontSize: 13,
-            color: selected ? AppColors.dark1 : AppColors.textPrimary,
+          selectedColor: chips.selectedBackground,
+          checkmarkColor: chips.checkmark,
+          labelStyle: chips.labelStyle.copyWith(
+            color: selected
+                ? chips.selectedForeground
+                : chips.unselectedForeground,
           ),
-          backgroundColor: AppColors.backgroundSecondary,
+          backgroundColor: chips.unselectedBackground,
           side: BorderSide(
-            color: selected ? AppColors.goldAccent : AppColors.greenDeep,
+            color: selected ? chips.selectedBorder : chips.unselectedBorder,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(chips.radius),
           ),
           onSelected: onSelected,
         ),
@@ -502,7 +520,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         if (_filterPlantFamily != null && genusOptions.isNotEmpty) ...[
-          const SizedBox(height: 8),
+          _spacing.vXs,
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -537,7 +555,7 @@ class _HomePageState extends State<HomePage> {
         if (stageOptions.isNotEmpty) ...[
           if (families.isNotEmpty ||
               (_filterPlantFamily != null && genusOptions.isNotEmpty))
-            const SizedBox(height: 8),
+            _spacing.vXs,
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -724,7 +742,7 @@ class _HomePageState extends State<HomePage> {
     ];
 
     return AppBar(
-      backgroundColor: AppColors.background,
+      backgroundColor: _colors.screen,
       leading: IconButton(
         onPressed: _exitSelectionMode,
         icon: const Icon(Icons.close),
@@ -738,7 +756,8 @@ class _HomePageState extends State<HomePage> {
       bottom: isWide
           ? null
           : PreferredSize(
-              preferredSize: const Size.fromHeight(48),
+              preferredSize:
+                  Size.fromHeight(_spacing.xxxl + _spacing.md),
               child: Row(
                 children: [
                   for (final button in actionButtons) Expanded(child: button),
@@ -749,11 +768,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildHomeSearchField(AppLocalizations l10n) {
+    final colors = _colors;
+    final spacing = _spacing;
+    final radii = _radii;
+    final typography = _typography;
+
     return Padding(
-      padding: const EdgeInsets.only(
-        left: 16.0,
-        right: 16.0,
-        bottom: 12.0,
+      padding: EdgeInsets.only(
+        left: spacing.md,
+        right: spacing.md,
+        bottom: spacing.sm,
       ),
       child: GestureDetector(
         onTap: () {
@@ -770,16 +794,16 @@ class _HomePageState extends State<HomePage> {
           child: TextField(
             decoration: InputDecoration(
               hintText: l10n.homeSearchHint,
-              hintStyle: const TextStyle(color: AppColors.textSecondary),
-              prefixIcon: const Icon(
+              hintStyle: typography.bodySmall,
+              prefixIcon: Icon(
                 Icons.search,
-                color: AppColors.textSecondary,
+                color: colors.textSecondary,
               ),
               filled: true,
-              fillColor: AppColors.heading.withValues(alpha: 0.05),
-              contentPadding: const EdgeInsets.symmetric(vertical: 12),
+              fillColor: colors.heading.withValues(alpha: 0.05),
+              contentPadding: EdgeInsets.symmetric(vertical: spacing.sm),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: radii.mdAll,
                 borderSide: BorderSide.none,
               ),
             ),
@@ -793,6 +817,10 @@ class _HomePageState extends State<HomePage> {
     AppLocalizations l10n,
     AuthService authService,
   ) {
+    final colors = _colors;
+    final spacing = _spacing;
+    final avatarSize = _homeTheme.avatarSize;
+
     return [
       IconButton(
         tooltip: l10n.homePropagation,
@@ -803,9 +831,9 @@ class _HomePageState extends State<HomePage> {
             ),
           );
         },
-        icon: const HugeIcon(
+        icon: HugeIcon(
           icon: HugeIcons.strokeRoundedEcoLab01,
-          color: AppColors.accentLight,
+          color: colors.icon,
         ),
       ),
       IconButton(
@@ -817,29 +845,29 @@ class _HomePageState extends State<HomePage> {
             ),
           );
         },
-        icon: const Icon(
+        icon: Icon(
           Icons.settings,
-          color: AppColors.accentLight,
+          color: colors.icon,
         ),
       ),
       Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
+        padding: EdgeInsets.symmetric(horizontal: spacing.xxs),
         child: Center(
           child: SizedBox(
-            width: 40,
-            height: 40,
+            width: avatarSize,
+            height: avatarSize,
             child: ClipOval(
               child: widget.user.photoUrl != null &&
                       widget.user.photoUrl!.isNotEmpty
                   ? Image.network(
                       widget.user.photoUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(
+                      errorBuilder: (_, __, ___) => Icon(
                         Icons.person,
-                        color: AppColors.heading,
+                        color: colors.icon,
                       ),
                     )
-                  : const Icon(Icons.person, color: AppColors.heading),
+                  : Icon(Icons.person, color: colors.icon),
             ),
           ),
         ),
@@ -849,7 +877,7 @@ class _HomePageState extends State<HomePage> {
         onPressed: () async {
           await authService.signOut();
         },
-        icon: const Icon(Icons.logout, color: AppColors.accentLight),
+        icon: Icon(Icons.logout, color: colors.icon),
       ),
     ];
   }
@@ -862,7 +890,7 @@ class _HomePageState extends State<HomePage> {
     final navActions = _buildHomeNavActions(l10n, authService);
 
     return AppBar(
-      backgroundColor: AppColors.background,
+      backgroundColor: _colors.screen,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       centerTitle: false,
@@ -872,11 +900,7 @@ class _HomePageState extends State<HomePage> {
           'Plöntukrot',
           minFontSize: 18,
           maxFontSize: 36,
-          style: TextStyle(
-            fontFamily: 'NordicStyle',
-            color: AppColors.heading,
-            fontSize: 36,
-          ),
+          style: _homeTheme.brandStyle,
         ),
       ),
       actions: isWide ? navActions : null,
@@ -903,6 +927,12 @@ class _HomePageState extends State<HomePage> {
     final authService = AuthService();
     final l10n = AppLocalizations.of(context);
     final isWide = MediaQuery.sizeOf(context).width >= _wideBreakpoint;
+    final colors = _colors;
+    final spacing = _spacing;
+    final radii = _radii;
+    final typography = _typography;
+    final dimensions = _dimensions;
+    final chips = context.components.chips;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -912,7 +942,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: _isSelectionMode
           ? null
           : FloatingActionButton(
-              foregroundColor: AppColors.dark1,
+              foregroundColor: colors.onPrimary,
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
@@ -930,8 +960,8 @@ class _HomePageState extends State<HomePage> {
         stream: _userDocumentExistsStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.goldAccent),
+            return Center(
+              child: CircularProgressIndicator(color: colors.primary),
             );
           }
 
@@ -939,13 +969,13 @@ class _HomePageState extends State<HomePage> {
             return Center(
               child: Text(
                 l10n.homeNoUserData,
-                style: const TextStyle(color: AppColors.textPrimary),
+                style: typography.bodyLarge,
               ),
             );
           }
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: spacing.allLg,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -954,39 +984,40 @@ class _HomePageState extends State<HomePage> {
                   builder: (context, plantSnapshot) {
                     if (plantSnapshot.connectionState ==
                         ConnectionState.waiting) {
-                      return const Center(
+                      return Center(
                         child: Padding(
-                          padding: EdgeInsets.all(30),
+                          padding: EdgeInsets.all(spacing.xxxl),
                           child: CircularProgressIndicator(
-                            color: AppColors.goldAccent,
+                            color: colors.primary,
                           ),
                         ),
                       );
                     }
 
                     if (!plantSnapshot.hasData || plantSnapshot.data!.isEmpty) {
+                      final homeTheme = context.screens.home;
                       return Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(34),
+                        padding: homeTheme.emptyStatePadding,
                         decoration: BoxDecoration(
-                          color: AppColors.backgroundSecondary,
-                          borderRadius: BorderRadius.circular(28),
-                          border: Border.all(color: AppColors.greenDeep),
+                          color: colors.modal,
+                          borderRadius: BorderRadius.circular(
+                            homeTheme.emptyStateRadius,
+                          ),
+                          border: Border.all(color: colors.outline),
                         ),
                         child: Column(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.eco_rounded,
-                              size: 48,
-                              color: AppColors.accentLight,
+                              size: dimensions.avatar + spacing.xs,
+                              color: colors.icon,
                             ),
-                            const SizedBox(height: 12),
+                            spacing.vSm,
                             Text(
                               l10n.homeNoPlantsYet,
-                              style: const TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 16,
-                              ),
+                              style: typography.bodyLarge
+                                  .copyWith(color: colors.textSecondary),
                             ),
                           ],
                         ),
@@ -1064,25 +1095,33 @@ class _HomePageState extends State<HomePage> {
                                             avatar: HugeIcon(
                                               icon: HugeIcons
                                                   .strokeRoundedEcoLab01,
-                                              size: 16,
+                                              size: dimensions.iconSm,
                                               color: _filterPropagatingOnly
-                                                  ? AppColors.dark1
-                                                  : AppColors.accentLight,
+                                                  ? chips.selectedForeground
+                                                  : colors.icon,
                                             ),
-                                            selectedColor: AppColors.goldAccent,
-                                            checkmarkColor: AppColors.dark1,
-                                            labelStyle: TextStyle(
-                                              fontSize: 13,
+                                            selectedColor:
+                                                chips.selectedBackground,
+                                            checkmarkColor: chips.checkmark,
+                                            labelStyle:
+                                                chips.labelStyle.copyWith(
                                               color: _filterPropagatingOnly
-                                                  ? AppColors.dark1
-                                                  : AppColors.textPrimary,
+                                                  ? chips.selectedForeground
+                                                  : chips
+                                                      .unselectedForeground,
                                             ),
                                             backgroundColor:
-                                                AppColors.backgroundSecondary,
+                                                chips.unselectedBackground,
                                             side: BorderSide(
                                               color: _filterPropagatingOnly
-                                                  ? AppColors.goldAccent
-                                                  : AppColors.greenDeep,
+                                                  ? chips.selectedBorder
+                                                  : chips.unselectedBorder,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                chips.radius,
+                                              ),
                                             ),
                                             onSelected: (selected) {
                                               setState(() {
@@ -1093,7 +1132,7 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
+                                      spacing.hXs,
                                       Flexible(
                                         child: Align(
                                           alignment: Alignment.centerRight,
@@ -1116,13 +1155,14 @@ class _HomePageState extends State<HomePage> {
                                                                         .arrow_upward
                                                                     : Icons
                                                                         .arrow_downward,
-                                                                size: 18,
+                                                                size: dimensions
+                                                                    .iconLg,
                                                               )
                                                             else
-                                                              const SizedBox(
-                                                                  width: 18),
-                                                            const SizedBox(
-                                                                width: 8),
+                                                              SizedBox(
+                                                                  width: dimensions
+                                                                      .iconLg),
+                                                            spacing.hXs,
                                                             Text(
                                                               _sortMenuLabel(
                                                                 field,
@@ -1144,14 +1184,12 @@ class _HomePageState extends State<HomePage> {
                                                 _sortAscending
                                                     ? Icons.arrow_upward
                                                     : Icons.arrow_downward,
-                                                size: 16,
+                                                size: dimensions.iconSm,
                                               ),
                                               label: Text(
                                                 _sortLabel(l10n),
                                                 overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 13,
-                                                ),
+                                                style: typography.bodySmall,
                                               ),
                                             ),
                                           ),
@@ -1160,28 +1198,27 @@ class _HomePageState extends State<HomePage> {
                                     ],
                                   ),
                                 if (!_isSelectionMode) ...[
-                                  const SizedBox(height: 8),
+                                  spacing.vXs,
                                   _buildBotanicalFilters(plants, l10n),
-                                  const SizedBox(height: 8),
+                                  spacing.vXs,
                                 ],
                                 if (_filterPropagatingOnly &&
                                     sortedPlants.isEmpty)
                                   Container(
                                     width: double.infinity,
-                                    padding: const EdgeInsets.all(24),
+                                    padding: EdgeInsets.all(spacing.xl),
                                     decoration: BoxDecoration(
-                                      color: AppColors.backgroundSecondary,
-                                      borderRadius: BorderRadius.circular(20),
+                                      color: colors.modal,
+                                      borderRadius: radii.lgAll,
                                       border: Border.all(
-                                        color: AppColors.greenDeep,
+                                        color: colors.outline,
                                       ),
                                     ),
                                     child: Text(
                                       l10n.homeNoPropagatingPlants,
                                       textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: AppColors.textSecondary,
-                                      ),
+                                      style: typography.bodyMedium
+                                          .copyWith(color: colors.textSecondary),
                                     ),
                                   )
                                 else if (sortedPlants.isEmpty &&
@@ -1190,20 +1227,19 @@ class _HomePageState extends State<HomePage> {
                                         _filterStage != null))
                                   Container(
                                     width: double.infinity,
-                                    padding: const EdgeInsets.all(24),
+                                    padding: EdgeInsets.all(spacing.xl),
                                     decoration: BoxDecoration(
-                                      color: AppColors.backgroundSecondary,
-                                      borderRadius: BorderRadius.circular(20),
+                                      color: colors.modal,
+                                      borderRadius: radii.lgAll,
                                       border: Border.all(
-                                        color: AppColors.greenDeep,
+                                        color: colors.outline,
                                       ),
                                     ),
                                     child: Text(
                                       l10n.homeNoPlantsForFilter,
                                       textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: AppColors.textSecondary,
-                                      ),
+                                      style: typography.bodyMedium
+                                          .copyWith(color: colors.textSecondary),
                                     ),
                                   )
                                 else if (_sortField == _PlantSortField.species)

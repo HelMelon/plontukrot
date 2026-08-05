@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/plant.dart';
 import '../../pages/plant_details_page.dart';
 
@@ -36,9 +36,6 @@ class PlantCard extends StatelessWidget {
     this.onLongPress,
   });
 
-  static const double _mainFontSize = 15;
-  static const double _subFontSize = 13;
-
   String? get _fertilizerLabel {
     if (!showLastFertilizer) return null;
     final name = plant.lastFertilizerName?.trim();
@@ -51,6 +48,11 @@ class PlantCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final radii = context.radii;
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final dimensions = context.dimensions;
     final imageUrl = plant.listImageUrl;
     final hasImage = imageUrl != null;
 
@@ -79,26 +81,20 @@ class PlantCard extends StatelessWidget {
       onLongPress: onLongPress,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.backgroundSecondary,
-          borderRadius: BorderRadius.circular(16),
+          color: colors.modal,
+          borderRadius: BorderRadius.circular(radii.md),
           border: Border.all(
             color: isSelected
-                ? AppColors.goldAccent
-                : AppColors.greenDeep.withValues(alpha: 0.3),
+                ? colors.primary
+                : colors.outline.withValues(alpha: 0.3),
             width: isSelected ? 3 : 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.dark1.withValues(alpha: 0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          boxShadow: context.shadows.card,
         ),
         child: Stack(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(radii.md),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -120,7 +116,7 @@ class PlantCard extends StatelessWidget {
                   ),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: EdgeInsets.all(spacing.sm),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -129,39 +125,35 @@ class PlantCard extends StatelessWidget {
                               title,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: _mainFontSize,
+                              style: typography.bodyEmphasis.copyWith(
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: -0.3,
-                                color: AppColors.goldAccent,
+                                color: colors.primary,
                                 height: 1.2,
                               ),
                             ),
                           ),
                           if (subtitle != null) ...[
-                            const SizedBox(height: 4),
+                            spacing.vXxs,
                             Text(
                               subtitle,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: _subFontSize,
-                                fontWeight: FontWeight.normal,
-                                color: AppColors.warmGray,
+                              style: typography.bodySmall.copyWith(
+                                color: colors.textSecondary,
                                 height: 1.2,
                               ),
                             ),
                           ],
                           if (fertilizerName != null) ...[
-                            const SizedBox(height: 4),
+                            spacing.vXxs,
                             Text(
                               fertilizerName,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: _subFontSize,
+                              style: typography.bodySmall.copyWith(
                                 fontWeight: FontWeight.w500,
-                                color: AppColors.accentLight,
+                                color: colors.icon,
                                 height: 1.2,
                               ),
                             ),
@@ -174,13 +166,17 @@ class PlantCard extends StatelessWidget {
               ),
             ),
             if (isSelected)
-              const Positioned(
-                top: 8,
-                right: 8,
+              Positioned(
+                top: spacing.xs,
+                right: spacing.xs,
                 child: CircleAvatar(
                   radius: 14,
-                  backgroundColor: AppColors.goldAccent,
-                  child: Icon(Icons.check, color: AppColors.dark1, size: 18),
+                  backgroundColor: colors.primary,
+                  child: Icon(
+                    Icons.check,
+                    color: colors.onPrimary,
+                    size: dimensions.iconMd,
+                  ),
                 ),
               ),
           ],
@@ -195,16 +191,21 @@ class _PlantAssetPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final dimensions = context.dimensions;
     return Container(
-      color: AppColors.backgroundSecondary,
+      color: colors.modal,
       child: Image.asset(
         'assets/images/default-img.png',
         fit: BoxFit.cover,
         alignment: Alignment.topCenter,
         errorBuilder: (context, error, stackTrace) {
-          return const Center(
-            child:
-                Icon(Icons.eco_rounded, color: AppColors.goldAccent, size: 40),
+          return Center(
+            child: Icon(
+              Icons.eco_rounded,
+              color: colors.icon,
+              size: dimensions.photoPlaceholder,
+            ),
           );
         },
       ),

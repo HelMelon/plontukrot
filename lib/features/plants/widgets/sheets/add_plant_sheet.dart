@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/variegation.dart';
 import '../../../../services/plant_service.dart';
 import '../selectors/plant_stage_selector.dart';
@@ -48,29 +47,14 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
     String? errorText,
     required IconData icon,
   }) {
-    return InputDecoration(
-      labelText: labelText,
-      errorText: errorText,
-      labelStyle: const TextStyle(color: AppColors.textSecondary),
-      filled: true,
-      fillColor: AppColors.dark2,
-      prefixIcon: Icon(icon, color: AppColors.accentLight),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: const BorderSide(color: AppColors.greenDeep),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: const BorderSide(
-          color: AppColors.goldAccent,
-          width: 1.5,
-        ),
-      ),
-    );
+    final colors = context.colors;
+    final inputs = context.components.inputs;
+    return inputs
+        .decoration(
+          labelText: labelText,
+          prefixIcon: Icon(icon, color: colors.icon),
+        )
+        .copyWith(errorText: errorText);
   }
 
   Future<void> addPlant() async {
@@ -136,6 +120,12 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
     final l10n = AppLocalizations.of(context);
     final media = MediaQuery.of(context);
     final maxHeight = media.size.height * 0.92;
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final sheets = context.components.sheets;
+    final inputs = context.components.inputs;
+    final typography = context.typography;
+    final dimensions = context.dimensions;
 
     return AnimatedPadding(
       duration: const Duration(milliseconds: 100),
@@ -146,8 +136,8 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
         child: ConstrainedBox(
           constraints: BoxConstraints(maxHeight: maxHeight),
           child: Material(
-            color: AppColors.backgroundSecondary,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            color: colors.modal,
+            borderRadius: sheets.topBorderRadius,
             clipBehavior: Clip.antiAlias,
             child: SafeArea(
               top: false,
@@ -155,39 +145,45 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 12),
+                  spacing.vSm,
                   Center(
                     child: Container(
-                      width: 50,
-                      height: 5,
+                      width: sheets.handleWidth,
+                      height: sheets.handleHeight,
                       decoration: BoxDecoration(
-                        color: AppColors.greenSoft,
-                        borderRadius: BorderRadius.circular(20),
+                        color: sheets.handleColor,
+                        borderRadius: BorderRadius.circular(sheets.handleRadius),
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(22, 16, 22, 0),
+                    padding: EdgeInsets.fromLTRB(
+                      sheets.contentPadding.left,
+                      spacing.md,
+                      sheets.contentPadding.right,
+                      0,
+                    ),
                     child: Text(
                       l10n.plantAdd,
-                      style: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
+                      style: typography.titleLarge.copyWith(
                         letterSpacing: -1,
-                        color: AppColors.heading,
                       ),
                     ),
                   ),
                   Flexible(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(22, 16, 22, 12),
+                      padding: EdgeInsets.fromLTRB(
+                        sheets.contentPadding.left,
+                        spacing.md,
+                        sheets.contentPadding.right,
+                        spacing.sm,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TextField(
                             controller: genusController,
-                            style:
-                                const TextStyle(color: AppColors.textPrimary),
+                            style: inputs.textStyle,
                             onChanged: (_) {
                               if (genusError != null) {
                                 setState(() => genusError = null);
@@ -199,11 +195,10 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                               icon: Icons.park_outlined,
                             ),
                           ),
-                          const SizedBox(height: 18),
+                          spacing.vMd,
                           TextField(
                             controller: speciesController,
-                            style:
-                                const TextStyle(color: AppColors.textPrimary),
+                            style: inputs.textStyle,
                             onChanged: (_) {
                               if (speciesError != null) {
                                 setState(() => speciesError = null);
@@ -215,63 +210,57 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                               icon: Icons.eco,
                             ),
                           ),
-                          const SizedBox(height: 18),
+                          spacing.vMd,
                           TextField(
                             controller: cultivarController,
-                            style:
-                                const TextStyle(color: AppColors.textPrimary),
+                            style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantCultivar,
                               icon: Icons.spa_outlined,
                             ),
                           ),
-                          const SizedBox(height: 18),
+                          spacing.vMd,
                           PlantVariegationSelector(
                             selected: selectedVariegation,
                             onChanged: (value) {
                               setState(() => selectedVariegation = value);
                             },
                           ),
-                          const SizedBox(height: 18),
+                          spacing.vMd,
                           TextField(
                             controller: tradingNameController,
-                            style:
-                                const TextStyle(color: AppColors.textPrimary),
+                            style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantTradingName,
                               icon: Icons.storefront_outlined,
                             ),
                           ),
-                          const SizedBox(height: 18),
+                          spacing.vMd,
                           TextField(
                             controller: plantFamilyController,
-                            style:
-                                const TextStyle(color: AppColors.textPrimary),
+                            style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantFamily,
                               icon: Icons.family_restroom,
                             ),
                           ),
-                          const SizedBox(height: 18),
+                          spacing.vMd,
                           TextField(
                             controller: nickNameController,
-                            style:
-                                const TextStyle(color: AppColors.textPrimary),
+                            style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantNickname,
                               icon: Icons.local_florist,
                             ),
                           ),
-                          const SizedBox(height: 18),
+                          spacing.vMd,
                           Text(
                             l10n.plantGrowthStage,
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                            style: typography.label.copyWith(
+                              color: colors.textSecondary,
                             ),
                           ),
-                          const SizedBox(height: 10),
+                          spacing.vXs,
                           PlantStageSelector(
                             selectedStage: selectedStage,
                             onChanged: (value) {
@@ -280,15 +269,14 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                               });
                             },
                           ),
-                          const SizedBox(height: 18),
+                          spacing.vMd,
                           TextField(
                             controller: wateringFrequencyController,
                             keyboardType: TextInputType.number,
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
                             ],
-                            style:
-                                const TextStyle(color: AppColors.textPrimary),
+                            style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantWateringFrequency,
                               icon: Icons.water_drop,
@@ -299,27 +287,24 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(22, 8, 22, 16),
+                    padding: EdgeInsets.fromLTRB(
+                      sheets.contentPadding.left,
+                      spacing.xs,
+                      sheets.contentPadding.right,
+                      spacing.md,
+                    ),
                     child: SizedBox(
                       width: double.infinity,
-                      height: AppTheme.buttonHeight,
+                      height: dimensions.buttonHeight,
                       child: ElevatedButton(
                         onPressed: isLoading ? null : addPlant,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.goldAccent,
-                          foregroundColor: AppColors.dark1,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
                         child: isLoading
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
+                            ? SizedBox(
+                                width: dimensions.iconXl,
+                                height: dimensions.iconXl,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: AppColors.dark1,
+                                  color: colors.onPrimary,
                                 ),
                               )
                             : Text(

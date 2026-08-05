@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 
 /// Collapsed: first [collapsedVisible] items as a vertical list.
 /// Expanded: same vertical list, viewport fits ~[expandedViewport] items;
@@ -42,6 +42,7 @@ class _ExpandableSideScrollListState extends State<ExpandableSideScrollList> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final spacing = context.spacing;
     final count = widget.itemCount;
     if (count <= 0) return const SizedBox.shrink();
 
@@ -60,7 +61,7 @@ class _ExpandableSideScrollListState extends State<ExpandableSideScrollList> {
           for (var index = 0; index < collapsedCount; index++)
             Padding(
               padding: EdgeInsets.only(
-                bottom: index == collapsedCount - 1 ? 0 : 12,
+                bottom: index == collapsedCount - 1 ? 0 : spacing.sm,
               ),
               child: widget.itemBuilder(context, index),
             )
@@ -72,15 +73,15 @@ class _ExpandableSideScrollListState extends State<ExpandableSideScrollList> {
               thumbVisibility: count > viewport,
               child: ListView.separated(
                 controller: _scrollController,
-                padding: const EdgeInsets.only(right: 12),
+                padding: EdgeInsets.only(right: spacing.sm),
                 itemCount: count,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                separatorBuilder: (_, __) => spacing.vSm,
                 itemBuilder: widget.itemBuilder,
               ),
             ),
           ),
         if (canExpand) ...[
-          const SizedBox(height: 4),
+          spacing.vXxs,
           Center(
             child: IconButton(
               tooltip:
@@ -90,8 +91,8 @@ class _ExpandableSideScrollListState extends State<ExpandableSideScrollList> {
                 showExpanded
                     ? Icons.keyboard_arrow_up
                     : Icons.keyboard_arrow_down,
-                color: AppColors.goldAccent,
-                size: 28,
+                color: context.colors.primary,
+                size: spacing.xxl,
               ),
             ),
           ),

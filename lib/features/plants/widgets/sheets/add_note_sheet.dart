@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../services/note_service.dart';
 
 class AddNoteSheet extends StatefulWidget {
@@ -59,122 +58,92 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final sheets = context.components.sheets;
+    final inputs = context.components.inputs;
+    final typography = context.typography;
+    final dimensions = context.dimensions;
+    final media = MediaQuery.of(context);
+    final keyboard = media.viewInsets.bottom;
+    final availableHeight =
+        media.size.height - media.padding.top - keyboard;
+    // Tall sheet so the top edge sits high on the screen (above keyboard).
+    final sheetHeight = availableHeight * 0.92;
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.backgroundSecondary,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.only(
-          left: 22,
-          right: 22,
-          top: 22,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 50,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: AppColors.greenSoft,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 28),
-              Text(
-                l10n.notesAdd,
-                style: const TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -1,
-                  color: AppColors.heading,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                l10n.notesAddHint,
-                style: const TextStyle(
-                  fontSize: 15,
-                  height: 1.5,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 28),
-              TextField(
-                controller: noteController,
-                maxLines: 8,
-                autofocus: true,
-                style: const TextStyle(color: AppColors.textPrimary),
-                decoration: InputDecoration(
-                  labelText: l10n.notesLabel,
-                  alignLabelWithHint: true,
-                  labelStyle: const TextStyle(color: AppColors.textSecondary),
-                  filled: true,
-                  fillColor: AppColors.dark2,
-                  prefixIcon: const Padding(
-                    padding: EdgeInsets.only(bottom: 120),
-                    child: Icon(
-                      Icons.notes_rounded,
-                      color: AppColors.accentLight,
-                    ),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(color: AppColors.greenDeep),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(
-                      color: AppColors.goldAccent,
-                      width: 1.5,
+    return Padding(
+      padding: EdgeInsets.only(bottom: keyboard),
+      child: SizedBox(
+        height: sheetHeight,
+        child: Container(
+          decoration: BoxDecoration(
+            color: colors.modal,
+            borderRadius: sheets.topBorderRadius,
+          ),
+          child: Padding(
+            padding: sheets.contentPadding,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: sheets.handleWidth,
+                    height: sheets.handleHeight,
+                    decoration: BoxDecoration(
+                      color: sheets.handleColor,
+                      borderRadius: BorderRadius.circular(sheets.handleRadius),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                height: AppTheme.buttonHeight,
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : saveNote,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.goldAccent,
-                    foregroundColor: AppColors.dark1,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                spacing.vXxl,
+                Text(
+                  l10n.notesAdd,
+                  style: typography.titleLarge.copyWith(
+                    letterSpacing: -1,
                   ),
-                  child: isLoading
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppColors.dark1,
-                          ),
-                        )
-                      : Text(
-                          l10n.commonSave,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
                 ),
-              ),
-            ],
+                spacing.vXs,
+                Text(
+                  l10n.notesAddHint,
+                  style: typography.bodyLarge.copyWith(
+                    height: 1.5,
+                    color: colors.textSecondary,
+                  ),
+                ),
+                spacing.vXxl,
+                Expanded(
+                  child: TextField(
+                    controller: noteController,
+                    maxLines: null,
+                    expands: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    autofocus: true,
+                    style: inputs.textStyle,
+                    decoration: inputs.decoration(
+                      labelText: l10n.notesLabel,
+                    ).copyWith(alignLabelWithHint: true),
+                  ),
+                ),
+                spacing.vXl,
+                SizedBox(
+                  width: double.infinity,
+                  height: dimensions.buttonHeight,
+                  child: ElevatedButton(
+                    onPressed: isLoading ? null : saveNote,
+                    child: isLoading
+                        ? SizedBox(
+                            width: dimensions.iconXl,
+                            height: dimensions.iconXl,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: colors.onPrimary,
+                            ),
+                          )
+                        : Text(l10n.commonSave),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

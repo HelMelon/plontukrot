@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../theme/app_colors.dart';
+import '../theme/theme_context.dart';
 
 /// Shows a text prompt dialog without disposing the controller while the
 /// TextField is still attached (which crashes on dismiss with empty focus).
@@ -98,14 +98,23 @@ class _PromptTextDialogState extends State<_PromptTextDialog> {
     final media = MediaQuery.of(context);
     final maxContentHeight =
         (media.size.height - media.viewInsets.bottom) * 0.4;
+    final dialogs = context.components.dialogs;
+    final spacing = context.spacing;
 
     return AlertDialog(
-      backgroundColor: AppColors.backgroundSecondary,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      backgroundColor: dialogs.background,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(dialogs.radius),
+      ),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: spacing.xl,
+        vertical: spacing.xl,
+      ),
       title: Text(
         widget.title,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
+        style: dialogs.titleStyle,
       ),
       content: ConstrainedBox(
         constraints:
@@ -132,7 +141,7 @@ class _PromptTextDialogState extends State<_PromptTextDialog> {
       actionsAlignment: MainAxisAlignment.end,
       actionsOverflowAlignment: OverflowBarAlignment.end,
       actionsOverflowDirection: VerticalDirection.down,
-      actionsOverflowButtonSpacing: 8,
+      actionsOverflowButtonSpacing: spacing.xs,
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),

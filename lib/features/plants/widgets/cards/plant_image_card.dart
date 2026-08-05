@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:plontukrot/features/plants/widgets/cards/placeholder_widget.dart';
 
+import '../../../../core/theme/theme_context.dart';
+
 class PlantImageCard extends StatelessWidget {
   final String? imageUrl;
   final VoidCallback onTap;
@@ -19,13 +21,14 @@ class PlantImageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasUrl = imageUrl != null && imageUrl!.isNotEmpty;
+    final colors = context.colors;
 
     return GestureDetector(
       onTap: onTap,
       child: AspectRatio(
         aspectRatio: aspectRatio,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(context.radii.md),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -51,7 +54,7 @@ class PlantImageCard extends StatelessWidget {
                 ),
               if (isUploading)
                 Container(
-                  color: Colors.black45,
+                  color: colors.screen.withValues(alpha: 0.45),
                   child: const Align(
                     alignment: Alignment.topCenter,
                     child: CircularProgressIndicator(),

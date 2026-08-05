@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/growth_event.dart';
 
 class PlantGrowthStatsSection extends StatelessWidget {
@@ -23,22 +23,23 @@ class PlantGrowthStatsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           l10n.plantLeafStatsTitle,
-          style: const TextStyle(
-            fontSize: 16,
+          style: typography.sectionTitle.copyWith(
             fontWeight: FontWeight.bold,
-            color: AppColors.heading,
           ),
         ),
-        const SizedBox(height: 12),
+        spacing.vSm,
         for (final stat in monthlyStats)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8),
+            padding: EdgeInsets.only(bottom: spacing.xs),
             child: Text(
               l10n.plantLeafStatsMonthLine(
                 _monthLabel(stat.monthStart, locale),
@@ -47,9 +48,9 @@ class PlantGrowthStatsSection extends StatelessWidget {
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 20,
-                color: AppColors.heading,
+              style: typography.titleMedium.copyWith(
+                fontWeight: FontWeight.normal,
+                color: colors.heading,
               ),
             ),
           ),

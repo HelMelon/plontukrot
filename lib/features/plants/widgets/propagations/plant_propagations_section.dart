@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/propagation.dart';
 import '../../../../services/propagation_service.dart';
 import '../common/expandable_side_scroll_list.dart';
@@ -68,18 +68,22 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
     AppLocalizations l10n,
     String dateLocale,
   ) {
+    final colors = context.colors;
+    final radii = context.radii;
+    final spacing = context.spacing;
+    final typography = context.typography;
     return Material(
-      color: AppColors.dark2,
-      borderRadius: BorderRadius.circular(16),
+      color: colors.card,
+      borderRadius: BorderRadius.circular(radii.md),
       child: InkWell(
         onTap: () => _openDetails(context, item),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(radii.md),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(14),
+          padding: EdgeInsets.all(spacing.sm + 2),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.greenDeep),
+            borderRadius: BorderRadius.circular(radii.md),
+            border: Border.all(color: colors.outline),
           ),
           child: Row(
             children: [
@@ -92,27 +96,26 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
                       '${l10n.stageTitle(item.stage)} · ${l10n.daysCount(item.daysSinceStart)}',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: typography.bodyLarge.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: colors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    spacing.vXxs,
                     Text(
                       '${l10n.propagationAliveWithMethod(item.quantityAlive, l10n.propagationMethodPlural(item.method))} · ${DateFormat('d MMM y', dateLocale).format(item.startedAt)}',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 13,
+                      style: typography.bodySmall.copyWith(
+                        color: colors.textSecondary,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.chevron_right,
-                color: AppColors.textSecondary,
+                color: colors.textSecondary,
               ),
             ],
           ),
@@ -125,6 +128,11 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final dateLocale = Localizations.localeOf(context).toString();
+    final colors = context.colors;
+    final radii = context.radii;
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final dimensions = context.dimensions;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,33 +142,31 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
             Expanded(
               child: Text(
                 l10n.propagationTitle,
-                style: const TextStyle(
-                  fontSize: 16,
+                style: typography.sectionTitle.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.heading,
                 ),
               ),
             ),
             TextButton.icon(
               onPressed: () => _openAdd(context),
-              icon: const Icon(Icons.add, size: 18),
+              icon: Icon(Icons.add, size: dimensions.iconMd),
               label: Text(l10n.commonAdd),
               style: TextButton.styleFrom(
-                foregroundColor: AppColors.goldAccent,
+                foregroundColor: colors.primary,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        spacing.vXs,
         StreamBuilder<List<Propagation>>(
           stream: _propagationsStream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting &&
                 !snapshot.hasData) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: spacing.md),
                 child: Center(
-                  child: CircularProgressIndicator(color: AppColors.goldAccent),
+                  child: CircularProgressIndicator(color: colors.primary),
                 ),
               );
             }
@@ -169,14 +175,14 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
             if (items.isEmpty) {
               return Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(16),
+                padding: spacing.allMd,
                 decoration: BoxDecoration(
-                  color: AppColors.dark2,
-                  borderRadius: BorderRadius.circular(16),
+                  color: colors.card,
+                  borderRadius: BorderRadius.circular(radii.md),
                 ),
                 child: Text(
                   l10n.propagationEmptyActive,
-                  style: const TextStyle(color: AppColors.textSecondary),
+                  style: typography.bodySmall,
                 ),
               );
             }

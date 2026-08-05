@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../core/theme/app_colors.dart';
+import 'package:plontukrot/core/theme/theme_context.dart';
+
 import '../../../models/plant.dart';
 import '../../../services/plant_service.dart';
 import '../widgets/cards/plant_card.dart';
@@ -39,21 +40,21 @@ class _PlantStageDetailsPageState extends State<PlantStageDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.screen,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: colors.screen,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.heading),
+        iconTheme: IconThemeData(color: colors.icon),
         title: Text(
           l10n.stageTitle(widget.stage),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: AppColors.heading,
-            fontWeight: FontWeight.bold,
-          ),
+          style: typography.titleMedium,
         ),
       ),
       body: StreamBuilder<List<Plant>>(
@@ -61,8 +62,8 @@ class _PlantStageDetailsPageState extends State<PlantStageDetailsPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting &&
               !snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.goldAccent),
+            return Center(
+              child: CircularProgressIndicator(color: colors.primary),
             );
           }
 
@@ -73,14 +74,11 @@ class _PlantStageDetailsPageState extends State<PlantStageDetailsPage> {
           if (plants.isEmpty) {
             return Center(
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: spacing.allXl,
                 child: Text(
                   l10n.plantEmptyStage,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 16,
-                  ),
+                  style: typography.bodyLarge,
                 ),
               ),
             );
@@ -90,12 +88,17 @@ class _PlantStageDetailsPageState extends State<PlantStageDetailsPage> {
             builder: (context, constraints) {
               final crossAxisCount = _crossAxisCount(constraints.maxWidth);
               return GridView.builder(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                padding: EdgeInsets.fromLTRB(
+                  spacing.md,
+                  spacing.xs,
+                  spacing.md,
+                  spacing.xl,
+                ),
                 itemCount: plants.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 16,
+                  crossAxisSpacing: spacing.sm,
+                  mainAxisSpacing: spacing.md,
                   childAspectRatio: 0.55,
                 ),
                 itemBuilder: (context, index) {

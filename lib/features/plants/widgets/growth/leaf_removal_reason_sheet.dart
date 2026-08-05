@@ -1,64 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/growth_event.dart';
 
 Future<LeafRemovalReason?> showLeafRemovalReasonSheet(BuildContext context) {
   final l10n = AppLocalizations.of(context);
+  final colors = context.colors;
+  final spacing = context.spacing;
+  final sheets = context.components.sheets;
+  final typography = context.typography;
   return showModalBottomSheet<LeafRemovalReason>(
     context: context,
-    backgroundColor: AppColors.backgroundSecondary,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    backgroundColor: colors.modal,
+    shape: RoundedRectangleBorder(
+      borderRadius: sheets.topBorderRadius,
     ),
     builder: (context) {
       return SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          padding: EdgeInsets.fromLTRB(spacing.lg, spacing.sm, spacing.lg, spacing.lg),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Center(
                 child: Container(
-                  width: 40,
-                  height: 4,
+                  width: sheets.handleWidth,
+                  height: sheets.handleHeight,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade400,
-                    borderRadius: BorderRadius.circular(99),
+                    color: sheets.handleColor,
+                    borderRadius: BorderRadius.circular(sheets.handleRadius),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              spacing.vMd,
               Text(
                 l10n.plantLeafRemoveTitle,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.heading,
-                ),
+                style: typography.titleSmall,
               ),
-              const SizedBox(height: 12),
+              spacing.vSm,
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.content_cut,
-                    color: AppColors.goldAccent),
+                leading: Icon(Icons.content_cut, color: colors.icon),
                 title: Text(l10n.plantLeafRemoveCut),
                 onTap: () =>
                     Navigator.pop(context, LeafRemovalReason.cutForRooting),
               ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.restaurant,
-                    color: AppColors.goldAccent),
+                leading: Icon(Icons.restaurant, color: colors.icon),
                 title: Text(l10n.plantLeafRemoveEaten),
                 onTap: () => Navigator.pop(context, LeafRemovalReason.eaten),
               ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.water_drop_outlined,
-                    color: AppColors.goldAccent),
+                leading:
+                    Icon(Icons.water_drop_outlined, color: colors.icon),
                 title: Text(l10n.plantLeafRemoveDried),
                 onTap: () => Navigator.pop(context, LeafRemovalReason.dried),
               ),

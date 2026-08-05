@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../core/widgets/prompt_text_dialog.dart';
 import '../../../../models/catalog_component.dart';
 import '../../../../models/component.dart';
@@ -304,6 +304,12 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
     final l10n = AppLocalizations.of(context);
     final media = MediaQuery.of(context);
     final maxHeight = media.size.height * 0.85;
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final sheets = context.components.sheets;
+    final inputs = context.components.inputs;
+    final typography = context.typography;
+    final dimensions = context.dimensions;
 
     return AnimatedPadding(
       duration: const Duration(milliseconds: 100),
@@ -314,8 +320,8 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
         child: ConstrainedBox(
           constraints: BoxConstraints(maxHeight: maxHeight),
           child: Material(
-            color: AppColors.backgroundSecondary,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            color: colors.modal,
+            borderRadius: sheets.topBorderRadius,
             clipBehavior: Clip.antiAlias,
             child: SafeArea(
               top: false,
@@ -323,20 +329,25 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 12),
+                  spacing.vSm,
                   Center(
                     child: Container(
-                      width: 40,
-                      height: 4,
+                      width: sheets.handleWidth,
+                      height: sheets.handleHeight,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade400,
-                        borderRadius: BorderRadius.circular(99),
+                        color: sheets.handleColor,
+                        borderRadius: BorderRadius.circular(sheets.handleRadius),
                       ),
                     ),
                   ),
                   Flexible(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                      padding: EdgeInsets.fromLTRB(
+                        spacing.lg,
+                        spacing.md,
+                        spacing.lg,
+                        spacing.lg,
+                      ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -346,12 +357,9 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                                 (widget.isEditing
                                     ? l10n.repottingEdit
                                     : l10n.repottingAdd),
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: typography.titleMedium,
                           ),
-                          const SizedBox(height: 20),
+                          spacing.vLg,
                           ListTile(
                             contentPadding: EdgeInsets.zero,
                             leading: const Icon(Icons.calendar_today),
@@ -367,10 +375,10 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                               child: Text(l10n.commonToday),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          spacing.vMd,
                           Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
+                            spacing: spacing.xs,
+                            runSpacing: spacing.xs,
                             children: [
                               ChoiceChip(
                                 label: Text(l10n.fertilizingSaved),
@@ -392,7 +400,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          spacing.vMd,
                           if (_mode == _SoilMode.saved)
                             StreamBuilder<List<Soil>>(
                               stream: _soilService.getSoils(),
@@ -413,9 +421,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                                     children: [
                                       Text(
                                         l10n.repottingEmptySoils,
-                                        style: const TextStyle(
-                                          color: AppColors.textSecondary,
-                                        ),
+                                        style: typography.bodySmall,
                                       ),
                                       TextButton(
                                         onPressed: () {
@@ -479,14 +485,17 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                               children: [
                                 Text(
                                   l10n.commonComposition,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600),
+                                  style: typography.label.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                                 const Spacer(),
                                 TextButton.icon(
                                   onPressed: _openManageComponents,
-                                  icon: const Icon(Icons.edit_outlined,
-                                      size: 18),
+                                  icon: Icon(
+                                    Icons.edit_outlined,
+                                    size: dimensions.iconMd,
+                                  ),
                                   label: Text(l10n.commonManage),
                                 ),
                               ],
@@ -498,9 +507,11 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                                   return Text(snapshot.error.toString());
                                 }
                                 if (!snapshot.hasData) {
-                                  return const Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 16),
-                                    child: Center(
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: spacing.md,
+                                    ),
+                                    child: const Center(
                                         child: CircularProgressIndicator()),
                                   );
                                 }
@@ -518,15 +529,14 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                                 );
                               },
                             ),
-                            const SizedBox(height: 8),
+                            spacing.vXs,
                             Text(
                               l10n.repottingSoilTapHint,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
+                              style: typography.caption.copyWith(
+                                color: colors.textSecondary,
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            spacing.vSm,
                             CheckboxListTile(
                               contentPadding: EdgeInsets.zero,
                               value: _saveMix,
@@ -539,14 +549,14 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                             if (_saveMix)
                               TextField(
                                 controller: _mixNameController,
-                                decoration: InputDecoration(
+                                decoration: inputs.decoration(
                                   labelText: l10n.fertilizingMixName,
                                   hintText: l10n.repottingMixNameHint,
                                 ),
                                 onChanged: (_) => setState(() {}),
                               ),
                           ],
-                          const SizedBox(height: 12),
+                          spacing.vSm,
                           CheckboxListTile(
                             contentPadding: EdgeInsets.zero,
                             value: _slowReleaseFertilizer,
@@ -557,18 +567,18 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                             title: Text(l10n.repottingSlowRelease),
                             subtitle: Text(
                               l10n.repottingSlowReleaseSubtitle,
-                              style: const TextStyle(fontSize: 12),
+                              style: typography.caption,
                             ),
                             controlAffinity: ListTileControlAffinity.leading,
                           ),
-                          const SizedBox(height: 20),
+                          spacing.vLg,
                           FilledButton(
                             onPressed: _canSave ? _save : null,
                             child: _saving
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
+                                ? SizedBox(
+                                    width: dimensions.iconLg,
+                                    height: dimensions.iconLg,
+                                    child: const CircularProgressIndicator(
                                         strokeWidth: 2),
                                   )
                                 : Text(l10n.commonSave),

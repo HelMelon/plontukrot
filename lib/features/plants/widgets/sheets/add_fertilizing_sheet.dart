@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../core/widgets/prompt_text_dialog.dart';
 import '../../../../models/fertilizer.dart';
 import '../../../../models/fertilizer_application_method.dart';
@@ -253,14 +253,16 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
   }
 
   Widget _waterVolumePicker(AppLocalizations l10n, {bool enabled = true}) {
+    final spacing = context.spacing;
+    final typography = context.typography;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           l10n.fertilizingWaterVolume,
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: typography.label.copyWith(fontWeight: FontWeight.w600),
         ),
-        const SizedBox(height: 8),
+        spacing.vXs,
         SegmentedButton<int>(
           segments: [
             for (final ml in kWaterVolumesMl)
@@ -387,33 +389,38 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final title = widget.title ??
         (widget.isEditing ? l10n.fertilizingEdit : l10n.fertilizingAdd);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final sheets = context.components.sheets;
+    final inputs = context.components.inputs;
+    final typography = context.typography;
+    final dimensions = context.dimensions;
 
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
       child: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: spacing.allLg,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Center(
                 child: Container(
-                  width: 40,
-                  height: 4,
+                  width: sheets.handleWidth,
+                  height: sheets.handleHeight,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade400,
-                    borderRadius: BorderRadius.circular(99),
+                    color: sheets.handleColor,
+                    borderRadius: BorderRadius.circular(sheets.handleRadius),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              spacing.vMd,
               Text(
                 title,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: typography.titleMedium,
               ),
-              const SizedBox(height: 20),
+              spacing.vLg,
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.calendar_today),
@@ -428,15 +435,15 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                   child: Text(l10n.commonToday),
                 ),
               ),
-              const SizedBox(height: 16),
+              spacing.vMd,
               Text(
                 l10n.fertilizingApplicationMethod,
-                style: const TextStyle(fontWeight: FontWeight.w600),
+                style: typography.label.copyWith(fontWeight: FontWeight.w600),
               ),
-              const SizedBox(height: 8),
+              spacing.vXs,
               Wrap(
-                spacing: 8,
-                runSpacing: 8,
+                spacing: spacing.xs,
+                runSpacing: spacing.xs,
                 children: [
                   ChoiceChip(
                     label: Text(l10n.applicationMethodLabel(
@@ -466,10 +473,10 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              spacing.vMd,
               Wrap(
-                spacing: 8,
-                runSpacing: 8,
+                spacing: spacing.xs,
+                runSpacing: spacing.xs,
                 children: [
                   ChoiceChip(
                     label: Text(l10n.fertilizingSaved),
@@ -491,7 +498,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              spacing.vMd,
               if (_mode == _FertilizerMode.saved)
                 StreamBuilder<List<Fertilizer>>(
                   stream: _service.getFertilizers(),
@@ -510,14 +517,17 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                           children: [
                             Text(
                               l10n.fertilizingCatalog,
-                              style: const TextStyle(
+                              style: typography.label.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             const Spacer(),
                             TextButton.icon(
                               onPressed: _openManageFertilizers,
-                              icon: const Icon(Icons.edit_outlined, size: 18),
+                              icon: Icon(
+                                Icons.edit_outlined,
+                                size: dimensions.iconMd,
+                              ),
                               label: Text(l10n.commonManage),
                             ),
                           ],
@@ -528,9 +538,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                             children: [
                               Text(
                                 l10n.fertilizingEmptyCatalog,
-                                style: const TextStyle(
-                                  color: AppColors.textSecondary,
-                                ),
+                                style: typography.bodySmall,
                               ),
                               TextButton(
                                 onPressed: () {
@@ -600,14 +608,12 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                           ),
                           if (_selectedFertilizerId != null ||
                               _components.isNotEmpty) ...[
-                            const SizedBox(height: 12),
+                            spacing.vSm,
                             Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
                                 l10n.fertilizingMixWaterVolume(_waterMl),
-                                style: const TextStyle(
-                                  color: AppColors.textSecondary,
-                                ),
+                                style: typography.bodySmall,
                               ),
                             ),
                           ],
@@ -618,17 +624,22 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                 ),
               if (_mode == _FertilizerMode.newMix) ...[
                 _waterVolumePicker(l10n),
-                const SizedBox(height: 16),
+                spacing.vMd,
                 Row(
                   children: [
                     Text(
                       l10n.fertilizingIngredients,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: typography.label.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const Spacer(),
                     TextButton.icon(
                       onPressed: _openManageIngredients,
-                      icon: const Icon(Icons.edit_outlined, size: 18),
+                      icon: Icon(
+                        Icons.edit_outlined,
+                        size: dimensions.iconMd,
+                      ),
                       label: Text(l10n.commonManage),
                     ),
                   ],
@@ -640,9 +651,9 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                       return Text(snapshot.error.toString());
                     }
                     if (!snapshot.hasData) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Center(child: CircularProgressIndicator()),
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: spacing.md),
+                        child: const Center(child: CircularProgressIndicator()),
                       );
                     }
 
@@ -657,15 +668,14 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                     );
                   },
                 ),
-                const SizedBox(height: 8),
+                spacing.vXs,
                 Text(
                   l10n.fertilizingTapIngredientHint,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
+                  style: typography.caption.copyWith(
+                    color: colors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 12),
+                spacing.vSm,
                 CheckboxListTile(
                   contentPadding: EdgeInsets.zero,
                   value: _saveMix,
@@ -678,21 +688,21 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                 if (_saveMix)
                   TextField(
                     controller: _mixNameController,
-                    decoration: InputDecoration(
+                    decoration: inputs.decoration(
                       labelText: l10n.fertilizingMixName,
                       hintText: l10n.fertilizingMixNameHint,
                     ),
                     onChanged: (_) => setState(() {}),
                   ),
               ],
-              const SizedBox(height: 20),
+              spacing.vLg,
               FilledButton(
                 onPressed: _canSave ? _save : null,
                 child: _saving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                    ? SizedBox(
+                        width: dimensions.iconLg,
+                        height: dimensions.iconLg,
+                        child: const CircularProgressIndicator(strokeWidth: 2),
                       )
                     : Text(l10n.commonSave),
               ),

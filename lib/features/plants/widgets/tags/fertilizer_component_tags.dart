@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/fertilizer_dose.dart';
 
 Future<FertilizerDose?> showFertilizerDoseDialog({
@@ -83,13 +83,16 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final dialogs = context.components.dialogs;
+    final spacing = context.spacing;
 
     return AlertDialog(
-      backgroundColor: AppColors.backgroundSecondary,
+      backgroundColor: dialogs.background,
       title: Text(
         widget.component,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
+        style: dialogs.titleStyle,
       ),
       content: SingleChildScrollView(
         child: Column(
@@ -112,7 +115,7 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
                 setState(() => _unit = value.first);
               },
             ),
-            const SizedBox(height: 16),
+            spacing.vMd,
             TextField(
               controller: _amountController,
               autofocus: true,
@@ -139,7 +142,7 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
       actionsAlignment: MainAxisAlignment.end,
       actionsOverflowAlignment: OverflowBarAlignment.end,
       actionsOverflowDirection: VerticalDirection.down,
-      actionsOverflowButtonSpacing: 8,
+      actionsOverflowButtonSpacing: spacing.xs,
       actions: [
         if (widget.initial != null)
           TextButton(
@@ -212,22 +215,30 @@ class FertilizerComponentTags extends StatelessWidget {
     onChanged(next);
   }
 
-  Widget _addButton(AppLocalizations l10n) {
+  Widget _addButton(BuildContext context, AppLocalizations l10n) {
+    final colors = context.colors;
+    final typography = context.typography;
+    final catalog = context.screens.catalogBuilder;
+    final spacing = context.spacing;
+    final dimensions = context.dimensions;
     return GestureDetector(
       onTap: onAddCustom,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: catalog.tagPadding,
         decoration: BoxDecoration(
-          color: AppColors.backgroundSecondary,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.sage),
+          color: colors.modal,
+          borderRadius: BorderRadius.circular(catalog.tagRadius),
+          border: Border.all(color: colors.outline),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.add, size: 16, color: AppColors.heading),
-            const SizedBox(width: 4),
-            Text(l10n.commonAdd, style: const TextStyle(color: AppColors.heading)),
+            Icon(Icons.add, size: dimensions.iconSm, color: colors.icon),
+            spacing.hXxs,
+            Text(
+              l10n.commonAdd,
+              style: typography.label.copyWith(color: colors.heading),
+            ),
           ],
         ),
       ),
@@ -237,6 +248,10 @@ class FertilizerComponentTags extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final catalog = context.screens.catalogBuilder;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -245,8 +260,8 @@ class FertilizerComponentTags extends StatelessWidget {
             : MediaQuery.sizeOf(context).width;
 
         return Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: spacing.xs,
+          runSpacing: spacing.xs,
           children: [
             ...availableComponents.map((name) {
               final selectedDose = _find(name);
@@ -258,17 +273,14 @@ class FertilizerComponentTags extends StatelessWidget {
                   constraints: BoxConstraints(maxWidth: chipMaxWidth),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 150),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: catalog.tagPadding,
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.goldAccent.withValues(alpha: 0.25)
-                          : AppColors.greenDeep,
-                      borderRadius: BorderRadius.circular(20),
+                          ? colors.primary.withValues(alpha: 0.25)
+                          : colors.outline,
+                      borderRadius: BorderRadius.circular(catalog.tagRadius),
                       border: Border.all(
-                        color: isSelected
-                            ? AppColors.goldAccent
-                            : AppColors.greenSoft,
+                        color: isSelected ? colors.primary : colors.divider,
                       ),
                     ),
                     child: Text(
@@ -277,10 +289,8 @@ class FertilizerComponentTags extends StatelessWidget {
                           : name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: isSelected
-                            ? AppColors.goldAccent
-                            : AppColors.textPrimary,
+                      style: typography.label.copyWith(
+                        color: isSelected ? colors.primary : colors.textPrimary,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.w400,
                       ),
@@ -289,7 +299,7 @@ class FertilizerComponentTags extends StatelessWidget {
                 ),
               );
             }),
-            if (onAddCustom != null) _addButton(l10n),
+            if (onAddCustom != null) _addButton(context, l10n),
           ],
         );
       },

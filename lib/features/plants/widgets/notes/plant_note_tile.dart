@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/note.dart';
 import '../../../../services/note_service.dart';
 import '../sheets/update_note_sheet.dart';
@@ -19,38 +19,38 @@ class PlantNoteTile extends StatelessWidget {
 
   Future<void> _deleteNote(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
+    final dialogs = context.components.dialogs;
+    final colors = context.colors;
+    final typography = context.typography;
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: AppColors.dark2,
+          backgroundColor: dialogs.background,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(dialogs.radius),
           ),
           title: Text(
             l10n.notesDeleteTitle,
-            style: const TextStyle(color: AppColors.textPrimary),
+            style: dialogs.titleStyle.copyWith(color: colors.textPrimary),
           ),
           content: Text(
             l10n.notesDeleteConfirm,
-            style: const TextStyle(color: AppColors.textSecondary),
+            style: dialogs.bodyStyle.copyWith(color: colors.textSecondary),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: Text(
                 l10n.commonCancel,
-                style: const TextStyle(color: AppColors.textSecondary),
+                style: typography.bodySmall,
               ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               child: Text(
                 l10n.commonDelete,
-                style: const TextStyle(
-                  color: Colors.redAccent,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: typography.error,
               ),
             ),
           ],
@@ -88,14 +88,18 @@ class PlantNoteTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final dimensions = context.dimensions;
     final date = _formatDate();
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: spacing.allMd,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: AppColors.dark2,
+        borderRadius: BorderRadius.circular(context.radii.md),
+        color: colors.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -107,54 +111,52 @@ class PlantNoteTile extends StatelessWidget {
                   date.isEmpty ? '—' : date,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: typography.caption.copyWith(
                     height: 1.2,
-                    color: AppColors.textSecondary,
+                    color: colors.textSecondary,
                   ),
                 ),
               ),
               SizedBox(
-                height: 20,
-                width: 28,
+                height: spacing.lg,
+                width: spacing.xxl,
                 child: IconButton(
                   tooltip: l10n.commonEdit,
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints.tightFor(
-                    width: 28,
-                    height: 20,
+                  constraints: BoxConstraints.tightFor(
+                    width: spacing.xxl,
+                    height: spacing.lg,
                   ),
                   visualDensity: VisualDensity.compact,
-                  iconSize: 16,
+                  iconSize: dimensions.iconSm,
                   icon: const Icon(Icons.edit_outlined),
                   onPressed: () => _editNote(context),
                 ),
               ),
               SizedBox(
-                height: 20,
-                width: 28,
+                height: spacing.lg,
+                width: spacing.xxl,
                 child: IconButton(
                   tooltip: l10n.commonDelete,
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints.tightFor(
-                    width: 28,
-                    height: 20,
+                  constraints: BoxConstraints.tightFor(
+                    width: spacing.xxl,
+                    height: spacing.lg,
                   ),
                   visualDensity: VisualDensity.compact,
-                  iconSize: 16,
+                  iconSize: dimensions.iconSm,
                   icon: const Icon(Icons.delete_outline),
                   onPressed: () => _deleteNote(context),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          spacing.vXs,
           Text(
             note.text,
-            style: const TextStyle(
-              fontSize: 15,
+            style: typography.bodyEmphasis.copyWith(
+              fontWeight: FontWeight.w400,
               height: 1.6,
-              color: AppColors.textPrimary,
             ),
           ),
         ],

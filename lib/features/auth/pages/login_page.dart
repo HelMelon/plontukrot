@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_theme.dart';
+import 'package:plontukrot/core/theme/theme_context.dart';
+
 import '../../../services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
@@ -26,16 +26,18 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context);
+      final colors = context.colors;
+      final typography = context.typography;
       final message = e is FirebaseAuthException &&
               e.code == 'google-id-token-null'
           ? l10n.authGoogleIdTokenMissing
           : l10n.authSignInError(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: AppColors.dark2,
+          backgroundColor: colors.card,
           content: Text(
             message,
-            style: const TextStyle(color: AppColors.textPrimary),
+            style: typography.bodyLarge,
           ),
         ),
       );
@@ -49,13 +51,18 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final dimensions = context.dimensions;
+    final typography = context.typography;
+    final loginTheme = context.screens.login;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: spacing.allXl,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -67,41 +74,35 @@ class _LoginPageState extends State<LoginPage> {
                     fit: BoxFit.cover,
                   ),
                 ),
-                const SizedBox(height: 42),
+                spacing.vXxxl,
                 Text(
                   l10n.appName,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: 'NordicStyle',
-                    fontSize: 38,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -1,
-                    color: AppColors.heading,
-                  ),
+                  style: loginTheme.brandStyle,
                 ),
-                const SizedBox(height: 14),
+                spacing.vMd,
                 Text(
                   l10n.brandTagline,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: typography.bodyLarge.copyWith(
+                    color: colors.textSecondary,
                     height: 1.5,
-                    color: AppColors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 54),
+                spacing.vXxxl,
+                spacing.vXl,
                 SizedBox(
                   width: double.infinity,
-                  height: AppTheme.buttonHeight,
+                  height: dimensions.buttonHeight,
                   child: ElevatedButton.icon(
                     onPressed: isLoading ? null : signIn,
                     icon: isLoading
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
+                        ? SizedBox(
+                            width: dimensions.iconLg,
+                            height: dimensions.iconLg,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: AppColors.dark1,
+                              color: colors.onPrimary,
                             ),
                           )
                         : const Icon(Icons.login),

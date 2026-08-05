@@ -3,7 +3,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../core/theme/app_colors.dart';
+import 'package:plontukrot/core/theme/theme_context.dart';
+
 import '../../../models/growth_event.dart';
 import '../../../models/plant.dart';
 import '../../../services/growth_event_service.dart';
@@ -52,9 +53,13 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
 
   Future<ImageSource?> selectImageSource() async {
     final l10n = AppLocalizations.of(context);
+    final sheets = context.components.sheets;
     return showModalBottomSheet<ImageSource>(
       context: context,
-      backgroundColor: AppColors.dark2,
+      backgroundColor: sheets.background,
+      shape: RoundedRectangleBorder(
+        borderRadius: sheets.topBorderRadius,
+      ),
       builder: (context) {
         return SafeArea(
           child: Column(
@@ -108,12 +113,14 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
     } catch (e) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context);
+      final colors = context.colors;
+      final typography = context.typography;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: AppColors.dark2,
+          backgroundColor: colors.card,
           content: Text(
             l10n.plantUploadError(e.toString()),
-            style: const TextStyle(color: AppColors.textPrimary),
+            style: typography.bodyLarge,
           ),
         ),
       );
@@ -244,6 +251,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
     required List<GrowthEvent> growthEvents,
     required bool isWide,
   }) {
+    final spacing = context.spacing;
     final displayCount = GrowthEvent.displayLeafCount(
       initialLeafCount: plant.initialLeafCount,
       events: growthEvents,
@@ -272,16 +280,16 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 12),
+                spacing.vSm,
                 counter,
               ],
             )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 12),
+                spacing.vSm,
                 counter,
-                const SizedBox(height: 16),
+                spacing.vMd,
                 infoCard,
               ],
             ),
@@ -302,12 +310,12 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                   isUploading: isUploading,
                   aspectRatio: 0.75,
                 ),
-                const SizedBox(height: 8),
+                spacing.vXs,
                 vineAndBelow,
               ],
             ),
           ),
-          const SizedBox(width: 20),
+          spacing.hLg,
           Expanded(flex: 5, child: infoCard),
         ],
       );
@@ -322,7 +330,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
           isUploading: isUploading,
           aspectRatio: 1.0,
         ),
-        const SizedBox(height: 8),
+        spacing.vXs,
         vineAndBelow,
       ],
     );
@@ -331,15 +339,20 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final plantDetailsTheme = context.screens.plantDetails;
+    final actionIconColor = plantDetailsTheme.actionIconColor;
 
     return StreamBuilder<Plant?>(
       stream: _plantStream,
       builder: (context, plantSnapshot) {
         if (!plantSnapshot.hasData || plantSnapshot.data == null) {
-          return const Scaffold(
+          return Scaffold(
             backgroundColor: Colors.transparent,
             body: Center(
-              child: CircularProgressIndicator(color: AppColors.goldAccent),
+              child: CircularProgressIndicator(color: colors.primary),
             ),
           );
         }
@@ -348,54 +361,49 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
         final title =
             plant.nickname.isNotEmpty ? plant.nickname : l10n.plantDefaultTitle;
         final isWideAppBar = MediaQuery.sizeOf(context).width >= 700;
-        final titleStyle = const TextStyle(
-          color: AppColors.heading,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        );
+        final titleStyle = typography.titleSmall;
 
         final actionButtons = <Widget>[
           IconButton(
             tooltip: l10n.watering,
             onPressed: _openWateringHistory,
-            icon: const Icon(Icons.water_drop_outlined,
-                color: AppColors.goldAccent),
+            icon: Icon(Icons.water_drop_outlined, color: actionIconColor),
           ),
           IconButton(
             tooltip: l10n.fertilizing,
             onPressed: _openFertilizing,
-            icon: const Icon(
+            icon: Icon(
               Icons.science_outlined,
-              color: AppColors.goldAccent,
+              color: actionIconColor,
             ),
           ),
           IconButton(
             tooltip: l10n.repotting,
             onPressed: _openRepotting,
-            icon: const HugeIcon(
+            icon: HugeIcon(
               icon: HugeIcons.strokeRoundedShovel,
-              color: AppColors.goldAccent,
+              color: actionIconColor,
             ),
           ),
           IconButton(
             tooltip: l10n.plantPropagation,
             onPressed: () => _openPropagation(plant),
-            icon: const HugeIcon(
+            icon: HugeIcon(
               icon: HugeIcons.strokeRoundedEcoLab01,
-              color: AppColors.goldAccent,
+              color: actionIconColor,
             ),
           ),
           IconButton(
             tooltip: l10n.commonEdit,
             onPressed: () => _openUpdatePlant(plant),
-            icon: const Icon(Icons.edit, color: AppColors.goldAccent),
+            icon: Icon(Icons.edit, color: actionIconColor),
           ),
           IconButton(
             tooltip: l10n.plantNote,
             onPressed: _openAddNote,
-            icon: const HugeIcon(
+            icon: HugeIcon(
               icon: HugeIcons.strokeRoundedNoteEdit,
-              color: AppColors.goldAccent,
+              color: actionIconColor,
             ),
           ),
         ];
@@ -417,7 +425,8 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
             bottom: isWideAppBar
                 ? null
                 : PreferredSize(
-                    preferredSize: const Size.fromHeight(48),
+                    preferredSize:
+                        Size.fromHeight(spacing.xxxl + spacing.md),
                     child: Row(
                       children: [
                         for (final button in actionButtons)
@@ -436,7 +445,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                   final isWide = constraints.maxWidth >= 700;
 
                   return SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(plantDetailsTheme.sectionGap),
                     child: Center(
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 1200),

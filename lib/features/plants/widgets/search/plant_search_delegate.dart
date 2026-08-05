@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/plant.dart';
 import '../../pages/plant_details_page.dart';
 
@@ -23,47 +23,50 @@ class PlantSearchDelegate extends SearchDelegate {
   @override
   ThemeData appBarTheme(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final colors = context.colors;
+    final radii = context.radii;
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final inputs = context.components.inputs;
     return theme.copyWith(
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.background,
+      appBarTheme: AppBarTheme(
+        backgroundColor: colors.screen,
         elevation: 0,
-        iconTheme: IconThemeData(color: AppColors.heading),
+        iconTheme: IconThemeData(color: colors.icon),
       ),
       inputDecorationTheme: InputDecorationTheme(
-        hintStyle: const TextStyle(
-          color: AppColors.textSecondary,
-          fontSize: 16,
+        hintStyle: typography.bodyLarge.copyWith(
+          color: colors.textSecondary,
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 12,
-          horizontal: 16,
+        contentPadding: EdgeInsets.symmetric(
+          vertical: spacing.sm,
+          horizontal: spacing.md,
         ),
         filled: true,
-        fillColor: AppColors.heading.withValues(alpha: 0.05),
+        fillColor: colors.heading.withValues(alpha: 0.05),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(radii.md),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(radii.md),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.goldAccent, width: 1.5),
+          borderRadius: BorderRadius.circular(radii.md),
+          borderSide: BorderSide(color: inputs.focusedBorder, width: 1.5),
         ),
       ),
       textTheme: theme.textTheme.copyWith(
-        titleLarge: const TextStyle(
-          color: AppColors.heading,
-          fontSize: 18,
+        titleLarge: typography.titleSmall.copyWith(
+          color: colors.heading,
           decorationThickness: 0,
         ),
       ),
-      textSelectionTheme: const TextSelectionThemeData(
-        cursorColor: AppColors.goldAccent,
-        selectionColor: AppColors.goldAccent,
-        selectionHandleColor: AppColors.goldAccent,
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: colors.primary,
+        selectionColor: colors.primary,
+        selectionHandleColor: colors.primary,
       ),
     );
   }
@@ -73,7 +76,7 @@ class PlantSearchDelegate extends SearchDelegate {
     return [
       if (query.isNotEmpty)
         IconButton(
-          icon: const Icon(Icons.clear, color: AppColors.heading),
+          icon: Icon(Icons.clear, color: context.colors.icon),
           onPressed: () => query = '',
         ),
     ];
@@ -82,7 +85,7 @@ class PlantSearchDelegate extends SearchDelegate {
   @override
   Widget? buildLeading(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.arrow_back, color: AppColors.heading),
+      icon: Icon(Icons.arrow_back, color: context.colors.icon),
       onPressed: () => close(context, null),
     );
   }
@@ -96,15 +99,20 @@ class PlantSearchDelegate extends SearchDelegate {
 
   Widget _buildSearchWithStream(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final radii = context.radii;
+    final typography = context.typography;
+    final dimensions = context.dimensions;
     final cleanQuery = query.trim().toLowerCase();
 
     return StreamBuilder<List<Plant>>(
       stream: plantsStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const ContainerWithBackground(
+          return ContainerWithBackground(
             child: Center(
-              child: CircularProgressIndicator(color: AppColors.goldAccent),
+              child: CircularProgressIndicator(color: colors.primary),
             ),
           );
         }
@@ -114,7 +122,7 @@ class PlantSearchDelegate extends SearchDelegate {
             child: Center(
               child: Text(
                 l10n.searchNoPlantsInJournal,
-                style: const TextStyle(color: AppColors.textPrimary),
+                style: typography.bodyLarge,
               ),
             ),
           );
@@ -139,7 +147,7 @@ class PlantSearchDelegate extends SearchDelegate {
             child: Center(
               child: Text(
                 l10n.searchNothingFound,
-                style: const TextStyle(color: AppColors.textPrimary),
+                style: typography.bodyLarge,
               ),
             ),
           );
@@ -182,33 +190,33 @@ class PlantSearchDelegate extends SearchDelegate {
                 subtitleText = null;
               }
               return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 6.0,
+                padding: EdgeInsets.symmetric(
+                  horizontal: spacing.md,
+                  vertical: spacing.xs - 2,
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppColors.heading.withValues(alpha: 0.04),
-                    borderRadius: BorderRadius.circular(14),
+                    color: colors.heading.withValues(alpha: 0.04),
+                    borderRadius: BorderRadius.circular(radii.md),
                     border: Border.all(
-                      color: AppColors.heading.withValues(alpha: 0.02),
+                      color: colors.heading.withValues(alpha: 0.02),
                       width: 1,
                     ),
                   ),
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8.0,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: spacing.md,
+                      vertical: spacing.xs,
                     ),
                     leading: Container(
-                      width: 40,
-                      height: 40,
+                      width: dimensions.avatar,
+                      height: dimensions.avatar,
                       decoration: BoxDecoration(
-                        color: AppColors.goldAccent.withValues(alpha: 0.12),
+                        color: colors.primary.withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(radii.pill),
                         child: () {
                           final String? imageUrl = plant.listImageUrl;
 
@@ -216,23 +224,23 @@ class PlantSearchDelegate extends SearchDelegate {
                             return CachedNetworkImage(
                               imageUrl: imageUrl,
                               fit: BoxFit.cover,
-                              width: 40,
-                              height: 40,
+                              width: dimensions.avatar,
+                              height: dimensions.avatar,
                               memCacheWidth: 80,
                               memCacheHeight: 80,
-                              errorWidget: (context, url, error) => const Icon(
+                              errorWidget: (context, url, error) => Icon(
                                 Icons.local_florist,
-                                color: AppColors.goldAccent,
-                                size: 22,
+                                color: colors.icon,
+                                size: dimensions.iconXl,
                               ),
-                              placeholder: (context, url) => const Center(
+                              placeholder: (context, url) => Center(
                                 child: SizedBox(
-                                  width: 16,
-                                  height: 16,
+                                  width: dimensions.iconSm,
+                                  height: dimensions.iconSm,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      AppColors.goldAccent,
+                                      colors.primary,
                                     ),
                                   ),
                                 ),
@@ -240,10 +248,10 @@ class PlantSearchDelegate extends SearchDelegate {
                             );
                           }
 
-                          return const Icon(
+                          return Icon(
                             Icons.local_florist,
-                            color: AppColors.goldAccent,
-                            size: 22,
+                            color: colors.primary,
+                            size: dimensions.iconXl,
                           );
                         }(),
                       ),
@@ -252,31 +260,29 @@ class PlantSearchDelegate extends SearchDelegate {
                       titleText,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppColors.heading,
-                        fontSize: 16,
+                      style: typography.bodyLarge.copyWith(
+                        color: colors.heading,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     subtitle: subtitleText != null
                         ? Padding(
-                            padding: const EdgeInsets.only(top: 4.0),
+                            padding: EdgeInsets.only(top: spacing.xxs),
                             child: Text(
                               subtitleText,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 13,
+                              style: typography.bodySmall.copyWith(
+                                color: colors.textSecondary,
                                 fontStyle: FontStyle.italic,
                               ),
                             ),
                           )
                         : null,
-                    trailing: const Icon(
+                    trailing: Icon(
                       Icons.chevron_right,
-                      color: AppColors.textSecondary,
-                      size: 20,
+                      color: colors.textSecondary,
+                      size: dimensions.iconLg,
                     ),
                     onTap: () {
                       Navigator.push(
@@ -306,7 +312,7 @@ class ContainerWithBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.background,
+      color: context.colors.screen,
       width: double.infinity,
       height: double.infinity,
       child: child,

@@ -3,7 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_context.dart';
 
 /// Snake vine under the plant photo.
 ///
@@ -12,8 +13,6 @@ import '../../../../core/theme/app_colors.dart';
 /// max 8 per row, alternating above/below, snake wrap with rounded U-turns.
 class PlantVineStrip extends StatelessWidget {
   static const int maxLeavesPerRow = 8;
-  static const double leafSize = 30;
-  static const double rowHeight = 56;
   static const double overflowOpacity = 0.32;
 
   final int leafCount;
@@ -29,6 +28,7 @@ class PlantVineStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final rowHeight = context.screens.growth.rowHeight;
     final count = leafCount < 0 ? 0 : leafCount;
     final rows =
         count == 0 ? 1 : ((count + maxLeavesPerRow - 1) ~/ maxLeavesPerRow);
@@ -96,6 +96,9 @@ class _VineRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final growth = context.screens.growth;
+    final colors = context.colors;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final cellW = constraints.maxWidth / PlantVineStrip.maxLeavesPerRow;
@@ -124,6 +127,10 @@ class _VineRow extends StatelessWidget {
                 absoluteIndex: leafStartIndex + j,
                 positionInRow: j,
                 cellWidth: cellW,
+                leafSize: growth.leafSize,
+                rowHeight: growth.rowHeight,
+                freshColor: colors.primary,
+                staleColor: colors.icon,
               ),
           ],
         );
@@ -135,6 +142,10 @@ class _VineRow extends StatelessWidget {
     required int absoluteIndex,
     required int positionInRow,
     required double cellWidth,
+    required double leafSize,
+    required double rowHeight,
+    required Color freshColor,
+    required Color staleColor,
   }) {
     final column = _rtl
         ? (PlantVineStrip.maxLeavesPerRow - 1 - positionInRow)
@@ -143,14 +154,14 @@ class _VineRow extends StatelessWidget {
     final isFresh = absoluteIndex >= leafStartIndex + leafCountInRow - 2;
 
     return Positioned(
-      left: column * cellWidth + (cellWidth - PlantVineStrip.leafSize) / 2,
-      top: above ? 2 : PlantVineStrip.rowHeight - PlantVineStrip.leafSize - 2,
+      left: column * cellWidth + (cellWidth - leafSize) / 2,
+      top: above ? 2 : rowHeight - leafSize - 2,
       child: Transform.flip(
         flipY: !above,
         child: HugeIcon(
           icon: HugeIcons.strokeRoundedLeaf01,
-          size: PlantVineStrip.leafSize,
-          color: isFresh ? AppColors.goldAccent : AppColors.accentLight,
+          size: leafSize,
+          color: isFresh ? freshColor : staleColor,
           strokeWidth: 1.8,
         ),
       ),
@@ -178,7 +189,7 @@ class _SnakeStemPainter extends CustomPainter {
     if (size.width <= 0 || size.height <= 0) return;
 
     final paint = Paint()
-      ..color = AppColors.textPrimary
+      ..color = AppTheme.colors.textPrimary
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.6
       ..strokeCap = StrokeCap.round

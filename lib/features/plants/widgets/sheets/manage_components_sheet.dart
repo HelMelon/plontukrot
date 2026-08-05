@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../core/widgets/prompt_text_dialog.dart';
 import '../../../../models/catalog_component.dart';
 import '../../../../services/component_service.dart';
@@ -64,7 +64,7 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: AppColors.backgroundSecondary,
+          backgroundColor: context.colors.modal,
           title: Text(l10n.componentDeleteTitle),
           content: Text(l10n.catalogItemDeleteConfirm(component.name)),
           actions: [
@@ -89,22 +89,25 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final spacing = context.spacing;
+    final sheets = context.components.sheets;
+    final typography = context.typography;
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: spacing.allLg,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 40,
-              height: 4,
+              width: sheets.handleWidth,
+              height: sheets.handleHeight,
               decoration: BoxDecoration(
-                color: Colors.grey.shade400,
-                borderRadius: BorderRadius.circular(99),
+                color: sheets.handleColor,
+                borderRadius: BorderRadius.circular(sheets.handleRadius),
               ),
             ),
-            const SizedBox(height: 16),
+            spacing.vMd,
             Row(
               children: [
                 Expanded(
@@ -112,13 +115,10 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
                     l10n.soilComponentsTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: typography.titleMedium,
                   ),
                 ),
-                const SizedBox(width: 8),
+                spacing.hXs,
                 FilledButton.icon(
                   onPressed: _add,
                   icon: const Icon(Icons.add),
@@ -126,7 +126,7 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            spacing.vSm,
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.45,
               child: StreamBuilder<List<CatalogComponent>>(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/component.dart';
 
 String formatParts(double parts) {
@@ -56,11 +56,14 @@ class SoilComponentTags extends StatelessWidget {
 
     if (existing == null) {
       next.add(SoilComponent(component: name, parts: 0.5));
-    } else if (existing.parts > 0.5) {
-      final index = next.indexWhere((c) => c.component == name);
-      next[index] = SoilComponent(component: name, parts: 0.5);
     } else {
-      next.removeWhere((c) => c.component == name);
+      final nextParts = existing.parts - 1;
+      if (nextParts < 0.5) {
+        next.removeWhere((c) => c.component == name);
+      } else {
+        final index = next.indexWhere((c) => c.component == name);
+        next[index] = SoilComponent(component: name, parts: nextParts);
+      }
     }
 
     onChanged(next);
@@ -69,6 +72,11 @@ class SoilComponentTags extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final catalog = context.screens.catalogBuilder;
+    final dimensions = context.dimensions;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -77,8 +85,8 @@ class SoilComponentTags extends StatelessWidget {
             : MediaQuery.sizeOf(context).width;
 
         return Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: spacing.xs,
+          runSpacing: spacing.xs,
           children: [
             ...availableComponents.map((name) {
               final selectedComponent = _find(name);
@@ -91,17 +99,14 @@ class SoilComponentTags extends StatelessWidget {
                   constraints: BoxConstraints(maxWidth: chipMaxWidth),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 150),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: catalog.tagPadding,
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.goldAccent.withValues(alpha: 0.25)
-                          : AppColors.greenDeep,
-                      borderRadius: BorderRadius.circular(20),
+                          ? colors.primary.withValues(alpha: 0.25)
+                          : colors.outline,
+                      borderRadius: BorderRadius.circular(catalog.tagRadius),
                       border: Border.all(
-                        color: isSelected
-                            ? AppColors.goldAccent
-                            : AppColors.greenSoft,
+                        color: isSelected ? colors.primary : colors.divider,
                       ),
                     ),
                     child: Text(
@@ -110,10 +115,8 @@ class SoilComponentTags extends StatelessWidget {
                           : name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: isSelected
-                            ? AppColors.goldAccent
-                            : AppColors.textPrimary,
+                      style: typography.label.copyWith(
+                        color: isSelected ? colors.primary : colors.textPrimary,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.w400,
                       ),
@@ -126,21 +129,24 @@ class SoilComponentTags extends StatelessWidget {
               GestureDetector(
                 onTap: onAddCustom,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: catalog.tagPadding,
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundSecondary,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.sage),
+                    color: colors.modal,
+                    borderRadius: BorderRadius.circular(catalog.tagRadius),
+                    border: Border.all(color: colors.outline),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.add, size: 16, color: AppColors.heading),
-                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.add,
+                        size: dimensions.iconSm,
+                        color: colors.icon,
+                      ),
+                      spacing.hXxs,
                       Text(
                         l10n.commonAdd,
-                        style: const TextStyle(color: AppColors.heading),
+                        style: typography.label.copyWith(color: colors.heading),
                       ),
                     ],
                   ),

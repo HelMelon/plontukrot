@@ -75,7 +75,7 @@ lib/
 ├── core/
 │   ├── l10n/app_localizations_x.dart
 │   ├── locale/app_locale_controller.dart
-│   ├── theme/app_colors.dart, app_theme.dart
+│   ├── theme/ (AppTheme, tokens, components, screens)
 │   └── widgets/prompt_text_dialog.dart
 ├── features/
 │   ├── auth/pages/
@@ -407,7 +407,7 @@ Do not introduce repositories unless there is a demonstrated need and an approve
 ### Shared UI
 
 - `core/widgets/prompt_text_dialog.dart` — generic text prompt only.
-- Theme: `AppTheme.darkTheme`, colors from `AppColors` only.
+- Theme: `AppTheme.theme` + `ThemeExtension` tokens; UI reads `context.colors` / spacing / radii / typography (see ADR-007).
 - Brand font: `NordicStyle` (SKÖRD).
 
 ### Logic placement

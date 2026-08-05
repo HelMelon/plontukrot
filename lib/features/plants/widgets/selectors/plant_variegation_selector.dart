@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/variegation.dart';
 
 class PlantVariegationSelector extends StatelessWidget {
@@ -18,35 +18,25 @@ class PlantVariegationSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final inputs = context.components.inputs;
 
     return DropdownButtonFormField<Variegation>(
       key: ValueKey(selected),
       initialValue: selected,
       isExpanded: true,
-      dropdownColor: AppColors.dark2,
-      style: const TextStyle(color: AppColors.textPrimary),
-      decoration: InputDecoration(
-        labelText: l10n.variegationLabel,
-        labelStyle: const TextStyle(color: AppColors.textSecondary),
-        filled: true,
-        fillColor: AppColors.dark2,
-        prefixIcon: Icon(selected.icon, color: selected.iconColor),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: AppColors.greenDeep),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(
-            color: AppColors.goldAccent,
-            width: 1.5,
+      dropdownColor: colors.card,
+      style: inputs.textStyle.copyWith(color: colors.textPrimary),
+      decoration: inputs
+          .decoration(
+            labelText: l10n.variegationLabel,
+            prefixIcon: Icon(selected.icon, color: selected.iconColor),
+          )
+          .copyWith(
+            labelStyle: inputs.labelStyle.copyWith(
+              color: colors.textSecondary,
+            ),
           ),
-        ),
-      ),
       items: Variegation.values
           .map(
             (item) => DropdownMenuItem(

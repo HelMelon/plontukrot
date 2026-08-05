@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_context.dart';
 import '../../../../models/fertilizer.dart';
 import '../../../../models/fertilizer_dose.dart';
 import '../../../../services/fertilize_service.dart';
@@ -73,7 +73,7 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: AppColors.backgroundSecondary,
+          backgroundColor: context.colors.modal,
           title: Text(l10n.fertilizerDeleteTitle),
           content: Text(l10n.catalogItemDeleteConfirm(fertilizer.name)),
           actions: [
@@ -98,22 +98,26 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final sheets = context.components.sheets;
+    final typography = context.typography;
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: spacing.allLg,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 40,
-              height: 4,
+              width: sheets.handleWidth,
+              height: sheets.handleHeight,
               decoration: BoxDecoration(
-                color: Colors.grey.shade400,
-                borderRadius: BorderRadius.circular(99),
+                color: sheets.handleColor,
+                borderRadius: BorderRadius.circular(sheets.handleRadius),
               ),
             ),
-            const SizedBox(height: 16),
+            spacing.vMd,
             Row(
               children: [
                 Expanded(
@@ -121,13 +125,10 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
                     l10n.manageFertilizersTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: typography.titleMedium,
                   ),
                 ),
-                const SizedBox(width: 8),
+                spacing.hXs,
                 FilledButton.icon(
                   onPressed: _addPurchased,
                   icon: const Icon(Icons.add),
@@ -135,20 +136,17 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            spacing.vXs,
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 l10n.manageFertilizersHint,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                ),
+                style: typography.caption.copyWith(color: colors.textSecondary),
               ),
             ),
-            const SizedBox(height: 12),
+            spacing.vSm,
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.45,
               child: StreamBuilder<List<Fertilizer>>(
@@ -347,9 +345,12 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
     final l10n = AppLocalizations.of(context);
     final isPurchased = _kind == FertilizerKind.purchased;
     final showSimpleDose = isPurchased || widget.initialComponents.length <= 1;
+    final spacing = context.spacing;
+    final inputs = context.components.inputs;
+    final typography = context.typography;
 
     return AlertDialog(
-      backgroundColor: AppColors.backgroundSecondary,
+      backgroundColor: context.colors.modal,
       title: Text(widget.title),
       content: SingleChildScrollView(
         child: Column(
@@ -363,20 +364,21 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
               onChanged: (_) {
                 if (_nameError != null) setState(() => _nameError = null);
               },
-              decoration: InputDecoration(
-                labelText: l10n.fertilizerNameLabel,
-                hintText: isPurchased
-                    ? l10n.fertilizerNameHint
-                    : l10n.fertilizingMixNameHint,
-                errorText: _nameError,
-              ),
+              decoration: inputs
+                  .decoration(
+                    labelText: l10n.fertilizerNameLabel,
+                    hintText: isPurchased
+                        ? l10n.fertilizerNameHint
+                        : l10n.fertilizingMixNameHint,
+                  )
+                  .copyWith(errorText: _nameError),
             ),
-            const SizedBox(height: 16),
+            spacing.vMd,
             Text(
               l10n.fertilizerKindSection,
-              style: const TextStyle(fontWeight: FontWeight.w600),
+              style: typography.label.copyWith(fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 8),
+            spacing.vXs,
             SegmentedButton<FertilizerKind>(
               segments: [
                 ButtonSegment(
@@ -393,12 +395,12 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
                 setState(() => _kind = value.first);
               },
             ),
-            const SizedBox(height: 16),
+            spacing.vMd,
             Text(
               l10n.fertilizerWaterForDilution,
-              style: const TextStyle(fontWeight: FontWeight.w600),
+              style: typography.label.copyWith(fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 8),
+            spacing.vXs,
             SegmentedButton<int>(
               segments: [
                 for (final ml in kWaterVolumesMl)
@@ -413,7 +415,7 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
               },
             ),
             if (showSimpleDose) ...[
-              const SizedBox(height: 16),
+              spacing.vMd,
               SegmentedButton<FertilizerDoseUnit>(
                 segments: [
                   ButtonSegment(
@@ -430,7 +432,7 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
                   setState(() => _doseUnit = value.first);
                 },
               ),
-              const SizedBox(height: 12),
+              spacing.vSm,
               TextField(
                 controller: _doseController,
                 keyboardType: const TextInputType.numberWithOptions(
@@ -439,7 +441,7 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
                 ],
-                decoration: InputDecoration(
+                decoration: inputs.decoration(
                   labelText: isPurchased
                       ? l10n.fertilizerDoseOnWaterOptional(_waterMl)
                       : l10n.fertilizerDoseOptional,
@@ -447,17 +449,14 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
                 ),
               ),
             ] else ...[
-              const SizedBox(height: 12),
+              spacing.vSm,
               Text(
                 l10n.fertilizerMixComposition(
                   widget.initialComponents
                       .map((c) => l10n.fertilizerDoseLabel(c))
                       .join(', '),
                 ),
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                ),
+                style: typography.bodySmall,
               ),
             ],
           ],

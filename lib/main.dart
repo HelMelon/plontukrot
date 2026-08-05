@@ -7,6 +7,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import 'core/locale/app_locale_controller.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_context.dart';
 import 'features/auth/pages/login_page.dart';
 import 'features/home/pages/home_page.dart';
 import 'features/splash/pages/splash_flow.dart';
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
         final localeOverride = AppLocaleController.instance.localeOverride;
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          theme: AppTheme.darkTheme,
+          theme: AppTheme.theme,
           locale: localeOverride,
           supportedLocales: AppLocalizations.supportedLocales,
           localeResolutionCallback: AppLocaleController.resolveLocale,
@@ -152,9 +153,12 @@ class AuthGate extends StatelessWidget {
       stream: AuthService().watchAuthState(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
+          final colors = context.colors;
+          return Scaffold(
             backgroundColor: Colors.transparent,
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(
+              child: CircularProgressIndicator(color: colors.primary),
+            ),
           );
         }
 

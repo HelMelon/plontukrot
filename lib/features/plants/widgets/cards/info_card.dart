@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+
+import '../../../../core/theme/theme_context.dart';
 
 class InfoCard extends StatelessWidget {
   final Widget? icon;
@@ -17,42 +18,52 @@ class InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final radii = context.radii;
+    final spacing = context.spacing;
+    final typography = context.typography;
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(radii.md),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.dark2,
-          borderRadius: BorderRadius.circular(16),
+        padding: EdgeInsets.symmetric(
+          horizontal: spacing.sm,
+          vertical: spacing.sm,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        decoration: BoxDecoration(
+          color: colors.card,
+          borderRadius: BorderRadius.circular(radii.md),
+        ),
+        child: Row(
           children: [
-            icon ?? const SizedBox(),
-            const SizedBox(height: 6),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.heading,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.textSecondary,
-                height: 1.25,
+            if (icon != null) ...[
+              icon!,
+              SizedBox(width: spacing.sm),
+            ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: typography.caption.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colors.heading,
+                    ),
+                  ),
+                  spacing.vXxs,
+                  Text(
+                    value,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: typography.captionSmall,
+                  ),
+                ],
               ),
             ),
           ],
