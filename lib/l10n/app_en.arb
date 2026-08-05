@@ -183,6 +183,14 @@
       "error": {"type": "String"}
     }
   },
+  "plantCropTitle": "Crop photo",
+  "plantCropConfirm": "Done",
+  "plantCropError": "Crop error: {error}",
+  "@plantCropError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "plantEmptyStage": "No plants of this stage in the collection yet",
   "plantEmptyGenus": "No plants of this genus in the collection yet",
   "plantNote": "Note",

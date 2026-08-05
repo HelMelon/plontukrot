@@ -22,6 +22,7 @@ import '../widgets/cards/plant_info_card.dart';
 import '../widgets/growth/plant_leaf_counter.dart';
 import '../widgets/growth/plant_vine_painter.dart';
 import '../widgets/growth/leaf_removal_reason_sheet.dart';
+import 'plant_image_crop_page.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 class PlantDetailsPage extends StatefulWidget {
@@ -96,13 +97,22 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
 
     if (pickedFile == null) return;
 
+    final Uint8List sourceBytes = await pickedFile.readAsBytes();
+    if (!mounted) return;
+
+    final Uint8List? croppedBytes = await Navigator.of(context).push<Uint8List>(
+      MaterialPageRoute(
+        builder: (_) => PlantImageCropPage(imageBytes: sourceBytes),
+      ),
+    );
+
+    if (croppedBytes == null) return;
+
     setState(() => isUploading = true);
 
     try {
-      final Uint8List imageBytes = await pickedFile.readAsBytes();
-
       final upload = await StorageService().uploadPlantImages(
-        imageBytes: imageBytes,
+        imageBytes: croppedBytes,
         plantId: widget.plantId,
       );
 

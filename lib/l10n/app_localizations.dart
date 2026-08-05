@@ -816,6 +816,24 @@ abstract class AppLocalizations {
   /// **'Upload error: {error}'**
   String plantUploadError(String error);
 
+  /// No description provided for @plantCropTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop photo'**
+  String get plantCropTitle;
+
+  /// No description provided for @plantCropConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get plantCropConfirm;
+
+  /// No description provided for @plantCropError.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop error: {error}'**
+  String plantCropError(String error);
+
   /// No description provided for @plantEmptyStage.
   ///
   /// In en, this message translates to:

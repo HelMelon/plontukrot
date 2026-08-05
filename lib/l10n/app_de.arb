@@ -128,6 +128,14 @@
   "plantGallery": "Galerie",
   "plantCamera": "Kamera",
   "plantUploadError": "Upload-Fehler: {error}",
+  "plantCropTitle": "Zuschneiden",
+  "plantCropConfirm": "Fertig",
+  "plantCropError": "Zuschneidefehler: {error}",
+  "@plantCropError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "plantEmptyStage": "Noch keine Pflanzen dieses Stadiums in der Sammlung",
   "plantEmptyGenus": "Noch keine Pflanzen dieser Gattung in der Sammlung",
   "plantNote": "Notiz",

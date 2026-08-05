@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:plontukrot/features/plants/widgets/cards/placeholder_widget.dart';
 
 import '../../../../core/theme/theme_context.dart';
@@ -53,16 +54,56 @@ class PlantImageCard extends StatelessWidget {
                   child: PlaceholderWithIcon(),
                 ),
               if (isUploading)
-                Container(
+                ColoredBox(
                   color: colors.screen.withValues(alpha: 0.45),
-                  child: const Align(
-                    alignment: Alignment.topCenter,
-                    child: CircularProgressIndicator(),
-                  ),
+                  child: const Center(child: _PlantImageUploadSpinner()),
                 ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _PlantImageUploadSpinner extends StatefulWidget {
+  const _PlantImageUploadSpinner();
+
+  @override
+  State<_PlantImageUploadSpinner> createState() =>
+      _PlantImageUploadSpinnerState();
+}
+
+class _PlantImageUploadSpinnerState extends State<_PlantImageUploadSpinner>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final size = context.dimensions.photoPlaceholder;
+
+    return RotationTransition(
+      turns: _controller,
+      child: HugeIcon(
+        icon: HugeIcons.strokeRoundedLaurelWreath01,
+        color: colors.icon,
+        size: size,
       ),
     );
   }

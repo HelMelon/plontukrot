@@ -400,6 +400,17 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get plantCropTitle => 'Recadrage';
+
+  @override
+  String get plantCropConfirm => 'Terminé';
+
+  @override
+  String plantCropError(String error) {
+    return 'Erreur de recadrage : $error';
+  }
+
+  @override
   String get plantEmptyStage =>
       'Aucune plante de ce stade dans la collection pour le moment';
 

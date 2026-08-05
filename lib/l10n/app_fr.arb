@@ -128,6 +128,14 @@
   "plantGallery": "Galerie",
   "plantCamera": "Appareil photo",
   "plantUploadError": "Erreur de téléversement : {error}",
+  "plantCropTitle": "Recadrage",
+  "plantCropConfirm": "Terminé",
+  "plantCropError": "Erreur de recadrage : {error}",
+  "@plantCropError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "plantEmptyStage": "Aucune plante de ce stade dans la collection pour le moment",
   "plantEmptyGenus": "Aucune plante de ce genre dans la collection pour le moment",
   "plantNote": "Note",

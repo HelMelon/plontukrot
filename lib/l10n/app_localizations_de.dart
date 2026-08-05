@@ -398,6 +398,17 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get plantCropTitle => 'Zuschneiden';
+
+  @override
+  String get plantCropConfirm => 'Fertig';
+
+  @override
+  String plantCropError(String error) {
+    return 'Zuschneidefehler: $error';
+  }
+
+  @override
   String get plantEmptyStage =>
       'Noch keine Pflanzen dieses Stadiums in der Sammlung';
 

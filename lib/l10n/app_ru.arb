@@ -128,6 +128,14 @@
   "plantGallery": "Галерея",
   "plantCamera": "Камера",
   "plantUploadError": "Ошибка загрузки: {error}",
+  "plantCropTitle": "Кадрирование",
+  "plantCropConfirm": "Готово",
+  "plantCropError": "Ошибка кадрирования: {error}",
+  "@plantCropError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "plantEmptyStage": "Растений этой стадии в коллекции пока нет",
   "plantEmptyGenus": "Растений этого рода в коллекции пока нет",
   "plantNote": "Заметка",

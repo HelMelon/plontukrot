@@ -397,6 +397,17 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get plantCropTitle => 'Кадрирование';
+
+  @override
+  String get plantCropConfirm => 'Готово';
+
+  @override
+  String plantCropError(String error) {
+    return 'Ошибка кадрирования: $error';
+  }
+
+  @override
   String get plantEmptyStage => 'Растений этой стадии в коллекции пока нет';
 
   @override

@@ -396,6 +396,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get plantCropTitle => 'Crop photo';
+
+  @override
+  String get plantCropConfirm => 'Done';
+
+  @override
+  String plantCropError(String error) {
+    return 'Crop error: $error';
+  }
+
+  @override
   String get plantEmptyStage => 'No plants of this stage in the collection yet';
 
   @override
