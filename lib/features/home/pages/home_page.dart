@@ -1163,6 +1163,7 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 if (!_isSelectionMode)
                                   Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Flexible(
                                         child: Wrap(
@@ -1271,7 +1272,7 @@ class _HomePageState extends State<HomePage> {
                                       spacing.hXs,
                                       Flexible(
                                         child: Align(
-                                          alignment: Alignment.centerRight,
+                                          alignment: Alignment.topRight,
                                           child:
                                               PopupMenuButton<_PlantSortField>(
                                             tooltip: l10n.homeSort,
