@@ -84,7 +84,10 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _userDocumentExistsStream = FirestoreService().watchUserDocumentExists();
-    _plantsStream = PlantService().getPlants().asBroadcastStream();
+    // Single-subscription stream for this page only. Search / genus / stage
+    // open their own PlantService().getPlants() listeners — sharing a
+    // broadcast without per-listener replay left them on an infinite spinner.
+    _plantsStream = PlantService().getPlants();
     _activeParentPlantIdsStream =
         PropagationService().watchActiveParentPlantIds();
   }
@@ -413,10 +416,7 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => PlantGenusDetailsPage(
-          genus: genus,
-          plantsStream: _plantsStream,
-        ),
+        builder: (_) => PlantGenusDetailsPage(genus: genus),
       ),
     );
   }
@@ -425,10 +425,7 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => PlantStageDetailsPage(
-          stage: stage,
-          plantsStream: _plantsStream,
-        ),
+        builder: (_) => PlantStageDetailsPage(stage: stage),
       ),
     );
   }
@@ -825,8 +822,6 @@ class _HomePageState extends State<HomePage> {
           showSearch(
             context: context,
             delegate: PlantSearchDelegate(
-              userId: widget.user.uid,
-              plantsStream: _plantsStream,
               searchFieldLabel: l10n.homeSearchHint,
             ),
           );

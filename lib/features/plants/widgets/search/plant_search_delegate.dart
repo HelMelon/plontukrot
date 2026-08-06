@@ -1,24 +1,62 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/plant.dart';
+import '../../../../services/plant_service.dart';
 import '../../pages/plant_details_page.dart';
 
 class PlantSearchDelegate extends SearchDelegate {
-  final String userId;
-  final Stream<List<Plant>> plantsStream;
   final String _searchFieldLabel;
+  final StreamController<List<Plant>> _plantsController =
+      StreamController<List<Plant>>.broadcast();
+  late final StreamSubscription<List<Plant>> _plantsSubscription;
+  List<Plant>? _latestPlants;
 
   PlantSearchDelegate({
-    required this.userId,
-    required this.plantsStream,
     required String searchFieldLabel,
-  }) : _searchFieldLabel = searchFieldLabel;
+  }) : _searchFieldLabel = searchFieldLabel {
+    // Keep one Firestore subscription for the whole search session.
+    // StreamBuilders in suggestions/results only listen to the broadcast
+    // controller, which replays the latest list when they (re)attach.
+    _plantsController.onListen = _replayLatest;
+    _plantsSubscription = PlantService().getPlants().listen(
+      _onPlants,
+      onError: _plantsController.addError,
+    );
+  }
+
+  void _onPlants(List<Plant> plants) {
+    _latestPlants = plants;
+    if (!_plantsController.isClosed) {
+      _plantsController.add(plants);
+    }
+  }
+
+  void _replayLatest() {
+    final latest = _latestPlants;
+    if (latest == null || _plantsController.isClosed) return;
+    scheduleMicrotask(() {
+      if (!_plantsController.isClosed) {
+        _plantsController.add(latest);
+      }
+    });
+  }
 
   @override
   String get searchFieldLabel => _searchFieldLabel;
+
+  @override
+  void close(BuildContext context, covariant Object? result) {
+    _plantsSubscription.cancel();
+    if (!_plantsController.isClosed) {
+      _plantsController.close();
+    }
+    super.close(context, result);
+  }
 
   @override
   ThemeData appBarTheme(BuildContext context) {
@@ -107,9 +145,25 @@ class PlantSearchDelegate extends SearchDelegate {
     final cleanQuery = query.trim().toLowerCase();
 
     return StreamBuilder<List<Plant>>(
-      stream: plantsStream,
+      stream: _plantsController.stream,
+      initialData: _latestPlants,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (snapshot.hasData) {
+          _latestPlants = snapshot.data;
+        }
+
+        if (!snapshot.hasData) {
+          if (snapshot.hasError) {
+            return ContainerWithBackground(
+              child: Center(
+                child: Text(
+                  l10n.commonError(snapshot.error.toString()),
+                  style: typography.bodyLarge,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
           return ContainerWithBackground(
             child: Center(
               child: CircularProgressIndicator(color: colors.primary),
@@ -117,7 +171,7 @@ class PlantSearchDelegate extends SearchDelegate {
           );
         }
 
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        if (snapshot.data!.isEmpty) {
           return ContainerWithBackground(
             child: Center(
               child: Text(

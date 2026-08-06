@@ -117,6 +117,8 @@ class Plant {
         imageUrl: full,
         imageThumbUrl:
             (thumb != null && thumb.isNotEmpty) ? thumb : full,
+        // Not a real upload time — cover may have been replaced long after
+        // plant creation. UI hides the date for legacy photos.
         addedAt: createdAt ?? DateTime.fromMillisecondsSinceEpoch(0),
       ),
     ];
@@ -144,9 +146,10 @@ class Plant {
         .map((e) => PlantPhoto.fromMap(Map<String, dynamic>.from(e)))
         .where((p) => p.id.isNotEmpty && p.imageUrl.isNotEmpty)
         .toList();
-    photos.sort((a, b) => a.addedAt.compareTo(b.addedAt));
+    // Newest first so details PageView opens on the latest photo.
+    photos.sort((a, b) => b.addedAt.compareTo(a.addedAt));
     if (photos.length <= maxGalleryPhotos) return photos;
-    return photos.sublist(photos.length - maxGalleryPhotos);
+    return photos.sublist(0, maxGalleryPhotos);
   }
 
   factory Plant.fromMap(String id, Map<String, dynamic> data) {

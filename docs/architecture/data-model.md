@@ -104,7 +104,7 @@ Always trim user strings in **services** before write when the neighbor methods 
 3. Writes: either `model.toMap()` or hand-built `Map` in the service method.
 4. IDs: document id is model `id`; not stored as a field inside the map unless needed.
 
-Images: plant gallery is `images: [{ id, imageUrl, imageThumbUrl, addedAt }]` (max 5). Cover fields `imageUrl` / `imageThumbUrl` stay in sync with the newest photo for lists (`Plant.listImageUrl`). Legacy plants with only cover fields are exposed via `Plant.galleryPhotos` without a batch migration.
+Images: plant gallery is `images: [{ id, imageUrl, imageThumbUrl, addedAt }]` (max 5, **newest first** by `addedAt`). Cover fields `imageUrl` / `imageThumbUrl` stay in sync with the newest photo for lists (`Plant.listImageUrl`). Legacy plants with only cover fields are exposed via `Plant.galleryPhotos` without a batch migration; the date chip is hidden for synthetic `legacy` photos.
 
 ---
 

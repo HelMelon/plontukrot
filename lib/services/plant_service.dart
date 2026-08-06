@@ -316,7 +316,7 @@ class PlantService {
     });
   }
 
-  /// Appends a gallery photo. If the plant already has
+  /// Prepends a gallery photo (newest first). If the plant already has
   /// [Plant.maxGalleryPhotos], the oldest photo is deleted first.
   Future<void> addPlantPhoto({
     required String plantId,
@@ -335,10 +335,11 @@ class PlantService {
     final evicted = <PlantPhoto>[];
 
     while (photos.length >= Plant.maxGalleryPhotos) {
-      evicted.add(photos.removeAt(0));
+      evicted.add(photos.removeLast());
     }
 
-    photos.add(
+    photos.insert(
+      0,
       PlantPhoto(
         id: photoId,
         imageUrl: imageUrl,
@@ -384,7 +385,7 @@ class PlantService {
         'imageThumbUrl': null,
       };
     }
-    final newest = photos.last;
+    final newest = photos.first;
     return {
       'images': photos.map((p) => p.toMap()).toList(),
       'imageUrl': newest.imageUrl,

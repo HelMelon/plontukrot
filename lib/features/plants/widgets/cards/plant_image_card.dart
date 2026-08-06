@@ -34,20 +34,20 @@ class _PlantImageCardState extends State<PlantImageCard> {
   @override
   void initState() {
     super.initState();
-    _index = widget.photos.isEmpty ? 0 : widget.photos.length - 1;
-    _pageController = PageController(initialPage: _index);
+    _index = 0;
+    _pageController = PageController(initialPage: 0);
   }
 
   @override
   void didUpdateWidget(covariant PlantImageCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.photos.length != oldWidget.photos.length) {
-      final nextIndex = widget.photos.isEmpty ? 0 : widget.photos.length - 1;
-      if (nextIndex != _index) {
-        _index = nextIndex;
+      // New upload lands at index 0 (newest-first); reset the pager.
+      if (_index != 0 || widget.photos.length > oldWidget.photos.length) {
+        _index = 0;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted || !_pageController.hasClients) return;
-          _pageController.jumpToPage(_index);
+          _pageController.jumpToPage(0);
         });
       }
     } else if (widget.photos.isNotEmpty && _index >= widget.photos.length) {
@@ -72,7 +72,7 @@ class _PlantImageCardState extends State<PlantImageCard> {
     final hasPhotos = photos.isNotEmpty;
     final current = hasPhotos ? photos[_index.clamp(0, photos.length - 1)] : null;
     final dateLocale = Localizations.localeOf(context).toString();
-    final dateLabel = current == null
+    final dateLabel = current == null || current.isLegacy
         ? null
         : DateFormat('d MMM y', dateLocale).format(current.addedAt);
 

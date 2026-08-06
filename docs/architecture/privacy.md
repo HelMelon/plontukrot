@@ -15,7 +15,10 @@ Unauthenticated access denied.
 
 ## Storage (`storage.rules`)
 
-Path: `plants/{userId}/{fileName}` (e.g. `{plantId}.jpg`, `{plantId}_thumb.jpg`).
+Paths:
+
+- Legacy cover: `plants/{userId}/{fileName}` (e.g. `{plantId}.jpg`, `{plantId}_thumb.jpg`)
+- Gallery: `plants/{userId}/{plantId}/{fileName}` (e.g. `{photoId}.jpg`, `{photoId}_thumb.jpg`)
 
 | Action | Rule |
 |--------|------|
