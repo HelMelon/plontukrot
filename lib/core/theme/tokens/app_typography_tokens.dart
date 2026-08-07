@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'app_color_tokens.dart';
 
@@ -24,81 +25,86 @@ class AppTypographyTokens {
   });
 
   factory AppTypographyTokens.standard(AppColorTokens colors) {
+    TextStyle amatic({
+      double? fontSize,
+      FontWeight fontWeight = FontWeight.bold,
+      Color? color,
+      double? height,
+    }) {
+      return GoogleFonts.amaticSc(
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        color: color,
+        height: height,
+      );
+    }
+
     return AppTypographyTokens(
+      // Brand wordmark stays NordicStyle (SKÖRD) — not Amatic SC.
       brand: TextStyle(
         fontFamily: 'NordicStyle',
         fontSize: 36,
         color: colors.heading,
       ),
-      titlePage: TextStyle(
+      titlePage: amatic(
+        fontSize: 28,
+        color: colors.textPrimary,
+      ),
+      titleLarge: amatic(
+        fontSize: 30,
+        color: colors.heading,
+      ),
+      titleMedium: amatic(
         fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: colors.textPrimary,
-      ),
-      titleLarge: TextStyle(
-        fontSize: 26,
-        fontWeight: FontWeight.bold,
         color: colors.heading,
       ),
-      titleMedium: TextStyle(
+      titleSmall: amatic(
+        fontSize: 22,
+        color: colors.heading,
+      ),
+      bodyLarge: amatic(
         fontSize: 20,
-        fontWeight: FontWeight.bold,
-        color: colors.heading,
+        color: colors.textPrimary,
       ),
-      titleSmall: TextStyle(
+      bodyEmphasis: amatic(
+        fontSize: 19,
+        color: colors.textPrimary,
+      ),
+      bodyMedium: amatic(
         fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: colors.heading,
+        color: colors.textPrimary,
       ),
-      bodyLarge: TextStyle(
+      bodySmall: amatic(
+        fontSize: 17,
+        color: colors.textSecondary,
+      ),
+      label: amatic(
+        fontSize: 17,
+        color: colors.textPrimary,
+      ),
+      caption: amatic(
         fontSize: 16,
-        color: colors.textPrimary,
+        color: colors.textSecondary,
       ),
-      bodyEmphasis: TextStyle(
+      captionSmall: amatic(
         fontSize: 15,
-        fontWeight: FontWeight.w600,
-        color: colors.textPrimary,
-      ),
-      bodyMedium: TextStyle(
-        fontSize: 14,
-        color: colors.textPrimary,
-      ),
-      bodySmall: TextStyle(
-        fontSize: 13,
-        color: colors.textSecondary,
-      ),
-      label: TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w500,
-        color: colors.textPrimary,
-      ),
-      caption: TextStyle(
-        fontSize: 12,
-        color: colors.textSecondary,
-      ),
-      captionSmall: TextStyle(
-        fontSize: 11,
         color: colors.textSecondary,
         height: 1.25,
       ),
-      button: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w700,
+      button: amatic(
+        fontSize: 18,
         color: colors.onPrimary,
       ),
-      link: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
+      link: amatic(
+        fontSize: 18,
         color: colors.primary,
       ),
-      sectionTitle: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
+      sectionTitle: amatic(
+        fontSize: 20,
         color: colors.heading,
       ),
-      error: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.bold,
+      error: amatic(
+        fontSize: 18,
         color: colors.error,
       ),
     );

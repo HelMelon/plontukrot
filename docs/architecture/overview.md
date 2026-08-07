@@ -452,7 +452,8 @@ Do not introduce repositories unless there is a demonstrated need and an approve
 
 - `core/widgets/prompt_text_dialog.dart` — generic text prompt only.
 - Theme: `AppTheme.theme` + `ThemeExtension` tokens; UI reads `context.colors` / spacing / radii / typography (see ADR-007).
-- Brand font: `NordicStyle` (SKÖRD).
+- UI font: Google Fonts **Amatic SC** (`AppTypographyTokens` + `ThemeData.textTheme`).
+- Brand font: `NordicStyle` (SKÖRD) via `typography.brand` only.
 
 ### Logic placement
 
