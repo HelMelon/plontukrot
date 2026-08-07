@@ -408,6 +408,234 @@ abstract class AppLocalizations {
   /// **'Could not delete profile: {error}'**
   String profileDeleteAccountError(String error);
 
+  /// No description provided for @profileFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get profileFriends;
+
+  /// No description provided for @profileMyUid.
+  ///
+  /// In en, this message translates to:
+  /// **'Your ID'**
+  String get profileMyUid;
+
+  /// No description provided for @profileUidCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'ID copied'**
+  String get profileUidCopied;
+
+  /// No description provided for @profileCollectionVisibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection visibility'**
+  String get profileCollectionVisibility;
+
+  /// No description provided for @profileCollectionFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends can view'**
+  String get profileCollectionFriends;
+
+  /// No description provided for @profileCollectionPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get profileCollectionPrivate;
+
+  /// No description provided for @friendsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get friendsTitle;
+
+  /// No description provided for @friendsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No friends yet'**
+  String get friendsEmpty;
+
+  /// No description provided for @friendsAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add friend'**
+  String get friendsAddTitle;
+
+  /// No description provided for @friendsAddHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend user ID'**
+  String get friendsAddHint;
+
+  /// No description provided for @friendsAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Send request'**
+  String get friendsAddAction;
+
+  /// No description provided for @friendsIncoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Incoming requests'**
+  String get friendsIncoming;
+
+  /// No description provided for @friendsOutgoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Outgoing requests'**
+  String get friendsOutgoing;
+
+  /// No description provided for @friendsAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get friendsAccept;
+
+  /// No description provided for @friendsDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get friendsDecline;
+
+  /// No description provided for @friendsCancelRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get friendsCancelRequest;
+
+  /// No description provided for @friendsRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove friend'**
+  String get friendsRemove;
+
+  /// No description provided for @friendsRemoveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from friends?'**
+  String friendsRemoveConfirm(String name);
+
+  /// No description provided for @friendsRequestSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend request sent'**
+  String get friendsRequestSent;
+
+  /// No description provided for @friendsOpenCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection'**
+  String get friendsOpenCollection;
+
+  /// No description provided for @friendsGiftsInbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Plant gifts'**
+  String get friendsGiftsInbox;
+
+  /// No description provided for @friendsGiftFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From {name}'**
+  String friendsGiftFrom(String name);
+
+  /// No description provided for @friendsGiftAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept gift'**
+  String get friendsGiftAccept;
+
+  /// No description provided for @friendsGiftDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get friendsGiftDecline;
+
+  /// No description provided for @friendsGiftAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Plant added to your collection'**
+  String get friendsGiftAccepted;
+
+  /// No description provided for @friendsGiftEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No pending gifts'**
+  String get friendsGiftEmpty;
+
+  /// No description provided for @friendsCollectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}'**
+  String friendsCollectionTitle(String name);
+
+  /// No description provided for @friendsCollectionEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No plants to show'**
+  String get friendsCollectionEmpty;
+
+  /// No description provided for @friendsCollectionPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'This collection is private'**
+  String get friendsCollectionPrivate;
+
+  /// No description provided for @friendsReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'View only'**
+  String get friendsReadOnly;
+
+  /// No description provided for @plantGift.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift plant'**
+  String get plantGift;
+
+  /// No description provided for @plantGiftTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift to a friend'**
+  String get plantGiftTitle;
+
+  /// No description provided for @plantGiftPickFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a friend'**
+  String get plantGiftPickFriend;
+
+  /// No description provided for @plantGiftNoFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Add friends first'**
+  String get plantGiftNoFriends;
+
+  /// No description provided for @plantGiftConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Send gift'**
+  String get plantGiftConfirm;
+
+  /// No description provided for @plantGiftSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift sent — plant leaves your collection after they accept'**
+  String get plantGiftSent;
+
+  /// No description provided for @plantGiftMessageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Message (optional)'**
+  String get plantGiftMessageHint;
+
+  /// No description provided for @plantArchiveReasonGifted.
+  ///
+  /// In en, this message translates to:
+  /// **'Gifted'**
+  String get plantArchiveReasonGifted;
+
   /// No description provided for @settingsTitle.
   ///
   /// In en, this message translates to:

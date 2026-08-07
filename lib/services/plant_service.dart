@@ -18,9 +18,12 @@ class PlantService {
   final String uid = FirebaseAuth.instance.currentUser!.uid;
 
   CollectionReference<Map<String, dynamic>> get _plantsRef =>
-      _firestore.collection('users').doc(uid).collection('plants');
+      _plantsRefFor(uid);
 
-  Future<void> addPlant({
+  CollectionReference<Map<String, dynamic>> _plantsRefFor(String ownerUid) =>
+      _firestore.collection('users').doc(ownerUid).collection('plants');
+
+  Future<String> addPlant({
     required String genus,
     required String species,
     String? cultivar,
@@ -30,6 +33,7 @@ class PlantService {
     String nickname = '',
     required int stage,
     int initialLeafCount = 0,
+    List<PlantMember> members = const [],
   }) async {
     final trimmedGenus = genus.trim();
     final trimmedSpecies = species.trim();
@@ -39,7 +43,7 @@ class PlantService {
     final safeInitialLeafCount =
         initialLeafCount < 0 ? 0 : initialLeafCount;
 
-    await _plantsRef.add({
+    final doc = await _plantsRef.add({
       'genus': trimmedGenus,
       'species': trimmedSpecies,
       'cultivar':
@@ -57,6 +61,7 @@ class PlantService {
       'images': <Map<String, dynamic>>[],
       'wateringFrequency': null,
       'initialLeafCount': safeInitialLeafCount,
+      if (members.isNotEmpty) 'members': members.map((m) => m.toMap()).toList(),
       'createdAt': FieldValue.serverTimestamp(),
     });
 
@@ -65,10 +70,13 @@ class PlantService {
       genus: trimmedGenus,
       plantFamily: trimmedFamily,
     );
+
+    return doc.id;
   }
 
-  Stream<List<Plant>> getPlants() {
-    return _plantsRef
+  /// Active plants for [ownerUid] (own or friend-visible collection).
+  Stream<List<Plant>> getPlantsForUser(String ownerUid) {
+    return _plantsRefFor(ownerUid)
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map(
@@ -77,6 +85,23 @@ class PlantService {
               .where((plant) => !plant.isArchived)
               .toList(),
         );
+  }
+
+  Stream<List<Plant>> getPlants() => getPlantsForUser(uid);
+
+  Stream<Plant?> watchPlantForUser(String ownerUid, String plantId) {
+    return _plantsRefFor(ownerUid)
+        .doc(plantId)
+        .snapshots()
+        .map((doc) => doc.exists ? Plant.fromDocument(doc) : null);
+  }
+
+  Stream<Plant?> watchPlant(String plantId) => watchPlantForUser(uid, plantId);
+
+  Future<Plant?> getPlant(String plantId) async {
+    final doc = await _plantsRef.doc(plantId).get();
+    if (!doc.exists) return null;
+    return Plant.fromDocument(doc);
   }
 
   Stream<List<Plant>> watchArchivedPlants() {
@@ -91,18 +116,12 @@ class PlantService {
         );
   }
 
-  Stream<Plant?> watchPlant(String plantId) {
-    return _plantsRef
-        .doc(plantId)
-        .snapshots()
-        .map((doc) => doc.exists ? Plant.fromDocument(doc) : null);
-  }
-
   Map<String, dynamic> _archiveFields({
     required PlantArchiveReason reason,
     required DateTime at,
     String? note,
     String? mergedIntoPlantId,
+    String? giftedToUid,
   }) {
     final trimmedNote = note?.trim();
     return {
@@ -112,6 +131,7 @@ class PlantService {
       if (trimmedNote != null && trimmedNote.isNotEmpty)
         'archiveNote': trimmedNote,
       if (mergedIntoPlantId != null) 'mergedIntoPlantId': mergedIntoPlantId,
+      if (giftedToUid != null) 'giftedToUid': giftedToUid,
     };
   }
 
@@ -121,6 +141,7 @@ class PlantService {
     DateTime? at,
     String? note,
     String? mergedIntoPlantId,
+    String? giftedToUid,
   }) async {
     final when = at ?? DateTime.now();
     await _plantsRef.doc(plantId).update(
@@ -129,6 +150,7 @@ class PlantService {
             at: when,
             note: note,
             mergedIntoPlantId: mergedIntoPlantId,
+            giftedToUid: giftedToUid,
           ),
         );
   }

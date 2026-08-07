@@ -105,7 +105,11 @@ Always trim user strings in **services** before write when the neighbor methods 
 
 Images: plant gallery is `images: [{ id, imageUrl, imageThumbUrl, addedAt }]` (max 5, **newest first** by `addedAt`). Cover fields `imageUrl` / `imageThumbUrl` stay in sync with the newest photo for lists (`Plant.listImageUrl`). Legacy plants with only cover fields are exposed via `Plant.galleryPhotos` without a batch migration; the date chip is hidden for synthetic `legacy` photos.
 
-User document `users/{uid}` fields include `name`, `email`, `createdAt`, `localeCode`, `currencyCode`, and `personalDataConsentAt` (Privacy Policy acceptance timestamp; see ADR-014).
+User document `users/{uid}` fields include `name`, `email`, `createdAt`, `localeCode`, `currencyCode`, `personalDataConsentAt` (Privacy Policy acceptance timestamp; see ADR-014), and `collectionVisibility` (`friends` | `private`, default `friends`; see ADR-017).
+
+Plant archive reasons: `merged` | `died` | `sold` | `gifted` (optional `giftedToUid` when gifted).
+
+Social models: `Friendship`, `FriendRequest`, `IncomingGift` / `OutgoingGift`, `CollectionVisibility`.
 
 ---
 

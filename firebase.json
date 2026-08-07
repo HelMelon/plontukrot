@@ -30,6 +30,7 @@
     "rules": "storage.rules"
   },
   "hosting": {
+    "site": "plant-logger-e0677",
     "public": "build/web",
     "ignore": [
       "firebase.json",

@@ -176,6 +176,127 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get profileFriends => 'Freunde';
+
+  @override
+  String get profileMyUid => 'Deine ID';
+
+  @override
+  String get profileUidCopied => 'ID kopiert';
+
+  @override
+  String get profileCollectionVisibility => 'Sammlungssichtbarkeit';
+
+  @override
+  String get profileCollectionFriends => 'Für Freunde sichtbar';
+
+  @override
+  String get profileCollectionPrivate => 'Privat';
+
+  @override
+  String get friendsTitle => 'Freunde';
+
+  @override
+  String get friendsEmpty => 'Noch keine Freunde';
+
+  @override
+  String get friendsAddTitle => 'Freund hinzufügen';
+
+  @override
+  String get friendsAddHint => 'Benutzer-ID';
+
+  @override
+  String get friendsAddAction => 'Anfrage senden';
+
+  @override
+  String get friendsIncoming => 'Eingehende Anfragen';
+
+  @override
+  String get friendsOutgoing => 'Ausgehende Anfragen';
+
+  @override
+  String get friendsAccept => 'Annehmen';
+
+  @override
+  String get friendsDecline => 'Ablehnen';
+
+  @override
+  String get friendsCancelRequest => 'Abbrechen';
+
+  @override
+  String get friendsRemove => 'Freund entfernen';
+
+  @override
+  String friendsRemoveConfirm(String name) {
+    return '$name aus Freunden entfernen?';
+  }
+
+  @override
+  String get friendsRequestSent => 'Freundschaftsanfrage gesendet';
+
+  @override
+  String get friendsOpenCollection => 'Sammlung';
+
+  @override
+  String get friendsGiftsInbox => 'Pflanzengeschenke';
+
+  @override
+  String friendsGiftFrom(String name) {
+    return 'Von $name';
+  }
+
+  @override
+  String get friendsGiftAccept => 'Geschenk annehmen';
+
+  @override
+  String get friendsGiftDecline => 'Ablehnen';
+
+  @override
+  String get friendsGiftAccepted => 'Pflanze zur Sammlung hinzugefügt';
+
+  @override
+  String get friendsGiftEmpty => 'Keine ausstehenden Geschenke';
+
+  @override
+  String friendsCollectionTitle(String name) {
+    return '$name';
+  }
+
+  @override
+  String get friendsCollectionEmpty => 'Keine Pflanzen';
+
+  @override
+  String get friendsCollectionPrivate => 'Sammlung ist privat';
+
+  @override
+  String get friendsReadOnly => 'Nur Ansicht';
+
+  @override
+  String get plantGift => 'Verschenken';
+
+  @override
+  String get plantGiftTitle => 'An Freund verschenken';
+
+  @override
+  String get plantGiftPickFriend => 'Freund wählen';
+
+  @override
+  String get plantGiftNoFriends => 'Zuerst Freunde hinzufügen';
+
+  @override
+  String get plantGiftConfirm => 'Geschenk senden';
+
+  @override
+  String get plantGiftSent =>
+      'Geschenk gesendet — Pflanze verlässt die Sammlung nach Annahme';
+
+  @override
+  String get plantGiftMessageHint => 'Nachricht (optional)';
+
+  @override
+  String get plantArchiveReasonGifted => 'Verschenkt';
+
+  @override
   String get settingsTitle => 'Einstellungen';
 
   @override

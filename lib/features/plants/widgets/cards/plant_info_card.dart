@@ -219,6 +219,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                 PlantArchiveReason.merged => l10n.plantArchiveReasonMerged,
                 PlantArchiveReason.died => l10n.plantArchiveReasonDied,
                 PlantArchiveReason.sold => l10n.plantArchiveReasonSold,
+                PlantArchiveReason.gifted => l10n.plantArchiveReasonGifted,
                 null => l10n.homeArchive,
               },
               style: details.infoRowLabelStyle,

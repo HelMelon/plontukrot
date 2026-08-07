@@ -19,6 +19,7 @@ import 'firebase_options.dart';
 import 'models/app_user.dart';
 import 'services/app_crash_reporting.dart';
 import 'services/auth_service.dart';
+import 'services/gift_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -285,6 +286,7 @@ class _AuthenticatedShellState extends State<_AuthenticatedShell> {
   void initState() {
     super.initState();
     _syncPreferences();
+    unawaited(GiftService().processAcceptedOutgoingGifts());
   }
 
   @override
@@ -292,6 +294,7 @@ class _AuthenticatedShellState extends State<_AuthenticatedShell> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.user.uid != widget.user.uid) {
       _syncPreferences();
+      unawaited(GiftService().processAcceptedOutgoingGifts());
     }
   }
 

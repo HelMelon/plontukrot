@@ -34,6 +34,7 @@ class Plant {
   final PlantArchiveReason? archiveReason;
   final String? archiveNote;
   final String? mergedIntoPlantId;
+  final String? giftedToUid;
 
   const Plant({
     required this.id,
@@ -61,6 +62,7 @@ class Plant {
     this.archiveReason,
     this.archiveNote,
     this.mergedIntoPlantId,
+    this.giftedToUid,
   });
 
   bool get isGroup => members.length >= 2;
@@ -178,6 +180,7 @@ class Plant {
       ),
       archiveNote: _nullableTrimmed(data['archiveNote'] as String?),
       mergedIntoPlantId: data['mergedIntoPlantId'] as String?,
+      giftedToUid: data['giftedToUid'] as String?,
     );
   }
 
@@ -222,6 +225,7 @@ class Plant {
       if (archiveReason != null) 'archiveReason': archiveReason!.code,
       if (archiveNote != null) 'archiveNote': archiveNote,
       if (mergedIntoPlantId != null) 'mergedIntoPlantId': mergedIntoPlantId,
+      if (giftedToUid != null) 'giftedToUid': giftedToUid,
     };
   }
 }

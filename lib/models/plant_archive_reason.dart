@@ -1,7 +1,8 @@
 enum PlantArchiveReason {
   merged,
   died,
-  sold;
+  sold,
+  gifted;
 
   String get code => name;
 

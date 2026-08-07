@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../core/currency/app_currency_controller.dart';
 import '../core/locale/app_locale_controller.dart';
 import '../core/privacy/privacy_constants.dart';
+import '../models/collection_visibility.dart';
 import 'plant_service.dart';
 import 'storage_service.dart';
 
@@ -12,11 +13,13 @@ class UserProfileDoc {
   final String? name;
   final String? email;
   final DateTime? personalDataConsentAt;
+  final CollectionVisibility collectionVisibility;
 
   const UserProfileDoc({
     this.name,
     this.email,
     this.personalDataConsentAt,
+    this.collectionVisibility = CollectionVisibility.friends,
   });
 
   bool get hasPersonalDataConsent => personalDataConsentAt != null;
@@ -36,6 +39,9 @@ class UserProfileDoc {
       name: (data['name'] as String?)?.trim(),
       email: (data['email'] as String?)?.trim(),
       personalDataConsentAt: consentAt,
+      collectionVisibility: CollectionVisibility.fromCode(
+        data['collectionVisibility'] as String?,
+      ),
     );
   }
 }
@@ -61,10 +67,19 @@ class FirestoreService {
         'createdAt': FieldValue.serverTimestamp(),
         'localeCode': AppLocaleController.instance.preferenceCode,
         'currencyCode': AppCurrencyController.instance.currency.code,
+        'collectionVisibility': CollectionVisibility.friends.code,
         if (recordConsent)
           kPersonalDataConsentAtField: FieldValue.serverTimestamp(),
       });
       return;
+    }
+
+    // Backfill visibility for older profiles.
+    final data = snapshot.data();
+    if (data != null && !data.containsKey('collectionVisibility')) {
+      await userDoc.set({
+        'collectionVisibility': CollectionVisibility.friends.code,
+      }, SetOptions(merge: true));
     }
 
     if (recordConsent) {
@@ -106,6 +121,10 @@ class FirestoreService {
       'components',
       'wishList',
       'financeEntries',
+      'friends',
+      'friendRequests',
+      'incomingGifts',
+      'outgoingGifts',
     ];
 
     for (final name in topLevel) {

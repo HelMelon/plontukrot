@@ -173,6 +173,127 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get profileFriends => 'Friends';
+
+  @override
+  String get profileMyUid => 'Your ID';
+
+  @override
+  String get profileUidCopied => 'ID copied';
+
+  @override
+  String get profileCollectionVisibility => 'Collection visibility';
+
+  @override
+  String get profileCollectionFriends => 'Friends can view';
+
+  @override
+  String get profileCollectionPrivate => 'Private';
+
+  @override
+  String get friendsTitle => 'Friends';
+
+  @override
+  String get friendsEmpty => 'No friends yet';
+
+  @override
+  String get friendsAddTitle => 'Add friend';
+
+  @override
+  String get friendsAddHint => 'Friend user ID';
+
+  @override
+  String get friendsAddAction => 'Send request';
+
+  @override
+  String get friendsIncoming => 'Incoming requests';
+
+  @override
+  String get friendsOutgoing => 'Outgoing requests';
+
+  @override
+  String get friendsAccept => 'Accept';
+
+  @override
+  String get friendsDecline => 'Decline';
+
+  @override
+  String get friendsCancelRequest => 'Cancel';
+
+  @override
+  String get friendsRemove => 'Remove friend';
+
+  @override
+  String friendsRemoveConfirm(String name) {
+    return 'Remove $name from friends?';
+  }
+
+  @override
+  String get friendsRequestSent => 'Friend request sent';
+
+  @override
+  String get friendsOpenCollection => 'Collection';
+
+  @override
+  String get friendsGiftsInbox => 'Plant gifts';
+
+  @override
+  String friendsGiftFrom(String name) {
+    return 'From $name';
+  }
+
+  @override
+  String get friendsGiftAccept => 'Accept gift';
+
+  @override
+  String get friendsGiftDecline => 'Decline';
+
+  @override
+  String get friendsGiftAccepted => 'Plant added to your collection';
+
+  @override
+  String get friendsGiftEmpty => 'No pending gifts';
+
+  @override
+  String friendsCollectionTitle(String name) {
+    return '$name';
+  }
+
+  @override
+  String get friendsCollectionEmpty => 'No plants to show';
+
+  @override
+  String get friendsCollectionPrivate => 'This collection is private';
+
+  @override
+  String get friendsReadOnly => 'View only';
+
+  @override
+  String get plantGift => 'Gift plant';
+
+  @override
+  String get plantGiftTitle => 'Gift to a friend';
+
+  @override
+  String get plantGiftPickFriend => 'Choose a friend';
+
+  @override
+  String get plantGiftNoFriends => 'Add friends first';
+
+  @override
+  String get plantGiftConfirm => 'Send gift';
+
+  @override
+  String get plantGiftSent =>
+      'Gift sent — plant leaves your collection after they accept';
+
+  @override
+  String get plantGiftMessageHint => 'Message (optional)';
+
+  @override
+  String get plantArchiveReasonGifted => 'Gifted';
+
+  @override
   String get settingsTitle => 'Settings';
 
   @override

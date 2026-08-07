@@ -97,7 +97,13 @@ users/{uid}
   components/{id}
   propagations/{id}
     stageHistory/{id}
+  friends/{friendUid}
+  friendRequests/{requestId}
+  incomingGifts/{giftId}
+  outgoingGifts/{giftId}
 ```
+
+Social reads/writes: see [ADR-017](../decisions/ADR-017-friends-collections-gifts.md). Friends may read another user’s plant docs when `collectionVisibility == friends` (default). Care subcollections remain owner-only. Gifts use incoming/outgoing offer docs; recipient materializes the plant into their own tree.
 
 ### Global catalog (not under user)
 
@@ -172,6 +178,8 @@ Details: [data-model.md](data-model.md).
 | `AuthService` | Auth + Google Sign-In |
 | `FirestoreService` | `users/{uid}` document |
 | `PlantService` | `users/{uid}/plants` |
+| `FriendsService` | friends / friendRequests / collectionVisibility |
+| `GiftService` | incomingGifts / outgoingGifts + gift materialize |
 | `StartupWarmupService` | Auth session + plant list thumbs precache (startup only) |
 | `PlantSpeciesService` | `plantSpecies` |
 | `StorageService` | Storage plant images |

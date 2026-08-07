@@ -175,6 +175,127 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get profileFriends => 'Друзья';
+
+  @override
+  String get profileMyUid => 'Ваш ID';
+
+  @override
+  String get profileUidCopied => 'ID скопирован';
+
+  @override
+  String get profileCollectionVisibility => 'Видимость коллекции';
+
+  @override
+  String get profileCollectionFriends => 'Видна друзьям';
+
+  @override
+  String get profileCollectionPrivate => 'Приватная';
+
+  @override
+  String get friendsTitle => 'Друзья';
+
+  @override
+  String get friendsEmpty => 'Пока нет друзей';
+
+  @override
+  String get friendsAddTitle => 'Добавить друга';
+
+  @override
+  String get friendsAddHint => 'ID пользователя';
+
+  @override
+  String get friendsAddAction => 'Отправить заявку';
+
+  @override
+  String get friendsIncoming => 'Входящие заявки';
+
+  @override
+  String get friendsOutgoing => 'Исходящие заявки';
+
+  @override
+  String get friendsAccept => 'Принять';
+
+  @override
+  String get friendsDecline => 'Отклонить';
+
+  @override
+  String get friendsCancelRequest => 'Отменить';
+
+  @override
+  String get friendsRemove => 'Удалить из друзей';
+
+  @override
+  String friendsRemoveConfirm(String name) {
+    return 'Удалить $name из друзей?';
+  }
+
+  @override
+  String get friendsRequestSent => 'Заявка отправлена';
+
+  @override
+  String get friendsOpenCollection => 'Коллекция';
+
+  @override
+  String get friendsGiftsInbox => 'Подарки растений';
+
+  @override
+  String friendsGiftFrom(String name) {
+    return 'От $name';
+  }
+
+  @override
+  String get friendsGiftAccept => 'Принять подарок';
+
+  @override
+  String get friendsGiftDecline => 'Отклонить';
+
+  @override
+  String get friendsGiftAccepted => 'Растение добавлено в коллекцию';
+
+  @override
+  String get friendsGiftEmpty => 'Нет ожидающих подарков';
+
+  @override
+  String friendsCollectionTitle(String name) {
+    return '$name';
+  }
+
+  @override
+  String get friendsCollectionEmpty => 'Нет растений';
+
+  @override
+  String get friendsCollectionPrivate => 'Коллекция скрыта';
+
+  @override
+  String get friendsReadOnly => 'Только просмотр';
+
+  @override
+  String get plantGift => 'Подарить';
+
+  @override
+  String get plantGiftTitle => 'Подарок другу';
+
+  @override
+  String get plantGiftPickFriend => 'Выберите друга';
+
+  @override
+  String get plantGiftNoFriends => 'Сначала добавьте друзей';
+
+  @override
+  String get plantGiftConfirm => 'Отправить подарок';
+
+  @override
+  String get plantGiftSent =>
+      'Подарок отправлен — растение уйдёт из коллекции после принятия';
+
+  @override
+  String get plantGiftMessageHint => 'Сообщение (необязательно)';
+
+  @override
+  String get plantArchiveReasonGifted => 'Подарено';
+
+  @override
   String get settingsTitle => 'Настройки';
 
   @override

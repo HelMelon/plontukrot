@@ -78,6 +78,61 @@
       "error": {"type": "String"}
     }
   },
+  "profileFriends": "Friends",
+  "profileMyUid": "Your ID",
+  "profileUidCopied": "ID copied",
+  "profileCollectionVisibility": "Collection visibility",
+  "profileCollectionFriends": "Friends can view",
+  "profileCollectionPrivate": "Private",
+
+  "friendsTitle": "Friends",
+  "friendsEmpty": "No friends yet",
+  "friendsAddTitle": "Add friend",
+  "friendsAddHint": "Friend user ID",
+  "friendsAddAction": "Send request",
+  "friendsIncoming": "Incoming requests",
+  "friendsOutgoing": "Outgoing requests",
+  "friendsAccept": "Accept",
+  "friendsDecline": "Decline",
+  "friendsCancelRequest": "Cancel",
+  "friendsRemove": "Remove friend",
+  "friendsRemoveConfirm": "Remove {name} from friends?",
+  "@friendsRemoveConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "friendsRequestSent": "Friend request sent",
+  "friendsOpenCollection": "Collection",
+  "friendsGiftsInbox": "Plant gifts",
+  "friendsGiftFrom": "From {name}",
+  "@friendsGiftFrom": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "friendsGiftAccept": "Accept gift",
+  "friendsGiftDecline": "Decline",
+  "friendsGiftAccepted": "Plant added to your collection",
+  "friendsGiftEmpty": "No pending gifts",
+  "friendsCollectionTitle": "{name}",
+  "@friendsCollectionTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "friendsCollectionEmpty": "No plants to show",
+  "friendsCollectionPrivate": "This collection is private",
+  "friendsReadOnly": "View only",
+
+  "plantGift": "Gift plant",
+  "plantGiftTitle": "Gift to a friend",
+  "plantGiftPickFriend": "Choose a friend",
+  "plantGiftNoFriends": "Add friends first",
+  "plantGiftConfirm": "Send gift",
+  "plantGiftSent": "Gift sent — plant leaves your collection after they accept",
+  "plantGiftMessageHint": "Message (optional)",
+  "plantArchiveReasonGifted": "Gifted",
 
   "settingsTitle": "Settings",
   "settingsLanguage": "Language",

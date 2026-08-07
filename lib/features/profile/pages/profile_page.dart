@@ -14,6 +14,7 @@ import '../../../services/auth_service.dart';
 import '../../../services/firestore_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
+import '../../friends/pages/friends_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final AppUser user;
@@ -302,6 +303,22 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       );
                     },
+                  );
+                },
+              ),
+              spacing.vXl,
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.people_outline, color: colors.icon),
+                title: Text(
+                  l10n.profileFriends,
+                  style: typography.bodyEmphasis,
+                ),
+                trailing: Icon(Icons.chevron_right, color: colors.icon),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const FriendsPage()),
                   );
                 },
               ),

@@ -15,6 +15,7 @@ import '../widgets/sheets/update_plant_sheet.dart';
 import '../widgets/sheets/add_note_sheet.dart';
 import '../widgets/sheets/add_propagation_sheet.dart';
 import '../widgets/sheets/archive_plant_sheet.dart';
+import '../widgets/sheets/gift_plant_sheet.dart';
 import '../widgets/sheets/watering_history_sheet.dart';
 import '../widgets/sheets/add_repotting_sheet.dart';
 import '../widgets/sheets/add_fertilizing_sheet.dart';
@@ -474,12 +475,18 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               color: actionIconColor,
             ),
           ),
-          if (!plant.isArchived)
+          if (!plant.isArchived) ...[
+            IconButton(
+              tooltip: l10n.plantGift,
+              onPressed: () => showGiftPlantSheet(context: context, plant: plant),
+              icon: Icon(Icons.card_giftcard_outlined, color: actionIconColor),
+            ),
             IconButton(
               tooltip: l10n.plantDispose,
               onPressed: () => _openDispose(plant),
               icon: Icon(Icons.archive_outlined, color: actionIconColor),
             ),
+          ],
         ];
 
         return Scaffold(
