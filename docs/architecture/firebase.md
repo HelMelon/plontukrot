@@ -188,6 +188,23 @@ Instantiation: `ServiceName()` at call site — **no DI container**.
 
 ---
 
+## Web hosting
+
+Flutter web is served via Firebase Hosting (`firebase.json` → `public: build/web`).
+
+```bash
+flutter build web --release
+firebase deploy --only hosting
+```
+
+Live URL (default site): https://plant-logger-e0677.web.app  
+
+Also: https://plant-logger-e0677.firebaseapp.com  
+
+After first deploy, add both hostnames under Firebase Console → Authentication → Settings → Authorized domains (if not already present) so Google sign-in works on web.
+
+---
+
 ## One-shot ops scripts (`tools/`)
 
 CLI scripts talk to Firestore REST with Application Default Credentials (`gcloud auth application-default login`) or `FIREBASE_ACCESS_TOKEN`. Project default: `plant-logger-e0677`.
