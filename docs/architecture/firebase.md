@@ -188,6 +188,25 @@ Instantiation: `ServiceName()` at call site — **no DI container**.
 
 ---
 
+## Crashlytics
+
+Mobile (Android/iOS) crash and non-fatal reporting via `firebase_crashlytics`, wrapped by `AppCrashReporting` (`lib/services/app_crash_reporting.dart`).
+
+| Concern | Behavior |
+|---------|----------|
+| Platform | Android / iOS only; web is a no-op |
+| Collection | Enabled when `!kDebugMode` |
+| Init | After `Firebase.initializeApp` in bootstrap (`main.dart`) |
+| Fatals | `FlutterError.onError`, `PlatformDispatcher.onError` |
+| Non-fatals | Bootstrap failure, splash ready timeout, auth sign-in/delete (not user cancel), photo upload failures |
+| User id | Set from Auth session; cleared on sign-out / account delete |
+
+Enable Crashlytics in Firebase Console → Crashlytics if not already. Verify with a release/profile build on a device (debug collection is off).
+
+See [ADR-016](../decisions/ADR-016-firebase-crashlytics.md).
+
+---
+
 ## Web hosting
 
 Flutter web is served via Firebase Hosting (`firebase.json` → `public: build/web`).

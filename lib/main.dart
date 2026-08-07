@@ -17,6 +17,7 @@ import 'features/home/pages/home_page.dart';
 import 'features/splash/pages/splash_flow.dart';
 import 'firebase_options.dart';
 import 'models/app_user.dart';
+import 'services/app_crash_reporting.dart';
 import 'services/auth_service.dart';
 
 Future<void> main() async {
@@ -109,6 +110,10 @@ class _AppStartupState extends State<AppStartup> {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
+      await AppCrashReporting.instance.install();
+      await AppCrashReporting.instance.setUserId(
+        AuthService().currentUser?.uid,
+      );
       if (!mounted) return;
       setState(() {
         _progress = 0.65;
@@ -126,7 +131,12 @@ class _AppStartupState extends State<AppStartup> {
       await Future<void>.delayed(const Duration(milliseconds: 100));
       if (!mounted) return;
       setState(() => _phase = _StartupPhase.app);
-    } catch (_) {
+    } catch (error, stack) {
+      await AppCrashReporting.instance.recordError(
+        error,
+        stack,
+        reason: 'app_bootstrap_failed',
+      );
       if (!mounted) return;
       setState(() => _phase = _StartupPhase.app);
     }
@@ -159,7 +169,15 @@ class _AppStartupState extends State<AppStartup> {
                   secondsPerImage: const Duration(milliseconds: 1600),
                   waitFor: _contentReady.future.timeout(
                     const Duration(seconds: 20),
-                    onTimeout: () {},
+                    onTimeout: () {
+                      unawaited(
+                        AppCrashReporting.instance.recordError(
+                          TimeoutException('home_content_ready'),
+                          StackTrace.current,
+                          reason: 'splash_home_ready_timeout',
+                        ),
+                      );
+                    },
                   ),
                   onFinished: () {
                     if (!mounted) return;
@@ -204,12 +222,14 @@ class AuthGate extends StatelessWidget {
         }
 
         if (user != null) {
+          unawaited(AppCrashReporting.instance.setUserId(user.uid));
           return _AuthenticatedShell(
             user: user,
             onContentReady: onContentReady,
           );
         }
 
+        unawaited(AppCrashReporting.instance.setUserId(null));
         return _ReadyAfterFrame(
           onReady: onContentReady,
           child: const LoginPage(),

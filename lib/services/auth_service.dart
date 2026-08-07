@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../models/app_user.dart';
+import 'app_crash_reporting.dart';
 import 'firestore_service.dart';
 
 class AuthService {
@@ -39,39 +40,60 @@ class AuthService {
 
   /// [recordConsent] writes `personalDataConsentAt` on the user document.
   Future<void> signInWithGoogle({bool recordConsent = false}) async {
-    if (kIsWeb) {
-      final provider = GoogleAuthProvider();
+    try {
+      if (kIsWeb) {
+        final provider = GoogleAuthProvider();
 
-      provider.addScope('email');
-      provider.addScope('profile');
+        provider.addScope('email');
+        provider.addScope('profile');
 
-      await _auth.signInWithPopup(provider);
+        await _auth.signInWithPopup(provider);
+
+        await FirestoreService().createUserDocument(recordConsent: recordConsent);
+        return;
+      }
+
+      await _initializeGoogleSignIn();
+
+      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
+
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+
+      final idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        throw FirebaseAuthException(
+          code: 'google-id-token-null',
+        );
+      }
+
+      final credential = GoogleAuthProvider.credential(
+        idToken: idToken,
+      );
+
+      await _auth.signInWithCredential(credential);
 
       await FirestoreService().createUserDocument(recordConsent: recordConsent);
-      return;
+    } catch (error, stack) {
+      if (!_isUserCancelledAuth(error)) {
+        await AppCrashReporting.instance.recordError(
+          error,
+          stack,
+          reason: 'auth_sign_in_failed',
+        );
+      }
+      rethrow;
     }
+  }
 
-    await _initializeGoogleSignIn();
-
-    final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
-
-    final GoogleSignInAuthentication googleAuth = googleUser.authentication;
-
-    final idToken = googleAuth.idToken;
-
-    if (idToken == null) {
-      throw FirebaseAuthException(
-        code: 'google-id-token-null',
-      );
+  bool _isUserCancelledAuth(Object error) {
+    if (error is FirebaseAuthException) {
+      return error.code == 'popup-closed-by-user' ||
+          error.code == 'cancelled-popup-request' ||
+          error.code == 'web-context-cancelled';
     }
-
-    final credential = GoogleAuthProvider.credential(
-      idToken: idToken,
-    );
-
-    await _auth.signInWithCredential(credential);
-
-    await FirestoreService().createUserDocument(recordConsent: recordConsent);
+    final message = error.toString().toLowerCase();
+    return message.contains('canceled') || message.contains('cancelled');
   }
 
   Future<void> signOut() async {
@@ -81,6 +103,7 @@ class AuthService {
     }
 
     await _auth.signOut();
+    await AppCrashReporting.instance.setUserId(null);
   }
 
   Future<void> _reauthenticateWithGoogle() async {
@@ -110,22 +133,33 @@ class AuthService {
 
   /// Reauthenticates, wipes Firestore + Storage user data, then deletes Auth.
   Future<void> deleteAccount() async {
-    await _reauthenticateWithGoogle();
-    await FirestoreService().deleteAllUserData();
+    try {
+      await _reauthenticateWithGoogle();
+      await FirestoreService().deleteAllUserData();
 
-    final user = _auth.currentUser;
-    if (user == null) {
-      throw StateError('User missing after data wipe');
-    }
-    await user.delete();
-
-    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
-      try {
-        await _initializeGoogleSignIn();
-        await _googleSignIn.signOut();
-      } catch (_) {
-        // Auth user already deleted; ignore Google sign-out failures.
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw StateError('User missing after data wipe');
       }
+      await user.delete();
+
+      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+        try {
+          await _initializeGoogleSignIn();
+          await _googleSignIn.signOut();
+        } catch (_) {
+          // Auth user already deleted; ignore Google sign-out failures.
+        }
+      }
+
+      await AppCrashReporting.instance.setUserId(null);
+    } catch (error, stack) {
+      await AppCrashReporting.instance.recordError(
+        error,
+        stack,
+        reason: 'auth_delete_account_failed',
+      );
+      rethrow;
     }
   }
 }

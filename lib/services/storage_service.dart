@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 import '../models/plant_photo.dart';
+import 'app_crash_reporting.dart';
 
 class PlantImageUploadResult {
   final String photoId;
@@ -70,29 +71,38 @@ class StorageService {
     required String plantId,
     String? photoId,
   }) async {
-    final id = (photoId != null && photoId.trim().isNotEmpty)
-        ? photoId.trim()
-        : DateTime.now().microsecondsSinceEpoch.toString();
-    final metadata = SettableMetadata(contentType: 'image/jpeg');
-    final fullRef = _plantPhotoRef(plantId, id);
-    final thumbRef = _plantPhotoThumbRef(plantId, id);
-    final thumbBytes = await _buildThumbBytes(imageBytes);
+    try {
+      final id = (photoId != null && photoId.trim().isNotEmpty)
+          ? photoId.trim()
+          : DateTime.now().microsecondsSinceEpoch.toString();
+      final metadata = SettableMetadata(contentType: 'image/jpeg');
+      final fullRef = _plantPhotoRef(plantId, id);
+      final thumbRef = _plantPhotoThumbRef(plantId, id);
+      final thumbBytes = await _buildThumbBytes(imageBytes);
 
-    await Future.wait([
-      fullRef.putData(imageBytes, metadata),
-      thumbRef.putData(thumbBytes, metadata),
-    ]);
+      await Future.wait([
+        fullRef.putData(imageBytes, metadata),
+        thumbRef.putData(thumbBytes, metadata),
+      ]);
 
-    final urls = await Future.wait([
-      fullRef.getDownloadURL(),
-      thumbRef.getDownloadURL(),
-    ]);
+      final urls = await Future.wait([
+        fullRef.getDownloadURL(),
+        thumbRef.getDownloadURL(),
+      ]);
 
-    return PlantImageUploadResult(
-      photoId: id,
-      imageUrl: urls[0],
-      imageThumbUrl: urls[1],
-    );
+      return PlantImageUploadResult(
+        photoId: id,
+        imageUrl: urls[0],
+        imageThumbUrl: urls[1],
+      );
+    } catch (error, stack) {
+      await AppCrashReporting.instance.recordError(
+        error,
+        stack,
+        reason: 'storage_upload_plant_photo_failed',
+      );
+      rethrow;
+    }
   }
 
   /// Legacy single-file upload kept for older callers.
@@ -100,26 +110,35 @@ class StorageService {
     required Uint8List imageBytes,
     required String plantId,
   }) async {
-    final metadata = SettableMetadata(contentType: 'image/jpeg');
-    final fullRef = _legacyPlantImageRef(plantId);
-    final thumbRef = _legacyPlantThumbRef(plantId);
-    final thumbBytes = await _buildThumbBytes(imageBytes);
+    try {
+      final metadata = SettableMetadata(contentType: 'image/jpeg');
+      final fullRef = _legacyPlantImageRef(plantId);
+      final thumbRef = _legacyPlantThumbRef(plantId);
+      final thumbBytes = await _buildThumbBytes(imageBytes);
 
-    await Future.wait([
-      fullRef.putData(imageBytes, metadata),
-      thumbRef.putData(thumbBytes, metadata),
-    ]);
+      await Future.wait([
+        fullRef.putData(imageBytes, metadata),
+        thumbRef.putData(thumbBytes, metadata),
+      ]);
 
-    final urls = await Future.wait([
-      fullRef.getDownloadURL(),
-      thumbRef.getDownloadURL(),
-    ]);
+      final urls = await Future.wait([
+        fullRef.getDownloadURL(),
+        thumbRef.getDownloadURL(),
+      ]);
 
-    return PlantImageUploadResult(
-      photoId: PlantPhoto.legacyId,
-      imageUrl: urls[0],
-      imageThumbUrl: urls[1],
-    );
+      return PlantImageUploadResult(
+        photoId: PlantPhoto.legacyId,
+        imageUrl: urls[0],
+        imageThumbUrl: urls[1],
+      );
+    } catch (error, stack) {
+      await AppCrashReporting.instance.recordError(
+        error,
+        stack,
+        reason: 'storage_upload_plant_images_failed',
+      );
+      rethrow;
+    }
   }
 
   /// Legacy single-upload path kept for callers; also writes a thumb.
