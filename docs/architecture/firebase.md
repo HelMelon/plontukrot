@@ -172,6 +172,7 @@ Details: [data-model.md](data-model.md).
 | `AuthService` | Auth + Google Sign-In |
 | `FirestoreService` | `users/{uid}` document |
 | `PlantService` | `users/{uid}/plants` |
+| `StartupWarmupService` | Auth session + plant list thumbs precache (startup only) |
 | `PlantSpeciesService` | `plantSpecies` |
 | `StorageService` | Storage plant images |
 | `WateringService` | watering subcollection + denorm |

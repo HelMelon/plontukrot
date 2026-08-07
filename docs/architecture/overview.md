@@ -116,17 +116,20 @@ main()
   → MyApp (MaterialApp + ListenableBuilder for locale)
   → AppStartup
        1. bootstrap: Firebase.initializeApp, date formatting
-       2. splash: SplashCarouselPage
-       3. ready: AuthGate
+       2. app: Stack(
+            AuthGate → consent → Home/Login  (builds for real under splash),
+            SplashCarouselPage overlay until carousel + onContentReady
+          )
 ```
 
 | Step | Class | Layer | Responsibility |
 |------|-------|-------|----------------|
 | Entry | `main` / `MyApp` | Entry | Theme, l10n delegates, background |
-| Boot | `AppStartup` | Entry | Firebase + intl; then splash |
-| Splash | `SplashCarouselPage` | Feature splash | Onboarding carousel |
-| Auth | `AuthGate` | Entry | `StreamBuilder` on `AuthService.watchAuthState()` |
-| Signed in | `HomePage` | Feature home | Plant collection hub |
+| Boot | `AppStartup` | Entry | Firebase + intl; then overlayed app |
+| Splash | `SplashCarouselPage` | Feature splash | Asset carousel over live Auth/Home; holds last frame until ready |
+| Warmup | `StartupWarmupService` | Service | Precache Home `listImageUrl` thumbs + avatar before reveal |
+| Auth | `AuthGate` | Entry | `StreamBuilder` on `AuthService.watchAuthState()` (+ `initialData`) |
+| Signed in | `HomePage` | Feature home | Plant collection hub; `onFirstContentReady` |
 | Signed out | `LoginPage` | Feature auth | Google sign-in |
 
 ### Auth flow
@@ -209,17 +212,18 @@ AuthGate → PersonalDataConsentGatePage → HomePage
 
 ### splash
 
-**Responsibility:** Cold-start progress UI and first-run splash carousel.
+**Responsibility:** Cold-start progress UI and splash carousel that covers real Auth/Home load and first paint.
 
 **Structure:**
 
 ```
 features/splash/pages/splash_flow.dart   # AppBootstrapPage, SplashCarouselPage
+services/startup_warmup_service.dart     # precache list thumbs before reveal
 ```
 
-**Data flow:** Local UI only (driven by `AppStartup`). No services.
+**Data flow:** `AppStartup` shows `AuthGate` under an opaque `SplashCarouselPage`. Home (or Login/consent) signals `onContentReady` after data + image precache + frames. Carousel finishes only when slides are done **and** that signal arrives (or timeout).
 
-**Public API:** `AppBootstrapPage`, `SplashCarouselPage`.
+**Public API:** `AppBootstrapPage`, `SplashCarouselPage` (`waitFor`).
 
 ---
 

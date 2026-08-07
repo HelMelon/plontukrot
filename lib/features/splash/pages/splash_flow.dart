@@ -110,14 +110,20 @@ class _AppBootstrapPageState extends State<AppBootstrapPage>
 }
 
 /// Shows splash-screen images in a shuffled order, each for [secondsPerImage].
+///
+/// Calls [onFinished] only after all slides have shown **and** [waitFor]
+/// completes (if non-null). If content loading outlasts the carousel, the last
+/// frame stays on screen — covering AuthGate/Home until they are ready.
 class SplashCarouselPage extends StatefulWidget {
   final VoidCallback onFinished;
   final Duration secondsPerImage;
+  final Future<void>? waitFor;
 
   const SplashCarouselPage({
     super.key,
     required this.onFinished,
-    this.secondsPerImage = const Duration(milliseconds: 1100),
+    this.secondsPerImage = const Duration(milliseconds: 1600),
+    this.waitFor,
   });
 
   static const images = [
@@ -133,24 +139,52 @@ class SplashCarouselPage extends StatefulWidget {
 class _SplashCarouselPageState extends State<SplashCarouselPage> {
   late final List<String> _order;
   int _index = 0;
+  bool _carouselDone = false;
+  bool _waitDone = false;
+  bool _finished = false;
 
   @override
   void initState() {
     super.initState();
     _order = List<String>.from(SplashCarouselPage.images)..shuffle(Random());
     _scheduleNext();
+    _awaitWarmup();
+  }
+
+  Future<void> _awaitWarmup() async {
+    final waitFor = widget.waitFor;
+    if (waitFor == null) {
+      _waitDone = true;
+      _tryFinish();
+      return;
+    }
+    try {
+      await waitFor;
+    } on Object {
+      // Warmup failures must not block leaving splash.
+    }
+    if (!mounted) return;
+    _waitDone = true;
+    _tryFinish();
   }
 
   void _scheduleNext() {
     Future<void>.delayed(widget.secondsPerImage, () {
       if (!mounted) return;
       if (_index >= _order.length - 1) {
-        widget.onFinished();
+        _carouselDone = true;
+        _tryFinish();
         return;
       }
       setState(() => _index += 1);
       _scheduleNext();
     });
+  }
+
+  void _tryFinish() {
+    if (_finished || !_carouselDone || !_waitDone) return;
+    _finished = true;
+    widget.onFinished();
   }
 
   @override

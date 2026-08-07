@@ -30,6 +30,9 @@ class AuthService {
     );
   }
 
+  /// Current session mapped for UI (null when signed out).
+  AppUser? get currentUser => _mapUser(_auth.currentUser);
+
   Stream<AppUser?> watchAuthState() {
     return _auth.authStateChanges().map(_mapUser);
   }

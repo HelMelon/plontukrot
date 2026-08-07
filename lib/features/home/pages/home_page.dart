@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import './../../../services/firestore_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -21,6 +23,7 @@ import '../../plants/widgets/sheets/add_repotting_sheet.dart';
 import '../../plants/widgets/sheets/merge_plant_sheet.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
+import '../../../services/startup_warmup_service.dart';
 import '../../../services/watering_service.dart';
 import '../../plants/pages/plant_archive_page.dart';
 import '../../plants/pages/plant_genus_details_page.dart';
@@ -46,7 +49,16 @@ enum _PlantSortField {
 class HomePage extends StatefulWidget {
   final AppUser user;
 
-  const HomePage({super.key, required this.user});
+  /// Fired once when the first Home content (grid or empty) is loaded,
+  /// images are precached, and at least one frame has been painted.
+  /// Used by cold-start splash to reveal only a ready Home.
+  final VoidCallback? onFirstContentReady;
+
+  const HomePage({
+    super.key,
+    required this.user,
+    this.onFirstContentReady,
+  });
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -67,6 +79,9 @@ class _HomePageState extends State<HomePage> {
   String? _filterPlantFamily;
   String? _filterGenus;
   int? _filterStage;
+  bool _firstContentReadySignaled = false;
+
+  bool get _coverLoadingUi => widget.onFirstContentReady != null;
 
   AppColorTokens get _colors => context.colors;
   AppSpacingTokens get _spacing => context.spacing;
@@ -85,6 +100,34 @@ class _HomePageState extends State<HomePage> {
     _plantsStream = PlantService().getPlants();
     _activeParentPlantIdsStream =
         PropagationService().watchActiveParentPlantIds();
+  }
+
+  Future<void> _signalFirstContentReady(List<Plant> plants) async {
+    if (_firstContentReadySignaled || widget.onFirstContentReady == null) {
+      return;
+    }
+    _firstContentReadySignaled = true;
+    await StartupWarmupService().precacheHomeContent(
+      context,
+      plants: plants,
+      avatarUrl: widget.user.photoUrl,
+    );
+    if (!mounted) return;
+    // Let PlantCard CachedNetworkImages resolve from cache and paint.
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+    widget.onFirstContentReady?.call();
+  }
+
+  Widget _loadingPlaceholder({required Color color}) {
+    if (_coverLoadingUi) {
+      return const SizedBox.shrink();
+    }
+    return Center(
+      child: CircularProgressIndicator(color: color),
+    );
   }
 
   bool get _isSelectionMode => _selectedPlantIds.isNotEmpty;
@@ -1017,12 +1060,11 @@ class _HomePageState extends State<HomePage> {
         stream: _userDocumentExistsStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(color: colors.primary),
-            );
+            return _loadingPlaceholder(color: colors.primary);
           }
 
           if (!snapshot.hasData || snapshot.data != true) {
+            unawaited(_signalFirstContentReady(const []));
             return Center(
               child: Text(
                 l10n.homeNoUserData,
@@ -1044,14 +1086,19 @@ class _HomePageState extends State<HomePage> {
                       return Center(
                         child: Padding(
                           padding: EdgeInsets.all(spacing.xxxl),
-                          child: CircularProgressIndicator(
-                            color: colors.primary,
-                          ),
+                          child: _coverLoadingUi
+                              ? SizedBox(
+                                  height: dimensions.avatar * 3,
+                                )
+                              : CircularProgressIndicator(
+                                  color: colors.primary,
+                                ),
                         ),
                       );
                     }
 
                     if (!plantSnapshot.hasData || plantSnapshot.data!.isEmpty) {
+                      unawaited(_signalFirstContentReady(const []));
                       final homeTheme = context.screens.home;
                       return Container(
                         width: double.infinity,
@@ -1083,6 +1130,7 @@ class _HomePageState extends State<HomePage> {
 
                     final plants = plantSnapshot.data!;
                     _latestPlants = plants;
+                    unawaited(_signalFirstContentReady(plants));
 
                     return StreamBuilder<Set<String>>(
                       stream: _activeParentPlantIdsStream,

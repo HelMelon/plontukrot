@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -64,7 +66,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-enum _StartupPhase { bootstrap, splash, ready }
+enum _StartupPhase { bootstrap, app }
 
 class AppStartup extends StatefulWidget {
   const AppStartup({super.key});
@@ -77,6 +79,10 @@ class _AppStartupState extends State<AppStartup> {
   _StartupPhase _phase = _StartupPhase.bootstrap;
   double _progress = 0;
   String? _statusText;
+
+  /// Completes when Login / consent / Home first content is painted under splash.
+  final Completer<void> _contentReady = Completer<void>();
+  bool _splashDismissed = false;
 
   @override
   void initState() {
@@ -119,10 +125,16 @@ class _AppStartupState extends State<AppStartup> {
 
       await Future<void>.delayed(const Duration(milliseconds: 100));
       if (!mounted) return;
-      setState(() => _phase = _StartupPhase.splash);
+      setState(() => _phase = _StartupPhase.app);
     } catch (_) {
       if (!mounted) return;
-      setState(() => _phase = _StartupPhase.splash);
+      setState(() => _phase = _StartupPhase.app);
+    }
+  }
+
+  void _onContentReady() {
+    if (!_contentReady.isCompleted) {
+      _contentReady.complete();
     }
   }
 
@@ -134,28 +146,54 @@ class _AppStartupState extends State<AppStartup> {
           progress: _progress,
           statusText: _statusText,
         );
-      case _StartupPhase.splash:
-        return SplashCarouselPage(
-          onFinished: () {
-            if (!mounted) return;
-            setState(() => _phase = _StartupPhase.ready);
-          },
+      case _StartupPhase.app:
+        // Build the real app under the splash so streams, images, and the first
+        // Home frame happen while art is visible — then reveal.
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            AuthGate(onContentReady: _onContentReady),
+            if (!_splashDismissed)
+              Positioned.fill(
+                child: SplashCarouselPage(
+                  secondsPerImage: const Duration(milliseconds: 1600),
+                  waitFor: _contentReady.future.timeout(
+                    const Duration(seconds: 20),
+                    onTimeout: () {},
+                  ),
+                  onFinished: () {
+                    if (!mounted) return;
+                    setState(() => _splashDismissed = true);
+                  },
+                ),
+              ),
+          ],
         );
-      case _StartupPhase.ready:
-        return const AuthGate();
     }
   }
 }
 
 class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
+  final VoidCallback? onContentReady;
+
+  const AuthGate({super.key, this.onContentReady});
 
   @override
   Widget build(BuildContext context) {
+    final auth = AuthService();
     return StreamBuilder<AppUser?>(
-      stream: AuthService().watchAuthState(),
+      stream: auth.watchAuthState(),
+      initialData: auth.currentUser,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        final user = snapshot.data ?? auth.currentUser;
+        final waiting = snapshot.connectionState == ConnectionState.waiting &&
+            user == null;
+
+        if (waiting) {
+          // Covered by splash during cold start; avoid a visible spinner.
+          if (onContentReady != null) {
+            return const SizedBox.expand();
+          }
           final colors = context.colors;
           return Scaffold(
             backgroundColor: Colors.transparent,
@@ -165,21 +203,58 @@ class AuthGate extends StatelessWidget {
           );
         }
 
-        if (snapshot.hasData && snapshot.data != null) {
-          return _AuthenticatedShell(user: snapshot.data!);
+        if (user != null) {
+          return _AuthenticatedShell(
+            user: user,
+            onContentReady: onContentReady,
+          );
         }
 
-        return const LoginPage();
+        return _ReadyAfterFrame(
+          onReady: onContentReady,
+          child: const LoginPage(),
+        );
       },
     );
   }
 }
 
+/// Fires [onReady] once after the first frame of [child].
+class _ReadyAfterFrame extends StatefulWidget {
+  final Widget child;
+  final VoidCallback? onReady;
+
+  const _ReadyAfterFrame({required this.child, this.onReady});
+
+  @override
+  State<_ReadyAfterFrame> createState() => _ReadyAfterFrameState();
+}
+
+class _ReadyAfterFrameState extends State<_ReadyAfterFrame> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.onReady == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onReady?.call();
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
+
 /// Syncs locale/currency from Firestore once the user is signed in.
 class _AuthenticatedShell extends StatefulWidget {
   final AppUser user;
+  final VoidCallback? onContentReady;
 
-  const _AuthenticatedShell({required this.user});
+  const _AuthenticatedShell({
+    required this.user,
+    this.onContentReady,
+  });
 
   @override
   State<_AuthenticatedShell> createState() => _AuthenticatedShellState();
@@ -208,7 +283,11 @@ class _AuthenticatedShellState extends State<_AuthenticatedShell> {
   @override
   Widget build(BuildContext context) {
     return PersonalDataConsentGatePage(
-      child: HomePage(user: widget.user),
+      onContentReady: widget.onContentReady,
+      child: HomePage(
+        user: widget.user,
+        onFirstContentReady: widget.onContentReady,
+      ),
     );
   }
 }

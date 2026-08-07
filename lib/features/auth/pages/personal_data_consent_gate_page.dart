@@ -8,8 +8,13 @@ import '../../../services/firestore_service.dart';
 /// Blocks Home until `personalDataConsentAt` exists on the user document.
 class PersonalDataConsentGatePage extends StatefulWidget {
   final Widget child;
+  final VoidCallback? onContentReady;
 
-  const PersonalDataConsentGatePage({super.key, required this.child});
+  const PersonalDataConsentGatePage({
+    super.key,
+    required this.child,
+    this.onContentReady,
+  });
 
   @override
   State<PersonalDataConsentGatePage> createState() =>
@@ -20,6 +25,17 @@ class _PersonalDataConsentGatePageState
     extends State<PersonalDataConsentGatePage> {
   bool _accepted = false;
   bool _saving = false;
+  bool _readySignaled = false;
+
+  void _signalReadyOnce() {
+    if (_readySignaled || widget.onContentReady == null) return;
+    _readySignaled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onContentReady?.call();
+      });
+    });
+  }
 
   Future<void> _submit() async {
     if (!_accepted || _saving) return;
@@ -44,6 +60,10 @@ class _PersonalDataConsentGatePageState
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting &&
             !snapshot.hasData) {
+          // Splash covers cold start; avoid a visible spinner flash.
+          if (widget.onContentReady != null) {
+            return const SizedBox.expand();
+          }
           final colors = context.colors;
           return Scaffold(
             backgroundColor: Colors.transparent,
@@ -56,6 +76,8 @@ class _PersonalDataConsentGatePageState
         if (snapshot.data == true) {
           return widget.child;
         }
+
+        _signalReadyOnce();
 
         final l10n = AppLocalizations.of(context);
         final colors = context.colors;
