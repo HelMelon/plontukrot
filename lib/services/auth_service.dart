@@ -34,7 +34,8 @@ class AuthService {
     return _auth.authStateChanges().map(_mapUser);
   }
 
-  Future<void> signInWithGoogle() async {
+  /// [recordConsent] writes `personalDataConsentAt` on the user document.
+  Future<void> signInWithGoogle({bool recordConsent = false}) async {
     if (kIsWeb) {
       final provider = GoogleAuthProvider();
 
@@ -43,7 +44,7 @@ class AuthService {
 
       await _auth.signInWithPopup(provider);
 
-      await FirestoreService().createUserDocument();
+      await FirestoreService().createUserDocument(recordConsent: recordConsent);
       return;
     }
 
@@ -67,7 +68,7 @@ class AuthService {
 
     await _auth.signInWithCredential(credential);
 
-    await FirestoreService().createUserDocument();
+    await FirestoreService().createUserDocument(recordConsent: recordConsent);
   }
 
   Future<void> signOut() async {
@@ -77,5 +78,51 @@ class AuthService {
     }
 
     await _auth.signOut();
+  }
+
+  Future<void> _reauthenticateWithGoogle() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw StateError('No signed-in user');
+    }
+
+    if (kIsWeb) {
+      final provider = GoogleAuthProvider();
+      provider.addScope('email');
+      provider.addScope('profile');
+      await user.reauthenticateWithPopup(provider);
+      return;
+    }
+
+    await _initializeGoogleSignIn();
+    final googleUser = await _googleSignIn.authenticate();
+    final googleAuth = googleUser.authentication;
+    final idToken = googleAuth.idToken;
+    if (idToken == null) {
+      throw FirebaseAuthException(code: 'google-id-token-null');
+    }
+    final credential = GoogleAuthProvider.credential(idToken: idToken);
+    await user.reauthenticateWithCredential(credential);
+  }
+
+  /// Reauthenticates, wipes Firestore + Storage user data, then deletes Auth.
+  Future<void> deleteAccount() async {
+    await _reauthenticateWithGoogle();
+    await FirestoreService().deleteAllUserData();
+
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw StateError('User missing after data wipe');
+    }
+    await user.delete();
+
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      try {
+        await _initializeGoogleSignIn();
+        await _googleSignIn.signOut();
+      } catch (_) {
+        // Auth user already deleted; ignore Google sign-out failures.
+      }
+    }
   }
 }

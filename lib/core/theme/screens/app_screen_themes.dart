@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../tokens/app_color_tokens.dart';
+import '../tokens/app_dimension_tokens.dart';
 import '../tokens/app_radii_tokens.dart';
 import '../tokens/app_spacing_tokens.dart';
 import '../tokens/app_typography_tokens.dart';
@@ -93,11 +94,15 @@ class PlantDetailsScreenTheme {
     required this.galleryActionBackground,
     required this.galleryDotSize,
     required this.galleryDotGap,
+    required this.nicknameStyle,
+    required this.infoRowLabelStyle,
+    required this.infoRowValueStyle,
   });
 
   factory PlantDetailsScreenTheme.standard({
     required AppColorTokens colors,
     required AppSpacingTokens spacing,
+    required AppTypographyTokens typography,
   }) {
     return PlantDetailsScreenTheme(
       sectionGap: spacing.xl,
@@ -109,6 +114,20 @@ class PlantDetailsScreenTheme {
       galleryActionBackground: colors.screen.withValues(alpha: 0.45),
       galleryDotSize: spacing.sm,
       galleryDotGap: spacing.xs,
+      nicknameStyle: typography.titleSmall.copyWith(
+        fontSize: (typography.titleSmall.fontSize ?? 18) + 1,
+        fontWeight: FontWeight.w600,
+        color: colors.heading,
+      ),
+      infoRowLabelStyle: typography.bodySmall.copyWith(
+        fontSize: (typography.bodySmall.fontSize ?? 13) + 1,
+        color: colors.textSecondary,
+      ),
+      infoRowValueStyle: typography.bodySmall.copyWith(
+        fontSize: (typography.bodySmall.fontSize ?? 13) + 1,
+        color: colors.heading,
+        fontWeight: FontWeight.w500,
+      ),
     );
   }
 
@@ -121,6 +140,9 @@ class PlantDetailsScreenTheme {
   final Color galleryActionBackground;
   final double galleryDotSize;
   final double galleryDotGap;
+  final TextStyle nicknameStyle;
+  final TextStyle infoRowLabelStyle;
+  final TextStyle infoRowValueStyle;
 }
 
 @immutable
@@ -211,14 +233,50 @@ class GrowthScreenTheme {
 }
 
 @immutable
-class SettingsScreenTheme {
-  const SettingsScreenTheme({required this.checkIconColor});
+class ProfileScreenTheme {
+  const ProfileScreenTheme({
+    required this.privacyLinkColor,
+    required this.statCardColor,
+    required this.avatarSize,
+    required this.dangerButtonBackground,
+    required this.dangerButtonForeground,
+    required this.dropdownTextStyle,
+    required this.statLabelStyle,
+    required this.statValueStyle,
+  });
 
-  factory SettingsScreenTheme.standard(AppColorTokens colors) {
-    return SettingsScreenTheme(checkIconColor: colors.primary);
+  factory ProfileScreenTheme.standard({
+    required AppColorTokens colors,
+    required AppDimensionTokens dimensions,
+    required AppTypographyTokens typography,
+  }) {
+    return ProfileScreenTheme(
+      privacyLinkColor: colors.primary,
+      statCardColor: colors.heading.withValues(alpha: 0.04),
+      avatarSize: dimensions.avatar * 2,
+      dangerButtonBackground: colors.error,
+      dangerButtonForeground: colors.onPrimary,
+      dropdownTextStyle: typography.bodySmall.copyWith(
+        color: colors.heading,
+      ),
+      statLabelStyle: typography.bodyMedium.copyWith(
+        color: colors.textSecondary,
+      ),
+      statValueStyle: typography.bodyMedium.copyWith(
+        color: colors.heading,
+        fontWeight: FontWeight.w600,
+      ),
+    );
   }
 
-  final Color checkIconColor;
+  final Color privacyLinkColor;
+  final Color statCardColor;
+  final double avatarSize;
+  final Color dangerButtonBackground;
+  final Color dangerButtonForeground;
+  final TextStyle dropdownTextStyle;
+  final TextStyle statLabelStyle;
+  final TextStyle statValueStyle;
 }
 
 @immutable
@@ -280,7 +338,7 @@ class AppScreenThemes {
     required this.careHistory,
     required this.catalogBuilder,
     required this.growth,
-    required this.settings,
+    required this.profile,
     required this.wishList,
     required this.finances,
   });
@@ -290,6 +348,7 @@ class AppScreenThemes {
     required AppSpacingTokens spacing,
     required AppRadiiTokens radii,
     required AppTypographyTokens typography,
+    required AppDimensionTokens dimensions,
   }) {
     return AppScreenThemes(
       splash: SplashScreenTheme.standard(
@@ -305,6 +364,7 @@ class AppScreenThemes {
       plantDetails: PlantDetailsScreenTheme.standard(
         colors: colors,
         spacing: spacing,
+        typography: typography,
       ),
       propagations: PropagationsScreenTheme.standard(
         spacing: spacing,
@@ -319,7 +379,11 @@ class AppScreenThemes {
         radii: radii,
       ),
       growth: GrowthScreenTheme.standard(radii),
-      settings: SettingsScreenTheme.standard(colors),
+      profile: ProfileScreenTheme.standard(
+        colors: colors,
+        dimensions: dimensions,
+        typography: typography,
+      ),
       wishList: WishListScreenTheme.standard(
         spacing: spacing,
         radii: radii,
@@ -339,7 +403,7 @@ class AppScreenThemes {
   final CareHistoryScreenTheme careHistory;
   final CatalogBuilderScreenTheme catalogBuilder;
   final GrowthScreenTheme growth;
-  final SettingsScreenTheme settings;
+  final ProfileScreenTheme profile;
   final WishListScreenTheme wishList;
   final FinancesScreenTheme finances;
 }

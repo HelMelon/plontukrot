@@ -90,7 +90,6 @@ Observed patterns (follow the specific model):
 
 - Missing strings → `''` or `null` after trim (`Plant._nullableTrimmed`).
 - Missing ints → `0` or `null` depending on field (`stage` defaults to `0`).
-- Missing bools → `false` for migration flags.
 - Missing timestamps → `null` (watering required `wateredAt` falls back to `DateTime.now()` on parse — be careful).
 
 Always trim user strings in **services** before write when the neighbor methods do.
@@ -106,6 +105,8 @@ Always trim user strings in **services** before write when the neighbor methods 
 
 Images: plant gallery is `images: [{ id, imageUrl, imageThumbUrl, addedAt }]` (max 5, **newest first** by `addedAt`). Cover fields `imageUrl` / `imageThumbUrl` stay in sync with the newest photo for lists (`Plant.listImageUrl`). Legacy plants with only cover fields are exposed via `Plant.galleryPhotos` without a batch migration; the date chip is hidden for synthetic `legacy` photos.
 
+User document `users/{uid}` fields include `name`, `email`, `createdAt`, `localeCode`, `currencyCode`, and `personalDataConsentAt` (Privacy Policy acceptance timestamp; see ADR-014).
+
 ---
 
 ## Backward compatibility
@@ -116,11 +117,10 @@ Readers tolerate legacy schema:
 |---------|-------------------|
 | `species` | older `name` on plant |
 | `plantFamily` | older `family` |
-| Botanical / care migration flags | backfill denorm fields and botanical naming |
 
-Writers may `FieldValue.delete()` obsolete keys when updating. Do not remove read fallbacks until data is confirmed migrated for all users.
+Writers may `FieldValue.delete()` obsolete keys when updating. In-app migrations and plant flags `careHistoryMigrated` / `botanicalFieldsMigrated` are gone from the app; leftover Firestore fields can be wiped with `dart run tools/cleanup_migration_flags.dart` (see [firebase.md](firebase.md)).
 
-**Not defined yet:** formal schema version field or migration runbook beyond in-app `migrate*` methods.
+**Not defined yet:** formal schema version field.
 
 ---
 

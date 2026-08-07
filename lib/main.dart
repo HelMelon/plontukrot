@@ -10,6 +10,7 @@ import 'core/locale/app_locale_controller.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_context.dart';
 import 'features/auth/pages/login_page.dart';
+import 'features/auth/pages/personal_data_consent_gate_page.dart';
 import 'features/home/pages/home_page.dart';
 import 'features/splash/pages/splash_flow.dart';
 import 'firebase_options.dart';
@@ -206,6 +207,8 @@ class _AuthenticatedShellState extends State<_AuthenticatedShell> {
 
   @override
   Widget build(BuildContext context) {
-    return HomePage(user: widget.user);
+    return PersonalDataConsentGatePage(
+      child: HomePage(user: widget.user),
+    );
   }
 }

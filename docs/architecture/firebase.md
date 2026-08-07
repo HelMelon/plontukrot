@@ -119,8 +119,6 @@ Leaf growth baseline (not care denorm): `initialLeafCount` — edited via `Plant
 
 `growthEvents` documents: `type`, `createdAt`, `expiresAt`; for `leafRemoved` also optional `reason` (`cutForRooting` | `eaten` | `dried`). Monthly stats count `newLeaf` as gained and all `leafRemoved` as lost.
 
-Migration flags (temporary): `careHistoryMigrated`, `botanicalFieldsMigrated`.
-
 ### Timestamps
 
 Use `readTimestamp` from `lib/models/firestore_helpers.dart` — handles `Timestamp`, `DateTime`, null.
@@ -186,3 +184,24 @@ Details: [data-model.md](data-model.md).
 | `PropagationService` | propagations + stageHistory |
 
 Instantiation: `ServiceName()` at call site — **no DI container**.
+
+---
+
+## One-shot ops scripts (`tools/`)
+
+CLI scripts talk to Firestore REST with Application Default Credentials (`gcloud auth application-default login`) or `FIREBASE_ACCESS_TOKEN`. Project default: `plant-logger-e0677`.
+
+| Script | Purpose |
+|--------|---------|
+| `tools/export_plants.dart` | Backup `users/{uid}/plants` (+ subcollections) to JSON |
+| `tools/cleanup_migration_flags.dart` | Delete obsolete `careHistoryMigrated` / `botanicalFieldsMigrated` on plant docs |
+
+Cleanup (preview, then apply):
+
+```bash
+dart run tools/cleanup_migration_flags.dart --dry-run
+dart run tools/cleanup_migration_flags.dart
+dart run tools/cleanup_migration_flags.dart --uid=<uid>
+```
+
+Does not remove legacy plant keys `name` / `family` (readers still accept them).

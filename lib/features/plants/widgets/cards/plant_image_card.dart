@@ -159,8 +159,6 @@ class _PlantImageCardState extends State<PlantImageCard> {
                             style: typography.bodySmall.copyWith(
                               color: gallery.galleryDateText,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),

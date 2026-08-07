@@ -29,7 +29,6 @@ class WateringService {
       'lastWateredAt': snapshot.docs.isEmpty
           ? FieldValue.delete()
           : snapshot.docs.first.data()['wateredAt'],
-      'careHistoryMigrated': true,
     });
   }
 
@@ -69,7 +68,6 @@ class WateringService {
     if (last == null || wateredAt.isAfter(last)) {
       batch.update(_plantsCollection.doc(plantId), {
         'lastWateredAt': Timestamp.fromDate(wateredAt),
-        'careHistoryMigrated': true,
       });
     }
 
@@ -109,7 +107,6 @@ class WateringService {
         if (last == null || wateredAt.isAfter(last)) {
           batch.update(_plantsCollection.doc(plantId), {
             'lastWateredAt': Timestamp.fromDate(wateredAt),
-            'careHistoryMigrated': true,
           });
         }
       }

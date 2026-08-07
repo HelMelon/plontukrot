@@ -138,7 +138,7 @@ class PlantCard extends StatelessWidget {
                             spacing.vXxs,
                             Text(
                               subtitle,
-                              maxLines: 1,
+                              maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                               style: typography.bodySmall.copyWith(
                                 color: colors.textSecondary,

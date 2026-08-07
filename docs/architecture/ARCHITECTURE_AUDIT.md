@@ -89,12 +89,9 @@ Global Home agent rules (Clean Architecture + flutter_bloc) **conflict** with th
 
 Waived explicitly by `architecture-status.mdc`. Docs also describe it. Not a finding to fix.
 
-### 3.5 UI triggers data migrations — **M**
+### 3.5 UI triggers data migrations — **resolved**
 
-| Code | `HomePage` StreamBuilder calls `PlantService().migrateCareDates` / `migrateBotanicalFields` |
-| Rules | Services should contain data operations; migration in UI lifecycle mixes concerns |
-| Docs | Called out as technical debt |
-| Risk | Side effects on every plants snapshot until flags are set; harder to reason about first paint |
+Former `HomePage` → `migrateCareDates` / `migrateBotanicalFields` path and plant flags `careHistoryMigrated` / `botanicalFieldsMigrated` were removed after data was backfilled.
 
 ### 3.6 Style: oversized files — **L**→**M**
 

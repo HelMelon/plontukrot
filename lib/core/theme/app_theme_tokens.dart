@@ -49,6 +49,7 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
         spacing: spacing,
         radii: radii,
         typography: typography,
+        dimensions: dimensions,
       ),
     );
   }

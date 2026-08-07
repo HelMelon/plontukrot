@@ -54,6 +54,31 @@
   "authGoogleIdTokenMissing": "Google did not return an ID token.",
   "authSignOut": "Sign out",
 
+  "authConsentLabel": "I agree to the processing of personal data",
+  "privacyPolicyLink": "Privacy Policy",
+  "authConsentGateTitle": "Personal data consent",
+  "authConsentGateBody": "To continue using the app, please accept the Privacy Policy.",
+  "authConsentContinue": "Continue",
+
+  "profileTitle": "Profile",
+  "profileEmDash": "—",
+  "profilePlantCount": "Plants",
+  "profileFavoriteFamily": "Favorite family",
+  "profileFavoriteGenus": "Favorite genus",
+  "profileActivePropagations": "On propagation",
+  "profileConsentAccepted": "Personal data consent recorded",
+  "profileDeleteAccount": "Delete profile",
+  "profileDeleteAccountConfirmTitle": "Delete profile?",
+  "profileDeleteAccountConfirmBody": "This permanently deletes your account, plants, photos, and all related data. This cannot be undone.",
+  "profileDeleteAccountConfirmAction": "Delete forever",
+  "profileDeletingAccount": "Deleting profile…",
+  "profileDeleteAccountError": "Could not delete profile: {error}",
+  "@profileDeleteAccountError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
   "settingsTitle": "Settings",
   "settingsLanguage": "Language",
   "settingsLanguageSystem": "System default",
@@ -207,6 +232,8 @@
   "plantLeafRemoveDried": "Dried out",
   "plantLeafStatsAnchor": "Leaf statistics",
   "plantLeafStatsTitle": "Leaf growth",
+  "plantLeafStatsGained": "Gained",
+  "plantLeafStatsLost": "Lost",
   "plantLeafStatsMonthLine": "{month}: gained {gained}, lost {lost}",
   "@plantLeafStatsMonthLine": {
     "placeholders": {

@@ -39,6 +39,26 @@
   "authGoogleIdTokenMissing": "Google hat kein ID-Token zurückgegeben.",
   "authSignOut": "Abmelden",
 
+  "authConsentLabel": "Ich stimme der Verarbeitung personenbezogener Daten zu",
+  "privacyPolicyLink": "Datenschutzerklärung",
+  "authConsentGateTitle": "Einwilligung zur Datenverarbeitung",
+  "authConsentGateBody": "Um die App weiter zu nutzen, akzeptieren Sie bitte die Datenschutzerklärung.",
+  "authConsentContinue": "Weiter",
+
+  "profileTitle": "Profil",
+  "profileEmDash": "—",
+  "profilePlantCount": "Pflanzen",
+  "profileFavoriteFamily": "Lieblingsfamilie",
+  "profileFavoriteGenus": "Lieblingsgattung",
+  "profileActivePropagations": "In Vermehrung",
+  "profileConsentAccepted": "Einwilligung zur Datenverarbeitung erfasst",
+  "profileDeleteAccount": "Profil löschen",
+  "profileDeleteAccountConfirmTitle": "Profil löschen?",
+  "profileDeleteAccountConfirmBody": "Konto, Pflanzen, Fotos und alle zugehörigen Daten werden dauerhaft gelöscht.",
+  "profileDeleteAccountConfirmAction": "Endgültig löschen",
+  "profileDeletingAccount": "Profil wird gelöscht…",
+  "profileDeleteAccountError": "Profil konnte nicht gelöscht werden: {error}",
+
   "settingsTitle": "Einstellungen",
   "settingsLanguage": "Sprache",
   "settingsLanguageSystem": "Systemstandard",
@@ -152,6 +172,8 @@
   "plantLeafRemoveDried": "Eingetrocknet",
   "plantLeafStatsAnchor": "Blattstatistik",
   "plantLeafStatsTitle": "Blattwachstum",
+  "plantLeafStatsGained": "Dazugekommen",
+  "plantLeafStatsLost": "Verloren",
   "plantLeafStatsMonthLine": "{month}: dazugekommen {gained}, verloren {lost}",
   "@plantLeafStatsMonthLine": {
     "placeholders": {

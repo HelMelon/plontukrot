@@ -28,7 +28,6 @@ class RepottingService {
       'lastRepottedAt': snapshot.docs.isEmpty
           ? FieldValue.delete()
           : snapshot.docs.first.data()['repottedAt'],
-      'careHistoryMigrated': true,
     });
   }
 
@@ -61,7 +60,6 @@ class RepottingService {
     if (last == null || repottedAt.isAfter(last)) {
       await _plantsCollection.doc(plantId).update({
         'lastRepottedAt': Timestamp.fromDate(repottedAt),
-        'careHistoryMigrated': true,
       });
     }
 
@@ -100,7 +98,6 @@ class RepottingService {
         if (last == null || repottedAt.isAfter(last)) {
           batch.update(_plantsCollection.doc(plantId), {
             'lastRepottedAt': Timestamp.fromDate(repottedAt),
-            'careHistoryMigrated': true,
           });
         }
       }

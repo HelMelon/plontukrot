@@ -80,7 +80,7 @@ lib/
 ├── features/
 │   ├── auth/pages/
 │   ├── home/pages/
-│   ├── settings/pages/
+│   ├── profile/pages/
 │   ├── splash/pages/
 │   ├── propagations/pages/
 │   ├── wish_list/
@@ -173,9 +173,9 @@ HomePage
 ### Locale change
 
 ```
-SettingsPage
-  → AppLocaleController.setLocaleOverride / clear
-  → SharedPreferences
+ProfilePage
+  → AppLocaleController.setPreference
+  → SharedPreferences + Firestore users/{uid}.localeCode
   → ListenableBuilder rebuilds MaterialApp.locale
 ```
 
@@ -185,21 +185,23 @@ SettingsPage
 
 ### auth
 
-**Responsibility:** Google sign-in UI and loading/error feedback.
+**Responsibility:** Google sign-in UI, personal-data consent checkbox, loading/error feedback; consent gate for existing sessions.
 
 **Structure:**
 
 ```
 features/auth/pages/login_page.dart
+features/auth/pages/personal_data_consent_gate_page.dart
 ```
 
 **Data flow:**
 
 ```
-LoginPage → AuthService → FirebaseAuth / GoogleSignIn → AppUser (via AuthGate)
+LoginPage → AuthService.signInWithGoogle(recordConsent: true) → Firestore personalDataConsentAt
+AuthGate → PersonalDataConsentGatePage → HomePage
 ```
 
-**Public API:** `LoginPage` (used by `AuthGate`).
+**Public API:** `LoginPage`, `PersonalDataConsentGatePage`.
 
 **Note:** Imports `firebase_auth` only to type `FirebaseAuthException` in catch — accepted leakage.
 
@@ -236,15 +238,15 @@ features/home/pages/home_page.dart
 ```
 HomePage
   → FirestoreService.watchUserDocumentExists
-  → PlantService.getPlants (+ migrateCareDates / migrateBotanicalFields)
+  → PlantService.getPlants
   → PropagationService.watchActiveParentPlantIds
   → WateringService / PlantService / AuthService (mutations)
-  → Navigator → plants pages, PropagationsPage, SettingsPage, sheets
+  → Navigator → plants pages, PropagationsPage, ProfilePage, sheets
 ```
 
 **Public API:** `HomePage({required AppUser user})`.
 
-**Accepted exception:** Imports plants widgets/pages and propagations/wish_list/settings pages (hub composition).
+**Accepted exception:** Imports plants widgets/pages and propagations/wish_list/profile pages (hub composition).
 
 ---
 
@@ -330,23 +332,26 @@ WishListPage «Купила» → AddPlantSheet → PlantService + WishListServi
 
 ---
 
-### settings
+### profile
 
-**Responsibility:** Language preference UI; sign-out may live on home (see code).
+**Responsibility:** User profile hub — display name/email, plant/propagation stats, language/currency dropdowns, Privacy Policy link, sign-out, full account deletion.
 
 **Structure:**
 
 ```
-features/settings/pages/settings_page.dart
+features/profile/pages/profile_page.dart
 ```
 
 **Data flow:**
 
 ```
-SettingsPage → AppLocaleController → SharedPreferences
+HomePage avatar → ProfilePage
+ProfilePage → AppLocaleController / AppCurrencyController
+ProfilePage → PlantService.getPlants + PropagationService.watchActivePropagations
+ProfilePage → AuthService.signOut / deleteAccount
 ```
 
-**Public API:** `SettingsPage`.
+**Public API:** `ProfilePage`.
 
 ---
 
@@ -360,7 +365,7 @@ SettingsPage → AppLocaleController → SharedPreferences
 | `StatefulWidget` + `setState` | Forms, sheets, selection mode, filters |
 | `TextEditingController` | Form fields (always dispose) |
 | `ChangeNotifier` (`AppLocaleController`) | App-wide locale override only |
-| `ListenableBuilder` | Rebuild `MaterialApp` / settings on locale change |
+| `ListenableBuilder` | Rebuild `MaterialApp` / profile prefs on locale change |
 
 **Not used:** Bloc, Cubit, Riverpod, Provider package, GetIt, Redux.
 
@@ -411,7 +416,7 @@ Do not introduce repositories unless there is a demonstrated need and an approve
 | `services` | Firebase SDKs, `models`, other services | Widgets / pages / `features` |
 | `main.dart` | All above, `firebase_core` | — |
 
-\*Exception: hub pages (`HomePage`) may compose pages/widgets from plants, propagations, wish_list, settings.
+\*Exception: hub pages (`HomePage`) may compose pages/widgets from plants, propagations, wish_list, profile.
 
 ---
 
@@ -511,17 +516,16 @@ Note: `ui-conventions.mdc` still mentions hardcoded Russian / no ARB — **stale
 
 ## Current Technical Debt
 
-1. **Client-side migrations** — `PlantService.migrateCareDates` / `migrateBotanicalFields` triggered from `HomePage` plant stream; flags on plant docs.
-2. **Models couple to Firestore** — many models import `cloud_firestore` for `QueryDocumentSnapshot` / `Timestamp` (accepted exception).
-3. **Inconsistent serialization** — some models lack `toMap`; writes built inline in services (`WateringEntry`, `Note`, etc.).
-4. **`Variegation` imports Flutter** — icons/colors on a model (`models` should not import UI).
-5. **Oversized hub** — `home_page.dart` is very large (filters, selection, migrations, layout).
-6. **Services constructed everywhere** — no shared instance lifecycle; many concurrent stream subscriptions via nested `StreamBuilder`s.
-7. **Legacy fields** — readers still accept old keys (`name`, `family`); updates may delete legacy fields.
-8. **Login UI types Firebase exception** — only feature-level Firebase package import.
-9. **Stale Cursor rules** — Russian-only / no-ARB conventions vs current l10n.
-10. **Thin test suite** — see [Testing](../development/testing.md).
-11. **Architecture.mdc examples** — names like `PlantModel` / `FertilizerService` do not match code (`Plant` / `FertilizeService`).
+1. **Models couple to Firestore** — many models import `cloud_firestore` for `QueryDocumentSnapshot` / `Timestamp` (accepted exception).
+2. **Inconsistent serialization** — some models lack `toMap`; writes built inline in services (`WateringEntry`, `Note`, etc.).
+3. **`Variegation` imports Flutter** — icons/colors on a model (`models` should not import UI).
+4. **Oversized hub** — `home_page.dart` is very large (filters, selection, layout).
+5. **Services constructed everywhere** — no shared instance lifecycle; many concurrent stream subscriptions via nested `StreamBuilder`s.
+6. **Legacy fields** — readers still accept old keys (`name`, `family`); updates may delete legacy fields.
+7. **Login UI types Firebase exception** — only feature-level Firebase package import.
+8. **Stale Cursor rules** — Russian-only / no-ARB conventions vs current l10n.
+9. **Thin test suite** — see [Testing](../development/testing.md).
+10. **Architecture.mdc examples** — names like `PlantModel` / `FertilizerService` do not match code (`Plant` / `FertilizeService`).
 
 ---
 

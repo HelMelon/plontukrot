@@ -28,8 +28,6 @@ class Plant {
   final String? lastFertilizerName;
   final DateTime? lastRepottedAt;
   final int initialLeafCount;
-  final bool careHistoryMigrated;
-  final bool botanicalFieldsMigrated;
   final List<PlantMember> members;
   final DateTime? archivedAt;
   final DateTime? expiresAt;
@@ -57,8 +55,6 @@ class Plant {
     this.lastFertilizerName,
     this.lastRepottedAt,
     this.initialLeafCount = 0,
-    this.careHistoryMigrated = false,
-    this.botanicalFieldsMigrated = false,
     this.members = const [],
     this.archivedAt,
     this.expiresAt,
@@ -174,9 +170,6 @@ class Plant {
       lastFertilizerName: _nullableTrimmed(data['lastFertilizerName'] as String?),
       lastRepottedAt: readTimestamp(data['lastRepottedAt']),
       initialLeafCount: data['initialLeafCount'] as int? ?? 0,
-      careHistoryMigrated: data['careHistoryMigrated'] as bool? ?? false,
-      botanicalFieldsMigrated:
-          data['botanicalFieldsMigrated'] as bool? ?? false,
       members: _readMembers(data['members']),
       archivedAt: readTimestamp(data['archivedAt']),
       expiresAt: readTimestamp(data['expiresAt']),
@@ -223,8 +216,6 @@ class Plant {
       if (lastRepottedAt != null)
         'lastRepottedAt': Timestamp.fromDate(lastRepottedAt!),
       'initialLeafCount': initialLeafCount,
-      'careHistoryMigrated': careHistoryMigrated,
-      'botanicalFieldsMigrated': botanicalFieldsMigrated,
       if (members.isNotEmpty) 'members': members.map((m) => m.toMap()).toList(),
       if (archivedAt != null) 'archivedAt': Timestamp.fromDate(archivedAt!),
       if (expiresAt != null) 'expiresAt': Timestamp.fromDate(expiresAt!),

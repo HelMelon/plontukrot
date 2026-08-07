@@ -16,7 +16,7 @@ Introduce a layered token system under `lib/core/theme/`:
 
 1. **Foundation tokens** — colors, spacing, radii, dimensions, typography, shadows.
 2. **Component themes** — buttons, sheets, inputs, cards, chips, dialogs.
-3. **Screen themes** — splash, login, home, plant details, propagations, care history, catalog builder, growth, settings.
+3. **Screen themes** — splash, login, home, plant details, propagations, care history, catalog builder, growth, profile, wish list, finances.
 
 Register tokens as `ThemeExtension<AppThemeTokens>` on `AppTheme.theme` (renamed from `darkTheme`).
 

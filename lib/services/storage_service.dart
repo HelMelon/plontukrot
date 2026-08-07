@@ -171,4 +171,18 @@ class StorageService {
       if (e.code != 'object-not-found') rethrow;
     }
   }
+
+  /// Deletes all objects under `plants/{uid}/` (legacy + gallery).
+  Future<void> deleteAllUserPlantImages() async {
+    final root = _storage.ref().child('plants').child(uid);
+    await _deleteRefRecursive(root);
+  }
+
+  Future<void> _deleteRefRecursive(Reference ref) async {
+    final listed = await ref.listAll();
+    await Future.wait([
+      for (final item in listed.items) _deleteQuietly(item),
+      for (final prefix in listed.prefixes) _deleteRefRecursive(prefix),
+    ]);
+  }
 }

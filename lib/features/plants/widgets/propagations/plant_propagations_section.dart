@@ -94,8 +94,6 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
                   children: [
                     Text(
                       '${l10n.stageTitle(item.stage)} · ${l10n.daysCount(item.daysSinceStart)}',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                       style: typography.bodyLarge.copyWith(
                         fontWeight: FontWeight.w700,
                         color: colors.textPrimary,
@@ -104,8 +102,6 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
                     spacing.vXxs,
                     Text(
                       '${l10n.propagationAliveWithMethod(item.quantityAlive, l10n.propagationMethodPlural(item.method))} · ${DateFormat('d MMM y', dateLocale).format(item.startedAt)}',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                       style: typography.bodySmall.copyWith(
                         color: colors.textSecondary,
                       ),

@@ -490,7 +490,6 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
             surfaceTintColor: Colors.transparent,
             title: Text(
               title,
-              maxLines: 1,
               softWrap: false,
               overflow: TextOverflow.ellipsis,
               style: titleStyle,

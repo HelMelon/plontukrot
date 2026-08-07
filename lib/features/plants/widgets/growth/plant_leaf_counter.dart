@@ -56,8 +56,6 @@ class PlantLeafCounter extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: spacing.lg),
                   child: Text(
                     '$count',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                     style: typography.titleLarge.copyWith(
                       fontSize: spacing.xxxl,
                       fontWeight: FontWeight.bold,
@@ -88,8 +86,6 @@ class PlantLeafCounter extends StatelessWidget {
                       Flexible(
                         child: Text(
                           l10n.plantLeafStatsAnchor,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                           style: typography.bodyEmphasis.copyWith(
                             color: colors.primary,
                           ),

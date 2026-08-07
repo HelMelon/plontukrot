@@ -116,6 +116,66 @@ class AppLocalizationsFr extends AppLocalizations {
   String get authSignOut => 'Se déconnecter';
 
   @override
+  String get authConsentLabel =>
+      'J’accepte le traitement des données personnelles';
+
+  @override
+  String get privacyPolicyLink => 'Politique de confidentialité';
+
+  @override
+  String get authConsentGateTitle => 'Consentement aux données personnelles';
+
+  @override
+  String get authConsentGateBody =>
+      'Pour continuer à utiliser l’application, veuillez accepter la Politique de confidentialité.';
+
+  @override
+  String get authConsentContinue => 'Continuer';
+
+  @override
+  String get profileTitle => 'Profil';
+
+  @override
+  String get profileEmDash => '—';
+
+  @override
+  String get profilePlantCount => 'Plantes';
+
+  @override
+  String get profileFavoriteFamily => 'Famille préférée';
+
+  @override
+  String get profileFavoriteGenus => 'Genre préféré';
+
+  @override
+  String get profileActivePropagations => 'En multiplication';
+
+  @override
+  String get profileConsentAccepted =>
+      'Consentement au traitement des données enregistré';
+
+  @override
+  String get profileDeleteAccount => 'Supprimer le profil';
+
+  @override
+  String get profileDeleteAccountConfirmTitle => 'Supprimer le profil ?';
+
+  @override
+  String get profileDeleteAccountConfirmBody =>
+      'Le compte, les plantes, les photos et toutes les données associées seront définitivement supprimés.';
+
+  @override
+  String get profileDeleteAccountConfirmAction => 'Supprimer définitivement';
+
+  @override
+  String get profileDeletingAccount => 'Suppression du profil…';
+
+  @override
+  String profileDeleteAccountError(String error) {
+    return 'Impossible de supprimer le profil : $error';
+  }
+
+  @override
   String get settingsTitle => 'Paramètres';
 
   @override
@@ -460,6 +520,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get plantLeafStatsTitle => 'Croissance des feuilles';
+
+  @override
+  String get plantLeafStatsGained => 'Gagné';
+
+  @override
+  String get plantLeafStatsLost => 'Perdu';
 
   @override
   String plantLeafStatsMonthLine(String month, int gained, int lost) {

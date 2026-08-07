@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import './../../../services/firestore_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -17,7 +15,6 @@ import '../../../core/widgets/prompt_text_dialog.dart';
 import '../../../models/app_user.dart';
 import '../../../models/plant.dart';
 import '../../../models/stage_info.dart';
-import '../../../services/auth_service.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
 import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
 import '../../plants/widgets/sheets/add_repotting_sheet.dart';
@@ -32,7 +29,7 @@ import '../../plants/widgets/cards/plant_card.dart';
 import '../../plants/widgets/search/plant_search_delegate.dart';
 import '../../finances/pages/finances_page.dart';
 import '../../propagations/pages/propagations_page.dart';
-import '../../settings/pages/settings_page.dart';
+import '../../profile/pages/profile_page.dart';
 import '../../wish_list/pages/wish_list_page.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -65,8 +62,6 @@ class _HomePageState extends State<HomePage> {
   List<Plant> _latestPlants = const [];
   _PlantSortField _sortField = _PlantSortField.createdAt;
   bool _sortAscending = false;
-  bool _careMigrationStarted = false;
-  bool _botanicalMigrationStarted = false;
   bool _filterPropagatingOnly = false;
   bool _filterGroupsOnly = false;
   String? _filterPlantFamily;
@@ -849,10 +844,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  List<Widget> _buildHomeNavActions(
-    AppLocalizations l10n,
-    AuthService authService,
-  ) {
+  List<Widget> _buildHomeNavActions(AppLocalizations l10n) {
     final colors = _colors;
     final spacing = _spacing;
     final avatarSize = _homeTheme.avatarSize;
@@ -911,58 +903,49 @@ class _HomePageState extends State<HomePage> {
           color: colors.icon,
         ),
       ),
-      IconButton(
-        tooltip: l10n.settingsTitle,
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const SettingsPage(),
-            ),
-          );
-        },
-        icon: Icon(
-          Icons.settings,
-          color: colors.icon,
-        ),
-      ),
       Padding(
         padding: EdgeInsets.symmetric(horizontal: spacing.xxs),
         child: Center(
-          child: SizedBox(
-            width: avatarSize,
-            height: avatarSize,
-            child: ClipOval(
-              child: widget.user.photoUrl != null &&
-                      widget.user.photoUrl!.isNotEmpty
-                  ? Image.network(
-                      widget.user.photoUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Icon(
-                        Icons.person,
-                        color: colors.icon,
-                      ),
-                    )
-                  : Icon(Icons.person, color: colors.icon),
+          child: Tooltip(
+            message: l10n.profileTitle,
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ProfilePage(user: widget.user),
+                  ),
+                );
+              },
+              child: SizedBox(
+                width: avatarSize,
+                height: avatarSize,
+                child: ClipOval(
+                  child: widget.user.photoUrl != null &&
+                          widget.user.photoUrl!.isNotEmpty
+                      ? Image.network(
+                          widget.user.photoUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.person,
+                            color: colors.icon,
+                          ),
+                        )
+                      : Icon(Icons.person, color: colors.icon),
+                ),
+              ),
             ),
           ),
         ),
-      ),
-      IconButton(
-        tooltip: l10n.authSignOut,
-        onPressed: () async {
-          await authService.signOut();
-        },
-        icon: Icon(Icons.logout, color: colors.icon),
       ),
     ];
   }
 
   AppBar _buildHomeAppBar(
-    AppLocalizations l10n,
-    AuthService authService, {
+    AppLocalizations l10n, {
     required bool isWide,
   }) {
-    final navActions = _buildHomeNavActions(l10n, authService);
+    final navActions = _buildHomeNavActions(l10n);
 
     return AppBar(
       backgroundColor: _colors.screen,
@@ -999,7 +982,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final authService = AuthService();
     final l10n = AppLocalizations.of(context);
     final isWide = MediaQuery.sizeOf(context).width >= _wideBreakpoint;
     final colors = _colors;
@@ -1013,7 +995,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.transparent,
       appBar: _isSelectionMode
           ? _buildSelectionAppBar(l10n, isWide: isWide)
-          : _buildHomeAppBar(l10n, authService, isWide: isWide),
+          : _buildHomeAppBar(l10n, isWide: isWide),
       floatingActionButton: _isSelectionMode
           ? null
           : FloatingActionButton(
@@ -1101,18 +1083,6 @@ class _HomePageState extends State<HomePage> {
 
                     final plants = plantSnapshot.data!;
                     _latestPlants = plants;
-                    if (!_careMigrationStarted &&
-                        plants.any((plant) => !plant.careHistoryMigrated)) {
-                      _careMigrationStarted = true;
-                      unawaited(PlantService().migrateCareDates(plants));
-                    }
-                    if (!_botanicalMigrationStarted &&
-                        plants.any(
-                          (plant) => !plant.botanicalFieldsMigrated,
-                        )) {
-                      _botanicalMigrationStarted = true;
-                      unawaited(PlantService().migrateBotanicalFields(plants));
-                    }
 
                     return StreamBuilder<Set<String>>(
                       stream: _activeParentPlantIdsStream,

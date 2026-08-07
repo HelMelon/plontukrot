@@ -4,6 +4,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import 'package:plontukrot/core/theme/theme_context.dart';
 
+import '../../../core/widgets/personal_data_consent_checkbox.dart';
 import '../../../services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
@@ -15,14 +16,17 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
+  bool _consentAccepted = false;
 
   Future<void> signIn() async {
+    if (!_consentAccepted || isLoading) return;
+
     setState(() {
       isLoading = true;
     });
 
     try {
-      await AuthService().signInWithGoogle();
+      await AuthService().signInWithGoogle(recordConsent: true);
     } catch (e) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context);
@@ -43,9 +47,11 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    setState(() {
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -90,12 +96,17 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 spacing.vXxxl,
+                PersonalDataConsentCheckbox(
+                  value: _consentAccepted,
+                  onChanged: (v) => setState(() => _consentAccepted = v),
+                ),
                 spacing.vXl,
                 SizedBox(
                   width: double.infinity,
                   height: dimensions.buttonHeight,
                   child: ElevatedButton.icon(
-                    onPressed: isLoading ? null : signIn,
+                    onPressed:
+                        isLoading || !_consentAccepted ? null : signIn,
                     icon: isLoading
                         ? SizedBox(
                             width: dimensions.iconLg,

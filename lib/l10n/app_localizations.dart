@@ -300,6 +300,114 @@ abstract class AppLocalizations {
   /// **'Sign out'**
   String get authSignOut;
 
+  /// No description provided for @authConsentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree to the processing of personal data'**
+  String get authConsentLabel;
+
+  /// No description provided for @privacyPolicyLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicyLink;
+
+  /// No description provided for @authConsentGateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal data consent'**
+  String get authConsentGateTitle;
+
+  /// No description provided for @authConsentGateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'To continue using the app, please accept the Privacy Policy.'**
+  String get authConsentGateBody;
+
+  /// No description provided for @authConsentContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get authConsentContinue;
+
+  /// No description provided for @profileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileTitle;
+
+  /// No description provided for @profileEmDash.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get profileEmDash;
+
+  /// No description provided for @profilePlantCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Plants'**
+  String get profilePlantCount;
+
+  /// No description provided for @profileFavoriteFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite family'**
+  String get profileFavoriteFamily;
+
+  /// No description provided for @profileFavoriteGenus.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite genus'**
+  String get profileFavoriteGenus;
+
+  /// No description provided for @profileActivePropagations.
+  ///
+  /// In en, this message translates to:
+  /// **'On propagation'**
+  String get profileActivePropagations;
+
+  /// No description provided for @profileConsentAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal data consent recorded'**
+  String get profileConsentAccepted;
+
+  /// No description provided for @profileDeleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete profile'**
+  String get profileDeleteAccount;
+
+  /// No description provided for @profileDeleteAccountConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete profile?'**
+  String get profileDeleteAccountConfirmTitle;
+
+  /// No description provided for @profileDeleteAccountConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes your account, plants, photos, and all related data. This cannot be undone.'**
+  String get profileDeleteAccountConfirmBody;
+
+  /// No description provided for @profileDeleteAccountConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete forever'**
+  String get profileDeleteAccountConfirmAction;
+
+  /// No description provided for @profileDeletingAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting profile…'**
+  String get profileDeletingAccount;
+
+  /// No description provided for @profileDeleteAccountError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete profile: {error}'**
+  String profileDeleteAccountError(String error);
+
   /// No description provided for @settingsTitle.
   ///
   /// In en, this message translates to:
@@ -929,6 +1037,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Leaf growth'**
   String get plantLeafStatsTitle;
+
+  /// No description provided for @plantLeafStatsGained.
+  ///
+  /// In en, this message translates to:
+  /// **'Gained'**
+  String get plantLeafStatsGained;
+
+  /// No description provided for @plantLeafStatsLost.
+  ///
+  /// In en, this message translates to:
+  /// **'Lost'**
+  String get plantLeafStatsLost;
 
   /// No description provided for @plantLeafStatsMonthLine.
   ///

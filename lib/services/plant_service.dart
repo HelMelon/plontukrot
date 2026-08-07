@@ -29,12 +29,15 @@ class PlantService {
     String tradingName = '',
     String nickname = '',
     required int stage,
+    int initialLeafCount = 0,
   }) async {
     final trimmedGenus = genus.trim();
     final trimmedSpecies = species.trim();
     final trimmedCultivar = cultivar?.trim();
     final trimmedFamily = plantFamily?.trim();
     final trimmedTradingName = tradingName.trim();
+    final safeInitialLeafCount =
+        initialLeafCount < 0 ? 0 : initialLeafCount;
 
     await _plantsRef.add({
       'genus': trimmedGenus,
@@ -53,10 +56,8 @@ class PlantService {
       'imageThumbUrl': null,
       'images': <Map<String, dynamic>>[],
       'wateringFrequency': null,
-      'initialLeafCount': 0,
+      'initialLeafCount': safeInitialLeafCount,
       'createdAt': FieldValue.serverTimestamp(),
-      'careHistoryMigrated': true,
-      'botanicalFieldsMigrated': true,
     });
 
     await _plantSpeciesService.ensureSpecies(
@@ -178,8 +179,6 @@ class PlantService {
       'wateringFrequency': null,
       'initialLeafCount': 0,
       'createdAt': FieldValue.serverTimestamp(),
-      'careHistoryMigrated': true,
-      'botanicalFieldsMigrated': true,
       'members': members.take(3).map((m) => m.toMap()).toList(),
     });
 
@@ -215,93 +214,6 @@ class PlantService {
       final plant = Plant.fromFirestore(doc);
       if (!plant.isArchived) continue;
       await _deletePlantSubtree(plant.id);
-    }
-  }
-
-  Future<void> migrateCareDates(Iterable<Plant> plants) async {
-    final plantsToMigrate = plants.where(
-      (plant) => !plant.careHistoryMigrated,
-    );
-
-    await Future.wait(plantsToMigrate.map((plant) async {
-      final plantRef = _plantsRef.doc(plant.id);
-      final results = await Future.wait([
-        plantRef
-            .collection('watering')
-            .orderBy('wateredAt', descending: true)
-            .limit(1)
-            .get(),
-        plantRef
-            .collection('fertilizing')
-            .orderBy('appliedAt', descending: true)
-            .limit(1)
-            .get(),
-      ]);
-      final watering = results[0];
-      final fertilizing = results[1];
-      final updates = <String, dynamic>{'careHistoryMigrated': true};
-
-      if (watering.docs.isNotEmpty) {
-        updates['lastWateredAt'] = watering.docs.first.data()['wateredAt'];
-      }
-      if (fertilizing.docs.isNotEmpty) {
-        final fertData = fertilizing.docs.first.data();
-        updates['lastFertilizedAt'] = fertData['appliedAt'];
-        final storedName = (fertData['fertilizerName'] as String?)?.trim();
-        if (storedName != null && storedName.isNotEmpty) {
-          updates['lastFertilizerName'] = storedName;
-        } else {
-          updates['lastFertilizerName'] = FieldValue.delete();
-        }
-      }
-
-      await plantRef.update(updates);
-    }));
-  }
-
-  Future<void> migrateBotanicalFields(Iterable<Plant> plants) async {
-    final plantsToMigrate =
-        plants.where((plant) => !plant.botanicalFieldsMigrated).toList();
-
-    await Future.wait(plantsToMigrate.map((plant) async {
-      final plantRef = _plantsRef.doc(plant.id);
-      final snap = await plantRef.get();
-      final data = snap.data() ?? <String, dynamic>{};
-
-      final species = (data['species'] as String? ??
-              data['name'] as String? ??
-              plant.species)
-          .trim();
-      final rawFamily =
-          data['plantFamily'] as String? ?? data['family'] as String?;
-      final trimmedFamily = rawFamily?.trim();
-      final plantFamily =
-          (trimmedFamily == null || trimmedFamily.isEmpty) ? null : trimmedFamily;
-      final genus = (data['genus'] as String? ?? plant.genus).trim();
-
-      await plantRef.update({
-        'species': species,
-        'genus': genus,
-        'plantFamily': plantFamily,
-        'name': FieldValue.delete(),
-        'family': FieldValue.delete(),
-        'botanicalFieldsMigrated': true,
-      });
-    }));
-
-    final speciesSeed = <String, Plant>{};
-    for (final plant in plants) {
-      final species = plant.species.trim();
-      if (species.isEmpty) continue;
-      speciesSeed.putIfAbsent(species, () => plant);
-    }
-    for (final entry in speciesSeed.entries) {
-      final plant = entry.value;
-      await _plantSpeciesService.ensureSpecies(
-        species: entry.key,
-        genus: plant.genus,
-        plantFamily: plant.plantFamily,
-      );
     }
   }
 
@@ -430,7 +342,6 @@ class PlantService {
       'wateringFrequency': wateringFrequency,
       'initialLeafCount': safeInitialLeafCount,
       'stage': stage,
-      'botanicalFieldsMigrated': true,
       'name': FieldValue.delete(),
       'family': FieldValue.delete(),
     };
@@ -521,6 +432,18 @@ class PlantService {
   Future<void> deletePlants(Iterable<String> plantIds) async {
     for (final plantId in plantIds) {
       await _deletePlantSubtree(plantId);
+    }
+  }
+
+  /// Deletes every plant document (active + archived) and their subtrees.
+  Future<void> deleteAllUserPlants() async {
+    while (true) {
+      final snapshot = await _plantsRef.limit(50).get();
+      if (snapshot.docs.isEmpty) break;
+      for (final doc in snapshot.docs) {
+        await _deletePlantSubtree(doc.id);
+      }
+      if (snapshot.docs.length < 50) break;
     }
   }
 }

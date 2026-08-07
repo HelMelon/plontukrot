@@ -19,6 +19,32 @@ class PlantGrowthStatsSection extends StatelessWidget {
     return '${raw[0].toUpperCase()}${raw.substring(1)}';
   }
 
+  Widget _statRow({
+    required String label,
+    required String value,
+    required TextStyle labelStyle,
+    required TextStyle valueStyle,
+    required double gap,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Flexible(
+          child: Text(label, style: labelStyle),
+        ),
+        SizedBox(width: gap),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: valueStyle,
+            ),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -26,6 +52,7 @@ class PlantGrowthStatsSection extends StatelessWidget {
     final colors = context.colors;
     final spacing = context.spacing;
     final typography = context.typography;
+    final details = context.screens.plantDetails;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,23 +64,35 @@ class PlantGrowthStatsSection extends StatelessWidget {
           ),
         ),
         spacing.vSm,
-        for (final stat in monthlyStats)
-          Padding(
-            padding: EdgeInsets.only(bottom: spacing.xs),
-            child: Text(
-              l10n.plantLeafStatsMonthLine(
-                _monthLabel(stat.monthStart, locale),
-                stat.newLeafCount,
-                stat.removedLeafCount,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: typography.titleMedium.copyWith(
-                fontWeight: FontWeight.normal,
-                color: colors.heading,
-              ),
-            ),
+        for (var i = 0; i < monthlyStats.length; i++) ...[
+          if (i > 0) spacing.vMd,
+          Text(
+            _monthLabel(monthlyStats[i].monthStart, locale),
+            style: details.infoRowValueStyle,
           ),
+          spacing.vXs,
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: colors.divider,
+          ),
+          spacing.vXs,
+          _statRow(
+            label: l10n.plantLeafStatsGained,
+            value: '${monthlyStats[i].newLeafCount}',
+            labelStyle: details.infoRowLabelStyle,
+            valueStyle: details.infoRowValueStyle,
+            gap: spacing.sm,
+          ),
+          spacing.vXxs,
+          _statRow(
+            label: l10n.plantLeafStatsLost,
+            value: '${monthlyStats[i].removedLeafCount}',
+            labelStyle: details.infoRowLabelStyle,
+            valueStyle: details.infoRowValueStyle,
+            gap: spacing.sm,
+          ),
+        ],
       ],
     );
   }

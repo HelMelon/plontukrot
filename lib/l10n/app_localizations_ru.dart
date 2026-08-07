@@ -115,6 +115,66 @@ class AppLocalizationsRu extends AppLocalizations {
   String get authSignOut => 'Выйти';
 
   @override
+  String get authConsentLabel =>
+      'Согласен(на) на обработку персональных данных';
+
+  @override
+  String get privacyPolicyLink => 'Политика конфиденциальности';
+
+  @override
+  String get authConsentGateTitle => 'Согласие на обработку данных';
+
+  @override
+  String get authConsentGateBody =>
+      'Чтобы продолжить пользоваться приложением, примите Политику конфиденциальности.';
+
+  @override
+  String get authConsentContinue => 'Продолжить';
+
+  @override
+  String get profileTitle => 'Профиль';
+
+  @override
+  String get profileEmDash => '—';
+
+  @override
+  String get profilePlantCount => 'Растений';
+
+  @override
+  String get profileFavoriteFamily => 'Любимое семейство';
+
+  @override
+  String get profileFavoriteGenus => 'Любимый род';
+
+  @override
+  String get profileActivePropagations => 'На размножении';
+
+  @override
+  String get profileConsentAccepted =>
+      'Согласие на обработку персональных данных получено';
+
+  @override
+  String get profileDeleteAccount => 'Удалить профиль';
+
+  @override
+  String get profileDeleteAccountConfirmTitle => 'Удалить профиль?';
+
+  @override
+  String get profileDeleteAccountConfirmBody =>
+      'Аккаунт, растения, фото и все связанные данные будут удалены безвозвратно.';
+
+  @override
+  String get profileDeleteAccountConfirmAction => 'Удалить навсегда';
+
+  @override
+  String get profileDeletingAccount => 'Удаление профиля…';
+
+  @override
+  String profileDeleteAccountError(String error) {
+    return 'Не удалось удалить профиль: $error';
+  }
+
+  @override
   String get settingsTitle => 'Настройки';
 
   @override
@@ -455,6 +515,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plantLeafStatsTitle => 'Рост листьев';
+
+  @override
+  String get plantLeafStatsGained => 'Прибыло';
+
+  @override
+  String get plantLeafStatsLost => 'Убыло';
 
   @override
   String plantLeafStatsMonthLine(String month, int gained, int lost) {

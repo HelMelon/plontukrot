@@ -52,11 +52,6 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     );
   }
 
-  TextStyle get _botanicalStyle => context.typography.titleMedium.copyWith(
-        fontWeight: FontWeight.normal,
-        color: context.colors.heading,
-      );
-
   Widget _section({Key? key, required Widget child}) {
     final cards = context.components.cards;
     return Container(
@@ -70,18 +65,56 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     );
   }
 
-  Widget? _botanicalLine(String label, String? value) {
-    final trimmed = value?.trim() ?? '';
-    if (trimmed.isEmpty) return null;
+  Widget _infoRow({
+    required String label,
+    required String value,
+    Widget? valueTrailing,
+    Widget? valueWidget,
+  }) {
+    final details = context.screens.plantDetails;
+    final spacing = context.spacing;
     return Padding(
-      padding: EdgeInsets.only(bottom: context.spacing.xs),
-      child: Text(
-        '$label: $trimmed',
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        style: _botanicalStyle,
+      padding: EdgeInsets.only(bottom: spacing.xs),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Flexible(
+            child: Text(
+              label,
+              style: details.infoRowLabelStyle,
+            ),
+          ),
+          spacing.hSm,
+          Flexible(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: valueWidget ??
+                      Text(
+                        value,
+                        textAlign: TextAlign.end,
+                        style: details.infoRowValueStyle,
+                      ),
+                ),
+                if (valueTrailing != null) ...[
+                  spacing.hXs,
+                  valueTrailing,
+                ],
+              ],
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  Widget? _infoRowIfPresent(String label, String? value) {
+    final trimmed = value?.trim() ?? '';
+    if (trimmed.isEmpty) return null;
+    return _infoRow(label: label, value: trimmed);
   }
 
   Future<void> _scrollToBotanicalDetails() async {
@@ -103,6 +136,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     final spacing = context.spacing;
     final radii = context.radii;
     final typography = context.typography;
+    final details = context.screens.plantDetails;
     final plant = widget.plant;
     final plantId = widget.plantId;
 
@@ -114,10 +148,10 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     final speciesTrimmed = plant.species.trim();
     final cultivarsDisplay = plant.cultivarsDisplay;
     final tradingNameTrimmed = plant.tradingName.trim();
-    final plantFamilyLine =
-        _botanicalLine(l10n.plantFamilyLabel, plant.plantFamily);
-    final tradingNameLine =
-        _botanicalLine(l10n.plantTradingNameLabel, tradingNameTrimmed);
+    final plantFamilyRow =
+        _infoRowIfPresent(l10n.plantFamilyLabel, plant.plantFamily);
+    final tradingNameRow =
+        _infoRowIfPresent(l10n.plantTradingNameLabel, tradingNameTrimmed);
     final variegation = plant.isGroup
         ? Variegation.none
         : plant.variegation;
@@ -126,13 +160,13 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     final createdAtLabel = plant.createdAt == null
         ? null
         : DateFormat('d MMM y', dateLocale).format(plant.createdAt!);
-    final dateAddedLine =
-        _botanicalLine(l10n.plantDateAddedLabel, createdAtLabel);
-    final hasBotanicalDetails = plantFamilyLine != null ||
+    final dateAddedRow =
+        _infoRowIfPresent(l10n.plantDateAddedLabel, createdAtLabel);
+    final hasBotanicalDetails = plantFamilyRow != null ||
         plant.genus.trim().isNotEmpty ||
-        tradingNameLine != null ||
+        tradingNameRow != null ||
         variegation != Variegation.none ||
-        dateAddedLine != null;
+        dateAddedRow != null;
 
     String careDateLabel(DateTime? date) {
       if (date == null) return l10n.commonNoData;
@@ -176,9 +210,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
           if (plant.nickname.trim().isNotEmpty)
             Text(
               plant.nickname,
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
-              style: typography.titlePage,
+              style: details.nicknameStyle,
             ),
           if (plant.nickname.trim().isNotEmpty) spacing.vXs,
           if (plant.isArchived) ...[
@@ -189,98 +221,58 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                 PlantArchiveReason.sold => l10n.plantArchiveReasonSold,
                 null => l10n.homeArchive,
               },
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: _botanicalStyle.copyWith(color: colors.textSecondary),
+              style: details.infoRowLabelStyle,
             ),
             if ((plant.archiveNote ?? '').trim().isNotEmpty)
               Padding(
                 padding: EdgeInsets.only(top: spacing.xxs, bottom: spacing.xs),
                 child: Text(
                   l10n.plantArchiveNoteLabel(plant.archiveNote!.trim()),
-                  maxLines: 4,
-                  overflow: TextOverflow.ellipsis,
-                  style: _botanicalStyle,
+                  style: details.infoRowValueStyle,
                 ),
               )
             else
               spacing.vXs,
           ],
           if (speciesTrimmed.isNotEmpty)
-            Padding(
-              padding: EdgeInsets.only(bottom: spacing.xs),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      l10n.plantSpeciesLabel(speciesTrimmed),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: _botanicalStyle,
-                    ),
-                  ),
-                  if (variegation.showIconNearSpecies) ...[
-                    spacing.hXs,
-                    Tooltip(
+            _infoRow(
+              label: l10n.plantSpecies,
+              value: speciesTrimmed,
+              valueTrailing: variegation.showIconNearSpecies
+                  ? Tooltip(
                       message: variegationLabel,
                       child: Icon(
                         variegation.icon,
                         color: variegation.iconColor,
                         size: spacing.xl,
                       ),
-                    ),
-                  ],
-                ],
-              ),
+                    )
+                  : null,
             ),
           if (cultivarsDisplay.isNotEmpty)
-            Padding(
-              padding: EdgeInsets.only(bottom: spacing.xs),
-              child: Text(
-                plant.isGroup
-                    ? l10n.plantCultivarsLabel(cultivarsDisplay)
-                    : l10n.plantCultivarLabel(cultivarsDisplay),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: _botanicalStyle,
-              ),
+            _infoRow(
+              label: l10n.plantCultivar,
+              value: cultivarsDisplay,
             ),
           if (plant.isGroup && plant.members.isNotEmpty) ...[
             for (final member in plant.members)
               if (member.variegation != Variegation.none)
-                Padding(
-                  padding: EdgeInsets.only(bottom: spacing.xxs),
-                  child: Row(
-                    children: [
-                      Icon(
-                        member.variegation.icon,
-                        color: member.variegation.iconColor,
-                        size: spacing.xl,
-                      ),
-                      spacing.hXs,
-                      Expanded(
-                        child: Text(
-                          [
-                            if ((member.cultivar ?? '').trim().isNotEmpty)
-                              member.cultivar!.trim(),
-                            l10n.variegationLabelOf(member.variegation),
-                          ].join(' · '),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: _botanicalStyle,
-                        ),
-                      ),
-                    ],
+                _infoRow(
+                  label: (member.cultivar ?? '').trim().isNotEmpty
+                      ? member.cultivar!.trim()
+                      : l10n.variegationLabel,
+                  value: l10n.variegationLabelOf(member.variegation),
+                  valueTrailing: Icon(
+                    member.variegation.icon,
+                    color: member.variegation.iconColor,
+                    size: spacing.xl,
                   ),
                 ),
           ],
           if (stage.value != 0)
-            Text(
-              l10n.plantStageLabel(l10n.stageInfoTitle(stage)),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: _botanicalStyle,
+            _infoRow(
+              label: l10n.plantGrowthStage,
+              value: l10n.stageInfoTitle(stage),
             ),
           if (hasBotanicalDetails) ...[
             spacing.vXs,
@@ -401,67 +393,47 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                   ),
                 ),
                 spacing.vSm,
-                if (plantFamilyLine != null) plantFamilyLine,
+                if (plantFamilyRow != null) plantFamilyRow,
                 if (plant.genus.trim().isNotEmpty)
-                  Padding(
-                    padding: EdgeInsets.only(bottom: spacing.xs),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(l10n.plantGenusPrefix, style: _botanicalStyle),
-                        Flexible(
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => PlantGenusDetailsPage(
-                                    genus: plant.genus.trim(),
-                                  ),
-                                ),
-                              );
-                            },
-                            borderRadius: BorderRadius.circular(radii.sm),
-                            child: Text(
-                              plant.genus.trim(),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: _botanicalStyle.copyWith(
-                                decoration: TextDecoration.underline,
-                                decorationColor:
-                                    colors.heading.withValues(alpha: 0.4),
-                              ),
+                  _infoRow(
+                    label: l10n.plantGenus,
+                    value: plant.genus.trim(),
+                    valueWidget: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PlantGenusDetailsPage(
+                              genus: plant.genus.trim(),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                Padding(
-                  padding: EdgeInsets.only(bottom: spacing.xs),
-                  child: Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          l10n.plantVariegationLabel(variegationLabel),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: _botanicalStyle,
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(radii.sm),
+                      child: Text(
+                        plant.genus.trim(),
+                        textAlign: TextAlign.end,
+                        style: details.infoRowValueStyle.copyWith(
+                          decoration: TextDecoration.underline,
+                          decorationColor:
+                              colors.heading.withValues(alpha: 0.4),
                         ),
                       ),
-                      if (variegation != Variegation.none) ...[
-                        spacing.hXs,
-                        Icon(
+                    ),
+                  ),
+                _infoRow(
+                  label: l10n.variegationLabel,
+                  value: variegationLabel,
+                  valueTrailing: variegation != Variegation.none
+                      ? Icon(
                           variegation.icon,
                           color: variegation.iconColor,
                           size: context.dimensions.iconXl,
-                        ),
-                      ],
-                    ],
-                  ),
+                        )
+                      : null,
                 ),
-                if (tradingNameLine != null) tradingNameLine,
-                if (dateAddedLine != null) dateAddedLine,
+                if (tradingNameRow != null) tradingNameRow,
+                if (dateAddedRow != null) dateAddedRow,
               ],
             ),
           );

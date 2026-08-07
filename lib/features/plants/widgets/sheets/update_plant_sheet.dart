@@ -9,6 +9,7 @@ import '../../../../models/variegation.dart';
 import '../../../../services/plant_service.dart';
 import '../selectors/plant_stage_selector.dart';
 import '../selectors/plant_variegation_selector.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 class UpdatePlantSheet extends StatefulWidget {
   final String plantId;
@@ -105,16 +106,41 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   InputDecoration _fieldDecoration({
     required String labelText,
     String? errorText,
-    required IconData icon,
+    required Widget prefixIcon,
   }) {
-    final colors = context.colors;
     final inputs = context.components.inputs;
     return inputs
         .decoration(
           labelText: labelText,
-          prefixIcon: Icon(icon, color: colors.icon),
+          prefixIcon: prefixIcon,
         )
         .copyWith(errorText: errorText);
+  }
+
+  /// Same token as Material — visual match; see [_hugePrefixIcon].
+  double get _prefixIconSize => context.dimensions.iconXl;
+
+  Widget _materialPrefixIcon(IconData icon) {
+    return Icon(
+      icon,
+      color: context.colors.icon,
+      size: _prefixIconSize,
+    );
+  }
+
+  /// [InputDecorator] forces prefix min 48×48. Material [Icon] still paints at
+  /// [size]; [HugeIcon]/[SvgPicture] scales up to fill that box unless the
+  /// min constraints are broken with [UnconstrainedBox].
+  Widget _hugePrefixIcon(List<List<dynamic>> icon) {
+    final size = _prefixIconSize;
+    return UnconstrainedBox(
+      child: HugeIcon(
+        icon: icon,
+        color: context.colors.icon,
+        size: size,
+        strokeWidth: 1.5,
+      ),
+    );
   }
 
   Future<void> updatePlant() async {
@@ -194,9 +220,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
         plantId: widget.plantId,
         genus: genus,
         species: species,
-        cultivar: _isGroup
-            ? null
-            : (cultivar.isEmpty ? null : cultivar),
+        cultivar: _isGroup ? null : (cultivar.isEmpty ? null : cultivar),
         plantFamily: plantFamily.isEmpty ? null : plantFamily,
         variegation: _isGroup ? Variegation.none : selectedVariegation,
         tradingName: tradingName,
@@ -298,7 +322,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             decoration: _fieldDecoration(
                               labelText: l10n.plantGenus,
                               errorText: genusError,
-                              icon: Icons.park_outlined,
+                              prefixIcon: _materialPrefixIcon(Icons.park_outlined),
                             ),
                           ),
                           spacing.vMd,
@@ -313,7 +337,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             decoration: _fieldDecoration(
                               labelText: l10n.plantSpecies,
                               errorText: speciesError,
-                              icon: Icons.eco,
+                              prefixIcon: _materialPrefixIcon(Icons.eco),
                             ),
                           ),
                           spacing.vMd,
@@ -336,7 +360,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                                 style: inputs.textStyle,
                                 decoration: _fieldDecoration(
                                   labelText: l10n.plantCultivar,
-                                  icon: Icons.spa_outlined,
+                                  prefixIcon: _materialPrefixIcon(Icons.spa_outlined),
                                 ),
                               ),
                               spacing.vSm,
@@ -356,7 +380,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                               style: inputs.textStyle,
                               decoration: _fieldDecoration(
                                 labelText: l10n.plantCultivar,
-                                icon: Icons.spa_outlined,
+                                prefixIcon: _materialPrefixIcon(Icons.spa_outlined),
                               ),
                             ),
                             spacing.vMd,
@@ -373,7 +397,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantTradingName,
-                              icon: Icons.storefront_outlined,
+                              prefixIcon: _materialPrefixIcon(Icons.storefront_outlined),
                             ),
                           ),
                           spacing.vMd,
@@ -382,7 +406,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantFamily,
-                              icon: Icons.family_restroom,
+                              prefixIcon: _materialPrefixIcon(Icons.family_restroom),
                             ),
                           ),
                           spacing.vMd,
@@ -391,7 +415,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantNickname,
-                              icon: Icons.local_florist,
+                              prefixIcon: _hugePrefixIcon(HugeIcons.strokeRoundedHouseHeart),
                             ),
                           ),
                           spacing.vMd,
@@ -418,7 +442,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantWateringFrequency,
-                              icon: Icons.water_drop,
+                              prefixIcon: _materialPrefixIcon(Icons.water_drop),
                             ),
                           ),
                           spacing.vMd,
@@ -431,7 +455,9 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantInitialLeafCount,
-                              icon: Icons.energy_savings_leaf_outlined,
+                              prefixIcon: _hugePrefixIcon(
+                                HugeIcons.strokeRoundedLeaf01,
+                              ),
                             ),
                           ),
                         ],

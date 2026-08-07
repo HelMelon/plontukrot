@@ -189,7 +189,6 @@ class FertilizeService {
       await _plantRef(plantId).update({
         'lastFertilizedAt': FieldValue.delete(),
         'lastFertilizerName': FieldValue.delete(),
-        'careHistoryMigrated': true,
       });
       return;
     }
@@ -202,7 +201,6 @@ class FertilizeService {
         'lastFertilizerName': storedName
       else
         'lastFertilizerName': FieldValue.delete(),
-      'careHistoryMigrated': true,
     });
   }
 
@@ -253,7 +251,6 @@ class FertilizeService {
           'lastFertilizerName': storedName
         else
           'lastFertilizerName': FieldValue.delete(),
-        'careHistoryMigrated': true,
       });
     }
 
@@ -316,7 +313,6 @@ class FertilizeService {
               'lastFertilizerName': storedName
             else
               'lastFertilizerName': FieldValue.delete(),
-            'careHistoryMigrated': true,
           });
         }
       }

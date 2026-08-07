@@ -115,6 +115,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authSignOut => 'Sign out';
 
   @override
+  String get authConsentLabel => 'I agree to the processing of personal data';
+
+  @override
+  String get privacyPolicyLink => 'Privacy Policy';
+
+  @override
+  String get authConsentGateTitle => 'Personal data consent';
+
+  @override
+  String get authConsentGateBody =>
+      'To continue using the app, please accept the Privacy Policy.';
+
+  @override
+  String get authConsentContinue => 'Continue';
+
+  @override
+  String get profileTitle => 'Profile';
+
+  @override
+  String get profileEmDash => '—';
+
+  @override
+  String get profilePlantCount => 'Plants';
+
+  @override
+  String get profileFavoriteFamily => 'Favorite family';
+
+  @override
+  String get profileFavoriteGenus => 'Favorite genus';
+
+  @override
+  String get profileActivePropagations => 'On propagation';
+
+  @override
+  String get profileConsentAccepted => 'Personal data consent recorded';
+
+  @override
+  String get profileDeleteAccount => 'Delete profile';
+
+  @override
+  String get profileDeleteAccountConfirmTitle => 'Delete profile?';
+
+  @override
+  String get profileDeleteAccountConfirmBody =>
+      'This permanently deletes your account, plants, photos, and all related data. This cannot be undone.';
+
+  @override
+  String get profileDeleteAccountConfirmAction => 'Delete forever';
+
+  @override
+  String get profileDeletingAccount => 'Deleting profile…';
+
+  @override
+  String profileDeleteAccountError(String error) {
+    return 'Could not delete profile: $error';
+  }
+
+  @override
   String get settingsTitle => 'Settings';
 
   @override
@@ -453,6 +511,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plantLeafStatsTitle => 'Leaf growth';
+
+  @override
+  String get plantLeafStatsGained => 'Gained';
+
+  @override
+  String get plantLeafStatsLost => 'Lost';
 
   @override
   String plantLeafStatsMonthLine(String month, int gained, int lost) {

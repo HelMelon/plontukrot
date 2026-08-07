@@ -39,6 +39,26 @@
   "authGoogleIdTokenMissing": "Google не вернул ID-токен.",
   "authSignOut": "Выйти",
 
+  "authConsentLabel": "Согласен(на) на обработку персональных данных",
+  "privacyPolicyLink": "Политика конфиденциальности",
+  "authConsentGateTitle": "Согласие на обработку данных",
+  "authConsentGateBody": "Чтобы продолжить пользоваться приложением, примите Политику конфиденциальности.",
+  "authConsentContinue": "Продолжить",
+
+  "profileTitle": "Профиль",
+  "profileEmDash": "—",
+  "profilePlantCount": "Растений",
+  "profileFavoriteFamily": "Любимое семейство",
+  "profileFavoriteGenus": "Любимый род",
+  "profileActivePropagations": "На размножении",
+  "profileConsentAccepted": "Согласие на обработку персональных данных получено",
+  "profileDeleteAccount": "Удалить профиль",
+  "profileDeleteAccountConfirmTitle": "Удалить профиль?",
+  "profileDeleteAccountConfirmBody": "Аккаунт, растения, фото и все связанные данные будут удалены безвозвратно.",
+  "profileDeleteAccountConfirmAction": "Удалить навсегда",
+  "profileDeletingAccount": "Удаление профиля…",
+  "profileDeleteAccountError": "Не удалось удалить профиль: {error}",
+
   "settingsTitle": "Настройки",
   "settingsLanguage": "Язык",
   "settingsLanguageSystem": "Системный",
@@ -152,6 +172,8 @@
   "plantLeafRemoveDried": "Отсушил",
   "plantLeafStatsAnchor": "Статистика листьев",
   "plantLeafStatsTitle": "Рост листьев",
+  "plantLeafStatsGained": "Прибыло",
+  "plantLeafStatsLost": "Убыло",
   "plantLeafStatsMonthLine": "{month}: прибыло {gained}, убыло {lost}",
   "@plantLeafStatsMonthLine": {
     "placeholders": {

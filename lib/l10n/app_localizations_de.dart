@@ -116,6 +116,66 @@ class AppLocalizationsDe extends AppLocalizations {
   String get authSignOut => 'Abmelden';
 
   @override
+  String get authConsentLabel =>
+      'Ich stimme der Verarbeitung personenbezogener Daten zu';
+
+  @override
+  String get privacyPolicyLink => 'Datenschutzerklärung';
+
+  @override
+  String get authConsentGateTitle => 'Einwilligung zur Datenverarbeitung';
+
+  @override
+  String get authConsentGateBody =>
+      'Um die App weiter zu nutzen, akzeptieren Sie bitte die Datenschutzerklärung.';
+
+  @override
+  String get authConsentContinue => 'Weiter';
+
+  @override
+  String get profileTitle => 'Profil';
+
+  @override
+  String get profileEmDash => '—';
+
+  @override
+  String get profilePlantCount => 'Pflanzen';
+
+  @override
+  String get profileFavoriteFamily => 'Lieblingsfamilie';
+
+  @override
+  String get profileFavoriteGenus => 'Lieblingsgattung';
+
+  @override
+  String get profileActivePropagations => 'In Vermehrung';
+
+  @override
+  String get profileConsentAccepted =>
+      'Einwilligung zur Datenverarbeitung erfasst';
+
+  @override
+  String get profileDeleteAccount => 'Profil löschen';
+
+  @override
+  String get profileDeleteAccountConfirmTitle => 'Profil löschen?';
+
+  @override
+  String get profileDeleteAccountConfirmBody =>
+      'Konto, Pflanzen, Fotos und alle zugehörigen Daten werden dauerhaft gelöscht.';
+
+  @override
+  String get profileDeleteAccountConfirmAction => 'Endgültig löschen';
+
+  @override
+  String get profileDeletingAccount => 'Profil wird gelöscht…';
+
+  @override
+  String profileDeleteAccountError(String error) {
+    return 'Profil konnte nicht gelöscht werden: $error';
+  }
+
+  @override
   String get settingsTitle => 'Einstellungen';
 
   @override
@@ -457,6 +517,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get plantLeafStatsTitle => 'Blattwachstum';
+
+  @override
+  String get plantLeafStatsGained => 'Dazugekommen';
+
+  @override
+  String get plantLeafStatsLost => 'Verloren';
 
   @override
   String plantLeafStatsMonthLine(String month, int gained, int lost) {

@@ -109,8 +109,6 @@ class PlantNoteTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   date.isEmpty ? '—' : date,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                   style: typography.caption.copyWith(
                     height: 1.2,
                     color: colors.textSecondary,

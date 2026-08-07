@@ -39,6 +39,26 @@
   "authGoogleIdTokenMissing": "Google n’a pas renvoyé de jeton d’identité.",
   "authSignOut": "Se déconnecter",
 
+  "authConsentLabel": "J’accepte le traitement des données personnelles",
+  "privacyPolicyLink": "Politique de confidentialité",
+  "authConsentGateTitle": "Consentement aux données personnelles",
+  "authConsentGateBody": "Pour continuer à utiliser l’application, veuillez accepter la Politique de confidentialité.",
+  "authConsentContinue": "Continuer",
+
+  "profileTitle": "Profil",
+  "profileEmDash": "—",
+  "profilePlantCount": "Plantes",
+  "profileFavoriteFamily": "Famille préférée",
+  "profileFavoriteGenus": "Genre préféré",
+  "profileActivePropagations": "En multiplication",
+  "profileConsentAccepted": "Consentement au traitement des données enregistré",
+  "profileDeleteAccount": "Supprimer le profil",
+  "profileDeleteAccountConfirmTitle": "Supprimer le profil ?",
+  "profileDeleteAccountConfirmBody": "Le compte, les plantes, les photos et toutes les données associées seront définitivement supprimés.",
+  "profileDeleteAccountConfirmAction": "Supprimer définitivement",
+  "profileDeletingAccount": "Suppression du profil…",
+  "profileDeleteAccountError": "Impossible de supprimer le profil : {error}",
+
   "settingsTitle": "Paramètres",
   "settingsLanguage": "Langue",
   "settingsLanguageSystem": "Langue du système",
@@ -152,6 +172,8 @@
   "plantLeafRemoveDried": "Séchée",
   "plantLeafStatsAnchor": "Statistiques des feuilles",
   "plantLeafStatsTitle": "Croissance des feuilles",
+  "plantLeafStatsGained": "Gagné",
+  "plantLeafStatsLost": "Perdu",
   "plantLeafStatsMonthLine": "{month} : gagné {gained}, perdu {lost}",
   "@plantLeafStatsMonthLine": {
     "placeholders": {

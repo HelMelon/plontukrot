@@ -30,6 +30,8 @@ Paths:
 - All user plant/care/catalog data is per-uid under `users/{uid}`.
 - Shared botanical catalog (`plantSpecies`) is readable by any signed-in user; writes are create-only from clients via `PlantSpeciesService.ensureSpecies`.
 - Do not store secrets in Firestore documents.
-- PII currently on user doc: `name`, `email` (from Google profile at create time).
+- PII currently on user doc: `name`, `email` (from Google profile at create time), and `personalDataConsentAt` (timestamp when the user accepted the Privacy Policy).
+- Privacy Policy URL: `https://helmelon.github.io/plontukrot/privacy.html` (consent required at Google sign-in; existing sessions without consent are gated).
+- Full account deletion (profile page) removes Auth user, `users/{uid}` subtree, and Storage `plants/{uid}/`; it does not remove shared `plantSpecies` entries.
 
-Formal privacy policy / GDPR runbook: **Not defined yet** in this repo docs set (see product docs if added later).
+Formal privacy policy document: hosted at the URL above (see ADR-014).

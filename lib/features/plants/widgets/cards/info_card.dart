@@ -49,8 +49,6 @@ class InfoCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                     style: typography.caption.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colors.heading,
@@ -59,8 +57,6 @@ class InfoCard extends StatelessWidget {
                   spacing.vXxs,
                   Text(
                     value,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                     style: typography.captionSmall,
                   ),
                 ],

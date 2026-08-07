@@ -8,6 +8,7 @@ import '../../../../services/plant_service.dart';
 import '../../../../services/wish_list_service.dart';
 import '../selectors/plant_stage_selector.dart';
 import '../selectors/plant_variegation_selector.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 class AddPlantSheet extends StatefulWidget {
   final String? initialTradingName;
@@ -31,6 +32,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
   late final TextEditingController tradingNameController;
   final nickNameController = TextEditingController();
   late final TextEditingController wateringFrequencyController;
+  late final TextEditingController initialLeafCountController;
 
   bool isLoading = false;
   int selectedStage = 0;
@@ -49,6 +51,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
       text: widget.initialTradingName ?? '',
     );
     wateringFrequencyController = TextEditingController();
+    initialLeafCountController = TextEditingController(text: '0');
   }
 
   @override
@@ -60,22 +63,48 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
     tradingNameController.dispose();
     nickNameController.dispose();
     wateringFrequencyController.dispose();
+    initialLeafCountController.dispose();
     super.dispose();
   }
 
   InputDecoration _fieldDecoration({
     required String labelText,
     String? errorText,
-    required IconData icon,
+    required Widget prefixIcon,
   }) {
-    final colors = context.colors;
     final inputs = context.components.inputs;
     return inputs
         .decoration(
           labelText: labelText,
-          prefixIcon: Icon(icon, color: colors.icon),
+          prefixIcon: prefixIcon,
         )
         .copyWith(errorText: errorText);
+  }
+
+  /// Same token as Material — visual match; see [_hugePrefixIcon].
+  double get _prefixIconSize => context.dimensions.iconXl;
+
+  Widget _materialPrefixIcon(IconData icon) {
+    return Icon(
+      icon,
+      color: context.colors.icon,
+      size: _prefixIconSize,
+    );
+  }
+
+  /// [InputDecorator] forces prefix min 48×48. Material [Icon] still paints at
+  /// [size]; [HugeIcon]/[SvgPicture] scales up to fill that box unless the
+  /// min constraints are broken with [UnconstrainedBox].
+  Widget _hugePrefixIcon(List<List<dynamic>> icon) {
+    final size = _prefixIconSize;
+    return UnconstrainedBox(
+      child: HugeIcon(
+        icon: icon,
+        color: context.colors.icon,
+        size: size,
+        strokeWidth: 1.5,
+      ),
+    );
   }
 
   Future<void> addPlant() async {
@@ -86,6 +115,9 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
     final plantFamily = plantFamilyController.text.trim();
     final tradingName = tradingNameController.text.trim();
     final nickname = nickNameController.text.trim();
+    final initialLeafRaw = initialLeafCountController.text.trim();
+    final initialLeafCount =
+        initialLeafRaw.isEmpty ? 0 : int.tryParse(initialLeafRaw);
 
     String? nextGenusError;
     String? nextSpeciesError;
@@ -100,6 +132,13 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
         genusError = nextGenusError;
         speciesError = nextSpeciesError;
       });
+      return;
+    }
+
+    if (initialLeafCount == null || initialLeafCount < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.plantInvalidInitialLeafCount)),
+      );
       return;
     }
 
@@ -121,6 +160,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
         tradingName: tradingName,
         nickname: nickname,
         stage: selectedStage,
+        initialLeafCount: initialLeafCount,
       );
 
       final wishListItemId = widget.wishListItemId;
@@ -178,7 +218,8 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                       height: sheets.handleHeight,
                       decoration: BoxDecoration(
                         color: sheets.handleColor,
-                        borderRadius: BorderRadius.circular(sheets.handleRadius),
+                        borderRadius:
+                            BorderRadius.circular(sheets.handleRadius),
                       ),
                     ),
                   ),
@@ -218,7 +259,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             decoration: _fieldDecoration(
                               labelText: l10n.plantGenus,
                               errorText: genusError,
-                              icon: Icons.park_outlined,
+                              prefixIcon: _materialPrefixIcon(Icons.park_outlined),
                             ),
                           ),
                           spacing.vMd,
@@ -233,7 +274,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             decoration: _fieldDecoration(
                               labelText: l10n.plantSpecies,
                               errorText: speciesError,
-                              icon: Icons.eco,
+                              prefixIcon: _materialPrefixIcon(Icons.eco),
                             ),
                           ),
                           spacing.vMd,
@@ -242,7 +283,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantCultivar,
-                              icon: Icons.spa_outlined,
+                              prefixIcon: _materialPrefixIcon(Icons.spa_outlined),
                             ),
                           ),
                           spacing.vMd,
@@ -258,7 +299,8 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantTradingName,
-                              icon: Icons.storefront_outlined,
+                              prefixIcon:
+                                  _materialPrefixIcon(Icons.storefront_outlined),
                             ),
                           ),
                           spacing.vMd,
@@ -267,7 +309,8 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantFamily,
-                              icon: Icons.family_restroom,
+                              prefixIcon:
+                                  _materialPrefixIcon(Icons.family_restroom),
                             ),
                           ),
                           spacing.vMd,
@@ -276,7 +319,9 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantNickname,
-                              icon: Icons.local_florist,
+                              prefixIcon: _hugePrefixIcon(
+                                HugeIcons.strokeRoundedHouseHeart,
+                              ),
                             ),
                           ),
                           spacing.vMd,
@@ -305,7 +350,22 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantWateringFrequency,
-                              icon: Icons.water_drop,
+                              prefixIcon: _materialPrefixIcon(Icons.water_drop),
+                            ),
+                          ),
+                          spacing.vMd,
+                          TextField(
+                            controller: initialLeafCountController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            style: inputs.textStyle,
+                            decoration: _fieldDecoration(
+                              labelText: l10n.plantInitialLeafCount,
+                              prefixIcon: _hugePrefixIcon(
+                                HugeIcons.strokeRoundedLeaf01,
+                              ),
                             ),
                           ),
                         ],
