@@ -190,6 +190,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileFriends => 'Amis';
 
   @override
+  String get profileExportPlants => 'Exporter les noms de plantes';
+
+  @override
+  String get profileExportPlantsEmpty => 'Aucune plante à exporter';
+
+  @override
+  String get profileExportingPlants => 'Export des plantes…';
+
+  @override
   String get profileMyUid => 'Votre ID';
 
   @override

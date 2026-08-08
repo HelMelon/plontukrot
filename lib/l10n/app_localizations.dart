@@ -432,6 +432,24 @@ abstract class AppLocalizations {
   /// **'Friends'**
   String get profileFriends;
 
+  /// No description provided for @profileExportPlants.
+  ///
+  /// In en, this message translates to:
+  /// **'Export plant names'**
+  String get profileExportPlants;
+
+  /// No description provided for @profileExportPlantsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No plants to export'**
+  String get profileExportPlantsEmpty;
+
+  /// No description provided for @profileExportingPlants.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting plants…'**
+  String get profileExportingPlants;
+
   /// No description provided for @profileMyUid.
   ///
   /// In en, this message translates to:

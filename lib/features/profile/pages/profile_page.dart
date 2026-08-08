@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/currency/app_currency.dart';
@@ -71,6 +76,94 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _openPrivacyPolicy() async {
     final uri = Uri.parse(kPrivacyPolicyUrl);
     await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  Future<void> _exportPlantNames() async {
+    if (_busy) return;
+    final l10n = AppLocalizations.of(context);
+    setState(() {
+      _busy = true;
+      _busyMessage = l10n.profileExportingPlants;
+    });
+    try {
+      final plants = await PlantService().getPlants().first;
+      if (!mounted) return;
+      if (plants.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.profileExportPlantsEmpty)),
+        );
+        return;
+      }
+
+      int comparePlants(Plant a, Plant b) {
+        final speciesCmp =
+            a.species.toLowerCase().compareTo(b.species.toLowerCase());
+        if (speciesCmp != 0) return speciesCmp;
+        return a.nickname.toLowerCase().compareTo(b.nickname.toLowerCase());
+      }
+
+      Map<String, dynamic> plantPayload(Plant plant) => {
+            'genus': plant.genus.trim(),
+            'species': plant.species.trim(),
+            'cultivar': plant.cultivarsDisplay,
+            'nickname': plant.nickname.trim(),
+          };
+
+      final grouped = <int, List<Plant>>{};
+      for (final plant in plants) {
+        grouped.putIfAbsent(plant.stage, () => <Plant>[]).add(plant);
+      }
+      final stageKeys = grouped.keys.toList()..sort();
+
+      final stages = <Map<String, dynamic>>[];
+      for (final stage in stageKeys) {
+        final stagePlants = List<Plant>.from(grouped[stage]!)..sort(comparePlants);
+        stages.add({
+          'stage': l10n.stageTitle(stage),
+          'count': stagePlants.length,
+          'plants': [for (final plant in stagePlants) plantPayload(plant)],
+        });
+      }
+
+      final payload = <String, dynamic>{
+        'uid': widget.user.uid,
+        'exportedAt': DateTime.now().toUtc().toIso8601String(),
+        'fields': ['cultivar', 'genus', 'nickname', 'species'],
+        'count': plants.length,
+        'stages': stages,
+      };
+
+      final dateStamp = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final fileName = 'plants-names-$dateStamp.json';
+      final bytes = utf8.encode(
+        const JsonEncoder.withIndent('  ').convert(payload),
+      );
+
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [
+            XFile.fromData(
+              bytes,
+              mimeType: 'application/json',
+              name: fileName,
+            ),
+          ],
+          fileNameOverrides: [fileName],
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commonError(e.toString()))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _busyMessage = null;
+        });
+      }
+    }
   }
 
   Future<void> _signOut() async {
@@ -323,12 +416,25 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: typography.bodyEmphasis,
                 ),
                 trailing: Icon(Icons.chevron_right, color: colors.icon),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const FriendsPage()),
-                  );
-                },
+                onTap: _busy
+                    ? null
+                    : () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const FriendsPage(),
+                          ),
+                        );
+                      },
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.upload_file_outlined, color: colors.icon),
+                title: Text(
+                  l10n.profileExportPlants,
+                  style: typography.bodyEmphasis,
+                ),
+                onTap: _busy ? null : _exportPlantNames,
               ),
               spacing.vXl,
               ListenableBuilder(

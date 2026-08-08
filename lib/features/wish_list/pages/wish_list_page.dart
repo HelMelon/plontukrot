@@ -1,9 +1,8 @@
-import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -101,13 +100,17 @@ class _WishListPageState extends State<WishListPage> {
       final lines = _latestItems
           .map((item) => '${item.nameAlt} | ${item.nameEn}')
           .join('\n');
-      final directory = await getTemporaryDirectory();
-      final file = File('${directory.path}/$fileName');
-      await file.writeAsString('$lines\n');
+      final bytes = utf8.encode('$lines\n');
 
       await SharePlus.instance.share(
         ShareParams(
-          files: [XFile(file.path, mimeType: 'text/plain')],
+          files: [
+            XFile.fromData(
+              bytes,
+              mimeType: 'text/plain',
+              name: fileName,
+            ),
+          ],
           fileNameOverrides: [fileName],
         ),
       );

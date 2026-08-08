@@ -187,6 +187,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileFriends => 'Friends';
 
   @override
+  String get profileExportPlants => 'Export plant names';
+
+  @override
+  String get profileExportPlantsEmpty => 'No plants to export';
+
+  @override
+  String get profileExportingPlants => 'Exporting plants…';
+
+  @override
   String get profileMyUid => 'Your ID';
 
   @override

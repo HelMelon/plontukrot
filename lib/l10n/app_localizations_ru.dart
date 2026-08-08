@@ -189,6 +189,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get profileFriends => 'Друзья';
 
   @override
+  String get profileExportPlants => 'Экспорт названий растений';
+
+  @override
+  String get profileExportPlantsEmpty => 'Нет растений для экспорта';
+
+  @override
+  String get profileExportingPlants => 'Экспорт растений…';
+
+  @override
   String get profileMyUid => 'Ваш ID';
 
   @override
