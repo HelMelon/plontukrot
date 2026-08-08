@@ -50,15 +50,19 @@ class MyApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
           ],
           builder: (context, child) {
-            return Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/background.png'),
-                  repeat: ImageRepeat.repeat,
-                  fit: BoxFit.contain,
+            final width = MediaQuery.sizeOf(context).width;
+            return Theme(
+              data: AppTheme.themeForWidth(width),
+              child: Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/background.png'),
+                    repeat: ImageRepeat.repeat,
+                    fit: BoxFit.contain,
+                  ),
                 ),
+                child: child,
               ),
-              child: child,
             );
           },
           home: const AppStartup(),

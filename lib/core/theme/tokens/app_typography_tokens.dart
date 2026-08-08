@@ -127,6 +127,35 @@ class AppTypographyTokens {
   final TextStyle sectionTitle;
   final TextStyle error;
 
+  /// Bumps every style's [fontSize] by [delta] (e.g. +2 on large screens).
+  AppTypographyTokens withSizeDelta(double delta) {
+    if (delta == 0) return this;
+    TextStyle bump(TextStyle style) {
+      final size = style.fontSize;
+      if (size == null) return style;
+      return style.copyWith(fontSize: size + delta);
+    }
+
+    return AppTypographyTokens(
+      brand: bump(brand),
+      titlePage: bump(titlePage),
+      titleLarge: bump(titleLarge),
+      titleMedium: bump(titleMedium),
+      titleSmall: bump(titleSmall),
+      bodyLarge: bump(bodyLarge),
+      bodyEmphasis: bump(bodyEmphasis),
+      bodyMedium: bump(bodyMedium),
+      bodySmall: bump(bodySmall),
+      label: bump(label),
+      caption: bump(caption),
+      captionSmall: bump(captionSmall),
+      button: bump(button),
+      link: bump(link),
+      sectionTitle: bump(sectionTitle),
+      error: bump(error),
+    );
+  }
+
   AppTypographyTokens lerp(AppTypographyTokens? other, double t) {
     if (other is! AppTypographyTokens) return this;
     return AppTypographyTokens(

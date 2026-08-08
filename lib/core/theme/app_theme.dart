@@ -17,7 +17,15 @@ import 'tokens/app_typography_tokens.dart';
 class AppTheme {
   AppTheme._();
 
+  /// Width at which UI type grows by [largeScreenFontDelta].
+  static const double largeScreenBreakpoint = 900;
+
+  /// Extra points added to all typography tokens on large screens.
+  static const double largeScreenFontDelta = 2;
+
   static final AppThemeTokens tokens = AppThemeTokens.standard();
+  static final AppThemeTokens _largeScreenTokens =
+      AppThemeTokens.standard(fontSizeDelta: largeScreenFontDelta);
 
   /// Static aliases for painters and code without [BuildContext].
   static AppColorTokens get colors => tokens.colors;
@@ -30,12 +38,22 @@ class AppTheme {
   /// Fixed height for primary actions (also in [dimensions.buttonHeight]).
   static double get buttonHeight => dimensions.buttonHeight;
 
-  /// Single app [ThemeData] (no light/dark switch yet).
-  static ThemeData get theme {
-    final c = colors;
-    final d = dimensions;
-    final t = typography;
-    final r = radii;
+  /// Default (phone / narrow) theme.
+  static ThemeData get theme => _buildTheme(tokens);
+
+  /// Theme with +[largeScreenFontDelta] typography for wide layouts.
+  static ThemeData get largeScreenTheme => _buildTheme(_largeScreenTokens);
+
+  static ThemeData themeForWidth(double width) {
+    return width >= largeScreenBreakpoint ? largeScreenTheme : theme;
+  }
+
+  static ThemeData _buildTheme(AppThemeTokens tokenSet) {
+    final c = tokenSet.colors;
+    final d = tokenSet.dimensions;
+    final t = tokenSet.typography;
+    final r = tokenSet.radii;
+    final s = tokenSet.spacing;
 
     ButtonStyle primaryButtonStyle({FontWeight weight = FontWeight.w700}) {
       return ElevatedButton.styleFrom(
@@ -43,7 +61,7 @@ class AppTheme {
         foregroundColor: c.onPrimary,
         minimumSize: d.buttonMinSize,
         maximumSize: d.buttonMaxSize,
-        padding: EdgeInsets.symmetric(horizontal: spacing.md),
+        padding: EdgeInsets.symmetric(horizontal: s.md),
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(r.lg),
@@ -57,7 +75,7 @@ class AppTheme {
       foregroundColor: c.textPrimary,
       minimumSize: d.buttonMinSize,
       maximumSize: d.buttonMaxSize,
-      padding: EdgeInsets.symmetric(horizontal: spacing.md),
+      padding: EdgeInsets.symmetric(horizontal: s.md),
       elevation: 0,
       side: BorderSide(color: c.outline),
       shape: RoundedRectangleBorder(
@@ -65,6 +83,8 @@ class AppTheme {
       ),
       textStyle: t.button.copyWith(color: c.textPrimary),
     );
+
+    final titleMediumSize = t.titleMedium.fontSize ?? 24;
 
     return ThemeData(
       useMaterial3: true,
@@ -81,7 +101,7 @@ class AppTheme {
         onError: c.onPrimary,
         outline: c.outline,
       ),
-      extensions: <ThemeExtension<dynamic>>[tokens],
+      extensions: <ThemeExtension<dynamic>>[tokenSet],
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: primaryButtonStyle(),
       ),
@@ -105,7 +125,7 @@ class AppTheme {
         elevation: 0,
         foregroundColor: c.heading,
         iconTheme: IconThemeData(color: c.icon),
-        titleTextStyle: t.titleMedium.copyWith(fontSize: 28),
+        titleTextStyle: t.titleMedium.copyWith(fontSize: titleMediumSize + 4),
       ),
       textTheme: GoogleFonts.amaticScTextTheme(
         TextTheme(
@@ -174,8 +194,8 @@ class AppTheme {
         labelStyle: t.bodySmall,
         secondaryLabelStyle: t.bodySmall.copyWith(color: c.onPrimary),
         padding: EdgeInsets.symmetric(
-          horizontal: spacing.sm,
-          vertical: spacing.xs,
+          horizontal: s.sm,
+          vertical: s.xs,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(r.lg),

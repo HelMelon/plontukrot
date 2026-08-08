@@ -482,34 +482,53 @@ class _HomePageState extends State<HomePage> {
     VoidCallback? onLongPress,
   }) {
     final chips = context.components.chips;
+    final spacing = _spacing;
+    final labelStyle = chips.labelStyle.copyWith(
+      color: selected
+          ? chips.selectedForeground
+          : chips.unselectedForeground,
+      height: 1.15,
+    );
+
+    // Custom chip: FilterChip's Flexible label truncates text in nested
+    // horizontal scroll on web. Size to intrinsic label width instead.
     return Padding(
-      padding: EdgeInsets.only(right: _spacing.xs),
-      child: GestureDetector(
-        onLongPress: onLongPress,
-        child: FilterChip(
-          selected: selected,
-          visualDensity: VisualDensity.compact,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          label: Text(
-            label,
-            overflow: TextOverflow.ellipsis,
-          ),
-          selectedColor: chips.selectedBackground,
-          checkmarkColor: chips.checkmark,
-          labelStyle: chips.labelStyle.copyWith(
-            color: selected
-                ? chips.selectedForeground
-                : chips.unselectedForeground,
-          ),
-          backgroundColor: chips.unselectedBackground,
+      padding: EdgeInsets.only(right: spacing.xs),
+      child: Material(
+        color: selected ? chips.selectedBackground : chips.unselectedBackground,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(chips.radius),
           side: BorderSide(
             color: selected ? chips.selectedBorder : chips.unselectedBorder,
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(chips.radius),
-          ),
-          onSelected: onSelected,
         ),
+        child: InkWell(
+          onTap: () => onSelected(!selected),
+          onLongPress: onLongPress,
+          borderRadius: BorderRadius.circular(chips.radius),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: spacing.sm,
+              vertical: spacing.xs,
+            ),
+            child: Text(
+              label,
+              softWrap: false,
+              maxLines: 1,
+              style: labelStyle,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHorizontalChipRow(List<Widget> children) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: children,
       ),
     );
   }
@@ -522,110 +541,95 @@ class _HomePageState extends State<HomePage> {
     final stageOptions = _stagesPresentIn(plants);
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (families.isNotEmpty)
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _buildFilterChip(
-                  label: l10n.homeAllFamilies,
-                  selected: _filterPlantFamily == null,
-                  onSelected: (_) {
-                    setState(() {
+          _buildHorizontalChipRow([
+            _buildFilterChip(
+              label: l10n.homeAllFamilies,
+              selected: _filterPlantFamily == null,
+              onSelected: (_) {
+                setState(() {
+                  _filterPlantFamily = null;
+                  _filterGenus = null;
+                });
+              },
+            ),
+            ...families.map(
+              (family) => _buildFilterChip(
+                label: family,
+                selected: _filterPlantFamily == family,
+                onSelected: (_) {
+                  setState(() {
+                    if (_filterPlantFamily == family) {
                       _filterPlantFamily = null;
                       _filterGenus = null;
-                    });
-                  },
-                ),
-                ...families.map(
-                  (family) => _buildFilterChip(
-                    label: family,
-                    selected: _filterPlantFamily == family,
-                    onSelected: (_) {
-                      setState(() {
-                        if (_filterPlantFamily == family) {
-                          _filterPlantFamily = null;
-                          _filterGenus = null;
-                        } else {
-                          _filterPlantFamily = family;
-                          _filterGenus = null;
-                        }
-                      });
-                    },
-                  ),
-                ),
-              ],
+                    } else {
+                      _filterPlantFamily = family;
+                      _filterGenus = null;
+                    }
+                  });
+                },
+              ),
             ),
-          ),
+          ]),
         if (_filterPlantFamily != null && genusOptions.isNotEmpty) ...[
           _spacing.vXs,
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _buildFilterChip(
-                  label: l10n.homeAllGenera,
-                  selected: _filterGenus == null,
-                  onSelected: (_) {
-                    setState(() => _filterGenus = null);
-                  },
-                ),
-                ...genusOptions.map(
-                  (genus) => _buildFilterChip(
-                    label: genus,
-                    selected: _filterGenus == genus,
-                    onSelected: (selected) {
-                      if (_filterGenus == genus) {
-                        _openGenusPage(genus);
-                        return;
-                      }
-                      setState(() {
-                        _filterGenus = selected ? genus : null;
-                      });
-                    },
-                    onLongPress: () => _openGenusPage(genus),
-                  ),
-                ),
-              ],
+          _buildHorizontalChipRow([
+            _buildFilterChip(
+              label: l10n.homeAllGenera,
+              selected: _filterGenus == null,
+              onSelected: (_) {
+                setState(() => _filterGenus = null);
+              },
             ),
-          ),
+            ...genusOptions.map(
+              (genus) => _buildFilterChip(
+                label: genus,
+                selected: _filterGenus == genus,
+                onSelected: (selected) {
+                  if (_filterGenus == genus) {
+                    _openGenusPage(genus);
+                    return;
+                  }
+                  setState(() {
+                    _filterGenus = selected ? genus : null;
+                  });
+                },
+                onLongPress: () => _openGenusPage(genus),
+              ),
+            ),
+          ]),
         ],
         if (stageOptions.isNotEmpty) ...[
           if (families.isNotEmpty ||
               (_filterPlantFamily != null && genusOptions.isNotEmpty))
             _spacing.vXs,
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _buildFilterChip(
-                  label: l10n.homeAllStages,
-                  selected: _filterStage == null,
-                  onSelected: (_) {
-                    setState(() => _filterStage = null);
-                  },
-                ),
-                ...stageOptions.map(
-                  (stage) => _buildFilterChip(
-                    label: l10n.stageInfoTitle(stage),
-                    selected: _filterStage == stage.value,
-                    onSelected: (selected) {
-                      if (_filterStage == stage.value) {
-                        _openStagePage(stage.value);
-                        return;
-                      }
-                      setState(() {
-                        _filterStage = selected ? stage.value : null;
-                      });
-                    },
-                    onLongPress: () => _openStagePage(stage.value),
-                  ),
-                ),
-              ],
+          _buildHorizontalChipRow([
+            _buildFilterChip(
+              label: l10n.homeAllStages,
+              selected: _filterStage == null,
+              onSelected: (_) {
+                setState(() => _filterStage = null);
+              },
             ),
-          ),
+            ...stageOptions.map(
+              (stage) => _buildFilterChip(
+                label: l10n.stageInfoTitle(stage),
+                selected: _filterStage == stage.value,
+                onSelected: (selected) {
+                  if (_filterStage == stage.value) {
+                    _openStagePage(stage.value);
+                    return;
+                  }
+                  setState(() {
+                    _filterStage = selected ? stage.value : null;
+                  });
+                },
+                onLongPress: () => _openStagePage(stage.value),
+              ),
+            ),
+          ]),
         ],
       ],
     );
@@ -1176,17 +1180,16 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 if (!_isSelectionMode)
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Flexible(
+                                      Expanded(
                                         child: Wrap(
                                           spacing: spacing.xs,
                                           runSpacing: spacing.xs,
                                           children: [
                                             FilterChip(
                                               selected: _filterPropagatingOnly,
-                                              visualDensity:
-                                                  VisualDensity.compact,
                                               materialTapTargetSize:
                                                   MaterialTapTargetSize
                                                       .shrinkWrap,
@@ -1211,6 +1214,7 @@ class _HomePageState extends State<HomePage> {
                                                     ? chips.selectedForeground
                                                     : chips
                                                         .unselectedForeground,
+                                                height: 1.1,
                                               ),
                                               backgroundColor:
                                                   chips.unselectedBackground,
@@ -1234,8 +1238,6 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                             FilterChip(
                                               selected: _filterGroupsOnly,
-                                              visualDensity:
-                                                  VisualDensity.compact,
                                               materialTapTargetSize:
                                                   MaterialTapTargetSize
                                                       .shrinkWrap,
@@ -1259,6 +1261,7 @@ class _HomePageState extends State<HomePage> {
                                                     ? chips.selectedForeground
                                                     : chips
                                                         .unselectedForeground,
+                                                height: 1.1,
                                               ),
                                               backgroundColor:
                                                   chips.unselectedBackground,
@@ -1283,65 +1286,56 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       spacing.hXs,
-                                      Flexible(
-                                        child: Align(
-                                          alignment: Alignment.topRight,
-                                          child:
-                                              PopupMenuButton<_PlantSortField>(
-                                            tooltip: l10n.homeSort,
-                                            onSelected: _setSortField,
-                                            itemBuilder: (context) =>
-                                                _PlantSortField.values
-                                                    .map(
-                                                      (field) => PopupMenuItem(
-                                                        value: field,
-                                                        child: Row(
-                                                          children: [
-                                                            if (_sortField ==
-                                                                field)
-                                                              Icon(
-                                                                _sortAscending
-                                                                    ? Icons
-                                                                        .arrow_upward
-                                                                    : Icons
-                                                                        .arrow_downward,
-                                                                size: dimensions
-                                                                    .iconLg,
-                                                              )
-                                                            else
-                                                              SizedBox(
-                                                                  width: dimensions
-                                                                      .iconLg),
-                                                            spacing.hXs,
-                                                            Text(
-                                                              _sortMenuLabel(
-                                                                field,
-                                                                l10n,
-                                                              ),
-                                                            ),
-                                                          ],
+                                      PopupMenuButton<_PlantSortField>(
+                                        tooltip: l10n.homeSort,
+                                        onSelected: _setSortField,
+                                        itemBuilder: (context) =>
+                                            _PlantSortField.values
+                                                .map(
+                                                  (field) => PopupMenuItem(
+                                                    value: field,
+                                                    child: Row(
+                                                      children: [
+                                                        if (_sortField == field)
+                                                          Icon(
+                                                            _sortAscending
+                                                                ? Icons
+                                                                    .arrow_upward
+                                                                : Icons
+                                                                    .arrow_downward,
+                                                            size: dimensions
+                                                                .iconLg,
+                                                          )
+                                                        else
+                                                          SizedBox(
+                                                              width: dimensions
+                                                                  .iconLg),
+                                                        spacing.hXs,
+                                                        Text(
+                                                          _sortMenuLabel(
+                                                            field,
+                                                            l10n,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    )
-                                                    .toList(),
-                                            child: Chip(
-                                              visualDensity:
-                                                  VisualDensity.compact,
-                                              materialTapTargetSize:
-                                                  MaterialTapTargetSize
-                                                      .shrinkWrap,
-                                              avatar: Icon(
-                                                _sortAscending
-                                                    ? Icons.arrow_upward
-                                                    : Icons.arrow_downward,
-                                                size: dimensions.iconSm,
-                                              ),
-                                              label: Text(
-                                                _sortLabel(l10n),
-                                                overflow: TextOverflow.ellipsis,
-                                                style: typography.bodySmall,
-                                              ),
-                                            ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                )
+                                                .toList(),
+                                        child: Chip(
+                                          materialTapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                          avatar: Icon(
+                                            _sortAscending
+                                                ? Icons.arrow_upward
+                                                : Icons.arrow_downward,
+                                            size: dimensions.iconSm,
+                                          ),
+                                          label: Text(
+                                            _sortLabel(l10n),
+                                            overflow: TextOverflow.ellipsis,
+                                            style: typography.bodySmall
+                                                .copyWith(height: 1.1),
                                           ),
                                         ),
                                       ),

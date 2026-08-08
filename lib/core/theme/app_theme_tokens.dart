@@ -23,12 +23,13 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
     required this.screens,
   });
 
-  factory AppThemeTokens.standard() {
+  factory AppThemeTokens.standard({double fontSizeDelta = 0}) {
     const colors = AppColorTokens.standard;
     const spacing = AppSpacingTokens.standard;
     const radii = AppRadiiTokens.standard;
     const dimensions = AppDimensionTokens.standard;
-    final typography = AppTypographyTokens.standard(colors);
+    final typography =
+        AppTypographyTokens.standard(colors).withSizeDelta(fontSizeDelta);
     final shadows = AppShadowTokens.standard(colors);
     return AppThemeTokens(
       colors: colors,
