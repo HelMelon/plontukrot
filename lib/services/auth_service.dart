@@ -8,6 +8,21 @@ import '../models/app_user.dart';
 import 'app_crash_reporting.dart';
 import 'firestore_service.dart';
 
+/// User-facing category for Google / Firebase Auth failures.
+enum AuthFailureKind {
+  /// User dismissed the account picker / popup — usually no snackbar.
+  cancelled,
+
+  /// Offline or network failure (including offline disguised as cancel/reauth).
+  network,
+
+  /// Google returned no ID token.
+  missingIdToken,
+
+  /// Anything else — show a generic retry message.
+  unknown,
+}
+
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -36,6 +51,81 @@ class AuthService {
 
   Stream<AppUser?> watchAuthState() {
     return _auth.authStateChanges().map(_mapUser);
+  }
+
+  /// Maps a thrown auth error to a UI category (no raw exception text).
+  static AuthFailureKind classifyFailure(Object error) {
+    if (error is FirebaseAuthException) {
+      switch (error.code) {
+        case 'popup-closed-by-user':
+        case 'cancelled-popup-request':
+        case 'web-context-cancelled':
+          return AuthFailureKind.cancelled;
+        case 'network-request-failed':
+          return AuthFailureKind.network;
+        case 'google-id-token-null':
+          return AuthFailureKind.missingIdToken;
+      }
+    }
+
+    if (error is GoogleSignInException) {
+      final description = (error.description ?? '').toLowerCase();
+      switch (error.code) {
+        case GoogleSignInExceptionCode.canceled:
+        case GoogleSignInExceptionCode.interrupted:
+          // Offline sign-in often surfaces as canceled + "Account reauth failed".
+          if (_looksLikeNetworkFailure(description)) {
+            return AuthFailureKind.network;
+          }
+          return AuthFailureKind.cancelled;
+        case GoogleSignInExceptionCode.uiUnavailable:
+          return AuthFailureKind.cancelled;
+        case GoogleSignInExceptionCode.clientConfigurationError:
+        case GoogleSignInExceptionCode.providerConfigurationError:
+        case GoogleSignInExceptionCode.userMismatch:
+        case GoogleSignInExceptionCode.unknownError:
+          break;
+      }
+    }
+
+    if (error is SocketException) {
+      return AuthFailureKind.network;
+    }
+
+    final message = error.toString().toLowerCase();
+    if (_looksLikeNetworkFailure(message)) {
+      return AuthFailureKind.network;
+    }
+    if (message.contains('popup-closed-by-user') ||
+        message.contains('cancelled-popup-request') ||
+        message.contains('web-context-cancelled')) {
+      return AuthFailureKind.cancelled;
+    }
+    if (message.contains('canceled') || message.contains('cancelled')) {
+      if (_looksLikeNetworkFailure(message) || message.contains('reauth')) {
+        return AuthFailureKind.network;
+      }
+      return AuthFailureKind.cancelled;
+    }
+    if (message.contains('google-id-token-null')) {
+      return AuthFailureKind.missingIdToken;
+    }
+
+    return AuthFailureKind.unknown;
+  }
+
+  static bool _looksLikeNetworkFailure(String lowercased) {
+    return lowercased.contains('network') ||
+        lowercased.contains('socket') ||
+        lowercased.contains('failed host lookup') ||
+        lowercased.contains('connection abort') ||
+        lowercased.contains('connection reset') ||
+        lowercased.contains('connection refused') ||
+        lowercased.contains('timed out') ||
+        lowercased.contains('timeout') ||
+        lowercased.contains('offline') ||
+        lowercased.contains('reauth failed') ||
+        lowercased.contains('account reauth');
   }
 
   /// [recordConsent] writes `personalDataConsentAt` on the user document.
@@ -75,7 +165,7 @@ class AuthService {
 
       await FirestoreService().createUserDocument(recordConsent: recordConsent);
     } catch (error, stack) {
-      if (!_isUserCancelledAuth(error)) {
+      if (classifyFailure(error) != AuthFailureKind.cancelled) {
         await AppCrashReporting.instance.recordError(
           error,
           stack,
@@ -84,16 +174,6 @@ class AuthService {
       }
       rethrow;
     }
-  }
-
-  bool _isUserCancelledAuth(Object error) {
-    if (error is FirebaseAuthException) {
-      return error.code == 'popup-closed-by-user' ||
-          error.code == 'cancelled-popup-request' ||
-          error.code == 'web-context-cancelled';
-    }
-    final message = error.toString().toLowerCase();
-    return message.contains('canceled') || message.contains('cancelled');
   }
 
   Future<void> signOut() async {
@@ -154,11 +234,13 @@ class AuthService {
 
       await AppCrashReporting.instance.setUserId(null);
     } catch (error, stack) {
-      await AppCrashReporting.instance.recordError(
-        error,
-        stack,
-        reason: 'auth_delete_account_failed',
-      );
+      if (classifyFailure(error) != AuthFailureKind.cancelled) {
+        await AppCrashReporting.instance.recordError(
+          error,
+          stack,
+          reason: 'auth_delete_account_failed',
+        );
+      }
       rethrow;
     }
   }

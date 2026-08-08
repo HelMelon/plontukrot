@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
@@ -6,6 +5,7 @@ import 'package:plontukrot/core/theme/theme_context.dart';
 
 import '../../../core/widgets/personal_data_consent_checkbox.dart';
 import '../../../services/auth_service.dart';
+import '../auth_failure_messages.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -30,12 +30,10 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context);
+      final message = authFailureMessage(AuthService.classifyFailure(e), l10n);
+      if (message == null) return;
       final colors = context.colors;
       final typography = context.typography;
-      final message = e is FirebaseAuthException &&
-              e.code == 'google-id-token-null'
-          ? l10n.authGoogleIdTokenMissing
-          : l10n.authSignInError(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: colors.card,
@@ -45,12 +43,12 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       );
-    }
-
-    if (mounted) {
-      setState(() {
-        isLoading = false;
-      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 

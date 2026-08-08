@@ -36,6 +36,8 @@
   "authSignInGoogle": "Войти через Google",
   "authSigningIn": "Вход…",
   "authSignInError": "Ошибка входа: {error}",
+  "authSignInNetworkError": "Нет соединения с интернетом. Проверьте сеть и попробуйте снова.",
+  "authSignInFailed": "Не удалось войти. Попробуйте ещё раз.",
   "authGoogleIdTokenMissing": "Google не вернул ID-токен.",
   "authSignOut": "Выйти",
 
@@ -58,6 +60,7 @@
   "profileDeleteAccountConfirmAction": "Удалить навсегда",
   "profileDeletingAccount": "Удаление профиля…",
   "profileDeleteAccountError": "Не удалось удалить профиль: {error}",
+  "profileDeleteAccountFailed": "Не удалось удалить профиль. Попробуйте ещё раз.",
   "profileFriends": "Друзья",
   "profileMyUid": "Ваш ID",
   "profileUidCopied": "ID скопирован",

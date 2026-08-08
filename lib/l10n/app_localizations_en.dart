@@ -109,6 +109,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get authSignInNetworkError =>
+      'No internet connection. Check your network and try again.';
+
+  @override
+  String get authSignInFailed => 'Could not sign in. Please try again.';
+
+  @override
   String get authGoogleIdTokenMissing => 'Google did not return an ID token.';
 
   @override
@@ -171,6 +178,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String profileDeleteAccountError(String error) {
     return 'Could not delete profile: $error';
   }
+
+  @override
+  String get profileDeleteAccountFailed =>
+      'Could not delete profile. Please try again.';
 
   @override
   String get profileFriends => 'Friends';

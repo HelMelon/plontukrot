@@ -36,6 +36,8 @@
   "authSignInGoogle": "Se connecter avec Google",
   "authSigningIn": "Connexion…",
   "authSignInError": "Erreur de connexion : {error}",
+  "authSignInNetworkError": "Pas de connexion Internet. Vérifiez le réseau et réessayez.",
+  "authSignInFailed": "Connexion impossible. Veuillez réessayer.",
   "authGoogleIdTokenMissing": "Google n’a pas renvoyé de jeton d’identité.",
   "authSignOut": "Se déconnecter",
 
@@ -58,6 +60,7 @@
   "profileDeleteAccountConfirmAction": "Supprimer définitivement",
   "profileDeletingAccount": "Suppression du profil…",
   "profileDeleteAccountError": "Impossible de supprimer le profil : {error}",
+  "profileDeleteAccountFailed": "Impossible de supprimer le profil. Veuillez réessayer.",
   "profileFriends": "Amis",
   "profileMyUid": "Votre ID",
   "profileUidCopied": "ID copié",

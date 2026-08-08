@@ -288,6 +288,18 @@ abstract class AppLocalizations {
   /// **'Sign-in error: {error}'**
   String authSignInError(String error);
 
+  /// No description provided for @authSignInNetworkError.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Check your network and try again.'**
+  String get authSignInNetworkError;
+
+  /// No description provided for @authSignInFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not sign in. Please try again.'**
+  String get authSignInFailed;
+
   /// No description provided for @authGoogleIdTokenMissing.
   ///
   /// In en, this message translates to:
@@ -407,6 +419,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not delete profile: {error}'**
   String profileDeleteAccountError(String error);
+
+  /// No description provided for @profileDeleteAccountFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete profile. Please try again.'**
+  String get profileDeleteAccountFailed;
 
   /// No description provided for @profileFriends.
   ///

@@ -129,8 +129,16 @@ class _ProfilePageState extends State<ProfilePage> {
       if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
     } catch (e) {
       if (!mounted) return;
+      final kind = AuthService.classifyFailure(e);
+      final message = switch (kind) {
+        AuthFailureKind.cancelled => null,
+        AuthFailureKind.network => l10n.authSignInNetworkError,
+        AuthFailureKind.missingIdToken => l10n.authGoogleIdTokenMissing,
+        AuthFailureKind.unknown => l10n.profileDeleteAccountFailed,
+      };
+      if (message == null) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.profileDeleteAccountError(e.toString()))),
+        SnackBar(content: Text(message)),
       );
     } finally {
       if (mounted) {

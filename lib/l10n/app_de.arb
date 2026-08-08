@@ -36,6 +36,8 @@
   "authSignInGoogle": "Mit Google anmelden",
   "authSigningIn": "Anmeldung…",
   "authSignInError": "Anmeldefehler: {error}",
+  "authSignInNetworkError": "Keine Internetverbindung. Prüfe das Netzwerk und versuche es erneut.",
+  "authSignInFailed": "Anmeldung fehlgeschlagen. Bitte erneut versuchen.",
   "authGoogleIdTokenMissing": "Google hat kein ID-Token zurückgegeben.",
   "authSignOut": "Abmelden",
 
@@ -58,6 +60,7 @@
   "profileDeleteAccountConfirmAction": "Endgültig löschen",
   "profileDeletingAccount": "Profil wird gelöscht…",
   "profileDeleteAccountError": "Profil konnte nicht gelöscht werden: {error}",
+  "profileDeleteAccountFailed": "Profil konnte nicht gelöscht werden. Bitte erneut versuchen.",
   "profileFriends": "Freunde",
   "profileMyUid": "Deine ID",
   "profileUidCopied": "ID kopiert",

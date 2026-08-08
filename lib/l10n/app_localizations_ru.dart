@@ -109,6 +109,13 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get authSignInNetworkError =>
+      'Нет соединения с интернетом. Проверьте сеть и попробуйте снова.';
+
+  @override
+  String get authSignInFailed => 'Не удалось войти. Попробуйте ещё раз.';
+
+  @override
   String get authGoogleIdTokenMissing => 'Google не вернул ID-токен.';
 
   @override
@@ -173,6 +180,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String profileDeleteAccountError(String error) {
     return 'Не удалось удалить профиль: $error';
   }
+
+  @override
+  String get profileDeleteAccountFailed =>
+      'Не удалось удалить профиль. Попробуйте ещё раз.';
 
   @override
   String get profileFriends => 'Друзья';

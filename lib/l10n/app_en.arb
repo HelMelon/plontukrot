@@ -51,6 +51,8 @@
       "error": {"type": "String"}
     }
   },
+  "authSignInNetworkError": "No internet connection. Check your network and try again.",
+  "authSignInFailed": "Could not sign in. Please try again.",
   "authGoogleIdTokenMissing": "Google did not return an ID token.",
   "authSignOut": "Sign out",
 
@@ -78,6 +80,7 @@
       "error": {"type": "String"}
     }
   },
+  "profileDeleteAccountFailed": "Could not delete profile. Please try again.",
   "profileFriends": "Friends",
   "profileMyUid": "Your ID",
   "profileUidCopied": "ID copied",

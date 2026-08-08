@@ -109,6 +109,13 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get authSignInNetworkError =>
+      'Pas de connexion Internet. Vérifiez le réseau et réessayez.';
+
+  @override
+  String get authSignInFailed => 'Connexion impossible. Veuillez réessayer.';
+
+  @override
   String get authGoogleIdTokenMissing =>
       'Google n’a pas renvoyé de jeton d’identité.';
 
@@ -174,6 +181,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String profileDeleteAccountError(String error) {
     return 'Impossible de supprimer le profil : $error';
   }
+
+  @override
+  String get profileDeleteAccountFailed =>
+      'Impossible de supprimer le profil. Veuillez réessayer.';
 
   @override
   String get profileFriends => 'Amis';
