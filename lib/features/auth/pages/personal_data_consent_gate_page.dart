@@ -96,15 +96,16 @@ class _PersonalDataConsentGatePageState
                   children: [
                     Text(
                       l10n.authConsentGateTitle,
-                      style: typography.titleMedium.copyWith(
+                      style: typography.titleSmall.copyWith(
                         color: colors.heading,
                       ),
                     ),
                     spacing.vMd,
                     Text(
                       l10n.authConsentGateBody,
-                      style: typography.bodyLarge.copyWith(
+                      style: typography.bodyMedium.copyWith(
                         color: colors.textSecondary,
+                        height: 1.4,
                       ),
                     ),
                     spacing.vXl,

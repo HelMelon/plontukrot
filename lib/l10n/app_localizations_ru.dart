@@ -237,6 +237,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get friendsOpenCollection => 'Коллекция';
 
   @override
+  String get friendsOpenWishList => 'WishLeafs';
+
+  @override
   String get friendsGiftsInbox => 'Подарки растений';
 
   @override
@@ -266,6 +269,17 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get friendsCollectionPrivate => 'Коллекция скрыта';
+
+  @override
+  String friendsWishListTitle(String name) {
+    return 'WishLeafs — $name';
+  }
+
+  @override
+  String get friendsWishListEmpty => 'Список желаний пуст';
+
+  @override
+  String get friendsWishListPrivate => 'Список желаний скрыт';
 
   @override
   String get friendsReadOnly => 'Только просмотр';

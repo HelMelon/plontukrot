@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'app_theme_tokens.dart';
 import 'tokens/app_color_tokens.dart';
@@ -127,17 +126,17 @@ class AppTheme {
         iconTheme: IconThemeData(color: c.icon),
         titleTextStyle: t.titleMedium.copyWith(fontSize: titleMediumSize + 4),
       ),
-      textTheme: GoogleFonts.amaticScTextTheme(
-        TextTheme(
-          bodyLarge: t.bodyLarge,
-          bodyMedium: t.bodyMedium,
-          bodySmall: t.bodySmall,
-          titleLarge: t.titleLarge,
-          titleMedium: t.titleMedium,
-          titleSmall: t.titleSmall,
-          labelLarge: t.label,
-          headlineMedium: t.titleMedium,
-        ),
+      // Tokens already use Amatic SC — do not wrap with
+      // GoogleFonts.amaticScTextTheme (avoids merging Material defaults).
+      textTheme: TextTheme(
+        bodyLarge: t.bodyLarge,
+        bodyMedium: t.bodyMedium,
+        bodySmall: t.bodySmall,
+        titleLarge: t.titleLarge,
+        titleMedium: t.titleMedium,
+        titleSmall: t.titleSmall,
+        labelLarge: t.label,
+        headlineMedium: t.titleMedium,
       ),
       cardColor: c.card,
       dividerColor: c.divider,

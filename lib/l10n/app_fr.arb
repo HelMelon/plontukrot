@@ -79,6 +79,7 @@
   "friendsRemoveConfirm": "Retirer {name} des amis ?",
   "friendsRequestSent": "Demande d'ami envoyée",
   "friendsOpenCollection": "Collection",
+  "friendsOpenWishList": "WishLeafs",
   "friendsGiftsInbox": "Cadeaux de plantes",
   "friendsGiftFrom": "De {name}",
   "friendsGiftAccept": "Accepter le cadeau",
@@ -88,6 +89,9 @@
   "friendsCollectionTitle": "{name}",
   "friendsCollectionEmpty": "Aucune plante",
   "friendsCollectionPrivate": "Collection privée",
+  "friendsWishListTitle": "WishLeafs — {name}",
+  "friendsWishListEmpty": "La liste de souhaits est vide",
+  "friendsWishListPrivate": "Liste de souhaits privée",
   "friendsReadOnly": "Lecture seule",
 
   "plantGift": "Offrir",

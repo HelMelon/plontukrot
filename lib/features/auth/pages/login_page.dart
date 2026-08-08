@@ -41,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
           backgroundColor: colors.card,
           content: Text(
             message,
-            style: typography.bodyLarge,
+            style: typography.bodyMedium,
           ),
         ),
       );
@@ -60,7 +60,6 @@ class _LoginPageState extends State<LoginPage> {
     final colors = context.colors;
     final spacing = context.spacing;
     final dimensions = context.dimensions;
-    final typography = context.typography;
     final loginTheme = context.screens.login;
 
     return Scaffold(
@@ -90,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
                 Text(
                   l10n.brandTagline,
                   textAlign: TextAlign.center,
-                  style: typography.bodyLarge.copyWith(
+                  style: loginTheme.subtitleStyle.copyWith(
                     color: colors.textSecondary,
                     height: 1.5,
                   ),

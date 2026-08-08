@@ -97,6 +97,13 @@ service cloud.firestore {
         }
       }
 
+      // Friends may read WishLeafs when collection is friends-visible.
+      match /wishList/{itemId} {
+        allow read: if isOwner(userId)
+          || (isFriendOf(userId) && collectionVisibleToFriends(userId));
+        allow write: if isOwner(userId);
+      }
+
       match /{collection}/{docId} {
         allow read, write: if isOwner(userId);
 

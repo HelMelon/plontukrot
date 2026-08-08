@@ -79,6 +79,7 @@
   "friendsRemoveConfirm": "Удалить {name} из друзей?",
   "friendsRequestSent": "Заявка отправлена",
   "friendsOpenCollection": "Коллекция",
+  "friendsOpenWishList": "WishLeafs",
   "friendsGiftsInbox": "Подарки растений",
   "friendsGiftFrom": "От {name}",
   "friendsGiftAccept": "Принять подарок",
@@ -88,6 +89,9 @@
   "friendsCollectionTitle": "{name}",
   "friendsCollectionEmpty": "Нет растений",
   "friendsCollectionPrivate": "Коллекция скрыта",
+  "friendsWishListTitle": "WishLeafs — {name}",
+  "friendsWishListEmpty": "Список желаний пуст",
+  "friendsWishListPrivate": "Список желаний скрыт",
   "friendsReadOnly": "Только просмотр",
 
   "plantGift": "Подарить",

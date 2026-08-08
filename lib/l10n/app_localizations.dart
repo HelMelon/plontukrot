@@ -528,6 +528,12 @@ abstract class AppLocalizations {
   /// **'Collection'**
   String get friendsOpenCollection;
 
+  /// No description provided for @friendsOpenWishList.
+  ///
+  /// In en, this message translates to:
+  /// **'WishLeafs'**
+  String get friendsOpenWishList;
+
   /// No description provided for @friendsGiftsInbox.
   ///
   /// In en, this message translates to:
@@ -581,6 +587,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This collection is private'**
   String get friendsCollectionPrivate;
+
+  /// No description provided for @friendsWishListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WishLeafs — {name}'**
+  String friendsWishListTitle(String name);
+
+  /// No description provided for @friendsWishListEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Wish list is empty'**
+  String get friendsWishListEmpty;
+
+  /// No description provided for @friendsWishListPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'This wish list is private'**
+  String get friendsWishListPrivate;
 
   /// No description provided for @friendsReadOnly.
   ///

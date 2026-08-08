@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../core/theme/theme_context.dart';
@@ -12,6 +13,7 @@ import '../../../services/firestore_service.dart';
 import '../../../services/friends_service.dart';
 import '../../../services/gift_service.dart';
 import 'friend_collection_page.dart';
+import 'friend_wish_list_page.dart';
 
 class FriendsPage extends StatefulWidget {
   const FriendsPage({super.key});
@@ -359,19 +361,41 @@ class _FriendsPageState extends State<FriendsPage> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      trailing: IconButton(
-                        tooltip: l10n.friendsOpenCollection,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => FriendCollectionPage(
-                                friendship: friend,
-                              ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            tooltip: l10n.friendsOpenWishList,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => FriendWishListPage(
+                                    friendship: friend,
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: HugeIcon(
+                              icon: HugeIcons.strokeRoundedBookHeart,
+                              color: colors.icon,
                             ),
-                          );
-                        },
-                        icon: Icon(Icons.grid_view, color: colors.icon),
+                          ),
+                          IconButton(
+                            tooltip: l10n.friendsOpenCollection,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => FriendCollectionPage(
+                                    friendship: friend,
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: Icon(Icons.grid_view, color: colors.icon),
+                          ),
+                        ],
                       ),
                       onLongPress: () => _removeFriend(friend),
                     ),

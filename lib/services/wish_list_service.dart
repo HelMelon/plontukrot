@@ -8,17 +8,22 @@ class WishListService {
 
   String get _uid => FirebaseAuth.instance.currentUser!.uid;
 
-  CollectionReference<Map<String, dynamic>> get _wishListRef =>
-      _firestore.collection('users').doc(_uid).collection('wishList');
+  CollectionReference<Map<String, dynamic>> _wishListRefFor(String ownerUid) =>
+      _firestore.collection('users').doc(ownerUid).collection('wishList');
 
-  Stream<List<WishListItem>> watchItems() {
-    return _wishListRef
+  CollectionReference<Map<String, dynamic>> get _wishListRef =>
+      _wishListRefFor(_uid);
+
+  Stream<List<WishListItem>> watchItemsForUser(String ownerUid) {
+    return _wishListRefFor(ownerUid)
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map(
           (snapshot) => snapshot.docs.map(WishListItem.fromFirestore).toList(),
         );
   }
+
+  Stream<List<WishListItem>> watchItems() => watchItemsForUser(_uid);
 
   Future<void> addItem({
     required String nameEn,

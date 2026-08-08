@@ -235,6 +235,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get friendsOpenCollection => 'Collection';
 
   @override
+  String get friendsOpenWishList => 'WishLeafs';
+
+  @override
   String get friendsGiftsInbox => 'Plant gifts';
 
   @override
@@ -264,6 +267,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get friendsCollectionPrivate => 'This collection is private';
+
+  @override
+  String friendsWishListTitle(String name) {
+    return 'WishLeafs — $name';
+  }
+
+  @override
+  String get friendsWishListEmpty => 'Wish list is empty';
+
+  @override
+  String get friendsWishListPrivate => 'This wish list is private';
 
   @override
   String get friendsReadOnly => 'View only';

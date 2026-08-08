@@ -104,6 +104,7 @@
   },
   "friendsRequestSent": "Friend request sent",
   "friendsOpenCollection": "Collection",
+  "friendsOpenWishList": "WishLeafs",
   "friendsGiftsInbox": "Plant gifts",
   "friendsGiftFrom": "From {name}",
   "@friendsGiftFrom": {
@@ -123,6 +124,14 @@
   },
   "friendsCollectionEmpty": "No plants to show",
   "friendsCollectionPrivate": "This collection is private",
+  "friendsWishListTitle": "WishLeafs — {name}",
+  "@friendsWishListTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "friendsWishListEmpty": "Wish list is empty",
+  "friendsWishListPrivate": "This wish list is private",
   "friendsReadOnly": "View only",
 
   "plantGift": "Gift plant",

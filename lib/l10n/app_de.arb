@@ -79,6 +79,7 @@
   "friendsRemoveConfirm": "{name} aus Freunden entfernen?",
   "friendsRequestSent": "Freundschaftsanfrage gesendet",
   "friendsOpenCollection": "Sammlung",
+  "friendsOpenWishList": "WishLeafs",
   "friendsGiftsInbox": "Pflanzengeschenke",
   "friendsGiftFrom": "Von {name}",
   "friendsGiftAccept": "Geschenk annehmen",
@@ -88,6 +89,9 @@
   "friendsCollectionTitle": "{name}",
   "friendsCollectionEmpty": "Keine Pflanzen",
   "friendsCollectionPrivate": "Sammlung ist privat",
+  "friendsWishListTitle": "WishLeafs — {name}",
+  "friendsWishListEmpty": "Wunschliste ist leer",
+  "friendsWishListPrivate": "Wunschliste ist privat",
   "friendsReadOnly": "Nur Ansicht",
 
   "plantGift": "Verschenken",
