@@ -113,7 +113,7 @@ class _FriendWishListPageState extends State<FriendWishListPage> {
                   child: Padding(
                     padding: spacing.allLg,
                     child: Text(
-                      l10n.commonError(snap.error.toString()),
+                      l10n.friendsWishListLoadError,
                       style: typography.bodyMedium,
                       textAlign: TextAlign.center,
                     ),

@@ -213,6 +213,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get friendsEmpty => 'Пока нет друзей';
 
   @override
+  String get friendsUnknownName => 'Друг';
+
+  @override
   String get friendsAddTitle => 'Добавить друга';
 
   @override
@@ -294,6 +297,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get friendsWishListPrivate => 'Список желаний скрыт';
+
+  @override
+  String get friendsWishListLoadError => 'Не удалось загрузить список желаний';
 
   @override
   String get friendsReadOnly => 'Только просмотр';

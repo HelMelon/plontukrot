@@ -480,6 +480,12 @@ abstract class AppLocalizations {
   /// **'No friends yet'**
   String get friendsEmpty;
 
+  /// No description provided for @friendsUnknownName.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend'**
+  String get friendsUnknownName;
+
   /// No description provided for @friendsAddTitle.
   ///
   /// In en, this message translates to:
@@ -629,6 +635,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This wish list is private'**
   String get friendsWishListPrivate;
+
+  /// No description provided for @friendsWishListLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the wish list'**
+  String get friendsWishListLoadError;
 
   /// No description provided for @friendsReadOnly.
   ///

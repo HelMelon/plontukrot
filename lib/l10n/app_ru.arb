@@ -71,6 +71,7 @@
 
   "friendsTitle": "Друзья",
   "friendsEmpty": "Пока нет друзей",
+  "friendsUnknownName": "Друг",
   "friendsAddTitle": "Добавить друга",
   "friendsAddHint": "ID пользователя",
   "friendsAddAction": "Отправить заявку",
@@ -96,6 +97,7 @@
   "friendsWishListTitle": "WishLeafs — {name}",
   "friendsWishListEmpty": "Список желаний пуст",
   "friendsWishListPrivate": "Список желаний скрыт",
+  "friendsWishListLoadError": "Не удалось загрузить список желаний",
   "friendsReadOnly": "Только просмотр",
 
   "plantGift": "Подарить",

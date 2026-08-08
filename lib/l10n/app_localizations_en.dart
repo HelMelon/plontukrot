@@ -211,6 +211,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get friendsEmpty => 'No friends yet';
 
   @override
+  String get friendsUnknownName => 'Friend';
+
+  @override
   String get friendsAddTitle => 'Add friend';
 
   @override
@@ -292,6 +295,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get friendsWishListPrivate => 'This wish list is private';
+
+  @override
+  String get friendsWishListLoadError => 'Could not load the wish list';
 
   @override
   String get friendsReadOnly => 'View only';

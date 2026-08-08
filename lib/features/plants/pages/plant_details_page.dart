@@ -429,8 +429,8 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
         final plant = plantSnapshot.data!;
         final title =
             plant.nickname.isNotEmpty ? plant.nickname : l10n.plantDefaultTitle;
-        final isWideAppBar = MediaQuery.sizeOf(context).width >= 700;
         final titleStyle = typography.titleSmall;
+        final actionsBarHeight = spacing.xxxl + spacing.md;
 
         final actionButtons = <Widget>[
           IconButton(
@@ -501,19 +501,35 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               overflow: TextOverflow.ellipsis,
               style: titleStyle,
             ),
-            actions: isWideAppBar ? actionButtons : null,
-            bottom: isWideAppBar
-                ? null
-                : PreferredSize(
-                    preferredSize:
-                        Size.fromHeight(spacing.xxxl + spacing.md),
+            // Keep actions in a dedicated bar so web/wide layouts do not clip
+            // trailing icons (gift/archive) from AppBar.actions.
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(actionsBarHeight),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final usePackedRow = constraints.maxWidth >= 700;
+                  if (usePackedRow) {
+                    return SizedBox(
+                      height: actionsBarHeight,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        padding: EdgeInsets.symmetric(horizontal: spacing.sm),
+                        child: Row(children: actionButtons),
+                      ),
+                    );
+                  }
+                  return SizedBox(
+                    height: actionsBarHeight,
                     child: Row(
                       children: [
                         for (final button in actionButtons)
                           Expanded(child: button),
                       ],
                     ),
-                  ),
+                  );
+                },
+              ),
+            ),
           ),
           body: StreamBuilder<List<GrowthEvent>>(
             stream: _growthStream,

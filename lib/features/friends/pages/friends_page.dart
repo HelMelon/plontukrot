@@ -8,10 +8,12 @@ import '../../../models/collection_visibility.dart';
 import '../../../models/friend_request.dart';
 import '../../../models/friendship.dart';
 import '../../../models/incoming_gift.dart';
+import '../../../models/plant.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/firestore_service.dart';
 import '../../../services/friends_service.dart';
 import '../../../services/gift_service.dart';
+import '../../../services/plant_service.dart';
 import 'friend_collection_page.dart';
 import 'friend_wish_list_page.dart';
 
@@ -68,11 +70,12 @@ class _FriendsPageState extends State<FriendsPage> {
 
   Future<void> _removeFriend(Friendship friend) async {
     final l10n = AppLocalizations.of(context);
+    final name = _friendDisplayName(friend, l10n);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.friendsRemove),
-        content: Text(l10n.friendsRemoveConfirm(friend.displayLabel)),
+        content: Text(l10n.friendsRemoveConfirm(name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -86,6 +89,7 @@ class _FriendsPageState extends State<FriendsPage> {
       ),
     );
     if (confirmed != true) return;
+    setState(() => _busy = true);
     try {
       await _friendsService.removeFriend(friend.friendUid);
     } catch (e) {
@@ -93,7 +97,15 @@ class _FriendsPageState extends State<FriendsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.commonError(e.toString()))),
       );
+    } finally {
+      if (mounted) setState(() => _busy = false);
     }
+  }
+
+  String _friendDisplayName(Friendship friend, AppLocalizations l10n) {
+    final name = friend.displayNameSnap?.trim();
+    if (name != null && name.isNotEmpty) return name;
+    return l10n.friendsUnknownName;
   }
 
   Future<void> _acceptGift(IncomingGift gift) async {
@@ -153,6 +165,7 @@ class _FriendsPageState extends State<FriendsPage> {
     final spacing = context.spacing;
     final typography = context.typography;
     final colors = context.colors;
+    final dimensions = context.dimensions;
     final myUid = AuthService().currentUser?.uid ?? '';
 
     return Scaffold(
@@ -249,36 +262,48 @@ class _FriendsPageState extends State<FriendsPage> {
                 children: [
                   for (final gift in gifts)
                     Card(
-                      child: ListTile(
-                        title: Text(
-                          gift.previewPlant.nickname.isNotEmpty
-                              ? gift.previewPlant.nickname
-                              : gift.previewPlant.species,
-                          style: typography.bodyEmphasis,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Text(
-                          l10n.friendsGiftFrom(
-                            gift.fromDisplayName?.isNotEmpty == true
-                                ? gift.fromDisplayName!
-                                : gift.fromUid,
-                          ),
-                          style: typography.captionSmall,
-                        ),
-                        trailing: Wrap(
-                          spacing: spacing.xs,
+                      child: Padding(
+                        padding: EdgeInsets.all(spacing.md),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            TextButton(
-                              onPressed: _busy
-                                  ? null
-                                  : () => _giftService.declineGift(gift),
-                              child: Text(l10n.friendsGiftDecline),
+                            Text(
+                              gift.previewPlant.nickname.isNotEmpty
+                                  ? gift.previewPlant.nickname
+                                  : gift.previewPlant.species,
+                              style: typography.bodyEmphasis,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            FilledButton(
-                              onPressed:
-                                  _busy ? null : () => _acceptGift(gift),
-                              child: Text(l10n.friendsGiftAccept),
+                            SizedBox(height: spacing.xs),
+                            Text(
+                              l10n.friendsGiftFrom(
+                                gift.fromDisplayName?.isNotEmpty == true
+                                    ? gift.fromDisplayName!
+                                    : gift.fromUid,
+                              ),
+                              style: typography.captionSmall,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: spacing.md),
+                            Wrap(
+                              alignment: WrapAlignment.end,
+                              spacing: spacing.xs,
+                              runSpacing: spacing.xs,
+                              children: [
+                                TextButton(
+                                  onPressed: _busy
+                                      ? null
+                                      : () => _giftService.declineGift(gift),
+                                  child: Text(l10n.friendsGiftDecline),
+                                ),
+                                FilledButton(
+                                  onPressed:
+                                      _busy ? null : () => _acceptGift(gift),
+                                  child: Text(l10n.friendsGiftAccept),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -303,38 +328,30 @@ class _FriendsPageState extends State<FriendsPage> {
               return Column(
                 children: [
                   for (final req in requests)
-                    Padding(
-                      padding: EdgeInsets.only(top: spacing.sm),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        req.fromDisplayName?.isNotEmpty == true
+                            ? req.fromDisplayName!
+                            : req.fromUid,
+                        style: typography.bodyMedium,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            req.fromDisplayName?.isNotEmpty == true
-                                ? req.fromDisplayName!
-                                : req.fromUid,
-                            style: typography.bodyMedium,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                          TextButton(
+                            onPressed: _busy
+                                ? null
+                                : () => _declineFriendRequest(req),
+                            child: Text(l10n.friendsDecline),
                           ),
-                          SizedBox(height: spacing.xs),
-                          Wrap(
-                            alignment: WrapAlignment.end,
-                            spacing: spacing.xs,
-                            runSpacing: spacing.xs,
-                            children: [
-                              TextButton(
-                                onPressed: _busy
-                                    ? null
-                                    : () => _declineFriendRequest(req),
-                                child: Text(l10n.friendsDecline),
-                              ),
-                              FilledButton(
-                                onPressed: _busy
-                                    ? null
-                                    : () => _acceptFriendRequest(req),
-                                child: Text(l10n.friendsAccept),
-                              ),
-                            ],
+                          FilledButton(
+                            onPressed: _busy
+                                ? null
+                                : () => _acceptFriendRequest(req),
+                            child: Text(l10n.friendsAccept),
                           ),
                         ],
                       ),
@@ -391,65 +408,92 @@ class _FriendsPageState extends State<FriendsPage> {
               return Column(
                 children: [
                   for (final friend in friends)
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: CircleAvatar(
-                        backgroundImage: friend.photoUrlSnap != null
-                            ? NetworkImage(friend.photoUrlSnap!)
-                            : null,
-                        child: friend.photoUrlSnap == null
-                            ? Icon(Icons.person, color: colors.icon)
-                            : null,
-                      ),
-                      title: Text(
-                        friend.displayLabel,
-                        style: typography.bodyEmphasis,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      subtitle: Text(
-                        friend.friendUid,
-                        style: typography.captionSmall,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: spacing.xs),
+                      child: Row(
                         children: [
-                          IconButton(
-                            tooltip: l10n.friendsOpenWishList,
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => FriendWishListPage(
-                                    friendship: friend,
-                                  ),
+                          CircleAvatar(
+                            backgroundImage: friend.photoUrlSnap != null
+                                ? NetworkImage(friend.photoUrlSnap!)
+                                : null,
+                            child: friend.photoUrlSnap == null
+                                ? Icon(Icons.person, color: colors.icon)
+                                : null,
+                          ),
+                          SizedBox(width: spacing.sm),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _friendDisplayName(friend, l10n),
+                                  style: typography.bodyEmphasis,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              );
-                            },
-                            icon: HugeIcon(
-                              icon: HugeIcons.strokeRoundedBookHeart,
-                              color: colors.icon,
+                                _FriendPlantCount(
+                                  ownerUid: friend.friendUid,
+                                ),
+                              ],
                             ),
                           ),
-                          IconButton(
-                            tooltip: l10n.friendsOpenCollection,
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => FriendCollectionPage(
-                                    friendship: friend,
-                                  ),
+                          SizedBox(width: spacing.xs),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _FriendActionIcon(
+                                tooltip: l10n.friendsOpenWishList,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => FriendWishListPage(
+                                        friendship: friend,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: HugeIcon(
+                                  icon: HugeIcons.strokeRoundedBookHeart,
+                                  color: colors.icon,
+                                  // Stroke HugeIcons read smaller than Material
+                                  // icons at the same nominal size.
+                                  size: dimensions.iconXl,
                                 ),
-                              );
-                            },
-                            icon: Icon(Icons.grid_view, color: colors.icon),
+                              ),
+                              _FriendActionIcon(
+                                tooltip: l10n.friendsOpenCollection,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => FriendCollectionPage(
+                                        friendship: friend,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Icon(
+                                  Icons.grid_view,
+                                  color: colors.icon,
+                                  size: dimensions.iconLg,
+                                ),
+                              ),
+                              _FriendActionIcon(
+                                tooltip: l10n.friendsRemove,
+                                onPressed: _busy
+                                    ? null
+                                    : () => _removeFriend(friend),
+                                child: Icon(
+                                  Icons.person_remove_outlined,
+                                  color: colors.icon,
+                                  size: dimensions.iconLg,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      onLongPress: () => _removeFriend(friend),
                     ),
                 ],
               );
@@ -457,6 +501,77 @@ class _FriendsPageState extends State<FriendsPage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _FriendActionIcon extends StatelessWidget {
+  final String tooltip;
+  final VoidCallback? onPressed;
+  final Widget child;
+
+  const _FriendActionIcon({
+    required this.tooltip,
+    required this.onPressed,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.spacing;
+    final dimensions = context.dimensions;
+    final side = dimensions.iconXl + spacing.sm;
+
+    return IconButton(
+      tooltip: tooltip,
+      onPressed: onPressed,
+      visualDensity: VisualDensity.compact,
+      style: IconButton.styleFrom(
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        padding: EdgeInsets.all(spacing.xs),
+        minimumSize: Size(side, side),
+        fixedSize: Size(side, side),
+      ),
+      icon: child,
+    );
+  }
+}
+
+class _FriendPlantCount extends StatelessWidget {
+  final String ownerUid;
+
+  const _FriendPlantCount({required this.ownerUid});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final dimensions = context.dimensions;
+
+    return StreamBuilder<List<Plant>>(
+      stream: PlantService().getPlantsForUser(ownerUid),
+      builder: (context, snapshot) {
+        if (snapshot.hasError || !snapshot.hasData) {
+          return const SizedBox.shrink();
+        }
+        final count = snapshot.data!.length;
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.local_florist_outlined,
+              size: dimensions.iconSm,
+              color: colors.icon,
+            ),
+            SizedBox(width: spacing.xs),
+            Text(
+              '$count',
+              style: typography.captionSmall,
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -91,6 +91,7 @@
 
   "friendsTitle": "Friends",
   "friendsEmpty": "No friends yet",
+  "friendsUnknownName": "Friend",
   "friendsAddTitle": "Add friend",
   "friendsAddHint": "Friend user ID",
   "friendsAddAction": "Send request",
@@ -136,6 +137,7 @@
   },
   "friendsWishListEmpty": "Wish list is empty",
   "friendsWishListPrivate": "This wish list is private",
+  "friendsWishListLoadError": "Could not load the wish list",
   "friendsReadOnly": "View only",
 
   "plantGift": "Gift plant",

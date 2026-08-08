@@ -71,6 +71,7 @@
 
   "friendsTitle": "Freunde",
   "friendsEmpty": "Noch keine Freunde",
+  "friendsUnknownName": "Freund",
   "friendsAddTitle": "Freund hinzufügen",
   "friendsAddHint": "Benutzer-ID",
   "friendsAddAction": "Anfrage senden",
@@ -96,6 +97,7 @@
   "friendsWishListTitle": "WishLeafs — {name}",
   "friendsWishListEmpty": "Wunschliste ist leer",
   "friendsWishListPrivate": "Wunschliste ist privat",
+  "friendsWishListLoadError": "Wunschliste konnte nicht geladen werden",
   "friendsReadOnly": "Nur Ansicht",
 
   "plantGift": "Verschenken",
