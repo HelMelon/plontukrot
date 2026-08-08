@@ -8,10 +8,17 @@ Living document. Checklist also in `.cursor/rules/testing.mdc` and `ui-quality.m
 
 | Kind | Status | Location |
 |------|--------|----------|
-| Unit tests (services / models) | **Mostly absent** | — |
-| Widget tests | Placeholder only | `test/widget_test.dart` (`expect(true, isTrue)`) |
+| Unit tests (services / models) | Partial | `test/growth_event_test.dart`, `test/propagation_lifecycle_test.dart`, `test/plant_photo_model_test.dart` |
+| Widget tests | Partial | `test/plant_card_image_test.dart` (photo card); `test/widget_test.dart` remains a stub |
 | Localization tests | Present | `test/l10n_test.dart` |
 | Integration / Firebase | **Absent** | — |
+
+### Photo / image tests
+
+- `test/plant_photo_model_test.dart` — `Plant.listImageUrl`, `Plant.galleryPhotos`, `PlantPhoto.fromMap`
+- `test/plant_card_image_test.dart` — `PlantCard` placeholder vs `PlantNetworkImage` wiring (no real network)
+
+Plant UI loads images through `PlantNetworkImage` (thumb → full fallback; debug logging on failure).
 
 ### `test/l10n_test.dart`
 

@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
@@ -8,6 +7,7 @@ import '../../../models/plant.dart';
 import '../../../models/stage_info.dart';
 import '../../../services/plant_service.dart';
 import '../../plants/widgets/cards/placeholder_widget.dart';
+import '../../plants/widgets/common/plant_network_image.dart';
 
 /// Read-only plant details for a friend's collection (card fields only).
 class FriendPlantDetailsPage extends StatelessWidget {
@@ -104,13 +104,13 @@ class FriendPlantDetailsPage extends StatelessWidget {
                       : PageView.builder(
                           itemCount: photos.length,
                           itemBuilder: (context, index) {
-                            return CachedNetworkImage(
-                              imageUrl: photos[index].imageUrl,
+                            final photo = photos[index];
+                            return PlantNetworkImage(
+                              imageUrl: photo.imageUrl,
+                              fallbackUrl: photo.imageThumbUrl,
                               fit: BoxFit.cover,
-                              placeholder: (_, __) =>
-                                  const PlaceholderWithIcon(),
-                              errorWidget: (_, __, ___) =>
-                                  const PlaceholderWithIcon(),
+                              placeholder: const PlaceholderWithIcon(),
+                              errorWidget: const PlaceholderWithIcon(),
                             );
                           },
                         ),

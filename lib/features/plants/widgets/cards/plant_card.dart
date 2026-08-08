@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
@@ -6,6 +5,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/plant.dart';
 import '../../pages/plant_details_page.dart';
+import '../common/plant_network_image.dart';
 
 extension CapitalizeString on String {
   String toTitleCase() {
@@ -54,6 +54,7 @@ class PlantCard extends StatelessWidget {
     final typography = context.typography;
     final dimensions = context.dimensions;
     final imageUrl = plant.listImageUrl;
+    final fullUrl = plant.imageUrl?.trim();
     final hasImage = imageUrl != null;
 
     final speciesBase =
@@ -102,16 +103,14 @@ class PlantCard extends StatelessWidget {
                   AspectRatio(
                     aspectRatio: 1.0,
                     child: hasImage
-                        ? CachedNetworkImage(
+                        ? PlantNetworkImage(
                             imageUrl: imageUrl,
+                            fallbackUrl: fullUrl,
                             fit: BoxFit.cover,
                             alignment: Alignment.center,
                             memCacheWidth: 600,
-                            fadeInDuration: const Duration(milliseconds: 300),
-                            placeholder: (context, url) =>
-                                const _PlantAssetPlaceholder(),
-                            errorWidget: (context, url, error) =>
-                                const _PlantAssetPlaceholder(),
+                            placeholder: const _PlantAssetPlaceholder(),
+                            errorWidget: const _PlantAssetPlaceholder(),
                           )
                         : const _PlantAssetPlaceholder(),
                   ),

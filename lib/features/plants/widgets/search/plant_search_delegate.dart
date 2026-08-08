@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
@@ -8,6 +7,7 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../models/plant.dart';
 import '../../../../services/plant_service.dart';
 import '../../pages/plant_details_page.dart';
+import '../common/plant_network_image.dart';
 
 class PlantSearchDelegate extends SearchDelegate {
   final String _searchFieldLabel;
@@ -273,32 +273,36 @@ class PlantSearchDelegate extends SearchDelegate {
                         borderRadius: BorderRadius.circular(radii.pill),
                         child: () {
                           final String? imageUrl = plant.listImageUrl;
+                          final fullUrl = plant.imageUrl?.trim();
+                          final florist = Icon(
+                            Icons.local_florist,
+                            color: colors.icon,
+                            size: dimensions.iconXl,
+                          );
+                          final loading = Center(
+                            child: SizedBox(
+                              width: dimensions.iconSm,
+                              height: dimensions.iconSm,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  colors.primary,
+                                ),
+                              ),
+                            ),
+                          );
 
                           if (imageUrl != null) {
-                            return CachedNetworkImage(
+                            return PlantNetworkImage(
                               imageUrl: imageUrl,
+                              fallbackUrl: fullUrl,
                               fit: BoxFit.cover,
                               width: dimensions.avatar,
                               height: dimensions.avatar,
                               memCacheWidth: 80,
                               memCacheHeight: 80,
-                              errorWidget: (context, url, error) => Icon(
-                                Icons.local_florist,
-                                color: colors.icon,
-                                size: dimensions.iconXl,
-                              ),
-                              placeholder: (context, url) => Center(
-                                child: SizedBox(
-                                  width: dimensions.iconSm,
-                                  height: dimensions.iconSm,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      colors.primary,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              errorWidget: florist,
+                              placeholder: loading,
                             );
                           }
 

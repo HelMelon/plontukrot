@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/features/plants/widgets/cards/placeholder_widget.dart';
+import 'package:plontukrot/features/plants/widgets/common/plant_network_image.dart';
 import 'package:plontukrot/models/plant_photo.dart';
 
 import '../../../../core/theme/theme_context.dart';
@@ -97,17 +97,18 @@ class _PlantImageCardState extends State<PlantImageCard> {
                 itemCount: photos.length,
                 onPageChanged: (i) => setState(() => _index = i),
                 itemBuilder: (context, i) {
-                  final url = photos[i].imageUrl;
-                  return CachedNetworkImage(
-                    imageUrl: url,
+                  final photo = photos[i];
+                  return PlantNetworkImage(
+                    imageUrl: photo.imageUrl,
+                    fallbackUrl: photo.imageThumbUrl,
                     fit: BoxFit.cover,
                     alignment: Alignment.center,
                     memCacheWidth: 800,
-                    placeholder: (context, url) => const Align(
+                    placeholder: const Align(
                       alignment: Alignment.topCenter,
                       child: PlaceholderWithIcon(),
                     ),
-                    errorWidget: (context, url, error) => const Align(
+                    errorWidget: const Align(
                       alignment: Alignment.topCenter,
                       child: PlaceholderWithIcon(),
                     ),

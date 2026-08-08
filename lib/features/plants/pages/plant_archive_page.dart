@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
@@ -9,6 +8,7 @@ import '../../../core/theme/theme_context.dart';
 import '../../../models/plant.dart';
 import '../../../models/plant_archive_reason.dart';
 import '../../../services/plant_service.dart';
+import '../widgets/common/plant_network_image.dart';
 import 'plant_details_page.dart';
 
 class PlantArchivePage extends StatefulWidget {
@@ -107,6 +107,14 @@ class _PlantArchivePageState extends State<PlantArchivePage> {
             itemBuilder: (context, index) {
               final plant = plants[index];
               final imageUrl = plant.listImageUrl;
+              final fullUrl = plant.imageUrl?.trim();
+              final archiveThumbError = ColoredBox(
+                color: colors.outline.withValues(alpha: 0.2),
+                child: Icon(
+                  Icons.local_florist_outlined,
+                  color: colors.icon,
+                ),
+              );
               final archivedAt = plant.archivedAt;
               final dateLabel = archivedAt == null
                   ? null
@@ -136,17 +144,12 @@ class _PlantArchivePageState extends State<PlantArchivePage> {
                             width: dimensions.avatar,
                             height: dimensions.avatar,
                             child: imageUrl != null
-                                ? CachedNetworkImage(
+                                ? PlantNetworkImage(
                                     imageUrl: imageUrl,
+                                    fallbackUrl: fullUrl,
                                     fit: BoxFit.cover,
-                                    errorWidget: (_, __, ___) => ColoredBox(
-                                      color: colors.outline
-                                          .withValues(alpha: 0.2),
-                                      child: Icon(
-                                        Icons.local_florist_outlined,
-                                        color: colors.icon,
-                                      ),
-                                    ),
+                                    errorWidget: archiveThumbError,
+                                    placeholder: archiveThumbError,
                                   )
                                 : ColoredBox(
                                     color:
