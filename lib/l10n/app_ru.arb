@@ -63,6 +63,7 @@
   "profileDeleteAccountFailed": "Не удалось удалить профиль. Попробуйте ещё раз.",
   "profileFriends": "Друзья",
   "profileMyUid": "Ваш ID",
+  "profileCopyUid": "Копировать ID",
   "profileUidCopied": "ID скопирован",
   "profileCollectionVisibility": "Видимость коллекции",
   "profileCollectionFriends": "Видна друзьям",

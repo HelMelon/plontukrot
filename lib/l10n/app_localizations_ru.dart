@@ -192,6 +192,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get profileMyUid => 'Ваш ID';
 
   @override
+  String get profileCopyUid => 'Копировать ID';
+
+  @override
   String get profileUidCopied => 'ID скопирован';
 
   @override

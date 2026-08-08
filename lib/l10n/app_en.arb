@@ -83,6 +83,7 @@
   "profileDeleteAccountFailed": "Could not delete profile. Please try again.",
   "profileFriends": "Friends",
   "profileMyUid": "Your ID",
+  "profileCopyUid": "Copy ID",
   "profileUidCopied": "ID copied",
   "profileCollectionVisibility": "Collection visibility",
   "profileCollectionFriends": "Friends can view",

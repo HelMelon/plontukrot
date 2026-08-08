@@ -63,6 +63,7 @@
   "profileDeleteAccountFailed": "Impossible de supprimer le profil. Veuillez réessayer.",
   "profileFriends": "Amis",
   "profileMyUid": "Votre ID",
+  "profileCopyUid": "Copier l’ID",
   "profileUidCopied": "ID copié",
   "profileCollectionVisibility": "Visibilité de la collection",
   "profileCollectionFriends": "Visible aux amis",

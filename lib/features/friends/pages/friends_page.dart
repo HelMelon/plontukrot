@@ -115,6 +115,38 @@ class _FriendsPageState extends State<FriendsPage> {
     }
   }
 
+  Future<void> _acceptFriendRequest(FriendRequest request) async {
+    if (_busy) return;
+    final l10n = AppLocalizations.of(context);
+    setState(() => _busy = true);
+    try {
+      await _friendsService.acceptFriendRequest(request);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commonError(e.toString()))),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _declineFriendRequest(FriendRequest request) async {
+    if (_busy) return;
+    final l10n = AppLocalizations.of(context);
+    setState(() => _busy = true);
+    try {
+      await _friendsService.declineFriendRequest(request);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commonError(e.toString()))),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -129,19 +161,28 @@ class _FriendsPageState extends State<FriendsPage> {
       body: ListView(
         padding: EdgeInsets.all(spacing.lg),
         children: [
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.profileMyUid, style: typography.label),
-            subtitle: Text(
-              myUid,
-              style: typography.captionSmall,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            trailing: IconButton(
-              onPressed: _copyMyUid,
-              icon: Icon(Icons.copy, color: colors.icon),
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.profileMyUid, style: typography.label),
+                    SizedBox(height: spacing.xs),
+                    SelectableText(
+                      myUid,
+                      style: typography.captionSmall,
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                tooltip: l10n.profileCopyUid,
+                onPressed: _copyMyUid,
+                icon: Icon(Icons.copy, color: colors.heading),
+              ),
+            ],
           ),
           StreamBuilder<UserProfileDoc>(
             stream: FirestoreService().watchUserProfile(),
@@ -262,27 +303,38 @@ class _FriendsPageState extends State<FriendsPage> {
               return Column(
                 children: [
                   for (final req in requests)
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(
-                        req.fromDisplayName?.isNotEmpty == true
-                            ? req.fromDisplayName!
-                            : req.fromUid,
-                        style: typography.bodyMedium,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      trailing: Wrap(
+                    Padding(
+                      padding: EdgeInsets.only(top: spacing.sm),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          TextButton(
-                            onPressed: () =>
-                                _friendsService.declineFriendRequest(req),
-                            child: Text(l10n.friendsDecline),
+                          Text(
+                            req.fromDisplayName?.isNotEmpty == true
+                                ? req.fromDisplayName!
+                                : req.fromUid,
+                            style: typography.bodyMedium,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          FilledButton(
-                            onPressed: () =>
-                                _friendsService.acceptFriendRequest(req),
-                            child: Text(l10n.friendsAccept),
+                          SizedBox(height: spacing.xs),
+                          Wrap(
+                            alignment: WrapAlignment.end,
+                            spacing: spacing.xs,
+                            runSpacing: spacing.xs,
+                            children: [
+                              TextButton(
+                                onPressed: _busy
+                                    ? null
+                                    : () => _declineFriendRequest(req),
+                                child: Text(l10n.friendsDecline),
+                              ),
+                              FilledButton(
+                                onPressed: _busy
+                                    ? null
+                                    : () => _acceptFriendRequest(req),
+                                child: Text(l10n.friendsAccept),
+                              ),
+                            ],
                           ),
                         ],
                       ),

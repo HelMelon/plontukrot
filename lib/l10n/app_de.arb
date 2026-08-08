@@ -63,6 +63,7 @@
   "profileDeleteAccountFailed": "Profil konnte nicht gelöscht werden. Bitte erneut versuchen.",
   "profileFriends": "Freunde",
   "profileMyUid": "Deine ID",
+  "profileCopyUid": "ID kopieren",
   "profileUidCopied": "ID kopiert",
   "profileCollectionVisibility": "Sammlungssichtbarkeit",
   "profileCollectionFriends": "Für Freunde sichtbar",

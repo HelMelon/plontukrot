@@ -438,6 +438,12 @@ abstract class AppLocalizations {
   /// **'Your ID'**
   String get profileMyUid;
 
+  /// No description provided for @profileCopyUid.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy ID'**
+  String get profileCopyUid;
+
   /// No description provided for @profileUidCopied.
   ///
   /// In en, this message translates to:

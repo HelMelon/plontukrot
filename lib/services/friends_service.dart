@@ -105,17 +105,15 @@ class FriendsService {
       throw StateError('Not the request recipient');
     }
 
-    final fromProfile = await _userDoc(request.fromUid).get();
-    final fromData = fromProfile.data() ?? {};
+    // Do not read the sender's user doc here — profile read requires
+    // friendship (or ownership), which does not exist yet. Use request
+    // snapshots + own profile / Auth instead.
     final myProfile = await _userDoc().get();
     final myData = myProfile.data() ?? {};
 
-    final fromName =
-        (fromData['name'] as String?)?.trim() ?? request.fromDisplayName;
+    final fromName = request.fromDisplayName?.trim();
     final myName = (myData['name'] as String?)?.trim();
-    final fromPhoto =
-        request.fromPhotoUrl ??
-        (fromData['photoUrl'] as String?)?.trim();
+    final fromPhoto = request.fromPhotoUrl?.trim();
     final myPhoto = FirebaseAuth.instance.currentUser?.photoURL;
 
     final batch = _firestore.batch();

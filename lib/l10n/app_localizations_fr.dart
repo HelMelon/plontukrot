@@ -193,6 +193,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileMyUid => 'Votre ID';
 
   @override
+  String get profileCopyUid => 'Copier l’ID';
+
+  @override
   String get profileUidCopied => 'ID copié';
 
   @override
