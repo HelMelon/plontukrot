@@ -3,6 +3,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import 'package:plontukrot/core/theme/theme_context.dart';
 
+import '../../../core/privacy/device_consent_store.dart';
 import '../../../core/widgets/personal_data_consent_checkbox.dart';
 import '../../../services/auth_service.dart';
 import '../auth_failure_messages.dart';
@@ -18,6 +19,27 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
   bool _consentAccepted = false;
+  bool _consentLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDeviceConsent();
+  }
+
+  Future<void> _loadDeviceConsent() async {
+    final accepted = await DeviceConsentStore.instance.isAccepted();
+    if (!mounted) return;
+    setState(() {
+      _consentAccepted = accepted;
+      _consentLoaded = true;
+    });
+  }
+
+  Future<void> _onConsentChanged(bool value) async {
+    setState(() => _consentAccepted = value);
+    await DeviceConsentStore.instance.setAccepted(value);
+  }
 
   Future<void> _showAuthError(Object error) async {
     if (!mounted) return;
@@ -43,6 +65,7 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => isLoading = true);
     try {
       await AuthService().signInWithGoogle(recordConsent: true);
+      await DeviceConsentStore.instance.rememberAccepted();
     } catch (e) {
       await _showAuthError(e);
     } finally {
@@ -52,6 +75,8 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _openEmailSignIn() async {
     if (!_consentAccepted || isLoading) return;
+    await DeviceConsentStore.instance.rememberAccepted();
+    if (!mounted) return;
     await showEmailSignInSheet(context);
   }
 
@@ -62,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
     final spacing = context.spacing;
     final dimensions = context.dimensions;
     final loginTheme = context.screens.login;
-    final canSubmit = !isLoading && _consentAccepted;
+    final canSubmit = !isLoading && _consentAccepted && _consentLoaded;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -92,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                 spacing.vXxxl,
                 PersonalDataConsentCheckbox(
                   value: _consentAccepted,
-                  onChanged: (v) => setState(() => _consentAccepted = v),
+                  onChanged: _onConsentChanged,
                 ),
                 spacing.vXl,
                 SizedBox(

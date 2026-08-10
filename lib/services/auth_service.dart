@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../core/privacy/device_consent_store.dart';
 import '../models/app_user.dart';
 import 'app_crash_reporting.dart';
 import 'firestore_service.dart';
@@ -248,8 +249,10 @@ class AuthService {
       if (user == null) {
         throw StateError('User missing after registration');
       }
+      // Send verification before profile updates — the first send right after
+      // create+updateDisplayName often never arrives; resend then works.
+      await _sendEmailVerificationReliably(user, retryAfterCreate: true);
       await user.updateDisplayName(trimmedName);
-      await user.sendEmailVerification();
       await FirestoreService().createUserDocument(
         recordConsent: recordConsent,
         displayName: trimmedName,
@@ -290,9 +293,43 @@ class AuthService {
       throw StateError('No signed-in user');
     }
     try {
-      await user.sendEmailVerification();
+      await _sendEmailVerificationReliably(user, retryAfterCreate: false);
     } catch (error, stack) {
       await _recordAuthError(error, stack, 'auth_send_verification_failed');
+      rethrow;
+    }
+  }
+
+  /// Firebase Auth often accepts the first [User.sendEmailVerification] call
+  /// after account creation without delivering mail; a short delayed retry
+  /// matches the manual "resend" that users otherwise need.
+  Future<void> _sendEmailVerificationReliably(
+    User user, {
+    required bool retryAfterCreate,
+  }) async {
+    Future<void> sendOnce() async {
+      final fresh = _auth.currentUser ?? user;
+      await fresh.sendEmailVerification();
+    }
+
+    try {
+      await sendOnce();
+    } catch (_) {
+      await Future<void>.delayed(const Duration(seconds: 1));
+      await _auth.currentUser?.reload();
+      await sendOnce();
+      return;
+    }
+
+    if (!retryAfterCreate) return;
+
+    await Future<void>.delayed(const Duration(seconds: 1));
+    try {
+      await _auth.currentUser?.reload();
+      await sendOnce();
+    } on FirebaseAuthException catch (e) {
+      // Rate limit / duplicate send — first attempt may still arrive.
+      if (e.code == 'too-many-requests') return;
       rethrow;
     }
   }
@@ -385,6 +422,7 @@ class AuthService {
       }
 
       await AppCrashReporting.instance.setUserId(null);
+      await DeviceConsentStore.instance.clear();
     } catch (error, stack) {
       await _recordAuthError(error, stack, 'auth_delete_account_failed');
       rethrow;

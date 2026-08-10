@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
+import '../../../core/privacy/device_consent_store.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/personal_data_consent_checkbox.dart';
 import '../../../services/firestore_service.dart';
@@ -42,6 +45,7 @@ class _PersonalDataConsentGatePageState
     setState(() => _saving = true);
     try {
       await FirestoreService().recordPersonalDataConsent();
+      await DeviceConsentStore.instance.rememberAccepted();
     } catch (e) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context);
@@ -74,6 +78,7 @@ class _PersonalDataConsentGatePageState
         }
 
         if (snapshot.data == true) {
+          unawaited(DeviceConsentStore.instance.rememberAccepted());
           return widget.child;
         }
 

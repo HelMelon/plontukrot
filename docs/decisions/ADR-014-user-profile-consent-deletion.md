@@ -12,7 +12,7 @@ Language and currency lived on a dedicated Settings page reached from a Home gea
 
 1. **Profile hub** (`ProfilePage`) opens from the Home avatar. Settings gear and Home logout are removed. Language and currency are dropdowns on the profile page (same controllers as before).
 2. **Stats** (client-side): active plant count, mode of `plantFamily` and `genus`, count of active propagation batches.
-3. **Consent:** Login requires a checked consent box linking to `https://helmelon.github.io/plontukrot/privacy.html`. Successful sign-in writes `users/{uid}.personalDataConsentAt` (server timestamp). Existing sessions without the field see a blocking gate before Home.
+3. **Consent:** Login requires a checked consent box linking to `https://helmelon.github.io/plontukrot/privacy.html`. Successful sign-in writes `users/{uid}.personalDataConsentAt` (server timestamp). Existing sessions without the field see a blocking gate before Home. Acceptance is also cached on the device (`SharedPreferences` via `DeviceConsentStore`) so the login checkbox stays checked on later visits to the same browser/device; clearing happens on account deletion. Firestore remains the account source of truth.
 4. **Delete profile:** Google reauth, wipe all `users/{uid}` data (plants and care subtrees, catalogs, wish list, finances, remaining propagations), delete Storage under `plants/{uid}/`, delete the user document, then delete the Firebase Auth user. Shared `plantSpecies` is not deleted.
 
 ## Implementation
