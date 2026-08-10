@@ -112,9 +112,11 @@ class PlantSearchDelegate extends SearchDelegate {
 
   @override
   List<Widget>? buildActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return [
       if (query.isNotEmpty)
         IconButton(
+          tooltip: l10n.commonClear,
           icon: Icon(Icons.clear, color: context.colors.icon),
           onPressed: () => query = '',
         ),
@@ -123,7 +125,9 @@ class PlantSearchDelegate extends SearchDelegate {
 
   @override
   Widget? buildLeading(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return IconButton(
+      tooltip: l10n.commonBack,
       icon: Icon(Icons.arrow_back, color: context.colors.icon),
       onPressed: () => close(context, null),
     );

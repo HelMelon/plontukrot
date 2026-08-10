@@ -34,7 +34,28 @@ class AppLocalizationsDe extends AppLocalizations {
   String get commonClose => 'Schließen';
 
   @override
+  String get commonBack => 'Zurück';
+
+  @override
+  String get commonClear => 'Leeren';
+
+  @override
   String get commonMore => 'Mehr';
+
+  @override
+  String get a11yShowPassword => 'Passwort anzeigen';
+
+  @override
+  String get a11yHidePassword => 'Passwort verbergen';
+
+  @override
+  String get a11yExitSelection => 'Auswahlmodus beenden';
+
+  @override
+  String get a11yOpenSearch => 'Pflanzensuche öffnen';
+
+  @override
+  String get plantPhotoAdd => 'Foto hinzufügen';
 
   @override
   String get commonToday => 'Heute';

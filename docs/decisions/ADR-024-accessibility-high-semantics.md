@@ -10,34 +10,43 @@ An accessibility-tree audit found no explicit `Semantics` usage and several high
 
 ## Decision
 
-1. Introduce `AccessibleProgressIndicator` (labeled live region) and replace app `CircularProgressIndicator` usages with it; keep the raw indicator only inside that wrapper.
-2. Wrap list-row and related tap targets with `Semantics(button: …, label: …)` using visible on-screen text; use `selected` where selection applies; `ExcludeSemantics` on decorative chevrons/icons.
-3. Cover composition tags and `PlantCard` with `button` + `selected`.
-4. Cover date-field `InkWell`s in finance/propagation sheets the same way as list rows.
-5. Defer Medium/Low items (image alt text, CustomPaint, sheet handles) and remaining unlabeled hub chrome (e.g. home letter-group headers, gallery add without a dedicated string) until a follow-up pass.
+Address all **High** audit gaps:
+
+1. Tooltips / semantic labels for FABs and icon-only controls on primary surfaces (home, wish list, finances, search clear/back, selection exit, auth password visibility, gallery add/delete).
+2. Expose `button` + `selected` (or `expanded`) on `PlantCard`, home filter chips, letter-group headers, and composition tags.
+3. Consent: labeled checkbox control via `Semantics(checked: …)` on the consent text; privacy policy as a separate `link` semantics node; visual checkbox excluded from the tree.
+4. `AccessibleProgressIndicator` (labeled live region) replaces app `CircularProgressIndicator` usages; raw indicator only inside the wrapper.
+5. List-row and date-field `InkWell`s outside hubs use `Semantics(button: …, label: …)` from visible text.
 6. Do not change fonts or type sizes.
+
+Medium/Low items (image alt text, CustomPaint, empty-state announcements, sheet drag handles) remain deferred.
 
 ## Implementation
 
-- `lib/core/widgets/accessible_progress_indicator.dart` — sole remaining raw `CircularProgressIndicator`
-- List/selection: `PlantCard`, soil/fertilizer tags, archive rows, propagations list, plant propagations section, care history sheets, wish-list select sheet, `InfoCard`
-- Detail links / controls: botanical / genus links on plant info card, leaf-counter scroll link and ± controls
-- Date pickers: add finance entry, add/change/sell-lose propagation sheets
-- Labels reuse existing visible / l10n strings (no new `a11y*` keys in this pass)
+- `lib/core/widgets/accessible_progress_indicator.dart`
+- Consent: `personal_data_consent_checkbox.dart`
+- Hub chrome: home FAB / search / selection close / filter chips / group headers; wish list & finances FABs; search delegate back/clear
+- Gallery: `plant_image_card.dart` empty-state + action buttons
+- Auth: password visibility tooltips on email sign-in/register sheets
+- Cards/tags/list rows/history/date pickers as in prior High follow-ups
+- l10n: `commonBack`, `commonClear`, `a11yShowPassword`, `a11yHidePassword`, `a11yExitSelection`, `a11yOpenSearch`, `plantPhotoAdd` (+ existing `plantAdd` / `wishListAdd` / `financesAdd` / `plantPhotoDeleteTitle`)
 
 ## Behavior
 
+- Screen readers get named FABs, selection exit, search open/clear/back, password show/hide, gallery add/delete.
+- Plant cards, filters, tags, and group headers announce role and selection/expansion.
+- Consent toggles as one labeled control; privacy policy remains a separate link.
 - Loading states announce via `AccessibleProgressIndicator`.
-- List rows, cards, tags, and date fields announce as buttons with the on-screen title/date/selection text.
-- Decorative chevrons and calendar icons do not duplicate announcements.
+- List rows and date fields announce as buttons with on-screen text.
 
 ## Consequences
 
-- Consent checkbox / privacy link merge, hub FAB tooltips, password visibility labels, and gallery add label may still be incomplete if not restored from earlier work.
 - Medium/Low audit items remain open.
 - Font sizes were not changed.
+- Some decorative icons use `ExcludeSemantics` to avoid duplicate announcements.
 
 ## Verification
 
+- `flutter gen-l10n`
 - `flutter analyze` on touched files — no issues
 - Grep: no `CircularProgressIndicator` outside `accessible_progress_indicator.dart`

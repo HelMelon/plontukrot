@@ -34,7 +34,28 @@ class AppLocalizationsRu extends AppLocalizations {
   String get commonClose => 'Закрыть';
 
   @override
+  String get commonBack => 'Назад';
+
+  @override
+  String get commonClear => 'Очистить';
+
+  @override
   String get commonMore => 'Ещё';
+
+  @override
+  String get a11yShowPassword => 'Показать пароль';
+
+  @override
+  String get a11yHidePassword => 'Скрыть пароль';
+
+  @override
+  String get a11yExitSelection => 'Выйти из режима выбора';
+
+  @override
+  String get a11yOpenSearch => 'Открыть поиск растений';
+
+  @override
+  String get plantPhotoAdd => 'Добавить фото';
 
   @override
   String get commonToday => 'Сегодня';

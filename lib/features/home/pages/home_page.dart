@@ -335,36 +335,44 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              InkWell(
-                borderRadius: radii.smAll,
-                onTap: () => _toggleGroup(entry.key),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: spacing.xxs,
-                    vertical: spacing.xs,
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          titleForKey(entry.key),
-                          style: typography.titleMedium,
+              Semantics(
+                button: true,
+                expanded: !isCollapsed,
+                label:
+                    '${titleForKey(entry.key)}, ${entry.value.length}',
+                child: InkWell(
+                  borderRadius: radii.smAll,
+                  onTap: () => _toggleGroup(entry.key),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: spacing.xxs,
+                      vertical: spacing.xs,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            titleForKey(entry.key),
+                            style: typography.titleMedium,
+                          ),
                         ),
-                      ),
-                      spacing.hXs,
-                      Text(
-                        '${entry.value.length}',
-                        style: typography.bodyMedium
-                            .copyWith(color: colors.textSecondary),
-                      ),
-                      spacing.hXs,
-                      Icon(
-                        isCollapsed
-                            ? Icons.keyboard_arrow_down
-                            : Icons.keyboard_arrow_up,
-                        color: colors.icon,
-                      ),
-                    ],
+                        spacing.hXs,
+                        Text(
+                          '${entry.value.length}',
+                          style: typography.bodyMedium
+                              .copyWith(color: colors.textSecondary),
+                        ),
+                        spacing.hXs,
+                        ExcludeSemantics(
+                          child: Icon(
+                            isCollapsed
+                                ? Icons.keyboard_arrow_down
+                                : Icons.keyboard_arrow_up,
+                            color: colors.icon,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -495,28 +503,34 @@ class _HomePageState extends State<HomePage> {
     // horizontal scroll on web. Size to intrinsic label width instead.
     return Padding(
       padding: EdgeInsets.only(right: spacing.xs),
-      child: Material(
-        color: selected ? chips.selectedBackground : chips.unselectedBackground,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(chips.radius),
-          side: BorderSide(
-            color: selected ? chips.selectedBorder : chips.unselectedBorder,
-          ),
-        ),
-        child: InkWell(
-          onTap: () => onSelected(!selected),
-          onLongPress: onLongPress,
-          borderRadius: BorderRadius.circular(chips.radius),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: spacing.sm,
-              vertical: spacing.xs,
+      child: Semantics(
+        button: true,
+        selected: selected,
+        label: label,
+        child: Material(
+          color:
+              selected ? chips.selectedBackground : chips.unselectedBackground,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(chips.radius),
+            side: BorderSide(
+              color: selected ? chips.selectedBorder : chips.unselectedBorder,
             ),
-            child: Text(
-              label,
-              softWrap: false,
-              maxLines: 1,
-              style: labelStyle,
+          ),
+          child: InkWell(
+            onTap: () => onSelected(!selected),
+            onLongPress: onLongPress,
+            borderRadius: BorderRadius.circular(chips.radius),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: spacing.sm,
+                vertical: spacing.xs,
+              ),
+              child: Text(
+                label,
+                softWrap: false,
+                maxLines: 1,
+                style: labelStyle,
+              ),
             ),
           ),
         ),
@@ -825,6 +839,7 @@ class _HomePageState extends State<HomePage> {
     return AppBar(
       backgroundColor: _colors.screen,
       leading: IconButton(
+        tooltip: l10n.a11yExitSelection,
         onPressed: _exitSelectionMode,
         icon: const Icon(Icons.close),
       ),
@@ -860,30 +875,34 @@ class _HomePageState extends State<HomePage> {
         right: spacing.md,
         bottom: spacing.sm,
       ),
-      child: GestureDetector(
-        onTap: () {
-          showSearch(
-            context: context,
-            delegate: PlantSearchDelegate(
-              searchFieldLabel: l10n.homeSearchHint,
-            ),
-          );
-        },
-        child: AbsorbPointer(
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: l10n.homeSearchHint,
-              hintStyle: typography.bodySmall,
-              prefixIcon: Icon(
-                Icons.search,
-                color: colors.textSecondary,
+      child: Semantics(
+        button: true,
+        label: l10n.a11yOpenSearch,
+        child: GestureDetector(
+          onTap: () {
+            showSearch(
+              context: context,
+              delegate: PlantSearchDelegate(
+                searchFieldLabel: l10n.homeSearchHint,
               ),
-              filled: true,
-              fillColor: colors.heading.withValues(alpha: 0.05),
-              contentPadding: EdgeInsets.symmetric(vertical: spacing.sm),
-              border: OutlineInputBorder(
-                borderRadius: radii.mdAll,
-                borderSide: BorderSide.none,
+            );
+          },
+          child: AbsorbPointer(
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: l10n.homeSearchHint,
+                hintStyle: typography.bodySmall,
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: colors.textSecondary,
+                ),
+                filled: true,
+                fillColor: colors.heading.withValues(alpha: 0.05),
+                contentPadding: EdgeInsets.symmetric(vertical: spacing.sm),
+                border: OutlineInputBorder(
+                  borderRadius: radii.mdAll,
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
           ),
@@ -1047,6 +1066,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: _isSelectionMode
           ? null
           : FloatingActionButton(
+              tooltip: l10n.plantAdd,
               foregroundColor: colors.onPrimary,
               onPressed: () {
                 showModalBottomSheet(

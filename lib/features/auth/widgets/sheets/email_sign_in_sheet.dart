@@ -183,6 +183,9 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
                             size: dimensions.iconLg,
                           ),
                           suffixIcon: IconButton(
+                            tooltip: _obscurePassword
+                                ? l10n.a11yShowPassword
+                                : l10n.a11yHidePassword,
                             onPressed: _isLoading
                                 ? null
                                 : () => setState(

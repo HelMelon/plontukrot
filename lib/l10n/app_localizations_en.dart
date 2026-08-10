@@ -34,7 +34,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonClose => 'Close';
 
   @override
+  String get commonBack => 'Back';
+
+  @override
+  String get commonClear => 'Clear';
+
+  @override
   String get commonMore => 'More';
+
+  @override
+  String get a11yShowPassword => 'Show password';
+
+  @override
+  String get a11yHidePassword => 'Hide password';
+
+  @override
+  String get a11yExitSelection => 'Exit selection mode';
+
+  @override
+  String get a11yOpenSearch => 'Open plant search';
+
+  @override
+  String get plantPhotoAdd => 'Add photo';
 
   @override
   String get commonToday => 'Today';

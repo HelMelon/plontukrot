@@ -263,6 +263,7 @@ class _WishListPageState extends State<WishListPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        tooltip: l10n.wishListAdd,
         onPressed: () => _openAddSheet(),
         child: const Icon(Icons.add),
       ),

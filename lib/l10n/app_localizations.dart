@@ -150,11 +150,53 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get commonClose;
 
+  /// No description provided for @commonBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get commonBack;
+
+  /// No description provided for @commonClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get commonClear;
+
   /// No description provided for @commonMore.
   ///
   /// In en, this message translates to:
   /// **'More'**
   String get commonMore;
+
+  /// No description provided for @a11yShowPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get a11yShowPassword;
+
+  /// No description provided for @a11yHidePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get a11yHidePassword;
+
+  /// No description provided for @a11yExitSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit selection mode'**
+  String get a11yExitSelection;
+
+  /// No description provided for @a11yOpenSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Open plant search'**
+  String get a11yOpenSearch;
+
+  /// No description provided for @plantPhotoAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photo'**
+  String get plantPhotoAdd;
 
   /// No description provided for @commonToday.
   ///

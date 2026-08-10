@@ -3,6 +3,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/features/plants/widgets/cards/placeholder_widget.dart';
 import 'package:plontukrot/features/plants/widgets/common/plant_network_image.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 import 'package:plontukrot/models/plant_photo.dart';
 
 import '../../../../core/theme/theme_context.dart';
@@ -68,6 +69,7 @@ class _PlantImageCardState extends State<PlantImageCard> {
     final radii = context.radii;
     final typography = context.typography;
     final gallery = context.screens.plantDetails;
+    final l10n = AppLocalizations.of(context);
     final photos = widget.photos;
     final hasPhotos = photos.isNotEmpty;
     final current = hasPhotos ? photos[_index.clamp(0, photos.length - 1)] : null;
@@ -84,11 +86,16 @@ class _PlantImageCardState extends State<PlantImageCard> {
           fit: StackFit.expand,
           children: [
             if (!hasPhotos)
-              GestureDetector(
-                onTap: widget.isUploading ? null : widget.onAdd,
-                child: const Align(
-                  alignment: Alignment.topCenter,
-                  child: PlaceholderWithIcon(),
+              Semantics(
+                button: true,
+                enabled: !widget.isUploading,
+                label: l10n.plantPhotoAdd,
+                child: GestureDetector(
+                  onTap: widget.isUploading ? null : widget.onAdd,
+                  child: const Align(
+                    alignment: Alignment.topCenter,
+                    child: PlaceholderWithIcon(),
+                  ),
                 ),
               )
             else
@@ -175,6 +182,7 @@ class _PlantImageCardState extends State<PlantImageCard> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _GalleryActionButton(
+                      tooltip: l10n.plantPhotoAdd,
                       background: gallery.galleryActionBackground,
                       iconColor: colors.onPrimary,
                       icon: HugeIcons.strokeRoundedAdd01,
@@ -183,6 +191,7 @@ class _PlantImageCardState extends State<PlantImageCard> {
                     if (widget.onDelete != null && current != null) ...[
                       SizedBox(width: spacing.xs),
                       _GalleryActionButton(
+                        tooltip: l10n.plantPhotoDeleteTitle,
                         background: gallery.galleryActionBackground,
                         iconColor: colors.onPrimary,
                         icon: HugeIcons.strokeRoundedDelete02,
@@ -205,12 +214,14 @@ class _PlantImageCardState extends State<PlantImageCard> {
 }
 
 class _GalleryActionButton extends StatelessWidget {
+  final String tooltip;
   final Color background;
   final Color iconColor;
   final List<List<dynamic>> icon;
   final VoidCallback onTap;
 
   const _GalleryActionButton({
+    required this.tooltip,
     required this.background,
     required this.iconColor,
     required this.icon,
@@ -221,15 +232,24 @@ class _GalleryActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.spacing;
     final size = context.dimensions.iconLg;
-    return Material(
-      color: background,
-      shape: const CircleBorder(),
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTap,
-        child: Padding(
-          padding: EdgeInsets.all(spacing.sm),
-          child: HugeIcon(icon: icon, color: iconColor, size: size),
+    return Semantics(
+      button: true,
+      label: tooltip,
+      child: Tooltip(
+        message: tooltip,
+        child: Material(
+          color: background,
+          shape: const CircleBorder(),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: onTap,
+            child: Padding(
+              padding: EdgeInsets.all(spacing.sm),
+              child: ExcludeSemantics(
+                child: HugeIcon(icon: icon, color: iconColor, size: size),
+              ),
+            ),
+          ),
         ),
       ),
     );

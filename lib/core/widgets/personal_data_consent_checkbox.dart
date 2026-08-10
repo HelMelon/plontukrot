@@ -38,30 +38,45 @@ class PersonalDataConsentCheckbox extends StatelessWidget {
       children: [
         // Shrink the Material tap target so the box lines up with the
         // first line of body text instead of floating in a 48px square.
-        Checkbox(
-          value: value,
-          onChanged: (next) => onChanged(next ?? false),
-          activeColor: colors.primary,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
+        ExcludeSemantics(
+          child: Checkbox(
+            value: value,
+            onChanged: (next) => onChanged(next ?? false),
+            activeColor: colors.primary,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: VisualDensity.compact,
+          ),
         ),
         spacing.hXs,
         Expanded(
           child: Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Text(
-                '${l10n.authConsentLabel}. ',
-                style: labelStyle,
+              Semantics(
+                checked: value,
+                button: true,
+                label: l10n.authConsentLabel,
+                child: GestureDetector(
+                  onTap: () => onChanged(!value),
+                  child: Text(
+                    '${l10n.authConsentLabel}. ',
+                    style: labelStyle,
+                  ),
+                ),
               ),
-              GestureDetector(
-                onTap: _openPrivacyPolicy,
-                child: Text(
-                  l10n.privacyPolicyLink,
-                  style: labelStyle.copyWith(
-                    color: linkColor,
-                    decoration: TextDecoration.underline,
-                    decorationColor: linkColor,
+              Semantics(
+                link: true,
+                button: true,
+                label: l10n.privacyPolicyLink,
+                child: GestureDetector(
+                  onTap: _openPrivacyPolicy,
+                  child: Text(
+                    l10n.privacyPolicyLink,
+                    style: labelStyle.copyWith(
+                      color: linkColor,
+                      decoration: TextDecoration.underline,
+                      decorationColor: linkColor,
+                    ),
                   ),
                 ),
               ),

@@ -200,6 +200,9 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                             size: dimensions.iconLg,
                           ),
                           suffixIcon: IconButton(
+                            tooltip: _obscurePassword
+                                ? l10n.a11yShowPassword
+                                : l10n.a11yHidePassword,
                             onPressed: _isLoading
                                 ? null
                                 : () => setState(

@@ -359,6 +359,7 @@ class _FinancesPageState extends State<FinancesPage> {
             title: Text(l10n.financesTitle),
           ),
           floatingActionButton: FloatingActionButton(
+            tooltip: l10n.financesAdd,
             onPressed: () => _openSheet(),
             child: const Icon(Icons.add),
           ),
