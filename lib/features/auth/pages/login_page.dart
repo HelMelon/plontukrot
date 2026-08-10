@@ -22,6 +22,10 @@ class _LoginPageState extends State<LoginPage> {
   bool _consentAccepted = false;
   bool _consentLoaded = false;
 
+  /// Device already remembered consent — hide the checkbox row.
+  bool get _consentRememberedOnDevice =>
+      _consentLoaded && _consentAccepted;
+
   @override
   void initState() {
     super.initState();
@@ -122,11 +126,13 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 spacing.vXxxl,
-                PersonalDataConsentCheckbox(
-                  value: _consentAccepted,
-                  onChanged: _onConsentChanged,
-                ),
-                spacing.vXl,
+                if (!_consentRememberedOnDevice) ...[
+                  PersonalDataConsentCheckbox(
+                    value: _consentAccepted,
+                    onChanged: _onConsentChanged,
+                  ),
+                  spacing.vXl,
+                ],
                 SizedBox(
                   width: double.infinity,
                   height: dimensions.buttonHeight,
@@ -146,7 +152,10 @@ class _LoginPageState extends State<LoginPage> {
                         ? SizedBox(
                             width: dimensions.iconLg,
                             height: dimensions.iconLg,
-                            child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
+                            child: AccessibleProgressIndicator(
+                              strokeWidth: 2,
+                              color: colors.onPrimary,
+                            ),
                           )
                         : const Icon(Icons.login),
                     label: Text(

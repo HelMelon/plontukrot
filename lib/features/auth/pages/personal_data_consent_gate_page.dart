@@ -28,8 +28,28 @@ class PersonalDataConsentGatePage extends StatefulWidget {
 class _PersonalDataConsentGatePageState
     extends State<PersonalDataConsentGatePage> {
   bool _accepted = false;
+  bool _deviceConsentLoaded = false;
   bool _saving = false;
   bool _readySignaled = false;
+
+  /// Device already remembered consent — hide the checkbox row.
+  bool get _consentRememberedOnDevice =>
+      _deviceConsentLoaded && _accepted;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDeviceConsent();
+  }
+
+  Future<void> _loadDeviceConsent() async {
+    final accepted = await DeviceConsentStore.instance.isAccepted();
+    if (!mounted) return;
+    setState(() {
+      _accepted = accepted;
+      _deviceConsentLoaded = true;
+    });
+  }
 
   void _signalReadyOnce() {
     if (_readySignaled || widget.onContentReady == null) return;
@@ -90,6 +110,8 @@ class _PersonalDataConsentGatePageState
         final spacing = context.spacing;
         final typography = context.typography;
         final dimensions = context.dimensions;
+        final canContinue =
+            _accepted && _deviceConsentLoaded && !_saving;
 
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -114,21 +136,26 @@ class _PersonalDataConsentGatePageState
                         height: 1.4,
                       ),
                     ),
-                    spacing.vXl,
-                    PersonalDataConsentCheckbox(
-                      value: _accepted,
-                      onChanged: (v) => setState(() => _accepted = v),
-                    ),
+                    if (!_consentRememberedOnDevice) ...[
+                      spacing.vXl,
+                      PersonalDataConsentCheckbox(
+                        value: _accepted,
+                        onChanged: (v) => setState(() => _accepted = v),
+                      ),
+                    ],
                     spacing.vXl,
                     SizedBox(
                       height: dimensions.buttonHeight,
                       child: ElevatedButton(
-                        onPressed: _accepted && !_saving ? _submit : null,
+                        onPressed: canContinue ? _submit : null,
                         child: _saving
                             ? SizedBox(
                                 width: dimensions.iconLg,
                                 height: dimensions.iconLg,
-                                child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
+                                child: AccessibleProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: colors.onPrimary,
+                                ),
                               )
                             : Text(l10n.authConsentContinue),
                       ),

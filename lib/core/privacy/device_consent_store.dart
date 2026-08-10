@@ -1,9 +1,10 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Device-local cache of personal-data consent (login checkbox).
+/// Device-local cache of personal-data consent.
 ///
-/// Firestore `personalDataConsentAt` remains the account source of truth;
-/// this only skips re-ticking the login checkbox on the same browser/device.
+/// Firestore `personalDataConsentAt` remains the account source of truth.
+/// When this flag is set, login/gate hide the consent checkbox on this device;
+/// clearing happens on account deletion.
 class DeviceConsentStore {
   DeviceConsentStore._();
 
