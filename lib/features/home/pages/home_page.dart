@@ -198,7 +198,12 @@ class _HomePageState extends State<HomePage> {
       };
 
   List<Plant> _sortPlants(Iterable<Plant> plants) {
-    final sortedPlants = plants.toList();
+    // Sorting by last fertilizing is only meaningful for plants that have
+    // fertilizing data — skip the rest instead of dumping them at the end.
+    final sortedPlants = (_sortField == _PlantSortField.lastFertilizedAt
+            ? plants.where((plant) => plant.lastFertilizedAt != null)
+            : plants)
+        .toList();
     sortedPlants.sort((first, second) {
       if (_sortField == _PlantSortField.nickname) {
         final firstHasNickname = first.nickname.trim().isNotEmpty;
