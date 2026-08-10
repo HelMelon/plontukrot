@@ -110,6 +110,14 @@ class FirestoreService {
     );
   }
 
+  /// Updates the site display name on `users/{uid}`.
+  Future<void> updateUserDisplayName(String displayName) async {
+    final trimmed = displayName.trim();
+    await _userDoc.set({
+      'name': trimmed.isEmpty ? null : trimmed,
+    }, SetOptions(merge: true));
+  }
+
   Stream<bool> watchUserDocumentExists() {
     return _userDoc.snapshots().map((snapshot) => snapshot.exists);
   }

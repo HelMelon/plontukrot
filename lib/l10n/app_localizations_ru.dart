@@ -176,6 +176,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get authDisplayNameLabel => 'Имя на сайте';
 
   @override
+  String get authDisplayNameOptionalHint => 'Необязательно';
+
+  @override
+  String get authPlantNameSuggestionHint =>
+      'Подсказка — нажмите, чтобы подставить';
+
+  @override
+  String get authPlantNameSuggestionEmpty => 'Пока нет подсказки';
+
+  @override
+  String get a11yRegeneratePlantNameSuggestion =>
+      'Сгенерировать другое название растения';
+
+  @override
   String get authSignInEmail => 'Войти с email';
 
   @override
@@ -271,6 +285,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get profileTitle => 'Профиль';
+
+  @override
+  String get profileEditDisplayName => 'Изменить имя на сайте';
+
+  @override
+  String get profileDisplayNameSaved => 'Имя обновлено';
 
   @override
   String get profileEmDash => '—';

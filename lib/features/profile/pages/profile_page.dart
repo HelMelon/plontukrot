@@ -265,6 +265,46 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> _editDisplayName(String currentName) async {
+    if (_busy) return;
+    final l10n = AppLocalizations.of(context);
+    final next = await showPromptTextDialog(
+      context: context,
+      title: l10n.profileEditDisplayName,
+      labelText: l10n.authDisplayNameLabel,
+      hintText: l10n.authDisplayNameOptionalHint,
+      initial: currentName,
+      allowEmpty: true,
+      confirmLabel: l10n.commonSave,
+      textCapitalization: TextCapitalization.words,
+    );
+    if (next == null || !mounted) return;
+
+    setState(() {
+      _busy = true;
+      _busyMessage = null;
+    });
+    try {
+      await AuthService().updateSiteDisplayName(next);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.profileDisplayNameSaved)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commonError(e.toString()))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _busyMessage = null;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -300,8 +340,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 stream: _profileStream,
                 builder: (context, profileSnap) {
                   final profile = profileSnap.data;
-                  final name = (profile?.name?.isNotEmpty == true)
-                      ? profile!.name!
+                  final rawName = profile?.name?.trim() ?? '';
+                  final name = rawName.isNotEmpty
+                      ? rawName
                       : (l10n.commonUntitled);
                   final email = profile?.email ?? '';
                   return Row(
@@ -363,6 +404,13 @@ class _ProfilePageState extends State<ProfilePage> {
                             ],
                           ],
                         ),
+                      ),
+                      IconButton(
+                        tooltip: l10n.profileEditDisplayName,
+                        onPressed: _busy
+                            ? null
+                            : () => _editDisplayName(rawName),
+                        icon: Icon(Icons.edit_outlined, color: colors.icon),
                       ),
                     ],
                   );

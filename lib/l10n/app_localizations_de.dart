@@ -178,6 +178,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String get authDisplayNameLabel => 'Anzeigename';
 
   @override
+  String get authDisplayNameOptionalHint => 'Optional';
+
+  @override
+  String get authPlantNameSuggestionHint => 'Vorschlag — tippen zum Übernehmen';
+
+  @override
+  String get authPlantNameSuggestionEmpty => 'Noch kein Vorschlag';
+
+  @override
+  String get a11yRegeneratePlantNameSuggestion =>
+      'Anderen Pflanzennamen erzeugen';
+
+  @override
   String get authSignInEmail => 'Mit E-Mail anmelden';
 
   @override
@@ -273,6 +286,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get profileTitle => 'Profil';
+
+  @override
+  String get profileEditDisplayName => 'Anzeigename ändern';
+
+  @override
+  String get profileDisplayNameSaved => 'Anzeigename aktualisiert';
 
   @override
   String get profileEmDash => '—';

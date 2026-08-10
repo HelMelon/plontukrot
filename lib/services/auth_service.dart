@@ -230,12 +230,12 @@ class AuthService {
     }
   }
 
-  /// Creates an email/password account, sets site display name, sends
-  /// verification email, and seeds the Firestore profile.
+  /// Creates an email/password account, optionally sets site display name,
+  /// sends verification email, and seeds the Firestore profile.
   Future<void> registerWithEmail({
     required String email,
     required String password,
-    required String displayName,
+    String displayName = '',
     bool recordConsent = false,
   }) async {
     final trimmedName = displayName.trim();
@@ -252,13 +252,31 @@ class AuthService {
       // Send verification before profile updates — the first send right after
       // create+updateDisplayName often never arrives; resend then works.
       await _sendEmailVerificationReliably(user, retryAfterCreate: true);
-      await user.updateDisplayName(trimmedName);
+      if (trimmedName.isNotEmpty) {
+        await user.updateDisplayName(trimmedName);
+      }
       await FirestoreService().createUserDocument(
         recordConsent: recordConsent,
-        displayName: trimmedName,
+        displayName: trimmedName.isEmpty ? null : trimmedName,
       );
     } catch (error, stack) {
       await _recordAuthError(error, stack, 'auth_register_failed');
+      rethrow;
+    }
+  }
+
+  /// Updates Auth `displayName` and Firestore `users/{uid}.name`.
+  Future<void> updateSiteDisplayName(String displayName) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw StateError('No signed-in user');
+    }
+    final trimmed = displayName.trim();
+    try {
+      await user.updateDisplayName(trimmed.isEmpty ? null : trimmed);
+      await FirestoreService().updateUserDisplayName(trimmed);
+    } catch (error, stack) {
+      await _recordAuthError(error, stack, 'auth_update_display_name_failed');
       rethrow;
     }
   }

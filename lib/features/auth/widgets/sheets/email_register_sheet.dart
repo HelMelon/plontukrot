@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
+import '../../../../core/widgets/random_plant_name_suggestion.dart';
 import '../../../../services/auth_service.dart';
 import '../../auth_failure_messages.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
@@ -146,12 +147,18 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                               size: dimensions.iconLg,
                             ),
                           ),
+                        ).copyWith(
+                          hintText: l10n.authDisplayNameOptionalHint,
                         ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return l10n.authFieldRequired;
-                          }
-                          return null;
+                      ),
+                      spacing.vSm,
+                      RandomPlantNameSuggestion(
+                        enabled: !_isLoading,
+                        onApply: (value) {
+                          _nameController.text = value;
+                          _nameController.selection = TextSelection.collapsed(
+                            offset: value.length,
+                          );
                         },
                       ),
                       spacing.vMd,

@@ -176,6 +176,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authDisplayNameLabel => 'Display name';
 
   @override
+  String get authDisplayNameOptionalHint => 'Optional';
+
+  @override
+  String get authPlantNameSuggestionHint => 'Suggestion — tap to use';
+
+  @override
+  String get authPlantNameSuggestionEmpty => 'No suggestion yet';
+
+  @override
+  String get a11yRegeneratePlantNameSuggestion => 'Generate another plant name';
+
+  @override
   String get authSignInEmail => 'Sign in with email';
 
   @override
@@ -270,6 +282,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileTitle => 'Profile';
+
+  @override
+  String get profileEditDisplayName => 'Edit display name';
+
+  @override
+  String get profileDisplayNameSaved => 'Display name updated';
 
   @override
   String get profileEmDash => '—';

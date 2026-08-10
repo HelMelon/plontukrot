@@ -408,6 +408,30 @@ abstract class AppLocalizations {
   /// **'Display name'**
   String get authDisplayNameLabel;
 
+  /// No description provided for @authDisplayNameOptionalHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get authDisplayNameOptionalHint;
+
+  /// No description provided for @authPlantNameSuggestionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestion — tap to use'**
+  String get authPlantNameSuggestionHint;
+
+  /// No description provided for @authPlantNameSuggestionEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No suggestion yet'**
+  String get authPlantNameSuggestionEmpty;
+
+  /// No description provided for @a11yRegeneratePlantNameSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate another plant name'**
+  String get a11yRegeneratePlantNameSuggestion;
+
   /// No description provided for @authSignInEmail.
   ///
   /// In en, this message translates to:
@@ -587,6 +611,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Profile'**
   String get profileTitle;
+
+  /// No description provided for @profileEditDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit display name'**
+  String get profileEditDisplayName;
+
+  /// No description provided for @profileDisplayNameSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name updated'**
+  String get profileDisplayNameSaved;
 
   /// No description provided for @profileEmDash.
   ///

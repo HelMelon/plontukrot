@@ -22,6 +22,7 @@ import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
 import '../../plants/widgets/sheets/add_repotting_sheet.dart';
 import '../../plants/widgets/sheets/merge_plant_sheet.dart';
 import '../../../services/plant_service.dart';
+import '../../../services/plant_name_catalog_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../../services/startup_warmup_service.dart';
 import '../../../services/watering_service.dart';
@@ -106,6 +107,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _signalFirstContentReady(List<Plant> plants) async {
+    unawaited(PlantNameCatalogService.instance.absorbPlants(plants));
     if (_firstContentReadySignaled || widget.onFirstContentReady == null) {
       return;
     }
