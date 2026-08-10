@@ -19,6 +19,21 @@ enum AuthFailureKind {
   /// Google returned no ID token.
   missingIdToken,
 
+  /// Malformed email address.
+  invalidEmail,
+
+  /// Password does not meet Firebase strength rules.
+  weakPassword,
+
+  /// Email is already registered.
+  emailAlreadyInUse,
+
+  /// Wrong password, unknown user, or invalid credential.
+  invalidCredentials,
+
+  /// Firebase rate limit.
+  tooManyRequests,
+
   /// Anything else — show a generic retry message.
   unknown,
 }
@@ -49,9 +64,29 @@ class AuthService {
   /// Current session mapped for UI (null when signed out).
   AppUser? get currentUser => _mapUser(_auth.currentUser);
 
+  /// Fires on sign-in/out and after [User.reload] (e.g. email verification).
   Stream<AppUser?> watchAuthState() {
-    return _auth.authStateChanges().map(_mapUser);
+    return _auth.userChanges().map(_mapUser);
   }
+
+  bool _hasPasswordProvider(User user) {
+    return user.providerData.any((info) => info.providerId == 'password');
+  }
+
+  /// Password-provider accounts must verify email before using the app.
+  bool get needsEmailVerification {
+    final user = _auth.currentUser;
+    if (user == null) return false;
+    return _hasPasswordProvider(user) && !user.emailVerified;
+  }
+
+  /// True when account deletion must reauthenticate with the account password.
+  bool get requiresPasswordToDelete {
+    final user = _auth.currentUser;
+    return user != null && _hasPasswordProvider(user);
+  }
+
+  String? get currentUserEmail => _auth.currentUser?.email;
 
   /// Maps a thrown auth error to a UI category (no raw exception text).
   static AuthFailureKind classifyFailure(Object error) {
@@ -65,6 +100,20 @@ class AuthService {
           return AuthFailureKind.network;
         case 'google-id-token-null':
           return AuthFailureKind.missingIdToken;
+        case 'invalid-email':
+          return AuthFailureKind.invalidEmail;
+        case 'weak-password':
+          return AuthFailureKind.weakPassword;
+        case 'email-already-in-use':
+          return AuthFailureKind.emailAlreadyInUse;
+        case 'user-not-found':
+        case 'wrong-password':
+        case 'invalid-credential':
+        case 'invalid-login-credentials':
+        case 'missing-password':
+          return AuthFailureKind.invalidCredentials;
+        case 'too-many-requests':
+          return AuthFailureKind.tooManyRequests;
       }
     }
 
@@ -128,6 +177,16 @@ class AuthService {
         lowercased.contains('account reauth');
   }
 
+  Future<void> _recordAuthError(Object error, StackTrace stack, String reason) async {
+    if (classifyFailure(error) != AuthFailureKind.cancelled) {
+      await AppCrashReporting.instance.recordError(
+        error,
+        stack,
+        reason: reason,
+      );
+    }
+  }
+
   /// [recordConsent] writes `personalDataConsentAt` on the user document.
   Future<void> signInWithGoogle({bool recordConsent = false}) async {
     try {
@@ -165,13 +224,75 @@ class AuthService {
 
       await FirestoreService().createUserDocument(recordConsent: recordConsent);
     } catch (error, stack) {
-      if (classifyFailure(error) != AuthFailureKind.cancelled) {
-        await AppCrashReporting.instance.recordError(
-          error,
-          stack,
-          reason: 'auth_sign_in_failed',
-        );
+      await _recordAuthError(error, stack, 'auth_sign_in_failed');
+      rethrow;
+    }
+  }
+
+  /// Creates an email/password account, sets site display name, sends
+  /// verification email, and seeds the Firestore profile.
+  Future<void> registerWithEmail({
+    required String email,
+    required String password,
+    required String displayName,
+    bool recordConsent = false,
+  }) async {
+    final trimmedName = displayName.trim();
+    final trimmedEmail = email.trim();
+    try {
+      final credential = await _auth.createUserWithEmailAndPassword(
+        email: trimmedEmail,
+        password: password,
+      );
+      final user = credential.user;
+      if (user == null) {
+        throw StateError('User missing after registration');
       }
+      await user.updateDisplayName(trimmedName);
+      await user.sendEmailVerification();
+      await FirestoreService().createUserDocument(
+        recordConsent: recordConsent,
+        displayName: trimmedName,
+      );
+    } catch (error, stack) {
+      await _recordAuthError(error, stack, 'auth_register_failed');
+      rethrow;
+    }
+  }
+
+  /// Signs in with email/password and ensures the Firestore profile exists.
+  Future<void> signInWithEmail({
+    required String email,
+    required String password,
+    bool recordConsent = false,
+  }) async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+      await FirestoreService().createUserDocument(recordConsent: recordConsent);
+    } catch (error, stack) {
+      await _recordAuthError(error, stack, 'auth_email_sign_in_failed');
+      rethrow;
+    }
+  }
+
+  /// Reloads the Firebase user so [needsEmailVerification] can clear.
+  Future<void> reloadCurrentUser() async {
+    await _auth.currentUser?.reload();
+  }
+
+  /// Resends the verification email for the signed-in password user.
+  Future<void> sendEmailVerification() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw StateError('No signed-in user');
+    }
+    try {
+      await user.sendEmailVerification();
+    } catch (error, stack) {
+      await _recordAuthError(error, stack, 'auth_send_verification_failed');
       rethrow;
     }
   }
@@ -211,17 +332,48 @@ class AuthService {
     await user.reauthenticateWithCredential(credential);
   }
 
-  /// Reauthenticates, wipes Firestore + Storage user data, then deletes Auth.
-  Future<void> deleteAccount() async {
-    try {
-      await _reauthenticateWithGoogle();
-      await FirestoreService().deleteAllUserData();
+  Future<void> _reauthenticateWithPassword(String password) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw StateError('No signed-in user');
+    }
+    final email = user.email;
+    if (email == null || email.isEmpty) {
+      throw FirebaseAuthException(code: 'invalid-email');
+    }
+    if (password.isEmpty) {
+      throw FirebaseAuthException(code: 'missing-password');
+    }
+    final credential = EmailAuthProvider.credential(
+      email: email,
+      password: password,
+    );
+    await user.reauthenticateWithCredential(credential);
+  }
 
+  /// Reauthenticates, wipes Firestore + Storage user data, then deletes Auth.
+  ///
+  /// Password accounts require [password]; Google accounts use Google reauth.
+  Future<void> deleteAccount({String? password}) async {
+    try {
       final user = _auth.currentUser;
       if (user == null) {
+        throw StateError('No signed-in user');
+      }
+
+      if (_hasPasswordProvider(user)) {
+        await _reauthenticateWithPassword(password ?? '');
+      } else {
+        await _reauthenticateWithGoogle();
+      }
+
+      await FirestoreService().deleteAllUserData();
+
+      final freshUser = _auth.currentUser;
+      if (freshUser == null) {
         throw StateError('User missing after data wipe');
       }
-      await user.delete();
+      await freshUser.delete();
 
       if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
         try {
@@ -234,13 +386,7 @@ class AuthService {
 
       await AppCrashReporting.instance.setUserId(null);
     } catch (error, stack) {
-      if (classifyFailure(error) != AuthFailureKind.cancelled) {
-        await AppCrashReporting.instance.recordError(
-          error,
-          stack,
-          reason: 'auth_delete_account_failed',
-        );
-      }
+      await _recordAuthError(error, stack, 'auth_delete_account_failed');
       rethrow;
     }
   }

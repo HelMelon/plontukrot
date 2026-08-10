@@ -54,15 +54,26 @@ class FirestoreService {
   DocumentReference<Map<String, dynamic>> get _userDoc =>
       _firestore.collection('users').doc(uid);
 
-  Future<void> createUserDocument({bool recordConsent = false}) async {
+  /// Seeds `users/{uid}` on first sign-in.
+  ///
+  /// [displayName] overrides Auth `displayName` when creating a new profile
+  /// (used for email registration before Auth profile may be fully refreshed).
+  Future<void> createUserDocument({
+    bool recordConsent = false,
+    String? displayName,
+  }) async {
     final user = FirebaseAuth.instance.currentUser!;
 
     final userDoc = _userDoc;
     final snapshot = await userDoc.get();
 
     if (!snapshot.exists) {
+      final trimmedOverride = displayName?.trim();
+      final name = (trimmedOverride != null && trimmedOverride.isNotEmpty)
+          ? trimmedOverride
+          : user.displayName;
       await userDoc.set({
-        'name': user.displayName,
+        'name': name,
         'email': user.email,
         'createdAt': FieldValue.serverTimestamp(),
         'localeCode': AppLocaleController.instance.preferenceCode,

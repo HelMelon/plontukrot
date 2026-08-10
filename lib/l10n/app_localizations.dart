@@ -312,6 +312,168 @@ abstract class AppLocalizations {
   /// **'Sign out'**
   String get authSignOut;
 
+  /// No description provided for @authEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get authEmailLabel;
+
+  /// No description provided for @authPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get authPasswordLabel;
+
+  /// No description provided for @authDisplayNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get authDisplayNameLabel;
+
+  /// No description provided for @authSignInEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with email'**
+  String get authSignInEmail;
+
+  /// No description provided for @authSignInEmailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Email sign-in'**
+  String get authSignInEmailTitle;
+
+  /// No description provided for @authSignInEmailSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get authSignInEmailSubmit;
+
+  /// No description provided for @authRegisterAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get authRegisterAction;
+
+  /// No description provided for @authRegisterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get authRegisterTitle;
+
+  /// No description provided for @authHaveAccountSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Sign in'**
+  String get authHaveAccountSignIn;
+
+  /// No description provided for @authNoAccountRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'No account? Register'**
+  String get authNoAccountRegister;
+
+  /// No description provided for @authOrDivider.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get authOrDivider;
+
+  /// No description provided for @authRegistering.
+  ///
+  /// In en, this message translates to:
+  /// **'Registering…'**
+  String get authRegistering;
+
+  /// No description provided for @authInvalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the email format.'**
+  String get authInvalidEmail;
+
+  /// No description provided for @authWeakPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is too short (minimum 6 characters).'**
+  String get authWeakPassword;
+
+  /// No description provided for @authEmailAlreadyInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is already registered.'**
+  String get authEmailAlreadyInUse;
+
+  /// No description provided for @authInvalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect email or password.'**
+  String get authInvalidCredentials;
+
+  /// No description provided for @authTooManyRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please wait and try again.'**
+  String get authTooManyRequests;
+
+  /// No description provided for @authFieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get authFieldRequired;
+
+  /// No description provided for @authEmailVerificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your email'**
+  String get authEmailVerificationTitle;
+
+  /// No description provided for @authEmailVerificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a message to {email}. Open the link in the email, then tap “I’ve confirmed”.'**
+  String authEmailVerificationBody(String email);
+
+  /// No description provided for @authEmailVerificationCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'I’ve confirmed'**
+  String get authEmailVerificationCheck;
+
+  /// No description provided for @authEmailVerificationResend.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend email'**
+  String get authEmailVerificationResend;
+
+  /// No description provided for @authEmailVerificationResent.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification email sent again'**
+  String get authEmailVerificationResent;
+
+  /// No description provided for @authEmailVerificationPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is not confirmed yet. Check your inbox and try again.'**
+  String get authEmailVerificationPending;
+
+  /// No description provided for @authEmailVerificationChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking…'**
+  String get authEmailVerificationChecking;
+
+  /// No description provided for @profileDeleteAccountPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password'**
+  String get profileDeleteAccountPasswordTitle;
+
+  /// No description provided for @profileDeleteAccountPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Account password'**
+  String get profileDeleteAccountPasswordHint;
+
   /// No description provided for @authConsentLabel.
   ///
   /// In en, this message translates to:

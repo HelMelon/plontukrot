@@ -123,6 +123,92 @@ class AppLocalizationsFr extends AppLocalizations {
   String get authSignOut => 'Se déconnecter';
 
   @override
+  String get authEmailLabel => 'E-mail';
+
+  @override
+  String get authPasswordLabel => 'Mot de passe';
+
+  @override
+  String get authDisplayNameLabel => 'Nom sur le site';
+
+  @override
+  String get authSignInEmail => 'Se connecter avec e-mail';
+
+  @override
+  String get authSignInEmailTitle => 'Connexion par e-mail';
+
+  @override
+  String get authSignInEmailSubmit => 'Se connecter';
+
+  @override
+  String get authRegisterAction => 'S’inscrire';
+
+  @override
+  String get authRegisterTitle => 'Créer un compte';
+
+  @override
+  String get authHaveAccountSignIn => 'Déjà un compte ? Se connecter';
+
+  @override
+  String get authNoAccountRegister => 'Pas de compte ? S’inscrire';
+
+  @override
+  String get authOrDivider => 'ou';
+
+  @override
+  String get authRegistering => 'Inscription…';
+
+  @override
+  String get authInvalidEmail => 'Vérifiez le format de l’e-mail.';
+
+  @override
+  String get authWeakPassword =>
+      'Mot de passe trop court (6 caractères minimum).';
+
+  @override
+  String get authEmailAlreadyInUse => 'Cet e-mail est déjà enregistré.';
+
+  @override
+  String get authInvalidCredentials => 'E-mail ou mot de passe incorrect.';
+
+  @override
+  String get authTooManyRequests =>
+      'Trop de tentatives. Attendez et réessayez.';
+
+  @override
+  String get authFieldRequired => 'Ce champ est obligatoire';
+
+  @override
+  String get authEmailVerificationTitle => 'Confirmez votre e-mail';
+
+  @override
+  String authEmailVerificationBody(String email) {
+    return 'Nous avons envoyé un message à $email. Ouvrez le lien dans l’e-mail, puis appuyez sur « J’ai confirmé ».';
+  }
+
+  @override
+  String get authEmailVerificationCheck => 'J’ai confirmé';
+
+  @override
+  String get authEmailVerificationResend => 'Renvoyer l’e-mail';
+
+  @override
+  String get authEmailVerificationResent => 'E-mail de confirmation renvoyé';
+
+  @override
+  String get authEmailVerificationPending =>
+      'E-mail pas encore confirmé. Vérifiez votre boîte et réessayez.';
+
+  @override
+  String get authEmailVerificationChecking => 'Vérification…';
+
+  @override
+  String get profileDeleteAccountPasswordTitle => 'Entrez votre mot de passe';
+
+  @override
+  String get profileDeleteAccountPasswordHint => 'Mot de passe du compte';
+
+  @override
   String get authConsentLabel =>
       'J’accepte le traitement des données personnelles';
 

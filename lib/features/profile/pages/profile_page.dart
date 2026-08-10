@@ -12,6 +12,7 @@ import '../../../core/currency/app_currency_controller.dart';
 import '../../../core/locale/app_locale_controller.dart';
 import '../../../core/privacy/privacy_constants.dart';
 import '../../../core/theme/theme_context.dart';
+import '../../../core/widgets/prompt_text_dialog.dart';
 import '../../../models/app_user.dart';
 import '../../../models/plant.dart';
 import '../../../models/propagation.dart';
@@ -213,12 +214,26 @@ class _ProfilePageState extends State<ProfilePage> {
     );
     if (confirmed != true || !mounted) return;
 
+    final auth = AuthService();
+    String? password;
+    if (auth.requiresPasswordToDelete) {
+      password = await showPromptTextDialog(
+        context: context,
+        title: l10n.profileDeleteAccountPasswordTitle,
+        labelText: l10n.profileDeleteAccountPasswordHint,
+        confirmLabel: l10n.profileDeleteAccountConfirmAction,
+        obscureText: true,
+        textCapitalization: TextCapitalization.none,
+      );
+      if (password == null || !mounted) return;
+    }
+
     setState(() {
       _busy = true;
       _busyMessage = l10n.profileDeletingAccount;
     });
     try {
-      await AuthService().deleteAccount();
+      await auth.deleteAccount(password: password);
       if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
     } catch (e) {
       if (!mounted) return;
@@ -227,6 +242,11 @@ class _ProfilePageState extends State<ProfilePage> {
         AuthFailureKind.cancelled => null,
         AuthFailureKind.network => l10n.authSignInNetworkError,
         AuthFailureKind.missingIdToken => l10n.authGoogleIdTokenMissing,
+        AuthFailureKind.invalidEmail => l10n.authInvalidEmail,
+        AuthFailureKind.weakPassword => l10n.authWeakPassword,
+        AuthFailureKind.emailAlreadyInUse => l10n.authEmailAlreadyInUse,
+        AuthFailureKind.invalidCredentials => l10n.authInvalidCredentials,
+        AuthFailureKind.tooManyRequests => l10n.authTooManyRequests,
         AuthFailureKind.unknown => l10n.profileDeleteAccountFailed,
       };
       if (message == null) return;

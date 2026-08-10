@@ -12,6 +12,16 @@ String? authFailureMessage(AuthFailureKind kind, AppLocalizations l10n) {
       return l10n.authSignInNetworkError;
     case AuthFailureKind.missingIdToken:
       return l10n.authGoogleIdTokenMissing;
+    case AuthFailureKind.invalidEmail:
+      return l10n.authInvalidEmail;
+    case AuthFailureKind.weakPassword:
+      return l10n.authWeakPassword;
+    case AuthFailureKind.emailAlreadyInUse:
+      return l10n.authEmailAlreadyInUse;
+    case AuthFailureKind.invalidCredentials:
+      return l10n.authInvalidCredentials;
+    case AuthFailureKind.tooManyRequests:
+      return l10n.authTooManyRequests;
     case AuthFailureKind.unknown:
       return l10n.authSignInFailed;
   }

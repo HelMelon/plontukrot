@@ -122,6 +122,92 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authSignOut => 'Sign out';
 
   @override
+  String get authEmailLabel => 'Email';
+
+  @override
+  String get authPasswordLabel => 'Password';
+
+  @override
+  String get authDisplayNameLabel => 'Display name';
+
+  @override
+  String get authSignInEmail => 'Sign in with email';
+
+  @override
+  String get authSignInEmailTitle => 'Email sign-in';
+
+  @override
+  String get authSignInEmailSubmit => 'Sign in';
+
+  @override
+  String get authRegisterAction => 'Register';
+
+  @override
+  String get authRegisterTitle => 'Create account';
+
+  @override
+  String get authHaveAccountSignIn => 'Already have an account? Sign in';
+
+  @override
+  String get authNoAccountRegister => 'No account? Register';
+
+  @override
+  String get authOrDivider => 'or';
+
+  @override
+  String get authRegistering => 'Registering…';
+
+  @override
+  String get authInvalidEmail => 'Check the email format.';
+
+  @override
+  String get authWeakPassword =>
+      'Password is too short (minimum 6 characters).';
+
+  @override
+  String get authEmailAlreadyInUse => 'This email is already registered.';
+
+  @override
+  String get authInvalidCredentials => 'Incorrect email or password.';
+
+  @override
+  String get authTooManyRequests =>
+      'Too many attempts. Please wait and try again.';
+
+  @override
+  String get authFieldRequired => 'This field is required';
+
+  @override
+  String get authEmailVerificationTitle => 'Confirm your email';
+
+  @override
+  String authEmailVerificationBody(String email) {
+    return 'We sent a message to $email. Open the link in the email, then tap “I’ve confirmed”.';
+  }
+
+  @override
+  String get authEmailVerificationCheck => 'I’ve confirmed';
+
+  @override
+  String get authEmailVerificationResend => 'Resend email';
+
+  @override
+  String get authEmailVerificationResent => 'Verification email sent again';
+
+  @override
+  String get authEmailVerificationPending =>
+      'Email is not confirmed yet. Check your inbox and try again.';
+
+  @override
+  String get authEmailVerificationChecking => 'Checking…';
+
+  @override
+  String get profileDeleteAccountPasswordTitle => 'Enter your password';
+
+  @override
+  String get profileDeleteAccountPasswordHint => 'Account password';
+
+  @override
   String get authConsentLabel => 'I agree to the processing of personal data';
 
   @override

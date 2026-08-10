@@ -122,6 +122,92 @@ class AppLocalizationsRu extends AppLocalizations {
   String get authSignOut => 'Выйти';
 
   @override
+  String get authEmailLabel => 'Email';
+
+  @override
+  String get authPasswordLabel => 'Пароль';
+
+  @override
+  String get authDisplayNameLabel => 'Имя на сайте';
+
+  @override
+  String get authSignInEmail => 'Войти с email';
+
+  @override
+  String get authSignInEmailTitle => 'Вход по email';
+
+  @override
+  String get authSignInEmailSubmit => 'Войти';
+
+  @override
+  String get authRegisterAction => 'Зарегистрироваться';
+
+  @override
+  String get authRegisterTitle => 'Регистрация';
+
+  @override
+  String get authHaveAccountSignIn => 'Уже есть аккаунт? Войти';
+
+  @override
+  String get authNoAccountRegister => 'Нет аккаунта? Зарегистрироваться';
+
+  @override
+  String get authOrDivider => 'или';
+
+  @override
+  String get authRegistering => 'Регистрация…';
+
+  @override
+  String get authInvalidEmail => 'Проверьте формат email.';
+
+  @override
+  String get authWeakPassword =>
+      'Пароль слишком короткий (минимум 6 символов).';
+
+  @override
+  String get authEmailAlreadyInUse => 'Этот email уже зарегистрирован.';
+
+  @override
+  String get authInvalidCredentials => 'Неверный email или пароль.';
+
+  @override
+  String get authTooManyRequests =>
+      'Слишком много попыток. Подождите и попробуйте снова.';
+
+  @override
+  String get authFieldRequired => 'Заполните это поле';
+
+  @override
+  String get authEmailVerificationTitle => 'Подтвердите email';
+
+  @override
+  String authEmailVerificationBody(String email) {
+    return 'Мы отправили письмо на $email. Откройте ссылку в письме, затем нажмите «Я подтвердил(а)».';
+  }
+
+  @override
+  String get authEmailVerificationCheck => 'Я подтвердил(а)';
+
+  @override
+  String get authEmailVerificationResend => 'Отправить письмо ещё раз';
+
+  @override
+  String get authEmailVerificationResent => 'Письмо отправлено повторно';
+
+  @override
+  String get authEmailVerificationPending =>
+      'Email ещё не подтверждён. Проверьте почту и попробуйте снова.';
+
+  @override
+  String get authEmailVerificationChecking => 'Проверка…';
+
+  @override
+  String get profileDeleteAccountPasswordTitle => 'Введите пароль';
+
+  @override
+  String get profileDeleteAccountPasswordHint => 'Пароль аккаунта';
+
+  @override
   String get authConsentLabel =>
       'Согласен(на) на обработку персональных данных';
 

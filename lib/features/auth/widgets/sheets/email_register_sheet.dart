@@ -1,0 +1,254 @@
+import 'package:flutter/material.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
+
+import '../../../../core/theme/theme_context.dart';
+import '../../../../services/auth_service.dart';
+import '../../auth_failure_messages.dart';
+
+Future<void> showEmailRegisterSheet(BuildContext context) {
+  return showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    enableDrag: true,
+    builder: (_) => const EmailRegisterSheet(),
+  );
+}
+
+class EmailRegisterSheet extends StatefulWidget {
+  const EmailRegisterSheet({super.key});
+
+  @override
+  State<EmailRegisterSheet> createState() => _EmailRegisterSheetState();
+}
+
+class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  bool _isLoading = false;
+  bool _obscurePassword = true;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  InputDecoration _fieldDecoration({
+    required String labelText,
+    Widget? prefixIcon,
+    Widget? suffixIcon,
+  }) {
+    return context.components.inputs.decoration(
+      labelText: labelText,
+      prefixIcon: prefixIcon,
+      suffixIcon: suffixIcon,
+    );
+  }
+
+  Future<void> _showAuthError(Object error) async {
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
+    final message =
+        authFailureMessage(AuthService.classifyFailure(error), l10n);
+    if (message == null) return;
+    final colors = context.colors;
+    final typography = context.typography;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: colors.card,
+        content: Text(message, style: typography.bodyMedium),
+      ),
+    );
+  }
+
+  Future<void> _register() async {
+    if (_isLoading) return;
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    setState(() => _isLoading = true);
+    try {
+      await AuthService().registerWithEmail(
+        email: _emailController.text,
+        password: _passwordController.text,
+        displayName: _nameController.text,
+        recordConsent: true,
+      );
+      if (!mounted) return;
+      Navigator.of(context).pop();
+    } catch (e) {
+      await _showAuthError(e);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final media = MediaQuery.of(context);
+    final maxHeight = media.size.height * 0.92;
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final sheets = context.components.sheets;
+    final dimensions = context.dimensions;
+
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeOut,
+      padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: maxHeight),
+          child: Material(
+            color: colors.modal,
+            borderRadius: sheets.topBorderRadius,
+            clipBehavior: Clip.antiAlias,
+            child: SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                padding: sheets.contentPadding,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Center(
+                        child: Container(
+                          width: sheets.handleWidth,
+                          height: sheets.handleHeight,
+                          decoration: BoxDecoration(
+                            color: sheets.handleColor,
+                            borderRadius:
+                                BorderRadius.circular(sheets.handleRadius),
+                          ),
+                        ),
+                      ),
+                      spacing.vLg,
+                      Text(
+                        l10n.authRegisterTitle,
+                        style: sheets.titleStyle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      spacing.vLg,
+                      TextFormField(
+                        controller: _nameController,
+                        enabled: !_isLoading,
+                        textCapitalization: TextCapitalization.words,
+                        autofillHints: const [AutofillHints.nickname],
+                        textInputAction: TextInputAction.next,
+                        decoration: _fieldDecoration(
+                          labelText: l10n.authDisplayNameLabel,
+                          prefixIcon: Icon(
+                            Icons.person_outline,
+                            color: colors.icon,
+                            size: dimensions.iconLg,
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return l10n.authFieldRequired;
+                          }
+                          return null;
+                        },
+                      ),
+                      spacing.vMd,
+                      TextFormField(
+                        controller: _emailController,
+                        enabled: !_isLoading,
+                        keyboardType: TextInputType.emailAddress,
+                        autofillHints: const [AutofillHints.email],
+                        textInputAction: TextInputAction.next,
+                        decoration: _fieldDecoration(
+                          labelText: l10n.authEmailLabel,
+                          prefixIcon: Icon(
+                            Icons.email_outlined,
+                            color: colors.icon,
+                            size: dimensions.iconLg,
+                          ),
+                        ),
+                        validator: (value) {
+                          final trimmed = value?.trim() ?? '';
+                          if (trimmed.isEmpty) return l10n.authFieldRequired;
+                          if (!trimmed.contains('@')) {
+                            return l10n.authInvalidEmail;
+                          }
+                          return null;
+                        },
+                      ),
+                      spacing.vMd,
+                      TextFormField(
+                        controller: _passwordController,
+                        enabled: !_isLoading,
+                        obscureText: _obscurePassword,
+                        autofillHints: const [AutofillHints.newPassword],
+                        textInputAction: TextInputAction.done,
+                        onFieldSubmitted: (_) => _register(),
+                        decoration: _fieldDecoration(
+                          labelText: l10n.authPasswordLabel,
+                          prefixIcon: Icon(
+                            Icons.lock_outline,
+                            color: colors.icon,
+                            size: dimensions.iconLg,
+                          ),
+                          suffixIcon: IconButton(
+                            onPressed: _isLoading
+                                ? null
+                                : () => setState(
+                                      () =>
+                                          _obscurePassword = !_obscurePassword,
+                                    ),
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                              color: colors.icon,
+                            ),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return l10n.authFieldRequired;
+                          }
+                          if (value.length < 6) return l10n.authWeakPassword;
+                          return null;
+                        },
+                      ),
+                      spacing.vXl,
+                      SizedBox(
+                        height: dimensions.buttonHeight,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _register,
+                          child: Text(
+                            _isLoading
+                                ? l10n.authRegistering
+                                : l10n.authRegisterAction,
+                          ),
+                        ),
+                      ),
+                      spacing.vMd,
+                      TextButton(
+                        onPressed: _isLoading
+                            ? null
+                            : () => Navigator.of(context).pop(),
+                        child: Text(l10n.commonCancel),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

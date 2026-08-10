@@ -15,6 +15,7 @@ Future<String?> showPromptTextDialog({
   String? confirmLabel,
   String? cancelLabel,
   bool allowEmpty = false,
+  bool obscureText = false,
   TextInputType? keyboardType,
   List<TextInputFormatter>? inputFormatters,
   TextCapitalization textCapitalization = TextCapitalization.sentences,
@@ -29,6 +30,7 @@ Future<String?> showPromptTextDialog({
       confirmLabel: confirmLabel,
       cancelLabel: cancelLabel,
       allowEmpty: allowEmpty,
+      obscureText: obscureText,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
       textCapitalization: textCapitalization,
@@ -44,6 +46,7 @@ class _PromptTextDialog extends StatefulWidget {
   final String? confirmLabel;
   final String? cancelLabel;
   final bool allowEmpty;
+  final bool obscureText;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final TextCapitalization textCapitalization;
@@ -56,6 +59,7 @@ class _PromptTextDialog extends StatefulWidget {
     required this.confirmLabel,
     required this.cancelLabel,
     required this.allowEmpty,
+    required this.obscureText,
     required this.keyboardType,
     required this.inputFormatters,
     required this.textCapitalization,
@@ -123,9 +127,12 @@ class _PromptTextDialogState extends State<_PromptTextDialog> {
           child: TextField(
             controller: _controller,
             autofocus: true,
+            obscureText: widget.obscureText,
             keyboardType: widget.keyboardType,
             inputFormatters: widget.inputFormatters,
-            textCapitalization: widget.textCapitalization,
+            textCapitalization: widget.obscureText
+                ? TextCapitalization.none
+                : widget.textCapitalization,
             onChanged: (_) {
               if (_errorText != null) setState(() => _errorText = null);
             },
