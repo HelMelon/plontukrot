@@ -32,6 +32,7 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
 
   bool _isLoading = false;
   bool _obscurePassword = true;
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
 
   @override
   void dispose() {
@@ -71,7 +72,11 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
 
   Future<void> _register() async {
     if (_isLoading) return;
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    final valid = _formKey.currentState?.validate() ?? false;
+    if (!valid) {
+      setState(() => _autovalidateMode = AutovalidateMode.onUserInteraction);
+      return;
+    }
 
     setState(() => _isLoading = true);
     try {
@@ -118,6 +123,7 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                 padding: sheets.contentPadding,
                 child: Form(
                   key: _formKey,
+                  autovalidateMode: _autovalidateMode,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,

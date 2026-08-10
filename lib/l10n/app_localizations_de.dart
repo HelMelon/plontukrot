@@ -259,6 +259,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Ich stimme der Verarbeitung personenbezogener Daten zu';
 
   @override
+  String get authConsentRequired =>
+      'Bitte der Datenverarbeitung zustimmen, um fortzufahren';
+
+  @override
   String get privacyPolicyLink => 'Datenschutzerklärung';
 
   @override

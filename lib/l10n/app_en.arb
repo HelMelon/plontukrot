@@ -118,6 +118,7 @@
   "profileDeleteAccountPasswordHint": "Account password",
 
   "authConsentLabel": "I agree to the processing of personal data",
+  "authConsentRequired": "Accept personal data processing to continue",
   "privacyPolicyLink": "Privacy Policy",
   "authConsentGateTitle": "Personal data consent",
   "authConsentGateBody": "To continue using the app, please accept the Privacy Policy.",

@@ -558,6 +558,12 @@ abstract class AppLocalizations {
   /// **'I agree to the processing of personal data'**
   String get authConsentLabel;
 
+  /// No description provided for @authConsentRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept personal data processing to continue'**
+  String get authConsentRequired;
+
   /// No description provided for @privacyPolicyLink.
   ///
   /// In en, this message translates to:

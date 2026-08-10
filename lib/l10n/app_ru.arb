@@ -98,6 +98,7 @@
   "profileDeleteAccountPasswordHint": "Пароль аккаунта",
 
   "authConsentLabel": "Согласен(на) на обработку персональных данных",
+  "authConsentRequired": "Отметьте согласие на обработку персональных данных",
   "privacyPolicyLink": "Политика конфиденциальности",
   "authConsentGateTitle": "Согласие на обработку данных",
   "authConsentGateBody": "Чтобы продолжить пользоваться приложением, примите Политику конфиденциальности.",

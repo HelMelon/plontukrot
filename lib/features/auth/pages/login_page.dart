@@ -7,6 +7,7 @@ import '../../../core/privacy/device_consent_store.dart';
 import '../../../core/widgets/personal_data_consent_checkbox.dart';
 import '../../../services/auth_service.dart';
 import '../auth_failure_messages.dart';
+import '../widgets/sheets/email_register_sheet.dart';
 import '../widgets/sheets/email_sign_in_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
@@ -21,6 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
   bool _consentAccepted = false;
   bool _consentLoaded = false;
+  bool _consentError = false;
 
   /// Device already remembered consent — hide the checkbox row.
   bool get _consentRememberedOnDevice =>
@@ -42,8 +44,17 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _onConsentChanged(bool value) async {
-    setState(() => _consentAccepted = value);
+    setState(() {
+      _consentAccepted = value;
+      if (value) _consentError = false;
+    });
     await DeviceConsentStore.instance.setAccepted(value);
+  }
+
+  bool _ensureConsent() {
+    if (_consentAccepted) return true;
+    setState(() => _consentError = true);
+    return false;
   }
 
   Future<void> _showAuthError(Object error) async {
@@ -66,7 +77,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _signInWithGoogle() async {
-    if (!_consentAccepted || isLoading) return;
+    if (isLoading || !_consentLoaded) return;
+    if (!_ensureConsent()) return;
     setState(() => isLoading = true);
     try {
       await AuthService().signInWithGoogle(recordConsent: true);
@@ -79,10 +91,15 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _openEmailSignIn() async {
-    if (!_consentAccepted || isLoading) return;
+    if (isLoading || !_consentLoaded) return;
+    if (!_ensureConsent()) return;
     await DeviceConsentStore.instance.rememberAccepted();
     if (!mounted) return;
-    await showEmailSignInSheet(context);
+    final openRegister = await showEmailSignInSheet(context);
+    if (!mounted) return;
+    if (openRegister) {
+      await showEmailRegisterSheet(context);
+    }
   }
 
   @override
@@ -92,7 +109,9 @@ class _LoginPageState extends State<LoginPage> {
     final spacing = context.spacing;
     final dimensions = context.dimensions;
     final loginTheme = context.screens.login;
-    final canSubmit = !isLoading && _consentAccepted && _consentLoaded;
+    // Only loading / not-yet-loaded block the buttons; missing consent is
+    // explained with a red label under the checkbox on press.
+    final canSubmit = !isLoading && _consentLoaded;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -130,6 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                   PersonalDataConsentCheckbox(
                     value: _consentAccepted,
                     onChanged: _onConsentChanged,
+                    errorText: _consentError ? l10n.authConsentRequired : null,
                   ),
                   spacing.vXl,
                 ],

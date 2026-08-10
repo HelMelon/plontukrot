@@ -98,6 +98,7 @@
   "profileDeleteAccountPasswordHint": "Mot de passe du compte",
 
   "authConsentLabel": "J’accepte le traitement des données personnelles",
+  "authConsentRequired": "Acceptez le traitement des données personnelles pour continuer",
   "privacyPolicyLink": "Politique de confidentialité",
   "authConsentGateTitle": "Consentement aux données personnelles",
   "authConsentGateBody": "Pour continuer à utiliser l’application, veuillez accepter la Politique de confidentialité.",

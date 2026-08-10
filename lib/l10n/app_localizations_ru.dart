@@ -257,6 +257,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Согласен(на) на обработку персональных данных';
 
   @override
+  String get authConsentRequired =>
+      'Отметьте согласие на обработку персональных данных';
+
+  @override
   String get privacyPolicyLink => 'Политика конфиденциальности';
 
   @override

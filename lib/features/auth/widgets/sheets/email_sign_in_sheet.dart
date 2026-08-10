@@ -4,18 +4,19 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../services/auth_service.dart';
 import '../../auth_failure_messages.dart';
-import 'email_register_sheet.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
 
-Future<void> showEmailSignInSheet(BuildContext context) {
-  return showAppModalBottomSheet<void>(
+/// Returns `true` when the user chose to open registration instead.
+Future<bool> showEmailSignInSheet(BuildContext context) async {
+  final result = await showAppModalBottomSheet<bool>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     enableDrag: true,
     builder: (_) => const EmailSignInSheet(),
   );
+  return result == true;
 }
 
 class EmailSignInSheet extends StatefulWidget {
@@ -32,6 +33,7 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
 
   bool _isLoading = false;
   bool _obscurePassword = true;
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
 
   @override
   void dispose() {
@@ -70,7 +72,11 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
 
   Future<void> _signIn() async {
     if (_isLoading) return;
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    final valid = _formKey.currentState?.validate() ?? false;
+    if (!valid) {
+      setState(() => _autovalidateMode = AutovalidateMode.onUserInteraction);
+      return;
+    }
 
     setState(() => _isLoading = true);
     try {
@@ -88,11 +94,11 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
     }
   }
 
-  Future<void> _openRegister() async {
+  void _openRegister() {
     if (_isLoading) return;
-    Navigator.of(context).pop();
-    if (!mounted) return;
-    await showEmailRegisterSheet(context);
+    // Pop with a flag so [LoginPage] opens register with a live parent context.
+    // Opening another sheet from this State's context after pop is unreliable.
+    Navigator.of(context).pop(true);
   }
 
   @override
@@ -123,6 +129,7 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
                 padding: sheets.contentPadding,
                 child: Form(
                   key: _formKey,
+                  autovalidateMode: _autovalidateMode,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,

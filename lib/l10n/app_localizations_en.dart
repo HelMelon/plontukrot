@@ -256,6 +256,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authConsentLabel => 'I agree to the processing of personal data';
 
   @override
+  String get authConsentRequired =>
+      'Accept personal data processing to continue';
+
+  @override
   String get privacyPolicyLink => 'Privacy Policy';
 
   @override

@@ -119,10 +119,12 @@ class AppInputComponentTheme {
     required this.fill,
     required this.border,
     required this.focusedBorder,
+    required this.errorBorder,
     required this.radius,
     required this.textStyle,
     required this.labelStyle,
     required this.hintStyle,
+    required this.errorStyle,
     required this.contentPadding,
   });
 
@@ -136,10 +138,12 @@ class AppInputComponentTheme {
       fill: colors.card,
       border: colors.outline,
       focusedBorder: colors.primary,
+      errorBorder: colors.error,
       radius: radii.lg,
       textStyle: typography.bodyLarge,
       labelStyle: typography.bodySmall,
       hintStyle: typography.bodySmall,
+      errorStyle: typography.bodySmall.copyWith(color: colors.error),
       contentPadding: EdgeInsets.symmetric(
         horizontal: spacing.md,
         vertical: spacing.sm,
@@ -150,25 +154,31 @@ class AppInputComponentTheme {
   final Color fill;
   final Color border;
   final Color focusedBorder;
+  final Color errorBorder;
   final double radius;
   final TextStyle textStyle;
   final TextStyle labelStyle;
   final TextStyle hintStyle;
+  final TextStyle errorStyle;
   final EdgeInsets contentPadding;
 
   InputDecoration decoration({
     String? labelText,
     String? hintText,
+    String? errorText,
     Widget? prefixIcon,
     Widget? suffixIcon,
   }) {
     final borderSide = BorderSide(color: border);
     final focusedSide = BorderSide(color: focusedBorder);
+    final errorSide = BorderSide(color: errorBorder);
     return InputDecoration(
       labelText: labelText,
       hintText: hintText,
+      errorText: errorText,
       labelStyle: labelStyle,
       hintStyle: hintStyle,
+      errorStyle: errorStyle,
       prefixIcon: prefixIcon,
       suffixIcon: suffixIcon,
       filled: true,
@@ -185,6 +195,14 @@ class AppInputComponentTheme {
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(radius),
         borderSide: focusedSide,
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(radius),
+        borderSide: errorSide,
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(radius),
+        borderSide: errorSide,
       ),
     );
   }

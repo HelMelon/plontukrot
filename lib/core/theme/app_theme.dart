@@ -175,6 +175,7 @@ class AppTheme {
         fillColor: c.card,
         labelStyle: t.bodySmall,
         hintStyle: t.bodySmall,
+        errorStyle: t.bodySmall.copyWith(color: c.error),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(r.lg),
           borderSide: BorderSide(color: c.outline),
@@ -186,6 +187,14 @@ class AppTheme {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(r.lg),
           borderSide: BorderSide(color: c.primary),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(r.lg),
+          borderSide: BorderSide(color: c.error),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(r.lg),
+          borderSide: BorderSide(color: c.error),
         ),
       ),
       chipTheme: ChipThemeData(

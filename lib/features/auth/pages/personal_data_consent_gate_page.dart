@@ -31,6 +31,7 @@ class _PersonalDataConsentGatePageState
   bool _deviceConsentLoaded = false;
   bool _saving = false;
   bool _readySignaled = false;
+  bool _consentError = false;
 
   /// Device already remembered consent — hide the checkbox row.
   bool get _consentRememberedOnDevice =>
@@ -62,7 +63,11 @@ class _PersonalDataConsentGatePageState
   }
 
   Future<void> _submit() async {
-    if (!_accepted || _saving) return;
+    if (_saving) return;
+    if (!_accepted) {
+      setState(() => _consentError = true);
+      return;
+    }
     setState(() => _saving = true);
     try {
       await FirestoreService().recordPersonalDataConsent();
@@ -110,8 +115,7 @@ class _PersonalDataConsentGatePageState
         final spacing = context.spacing;
         final typography = context.typography;
         final dimensions = context.dimensions;
-        final canContinue =
-            _accepted && _deviceConsentLoaded && !_saving;
+        final canContinue = _deviceConsentLoaded && !_saving;
 
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -140,7 +144,12 @@ class _PersonalDataConsentGatePageState
                       spacing.vXl,
                       PersonalDataConsentCheckbox(
                         value: _accepted,
-                        onChanged: (v) => setState(() => _accepted = v),
+                        onChanged: (v) => setState(() {
+                          _accepted = v;
+                          if (v) _consentError = false;
+                        }),
+                        errorText:
+                            _consentError ? l10n.authConsentRequired : null,
                       ),
                     ],
                     spacing.vXl,

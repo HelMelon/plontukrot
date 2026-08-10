@@ -258,6 +258,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'J’accepte le traitement des données personnelles';
 
   @override
+  String get authConsentRequired =>
+      'Acceptez le traitement des données personnelles pour continuer';
+
+  @override
   String get privacyPolicyLink => 'Politique de confidentialité';
 
   @override

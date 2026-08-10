@@ -98,6 +98,7 @@
   "profileDeleteAccountPasswordHint": "Kontopasswort",
 
   "authConsentLabel": "Ich stimme der Verarbeitung personenbezogener Daten zu",
+  "authConsentRequired": "Bitte der Datenverarbeitung zustimmen, um fortzufahren",
   "privacyPolicyLink": "Datenschutzerklärung",
   "authConsentGateTitle": "Einwilligung zur Datenverarbeitung",
   "authConsentGateBody": "Um die App weiter zu nutzen, akzeptieren Sie bitte die Datenschutzerklärung.",
