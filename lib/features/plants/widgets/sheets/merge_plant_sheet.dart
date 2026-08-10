@@ -9,6 +9,7 @@ import '../../../../services/plant_service.dart';
 import '../selectors/plant_stage_selector.dart';
 import '../selectors/plant_variegation_selector.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 class MergePlantSheet extends StatefulWidget {
   final List<Plant> sources;
@@ -205,17 +206,7 @@ class _MergePlantSheetState extends State<MergePlantSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   spacing.vSm,
-                  Center(
-                    child: Container(
-                      width: sheets.handleWidth,
-                      height: sheets.handleHeight,
-                      decoration: BoxDecoration(
-                        color: sheets.handleColor,
-                        borderRadius:
-                            BorderRadius.circular(sheets.handleRadius),
-                      ),
-                    ),
-                  ),
+                  Center(child: const SheetDragHandle()),
                   Padding(
                     padding: EdgeInsets.fromLTRB(
                       sheets.contentPadding.left,

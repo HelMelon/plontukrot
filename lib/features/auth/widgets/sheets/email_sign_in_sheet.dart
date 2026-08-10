@@ -5,6 +5,7 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../services/auth_service.dart';
 import '../../auth_failure_messages.dart';
 import 'email_register_sheet.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 Future<void> showEmailSignInSheet(BuildContext context) {
   return showModalBottomSheet<void>(
@@ -125,17 +126,7 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Center(
-                        child: Container(
-                          width: sheets.handleWidth,
-                          height: sheets.handleHeight,
-                          decoration: BoxDecoration(
-                            color: sheets.handleColor,
-                            borderRadius:
-                                BorderRadius.circular(sheets.handleRadius),
-                          ),
-                        ),
-                      ),
+                      Center(child: const SheetDragHandle()),
                       spacing.vLg,
                       Text(
                         l10n.authSignInEmailTitle,
@@ -152,10 +143,12 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
                         textInputAction: TextInputAction.next,
                         decoration: _fieldDecoration(
                           labelText: l10n.authEmailLabel,
-                          prefixIcon: Icon(
-                            Icons.email_outlined,
-                            color: colors.icon,
-                            size: dimensions.iconLg,
+                          prefixIcon: ExcludeSemantics(
+                            child: Icon(
+                              Icons.email_outlined,
+                              color: colors.icon,
+                              size: dimensions.iconLg,
+                            ),
                           ),
                         ),
                         validator: (value) {
@@ -177,10 +170,12 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
                         onFieldSubmitted: (_) => _signIn(),
                         decoration: _fieldDecoration(
                           labelText: l10n.authPasswordLabel,
-                          prefixIcon: Icon(
-                            Icons.lock_outline,
-                            color: colors.icon,
-                            size: dimensions.iconLg,
+                          prefixIcon: ExcludeSemantics(
+                            child: Icon(
+                              Icons.lock_outline,
+                              color: colors.icon,
+                              size: dimensions.iconLg,
+                            ),
                           ),
                           suffixIcon: IconButton(
                             tooltip: _obscurePassword

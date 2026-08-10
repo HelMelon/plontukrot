@@ -9,6 +9,7 @@ import '../../../../models/wish_list_item.dart';
 import '../../../../services/finance_service.dart';
 import '../../../plants/widgets/sheets/add_plant_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 enum WishListAcquireMode { bought, exchanged }
 
@@ -126,16 +127,7 @@ class _WishListAcquireSheetState extends State<WishListAcquireSheet> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Center(
-                    child: Container(
-                      width: sheets.handleWidth,
-                      height: sheets.handleHeight,
-                      decoration: BoxDecoration(
-                        color: sheets.handleColor,
-                        borderRadius: BorderRadius.circular(sheets.handleRadius),
-                      ),
-                    ),
-                  ),
+                  Center(child: const SheetDragHandle()),
                   spacing.vXxl,
                   Text(
                     l10n.wishListAcquireTitle,

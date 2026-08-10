@@ -4,6 +4,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../services/note_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 class AddNoteSheet extends StatefulWidget {
   final NoteParent parent;
@@ -86,16 +87,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: Container(
-                    width: sheets.handleWidth,
-                    height: sheets.handleHeight,
-                    decoration: BoxDecoration(
-                      color: sheets.handleColor,
-                      borderRadius: BorderRadius.circular(sheets.handleRadius),
-                    ),
-                  ),
-                ),
+                Center(child: const SheetDragHandle()),
                 spacing.vXxl,
                 Text(
                   l10n.notesAdd,

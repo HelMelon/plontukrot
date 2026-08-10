@@ -9,6 +9,7 @@ import '../../../../services/repotting_service.dart';
 import '../dialogs/soil_composition_dialog.dart';
 import 'add_repotting_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 class RepottingHistorySheet extends StatefulWidget {
   final String plantId;
@@ -119,14 +120,7 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
             padding: spacing.allMd,
             child: Column(
               children: [
-                Container(
-                  width: sheets.handleWidth,
-                  height: sheets.handleHeight,
-                  decoration: BoxDecoration(
-                    color: sheets.handleColor,
-                    borderRadius: BorderRadius.circular(sheets.handleRadius),
-                  ),
-                ),
+                const SheetDragHandle(),
                 spacing.vMd,
                 Row(
                   children: [

@@ -3,6 +3,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/growth_event.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 Future<LeafRemovalReason?> showLeafRemovalReasonSheet(BuildContext context) {
   final l10n = AppLocalizations.of(context);
@@ -24,16 +25,7 @@ Future<LeafRemovalReason?> showLeafRemovalReasonSheet(BuildContext context) {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: Container(
-                  width: sheets.handleWidth,
-                  height: sheets.handleHeight,
-                  decoration: BoxDecoration(
-                    color: sheets.handleColor,
-                    borderRadius: BorderRadius.circular(sheets.handleRadius),
-                  ),
-                ),
-              ),
+              Center(child: const SheetDragHandle()),
               spacing.vMd,
               Text(
                 l10n.plantLeafRemoveTitle,

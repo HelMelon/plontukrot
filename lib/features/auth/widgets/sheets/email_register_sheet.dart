@@ -4,6 +4,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../services/auth_service.dart';
 import '../../auth_failure_messages.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 Future<void> showEmailRegisterSheet(BuildContext context) {
   return showModalBottomSheet<void>(
@@ -120,17 +121,7 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Center(
-                        child: Container(
-                          width: sheets.handleWidth,
-                          height: sheets.handleHeight,
-                          decoration: BoxDecoration(
-                            color: sheets.handleColor,
-                            borderRadius:
-                                BorderRadius.circular(sheets.handleRadius),
-                          ),
-                        ),
-                      ),
+                      Center(child: const SheetDragHandle()),
                       spacing.vLg,
                       Text(
                         l10n.authRegisterTitle,
@@ -147,10 +138,12 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                         textInputAction: TextInputAction.next,
                         decoration: _fieldDecoration(
                           labelText: l10n.authDisplayNameLabel,
-                          prefixIcon: Icon(
-                            Icons.person_outline,
-                            color: colors.icon,
-                            size: dimensions.iconLg,
+                          prefixIcon: ExcludeSemantics(
+                            child: Icon(
+                              Icons.person_outline,
+                              color: colors.icon,
+                              size: dimensions.iconLg,
+                            ),
                           ),
                         ),
                         validator: (value) {
@@ -169,10 +162,12 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                         textInputAction: TextInputAction.next,
                         decoration: _fieldDecoration(
                           labelText: l10n.authEmailLabel,
-                          prefixIcon: Icon(
-                            Icons.email_outlined,
-                            color: colors.icon,
-                            size: dimensions.iconLg,
+                          prefixIcon: ExcludeSemantics(
+                            child: Icon(
+                              Icons.email_outlined,
+                              color: colors.icon,
+                              size: dimensions.iconLg,
+                            ),
                           ),
                         ),
                         validator: (value) {
@@ -194,10 +189,12 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                         onFieldSubmitted: (_) => _register(),
                         decoration: _fieldDecoration(
                           labelText: l10n.authPasswordLabel,
-                          prefixIcon: Icon(
-                            Icons.lock_outline,
-                            color: colors.icon,
-                            size: dimensions.iconLg,
+                          prefixIcon: ExcludeSemantics(
+                            child: Icon(
+                              Icons.lock_outline,
+                              color: colors.icon,
+                              size: dimensions.iconLg,
+                            ),
                           ),
                           suffixIcon: IconButton(
                             tooltip: _obscurePassword

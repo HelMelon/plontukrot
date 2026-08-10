@@ -13,6 +13,7 @@ import '../../../../services/finance_service.dart';
 import '../../../../services/note_service.dart';
 import '../../../../services/plant_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 class ArchivePlantSheet extends StatefulWidget {
   final Plant plant;
@@ -189,17 +190,7 @@ class _ArchivePlantSheetState extends State<ArchivePlantSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   spacing.vSm,
-                  Center(
-                    child: Container(
-                      width: sheets.handleWidth,
-                      height: sheets.handleHeight,
-                      decoration: BoxDecoration(
-                        color: sheets.handleColor,
-                        borderRadius:
-                            BorderRadius.circular(sheets.handleRadius),
-                      ),
-                    ),
-                  ),
+                  Center(child: const SheetDragHandle()),
                   Padding(
                     padding: EdgeInsets.fromLTRB(
                       sheets.contentPadding.left,
@@ -251,9 +242,11 @@ class _ArchivePlantSheetState extends State<ArchivePlantSheet> {
                           ListTile(
                             contentPadding: EdgeInsets.zero,
                             title: Text(DateFormat('d MMM y').format(_at)),
-                            trailing: Icon(
-                              Icons.calendar_today_outlined,
-                              color: colors.icon,
+                            trailing: ExcludeSemantics(
+                              child: Icon(
+                                Icons.calendar_today_outlined,
+                                color: colors.icon,
+                              ),
                             ),
                             onTap: _pickDate,
                           ),

@@ -6,11 +6,11 @@ Accepted
 
 ## Context
 
-An accessibility-tree audit found no explicit `Semantics` usage and several high-impact unlabeled controls (FABs, icon-only actions, custom chips/cards, consent checkbox, loading indicators).
+An accessibility-tree audit found no explicit `Semantics` usage and several high-impact unlabeled controls (FABs, icon-only actions, custom chips/cards, consent checkbox, loading indicators), plus Medium/Low decorative and content gaps.
 
 ## Decision
 
-Address all **High** audit gaps:
+### High
 
 1. Tooltips / semantic labels for FABs and icon-only controls on primary surfaces (home, wish list, finances, search clear/back, selection exit, auth password visibility, gallery add/delete).
 2. Expose `button` + `selected` (or `expanded`) on `PlantCard`, home filter chips, letter-group headers, and composition tags.
@@ -19,17 +19,25 @@ Address all **High** audit gaps:
 5. List-row and date-field `InkWell`s outside hubs use `Semantics(button: …, label: …)` from visible text.
 6. Do not change fonts or type sizes.
 
-Medium/Low items (image alt text, CustomPaint, empty-state announcements, sheet drag handles) remain deferred.
+### Low
+
+7. Decorative noise is excluded from the semantics tree:
+   - shared `SheetDragHandle` (`ExcludeSemantics`) for bottom-sheet drag indicators;
+   - decorative icons next to already-labeled text (chevrons, calendar adornments, auth prefix icons, profile leading/trailing icons);
+   - fake home search field contents under the outer labeled button;
+   - gallery page-indicator dots.
+
+### Deferred (Medium)
+
+Image `semanticLabel` / decorative images, CustomPaint vine semantics, color-only selection cues beyond dots, `update_note_sheet` title, friends/gift hint-only field names.
 
 ## Implementation
 
 - `lib/core/widgets/accessible_progress_indicator.dart`
-- Consent: `personal_data_consent_checkbox.dart`
-- Hub chrome: home FAB / search / selection close / filter chips / group headers; wish list & finances FABs; search delegate back/clear
-- Gallery: `plant_image_card.dart` empty-state + action buttons
-- Auth: password visibility tooltips on email sign-in/register sheets
-- Cards/tags/list rows/history/date pickers as in prior High follow-ups
-- l10n: `commonBack`, `commonClear`, `a11yShowPassword`, `a11yHidePassword`, `a11yExitSelection`, `a11yOpenSearch`, `plantPhotoAdd` (+ existing `plantAdd` / `wishListAdd` / `financesAdd` / `plantPhotoDeleteTitle`)
+- `lib/core/widgets/sheet_drag_handle.dart`
+- Consent, hub chrome, gallery actions, auth password tooltips, cards/tags/list rows as in High passes
+- Sheet files use `SheetDragHandle`; decorative `ExcludeSemantics` on listed adornments
+- l10n: `commonBack`, `commonClear`, `a11yShowPassword`, `a11yHidePassword`, `a11yExitSelection`, `a11yOpenSearch`, `plantPhotoAdd`
 
 ## Behavior
 
@@ -38,15 +46,15 @@ Medium/Low items (image alt text, CustomPaint, empty-state announcements, sheet 
 - Consent toggles as one labeled control; privacy policy remains a separate link.
 - Loading states announce via `AccessibleProgressIndicator`.
 - List rows and date fields announce as buttons with on-screen text.
+- Sheet handles and redundant decorative icons are not announced.
 
 ## Consequences
 
-- Medium/Low audit items remain open.
+- Medium audit items remain open.
 - Font sizes were not changed.
-- Some decorative icons use `ExcludeSemantics` to avoid duplicate announcements.
 
 ## Verification
 
-- `flutter gen-l10n`
-- `flutter analyze` on touched files — no issues
+- `flutter analyze` on touched areas
 - Grep: no `CircularProgressIndicator` outside `accessible_progress_indicator.dart`
+- Grep: sheet handles go through `SheetDragHandle`

@@ -335,10 +335,12 @@ class PlantSearchDelegate extends SearchDelegate {
                             ),
                           )
                         : null,
-                    trailing: Icon(
-                      Icons.chevron_right,
-                      color: colors.textSecondary,
-                      size: dimensions.iconLg,
+                    trailing: ExcludeSemantics(
+                      child: Icon(
+                        Icons.chevron_right,
+                        color: colors.textSecondary,
+                        size: dimensions.iconLg,
+                      ),
                     ),
                     onTap: () {
                       Navigator.push(

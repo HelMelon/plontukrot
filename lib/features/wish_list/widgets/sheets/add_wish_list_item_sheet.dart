@@ -5,6 +5,7 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../models/wish_list_item.dart';
 import '../../../../services/wish_list_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 class AddWishListItemSheet extends StatefulWidget {
   final WishListItem? item;
@@ -128,16 +129,7 @@ class _AddWishListItemSheetState extends State<AddWishListItemSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   spacing.vSm,
-                  Center(
-                    child: Container(
-                      width: sheets.handleWidth,
-                      height: sheets.handleHeight,
-                      decoration: BoxDecoration(
-                        color: sheets.handleColor,
-                        borderRadius: BorderRadius.circular(sheets.handleRadius),
-                      ),
-                    ),
-                  ),
+                  Center(child: const SheetDragHandle()),
                   Padding(
                     padding: EdgeInsets.fromLTRB(
                       sheets.contentPadding.left,

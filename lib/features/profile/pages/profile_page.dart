@@ -431,12 +431,16 @@ class _ProfilePageState extends State<ProfilePage> {
               spacing.vXl,
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: Icon(Icons.people_outline, color: colors.icon),
+                leading: ExcludeSemantics(
+                  child: Icon(Icons.people_outline, color: colors.icon),
+                ),
                 title: Text(
                   l10n.profileFriends,
                   style: typography.bodyEmphasis,
                 ),
-                trailing: Icon(Icons.chevron_right, color: colors.icon),
+                trailing: ExcludeSemantics(
+                  child: Icon(Icons.chevron_right, color: colors.icon),
+                ),
                 onTap: _busy
                     ? null
                     : () {
@@ -450,7 +454,9 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: Icon(Icons.upload_file_outlined, color: colors.icon),
+                leading: ExcludeSemantics(
+                  child: Icon(Icons.upload_file_outlined, color: colors.icon),
+                ),
                 title: Text(
                   l10n.profileExportPlants,
                   style: typography.bodyEmphasis,

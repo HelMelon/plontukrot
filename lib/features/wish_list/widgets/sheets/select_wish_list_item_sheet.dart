@@ -5,6 +5,7 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../models/wish_list_item.dart';
 import '../../../../services/wish_list_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 /// Picks a wish-list plant (e.g. after a propagation trade). No finance entry.
 class SelectWishListItemSheet extends StatelessWidget {
@@ -34,17 +35,7 @@ class SelectWishListItemSheet extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: Container(
-                    width: sheets.handleWidth,
-                    height: sheets.handleHeight,
-                    decoration: BoxDecoration(
-                      color: sheets.handleColor,
-                      borderRadius:
-                          BorderRadius.circular(sheets.handleRadius),
-                    ),
-                  ),
-                ),
+                Center(child: const SheetDragHandle()),
                 spacing.vXxl,
                 Text(
                   l10n.wishListSelectForTrade,

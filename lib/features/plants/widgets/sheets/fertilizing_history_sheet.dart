@@ -9,6 +9,7 @@ import '../../../../services/fertilize_service.dart';
 import '../dialogs/fertilizer_composition_dialog.dart';
 import 'add_fertilizing_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 class FertilizingHistorySheet extends StatefulWidget {
   final String plantId;
@@ -116,14 +117,7 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
             padding: spacing.allMd,
             child: Column(
               children: [
-                Container(
-                  width: sheets.handleWidth,
-                  height: sheets.handleHeight,
-                  decoration: BoxDecoration(
-                    color: sheets.handleColor,
-                    borderRadius: BorderRadius.circular(sheets.handleRadius),
-                  ),
-                ),
+                const SheetDragHandle(),
                 spacing.vMd,
                 Row(
                   children: [

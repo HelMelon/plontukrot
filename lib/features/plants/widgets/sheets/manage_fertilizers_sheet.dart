@@ -8,6 +8,7 @@ import '../../../../models/fertilizer.dart';
 import '../../../../models/fertilizer_dose.dart';
 import '../../../../services/fertilize_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 class ManageFertilizersSheet extends StatefulWidget {
   final void Function(String fertilizerId)? onDeleted;
@@ -119,7 +120,6 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
     final l10n = AppLocalizations.of(context);
     final colors = context.colors;
     final spacing = context.spacing;
-    final sheets = context.components.sheets;
     final typography = context.typography;
 
     return SafeArea(
@@ -128,14 +128,7 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: sheets.handleWidth,
-              height: sheets.handleHeight,
-              decoration: BoxDecoration(
-                color: sheets.handleColor,
-                borderRadius: BorderRadius.circular(sheets.handleRadius),
-              ),
-            ),
+            const SheetDragHandle(),
             spacing.vMd,
             Row(
               children: [

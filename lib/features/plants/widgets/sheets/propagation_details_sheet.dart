@@ -18,6 +18,7 @@ import 'add_note_sheet.dart';
 import 'add_plant_sheet.dart';
 import 'change_propagation_stage_sheet.dart';
 import 'sell_lose_propagation_sheet.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 class PropagationDetailsSheet extends StatelessWidget {
   final Propagation propagation;
@@ -194,16 +195,7 @@ class PropagationDetailsSheet extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: Container(
-                    width: sheets.handleWidth,
-                    height: sheets.handleHeight,
-                    decoration: BoxDecoration(
-                      color: sheets.handleColor,
-                      borderRadius: BorderRadius.circular(sheets.handleRadius),
-                    ),
-                  ),
-                ),
+                Center(child: const SheetDragHandle()),
                 spacing.vXl,
                 Expanded(
                   child: SingleChildScrollView(

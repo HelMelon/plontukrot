@@ -132,23 +132,26 @@ class _PlantImageCardState extends State<PlantImageCard> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (photos.length > 1) ...[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            for (var i = 0; i < photos.length; i++) ...[
-                              if (i > 0) SizedBox(width: gallery.galleryDotGap),
-                              Container(
-                                width: gallery.galleryDotSize,
-                                height: gallery.galleryDotSize,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: i == _index
-                                      ? gallery.galleryDotActive
-                                      : gallery.galleryDotInactive,
+                        ExcludeSemantics(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              for (var i = 0; i < photos.length; i++) ...[
+                                if (i > 0)
+                                  SizedBox(width: gallery.galleryDotGap),
+                                Container(
+                                  width: gallery.galleryDotSize,
+                                  height: gallery.galleryDotSize,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: i == _index
+                                        ? gallery.galleryDotActive
+                                        : gallery.galleryDotInactive,
+                                  ),
                                 ),
-                              ),
+                              ],
                             ],
-                          ],
+                          ),
                         ),
                         SizedBox(height: spacing.sm),
                       ],

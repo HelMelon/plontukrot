@@ -6,6 +6,7 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../models/watering_entry.dart';
 import '../../../../services/watering_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 class WateringHistorySheet extends StatefulWidget {
   final String plantId;
@@ -51,7 +52,6 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
     final l10n = AppLocalizations.of(context);
     final colors = context.colors;
     final spacing = context.spacing;
-    final sheets = context.components.sheets;
     final typography = context.typography;
 
     await showModalBottomSheet(
@@ -67,14 +67,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      width: sheets.handleWidth,
-                      height: sheets.handleHeight,
-                      decoration: BoxDecoration(
-                        color: sheets.handleColor,
-                        borderRadius: BorderRadius.circular(sheets.handleRadius),
-                      ),
-                    ),
+                    const SheetDragHandle(),
                     spacing.vLg,
                     Text(
                       isEditing ? l10n.wateringEdit : l10n.wateringAdd,
@@ -82,7 +75,9 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                     ),
                     spacing.vLg,
                     ListTile(
-                      leading: const Icon(Icons.calendar_today),
+                      leading: const ExcludeSemantics(
+                        child: Icon(Icons.calendar_today),
+                      ),
                       title: Text(DateFormat.yMMMMd().format(selectedDate)),
                       onTap: () async {
                         final picked = await showDatePicker(
@@ -212,14 +207,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
             padding: spacing.allMd,
             child: Column(
               children: [
-                Container(
-                  width: sheets.handleWidth,
-                  height: sheets.handleHeight,
-                  decoration: BoxDecoration(
-                    color: sheets.handleColor,
-                    borderRadius: BorderRadius.circular(sheets.handleRadius),
-                  ),
-                ),
+                const SheetDragHandle(),
                 spacing.vMd,
                 Row(
                   children: [

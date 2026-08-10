@@ -13,6 +13,7 @@ import '../../../../services/fertilize_service.dart';
 import '../../../../services/finance_service.dart';
 import '../../../../services/soil_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 enum _CatalogLink {
   none,
@@ -209,16 +210,7 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Center(
-                    child: Container(
-                      width: sheets.handleWidth,
-                      height: sheets.handleHeight,
-                      decoration: BoxDecoration(
-                        color: sheets.handleColor,
-                        borderRadius: BorderRadius.circular(sheets.handleRadius),
-                      ),
-                    ),
-                  ),
+                  Center(child: const SheetDragHandle()),
                   spacing.vXxl,
                   Text(
                     _isEditing ? l10n.financesEdit : l10n.financesAdd,

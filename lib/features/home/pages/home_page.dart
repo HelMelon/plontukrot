@@ -887,21 +887,23 @@ class _HomePageState extends State<HomePage> {
               ),
             );
           },
-          child: AbsorbPointer(
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: l10n.homeSearchHint,
-                hintStyle: typography.bodySmall,
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: colors.textSecondary,
-                ),
-                filled: true,
-                fillColor: colors.heading.withValues(alpha: 0.05),
-                contentPadding: EdgeInsets.symmetric(vertical: spacing.sm),
-                border: OutlineInputBorder(
-                  borderRadius: radii.mdAll,
-                  borderSide: BorderSide.none,
+          child: ExcludeSemantics(
+            child: AbsorbPointer(
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: l10n.homeSearchHint,
+                  hintStyle: typography.bodySmall,
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: colors.textSecondary,
+                  ),
+                  filled: true,
+                  fillColor: colors.heading.withValues(alpha: 0.05),
+                  contentPadding: EdgeInsets.symmetric(vertical: spacing.sm),
+                  border: OutlineInputBorder(
+                    borderRadius: radii.mdAll,
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
             ),

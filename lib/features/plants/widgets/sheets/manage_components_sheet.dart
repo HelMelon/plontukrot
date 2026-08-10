@@ -6,6 +6,7 @@ import '../../../../core/widgets/prompt_text_dialog.dart';
 import '../../../../models/catalog_component.dart';
 import '../../../../services/component_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 class ManageComponentsSheet extends StatefulWidget {
   final void Function(String oldName, String newName)? onRenamed;
@@ -111,7 +112,6 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final spacing = context.spacing;
-    final sheets = context.components.sheets;
     final typography = context.typography;
 
     return SafeArea(
@@ -120,14 +120,7 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: sheets.handleWidth,
-              height: sheets.handleHeight,
-              decoration: BoxDecoration(
-                color: sheets.handleColor,
-                borderRadius: BorderRadius.circular(sheets.handleRadius),
-              ),
-            ),
+            const SheetDragHandle(),
             spacing.vMd,
             Row(
               children: [

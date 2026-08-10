@@ -17,6 +17,7 @@ import '../tags/soil_component_tags.dart';
 import '../dialogs/soil_composition_dialog.dart';
 import 'manage_components_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 enum _SoilMode { saved, newMix }
 
@@ -326,16 +327,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   spacing.vSm,
-                  Center(
-                    child: Container(
-                      width: sheets.handleWidth,
-                      height: sheets.handleHeight,
-                      decoration: BoxDecoration(
-                        color: sheets.handleColor,
-                        borderRadius: BorderRadius.circular(sheets.handleRadius),
-                      ),
-                    ),
-                  ),
+                  Center(child: const SheetDragHandle()),
                   Flexible(
                     child: SingleChildScrollView(
                       padding: EdgeInsets.fromLTRB(
@@ -358,7 +350,9 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                           spacing.vLg,
                           ListTile(
                             contentPadding: EdgeInsets.zero,
-                            leading: const Icon(Icons.calendar_today),
+                            leading: const ExcludeSemantics(
+                              child: Icon(Icons.calendar_today),
+                            ),
                             title: Text(
                                 DateFormat('d MMM y').format(_selectedDate)),
                             onTap: _pickDate,

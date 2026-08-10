@@ -17,6 +17,7 @@ import '../dialogs/fertilizer_composition_dialog.dart';
 import 'manage_fertilizer_ingredients_sheet.dart';
 import 'manage_fertilizers_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 enum _FertilizerMode { saved, newMix }
 
@@ -387,7 +388,6 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
         (widget.isEditing ? l10n.fertilizingEdit : l10n.fertilizingAdd);
     final colors = context.colors;
     final spacing = context.spacing;
-    final sheets = context.components.sheets;
     final inputs = context.components.inputs;
     final typography = context.typography;
     final dimensions = context.dimensions;
@@ -401,16 +401,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: Container(
-                  width: sheets.handleWidth,
-                  height: sheets.handleHeight,
-                  decoration: BoxDecoration(
-                    color: sheets.handleColor,
-                    borderRadius: BorderRadius.circular(sheets.handleRadius),
-                  ),
-                ),
-              ),
+              Center(child: const SheetDragHandle()),
               spacing.vMd,
               Text(
                 title,
@@ -419,7 +410,9 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
               spacing.vLg,
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.calendar_today),
+                leading: const ExcludeSemantics(
+                  child: Icon(Icons.calendar_today),
+                ),
                 title: Text(DateFormat('d MMM y').format(_selectedDate)),
                 onTap: _pickDate,
               ),
