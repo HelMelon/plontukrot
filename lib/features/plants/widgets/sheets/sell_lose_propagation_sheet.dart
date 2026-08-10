@@ -288,7 +288,7 @@ class _MarkPropagationOutcomeSheetState
                   spacing.vMd,
                   Semantics(
                     button: true,
-                    label: l10n.propagationDate(
+                    label: l10n.a11ySelectDate(
                       DateFormat('d MMM y').format(_at),
                     ),
                     child: InkWell(

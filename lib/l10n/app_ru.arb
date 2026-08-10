@@ -17,6 +17,28 @@
   "a11yHidePassword": "Скрыть пароль",
   "a11yExitSelection": "Выйти из режима выбора",
   "a11yOpenSearch": "Открыть поиск растений",
+  "a11yPlantPhoto": "Фото растения",
+  "a11yGalleryPhoto": "Фото {current} из {total}",
+  "@a11yGalleryPhoto": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "a11yLeafCount": "Листьев на лозе: {count}",
+  "@a11yLeafCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "a11ySelectDate": "Выбрать дату: {date}",
+  "@a11ySelectDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "a11yProfilePhoto": "Фото профиля",
+  "a11yOpenProfile": "Открыть профиль",
   "plantPhotoAdd": "Добавить фото",
   "commonToday": "Сегодня",
   "commonError": "Ошибка: {error}",

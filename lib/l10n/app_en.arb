@@ -17,6 +17,28 @@
   "a11yHidePassword": "Hide password",
   "a11yExitSelection": "Exit selection mode",
   "a11yOpenSearch": "Open plant search",
+  "a11yPlantPhoto": "Plant photo",
+  "a11yGalleryPhoto": "Photo {current} of {total}",
+  "@a11yGalleryPhoto": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "a11yLeafCount": "Leaves on vine: {count}",
+  "@a11yLeafCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "a11ySelectDate": "Choose date: {date}",
+  "@a11ySelectDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "a11yProfilePhoto": "Profile photo",
+  "a11yOpenProfile": "Open profile",
   "plantPhotoAdd": "Add photo",
   "commonToday": "Today",
   "commonError": "Error: {error}",

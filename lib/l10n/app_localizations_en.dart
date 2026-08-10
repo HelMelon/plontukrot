@@ -55,6 +55,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get a11yOpenSearch => 'Open plant search';
 
   @override
+  String get a11yPlantPhoto => 'Plant photo';
+
+  @override
+  String a11yGalleryPhoto(int current, int total) {
+    return 'Photo $current of $total';
+  }
+
+  @override
+  String a11yLeafCount(int count) {
+    return 'Leaves on vine: $count';
+  }
+
+  @override
+  String a11ySelectDate(String date) {
+    return 'Choose date: $date';
+  }
+
+  @override
+  String get a11yProfilePhoto => 'Profile photo';
+
+  @override
+  String get a11yOpenProfile => 'Open profile';
+
+  @override
   String get plantPhotoAdd => 'Add photo';
 
   @override

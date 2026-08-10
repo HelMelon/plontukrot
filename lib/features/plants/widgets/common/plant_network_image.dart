@@ -17,6 +17,13 @@ class PlantNetworkImage extends StatefulWidget {
   final Widget placeholder;
   final Widget errorWidget;
 
+  /// When set, exposes an image semantics node with this label.
+  final String? semanticLabel;
+
+  /// When true, hides this image from the semantics tree (e.g. inside a
+  /// labeled card/list row).
+  final bool excludeFromSemantics;
+
   const PlantNetworkImage({
     super.key,
     required this.imageUrl,
@@ -29,6 +36,8 @@ class PlantNetworkImage extends StatefulWidget {
     this.memCacheHeight,
     this.width,
     this.height,
+    this.semanticLabel,
+    this.excludeFromSemantics = false,
   });
 
   @override
@@ -85,37 +94,53 @@ class _PlantNetworkImageState extends State<PlantNetworkImage> {
   @override
   Widget build(BuildContext context) {
     final url = _activeUrl;
+    final Widget child;
     if (url == null) {
-      return widget.placeholder;
+      child = widget.placeholder;
+    } else {
+      child = CachedNetworkImage(
+        imageUrl: url,
+        fit: widget.fit,
+        alignment: widget.alignment,
+        width: widget.width,
+        height: widget.height,
+        memCacheWidth: widget.memCacheWidth,
+        memCacheHeight: widget.memCacheHeight,
+        placeholder: (context, _) => widget.placeholder,
+        errorWidget: (context, failedUrl, error) {
+          final fallback = _fallback;
+          final canRetry = !_triedFallback &&
+              fallback != null &&
+              fallback != failedUrl;
+          if (canRetry) {
+            // Schedule fallback switch after this build.
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              _onError(failedUrl, error);
+            });
+            return widget.placeholder;
+          }
+          if (kDebugMode) {
+            debugPrint(
+              'PlantNetworkImage final failure url=$failedUrl error=$error',
+            );
+          }
+          return widget.errorWidget;
+        },
+      );
     }
 
-    return CachedNetworkImage(
-      imageUrl: url,
-      fit: widget.fit,
-      alignment: widget.alignment,
-      width: widget.width,
-      height: widget.height,
-      memCacheWidth: widget.memCacheWidth,
-      memCacheHeight: widget.memCacheHeight,
-      placeholder: (context, _) => widget.placeholder,
-      errorWidget: (context, failedUrl, error) {
-        final fallback = _fallback;
-        final canRetry = !_triedFallback &&
-            fallback != null &&
-            fallback != failedUrl;
-        if (canRetry) {
-          // Schedule fallback switch after this build.
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (!mounted) return;
-            _onError(failedUrl, error);
-          });
-          return widget.placeholder;
-        }
-        if (kDebugMode) {
-          debugPrint('PlantNetworkImage final failure url=$failedUrl error=$error');
-        }
-        return widget.errorWidget;
-      },
-    );
+    if (widget.excludeFromSemantics) {
+      return ExcludeSemantics(child: child);
+    }
+    final label = widget.semanticLabel;
+    if (label != null) {
+      return Semantics(
+        image: true,
+        label: label,
+        child: ExcludeSemantics(child: child),
+      );
+    }
+    return child;
   }
 }

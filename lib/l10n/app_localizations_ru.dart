@@ -55,6 +55,30 @@ class AppLocalizationsRu extends AppLocalizations {
   String get a11yOpenSearch => 'Открыть поиск растений';
 
   @override
+  String get a11yPlantPhoto => 'Фото растения';
+
+  @override
+  String a11yGalleryPhoto(int current, int total) {
+    return 'Фото $current из $total';
+  }
+
+  @override
+  String a11yLeafCount(int count) {
+    return 'Листьев на лозе: $count';
+  }
+
+  @override
+  String a11ySelectDate(String date) {
+    return 'Выбрать дату: $date';
+  }
+
+  @override
+  String get a11yProfilePhoto => 'Фото профиля';
+
+  @override
+  String get a11yOpenProfile => 'Открыть профиль';
+
+  @override
   String get plantPhotoAdd => 'Добавить фото';
 
   @override

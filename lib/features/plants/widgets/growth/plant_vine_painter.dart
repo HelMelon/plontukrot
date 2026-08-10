@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_context.dart';
@@ -64,13 +65,19 @@ class PlantVineStrip extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        rowAt(0, opacity: 1),
+        Semantics(
+          container: true,
+          label: AppLocalizations.of(context).a11yLeafCount(count),
+          child: ExcludeSemantics(
+            child: rowAt(0, opacity: 1),
+          ),
+        ),
         if (overflow != null || belowFirstRow != null)
           Stack(
             alignment: Alignment.topCenter,
             clipBehavior: Clip.none,
             children: [
-              if (overflow != null) overflow,
+              if (overflow != null) ExcludeSemantics(child: overflow),
               if (belowFirstRow != null) belowFirstRow!,
             ],
           ),

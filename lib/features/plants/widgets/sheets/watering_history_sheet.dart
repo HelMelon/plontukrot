@@ -74,25 +74,31 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                       style: typography.titleMedium,
                     ),
                     spacing.vLg,
-                    ListTile(
-                      leading: const ExcludeSemantics(
-                        child: Icon(Icons.calendar_today),
+                    Semantics(
+                      button: true,
+                      label: l10n.a11ySelectDate(
+                        DateFormat.yMMMMd().format(selectedDate),
                       ),
-                      title: Text(DateFormat.yMMMMd().format(selectedDate)),
-                      onTap: () async {
-                        final picked = await showDatePicker(
-                          context: context,
-                          initialDate: selectedDate,
-                          firstDate: DateTime(2020),
-                          lastDate: DateTime.now(),
-                        );
+                      child: ListTile(
+                        leading: const ExcludeSemantics(
+                          child: Icon(Icons.calendar_today),
+                        ),
+                        title: Text(DateFormat.yMMMMd().format(selectedDate)),
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: selectedDate,
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime.now(),
+                          );
 
-                        if (picked != null) {
-                          setModalState(() {
-                            selectedDate = picked;
-                          });
-                        }
-                      },
+                          if (picked != null) {
+                            setModalState(() {
+                              selectedDate = picked;
+                            });
+                          }
+                        },
+                      ),
                     ),
                     spacing.vMd,
                     Row(

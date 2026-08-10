@@ -55,15 +55,23 @@ class MyApp extends StatelessWidget {
             final width = MediaQuery.sizeOf(context).width;
             return Theme(
               data: AppTheme.themeForWidth(width),
-              child: Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/background.webp'),
-                    repeat: ImageRepeat.repeat,
-                    fit: BoxFit.contain,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  const ExcludeSemantics(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/images/background.webp'),
+                          repeat: ImageRepeat.repeat,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      child: SizedBox.expand(),
+                    ),
                   ),
-                ),
-                child: child,
+                  if (child != null) child,
+                ],
               ),
             );
           },

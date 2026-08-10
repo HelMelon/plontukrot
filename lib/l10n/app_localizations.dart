@@ -192,6 +192,42 @@ abstract class AppLocalizations {
   /// **'Open plant search'**
   String get a11yOpenSearch;
 
+  /// No description provided for @a11yPlantPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Plant photo'**
+  String get a11yPlantPhoto;
+
+  /// No description provided for @a11yGalleryPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo {current} of {total}'**
+  String a11yGalleryPhoto(int current, int total);
+
+  /// No description provided for @a11yLeafCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaves on vine: {count}'**
+  String a11yLeafCount(int count);
+
+  /// No description provided for @a11ySelectDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose date: {date}'**
+  String a11ySelectDate(String date);
+
+  /// No description provided for @a11yProfilePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo'**
+  String get a11yProfilePhoto;
+
+  /// No description provided for @a11yOpenProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Open profile'**
+  String get a11yOpenProfile;
+
   /// No description provided for @plantPhotoAdd.
   ///
   /// In en, this message translates to:

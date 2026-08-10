@@ -102,9 +102,15 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(
                   width: 280,
                   height: 280,
-                  child: Image.asset(
-                    'assets/images/big-logo.webp',
-                    fit: BoxFit.cover,
+                  child: Semantics(
+                    image: true,
+                    label: l10n.appName,
+                    child: ExcludeSemantics(
+                      child: Image.asset(
+                        'assets/images/big-logo.webp',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                 ),
                 Text(

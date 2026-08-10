@@ -299,6 +299,7 @@ class PlantSearchDelegate extends SearchDelegate {
                               height: dimensions.avatar,
                               memCacheWidth: 80,
                               memCacheHeight: 80,
+                              excludeFromSemantics: true,
                               errorWidget: florist,
                               placeholder: loading,
                             );

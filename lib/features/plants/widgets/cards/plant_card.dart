@@ -118,6 +118,7 @@ class PlantCard extends StatelessWidget {
                               fit: BoxFit.cover,
                               alignment: Alignment.center,
                               memCacheWidth: 600,
+                              excludeFromSemantics: true,
                               placeholder: const _PlantAssetPlaceholder(),
                               errorWidget: const _PlantAssetPlaceholder(),
                             )
@@ -205,21 +206,23 @@ class _PlantAssetPlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final dimensions = context.dimensions;
-    return Container(
-      color: colors.modal,
-      child: Image.asset(
-        'assets/images/default-img.webp',
-        fit: BoxFit.cover,
-        alignment: Alignment.topCenter,
-        errorBuilder: (context, error, stackTrace) {
-          return Center(
-            child: Icon(
-              Icons.eco_rounded,
-              color: colors.icon,
-              size: dimensions.photoPlaceholder,
-            ),
-          );
-        },
+    return ExcludeSemantics(
+      child: Container(
+        color: colors.modal,
+        child: Image.asset(
+          'assets/images/default-img.webp',
+          fit: BoxFit.cover,
+          alignment: Alignment.topCenter,
+          errorBuilder: (context, error, stackTrace) {
+            return Center(
+              child: Icon(
+                Icons.eco_rounded,
+                color: colors.icon,
+                size: dimensions.photoPlaceholder,
+              ),
+            );
+          },
+        ),
       ),
     );
   }

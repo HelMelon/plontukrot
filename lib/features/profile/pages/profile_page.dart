@@ -312,19 +312,27 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: ClipOval(
                           child: widget.user.photoUrl != null &&
                                   widget.user.photoUrl!.isNotEmpty
-                              ? Image.network(
-                                  widget.user.photoUrl!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Icon(
+                              ? Semantics(
+                                  image: true,
+                                  label: l10n.a11yProfilePhoto,
+                                  child: ExcludeSemantics(
+                                    child: Image.network(
+                                      widget.user.photoUrl!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Icon(
+                                        Icons.person,
+                                        color: colors.icon,
+                                        size: dimensions.iconXl,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : ExcludeSemantics(
+                                  child: Icon(
                                     Icons.person,
                                     color: colors.icon,
                                     size: dimensions.iconXl,
                                   ),
-                                )
-                              : Icon(
-                                  Icons.person,
-                                  color: colors.icon,
-                                  size: dimensions.iconXl,
                                 ),
                         ),
                       ),

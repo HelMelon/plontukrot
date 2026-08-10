@@ -17,6 +17,28 @@
   "a11yHidePassword": "Masquer le mot de passe",
   "a11yExitSelection": "Quitter le mode sélection",
   "a11yOpenSearch": "Ouvrir la recherche de plantes",
+  "a11yPlantPhoto": "Photo de la plante",
+  "a11yGalleryPhoto": "Photo {current} sur {total}",
+  "@a11yGalleryPhoto": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "a11yLeafCount": "Feuilles sur la liane : {count}",
+  "@a11yLeafCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "a11ySelectDate": "Choisir la date : {date}",
+  "@a11ySelectDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "a11yProfilePhoto": "Photo de profil",
+  "a11yOpenProfile": "Ouvrir le profil",
   "plantPhotoAdd": "Ajouter une photo",
   "commonToday": "Aujourd’hui",
   "commonError": "Erreur : {error}",

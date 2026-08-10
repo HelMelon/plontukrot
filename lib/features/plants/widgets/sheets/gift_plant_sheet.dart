@@ -133,6 +133,7 @@ class _GiftPlantSheetState extends State<_GiftPlantSheet> {
                   enabled: !_busy,
                   maxLines: 2,
                   decoration: InputDecoration(
+                    labelText: l10n.plantGiftMessageHint,
                     hintText: l10n.plantGiftMessageHint,
                     border: const OutlineInputBorder(),
                   ),

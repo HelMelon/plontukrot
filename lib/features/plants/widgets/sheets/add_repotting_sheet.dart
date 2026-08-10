@@ -348,14 +348,20 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                             style: typography.titleMedium,
                           ),
                           spacing.vLg,
-                          ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: const ExcludeSemantics(
-                              child: Icon(Icons.calendar_today),
+                          Semantics(
+                            button: true,
+                            label: l10n.a11ySelectDate(
+                              DateFormat('d MMM y').format(_selectedDate),
                             ),
-                            title: Text(
-                                DateFormat('d MMM y').format(_selectedDate)),
-                            onTap: _pickDate,
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: const ExcludeSemantics(
+                                child: Icon(Icons.calendar_today),
+                              ),
+                              title: Text(
+                                  DateFormat('d MMM y').format(_selectedDate)),
+                              onTap: _pickDate,
+                            ),
                           ),
                           Align(
                             alignment: Alignment.centerLeft,

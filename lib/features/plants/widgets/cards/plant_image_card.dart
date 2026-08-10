@@ -105,12 +105,20 @@ class _PlantImageCardState extends State<PlantImageCard> {
                 onPageChanged: (i) => setState(() => _index = i),
                 itemBuilder: (context, i) {
                   final photo = photos[i];
+                  final photoDate = photo.isLegacy
+                      ? null
+                      : DateFormat('d MMM y', dateLocale)
+                          .format(photo.addedAt);
                   return PlantNetworkImage(
                     imageUrl: photo.imageUrl,
                     fallbackUrl: photo.imageThumbUrl,
                     fit: BoxFit.cover,
                     alignment: Alignment.center,
                     memCacheWidth: 800,
+                    semanticLabel: [
+                      l10n.a11yGalleryPhoto(i + 1, photos.length),
+                      if (photoDate != null) photoDate,
+                    ].join('. '),
                     placeholder: const Align(
                       alignment: Alignment.topCenter,
                       child: PlaceholderWithIcon(),

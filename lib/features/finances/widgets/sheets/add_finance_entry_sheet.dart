@@ -269,7 +269,9 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
                   spacing.vMd,
                   Semantics(
                     button: true,
-                    label: DateFormat('d MMM y').format(_date),
+                    label: l10n.a11ySelectDate(
+                      DateFormat('d MMM y').format(_date),
+                    ),
                     child: InkWell(
                       onTap: _pickDate,
                       borderRadius: BorderRadius.circular(radii.lg),

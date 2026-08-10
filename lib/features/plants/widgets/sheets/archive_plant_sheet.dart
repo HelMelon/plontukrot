@@ -239,16 +239,22 @@ class _ArchivePlantSheetState extends State<ArchivePlantSheet> {
                             },
                           ),
                           spacing.vMd,
-                          ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: Text(DateFormat('d MMM y').format(_at)),
-                            trailing: ExcludeSemantics(
-                              child: Icon(
-                                Icons.calendar_today_outlined,
-                                color: colors.icon,
-                              ),
+                          Semantics(
+                            button: true,
+                            label: l10n.a11ySelectDate(
+                              DateFormat('d MMM y').format(_at),
                             ),
-                            onTap: _pickDate,
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(DateFormat('d MMM y').format(_at)),
+                              trailing: ExcludeSemantics(
+                                child: Icon(
+                                  Icons.calendar_today_outlined,
+                                  color: colors.icon,
+                                ),
+                              ),
+                              onTap: _pickDate,
+                            ),
                           ),
                           spacing.vMd,
                           if (_reason == PlantArchiveReason.died)

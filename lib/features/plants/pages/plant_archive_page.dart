@@ -162,6 +162,7 @@ class _PlantArchivePageState extends State<PlantArchivePage> {
                                         imageUrl: imageUrl,
                                         fallbackUrl: fullUrl,
                                         fit: BoxFit.cover,
+                                        excludeFromSemantics: true,
                                         errorWidget: archiveThumbError,
                                         placeholder: archiveThumbError,
                                       )

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
+import '../../../../core/widgets/sheet_drag_handle.dart';
 import '../../../../services/note_service.dart';
 
 class UpdateNoteSheet extends StatefulWidget {
@@ -79,6 +80,7 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
     final spacing = context.spacing;
     final sheets = context.components.sheets;
     final inputs = context.components.inputs;
+    final typography = context.typography;
     final dimensions = context.dimensions;
     final media = MediaQuery.of(context);
     final maxHeight = media.size.height -
@@ -99,7 +101,17 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const Center(child: SheetDragHandle()),
+              spacing.vLg,
+              Text(
+                l10n.notesEdit,
+                style: typography.titleLarge.copyWith(letterSpacing: -1),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              spacing.vLg,
               TextField(
                 controller: controller,
                 maxLines: 4,

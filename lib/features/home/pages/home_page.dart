@@ -975,32 +975,38 @@ class _HomePageState extends State<HomePage> {
       Padding(
         padding: EdgeInsets.symmetric(horizontal: spacing.xxs),
         child: Center(
-          child: Tooltip(
-            message: l10n.profileTitle,
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => ProfilePage(user: widget.user),
+          child: Semantics(
+            button: true,
+            label: l10n.a11yOpenProfile,
+            child: Tooltip(
+              message: l10n.profileTitle,
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ProfilePage(user: widget.user),
+                    ),
+                  );
+                },
+                child: SizedBox(
+                  width: avatarSize,
+                  height: avatarSize,
+                  child: ClipOval(
+                    child: ExcludeSemantics(
+                      child: widget.user.photoUrl != null &&
+                              widget.user.photoUrl!.isNotEmpty
+                          ? Image.network(
+                              widget.user.photoUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.person,
+                                color: colors.icon,
+                              ),
+                            )
+                          : Icon(Icons.person, color: colors.icon),
+                    ),
                   ),
-                );
-              },
-              child: SizedBox(
-                width: avatarSize,
-                height: avatarSize,
-                child: ClipOval(
-                  child: widget.user.photoUrl != null &&
-                          widget.user.photoUrl!.isNotEmpty
-                      ? Image.network(
-                          widget.user.photoUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Icon(
-                            Icons.person,
-                            color: colors.icon,
-                          ),
-                        )
-                      : Icon(Icons.person, color: colors.icon),
                 ),
               ),
             ),

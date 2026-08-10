@@ -45,11 +45,13 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
 
   static Widget _icon(BuildContext context, String asset) {
     final size = context.dimensions.avatar - 8;
-    return Image.asset(
-      asset,
-      width: size,
-      height: size,
-      fit: BoxFit.contain,
+    return ExcludeSemantics(
+      child: Image.asset(
+        asset,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+      ),
     );
   }
 

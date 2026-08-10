@@ -233,6 +233,7 @@ class _FriendsPageState extends State<FriendsPage> {
           TextField(
             controller: _uidController,
             decoration: InputDecoration(
+              labelText: l10n.friendsAddHint,
               hintText: l10n.friendsAddHint,
               border: const OutlineInputBorder(),
             ),

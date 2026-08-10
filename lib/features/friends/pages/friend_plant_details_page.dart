@@ -110,6 +110,10 @@ class FriendPlantDetailsPage extends StatelessWidget {
                               imageUrl: photo.imageUrl,
                               fallbackUrl: photo.imageThumbUrl,
                               fit: BoxFit.cover,
+                              semanticLabel: l10n.a11yGalleryPhoto(
+                                index + 1,
+                                photos.length,
+                              ),
                               placeholder: const PlaceholderWithIcon(),
                               errorWidget: const PlaceholderWithIcon(),
                             );

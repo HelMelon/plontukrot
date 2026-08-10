@@ -71,13 +71,15 @@ class _AppBootstrapPageState extends State<AppBootstrapPage>
                           0.88;
                       return RotationTransition(
                         turns: _rotationController,
-                        child: Image.asset(
-                          AppBootstrapPage.logoPath,
-                          width: side,
-                          height: side,
-                          fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) =>
-                              SizedBox(width: side, height: side),
+                        child: ExcludeSemantics(
+                          child: Image.asset(
+                            AppBootstrapPage.logoPath,
+                            width: side,
+                            height: side,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) =>
+                                SizedBox(width: side, height: side),
+                          ),
                         ),
                       );
                     },
@@ -202,12 +204,14 @@ class _SplashCarouselPageState extends State<SplashCarouselPage> {
           key: ValueKey(_order[_index]),
           color: splash.background,
           child: SizedBox.expand(
-            child: Image.asset(
-              _order[_index],
-              fit: BoxFit.cover,
-              alignment: Alignment.centerLeft,
-              errorBuilder: (_, __, ___) =>
-                  ColoredBox(color: splash.background),
+            child: ExcludeSemantics(
+              child: Image.asset(
+                _order[_index],
+                fit: BoxFit.cover,
+                alignment: Alignment.centerLeft,
+                errorBuilder: (_, __, ___) =>
+                    ColoredBox(color: splash.background),
+              ),
             ),
           ),
         ),
