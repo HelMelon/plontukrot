@@ -16,6 +16,7 @@ import '../../../services/gift_service.dart';
 import '../../../services/plant_service.dart';
 import 'friend_collection_page.dart';
 import 'friend_wish_list_page.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class FriendsPage extends StatefulWidget {
   const FriendsPage({super.key});
@@ -71,7 +72,7 @@ class _FriendsPageState extends State<FriendsPage> {
   Future<void> _removeFriend(Friendship friend) async {
     final l10n = AppLocalizations.of(context);
     final name = _friendDisplayName(friend, l10n);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.friendsRemove),

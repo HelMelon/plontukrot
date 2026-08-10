@@ -10,6 +10,7 @@ import '../dialogs/fertilizer_composition_dialog.dart';
 import 'add_fertilizing_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class FertilizingHistorySheet extends StatefulWidget {
   final String plantId;
@@ -48,7 +49,7 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
   }
 
   Future<void> _showAddSheet() async {
-    await showModalBottomSheet(
+    await showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (_) => AddFertilizingSheet.forPlant(plantId: widget.plantId),
@@ -56,7 +57,7 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
   }
 
   Future<void> _showEditSheet(FertilizingEntry entry) async {
-    await showModalBottomSheet(
+    await showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (_) => AddFertilizingSheet.edit(
@@ -68,7 +69,7 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
 
   Future<void> _confirmDelete(FertilizingEntry entry) async {
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(

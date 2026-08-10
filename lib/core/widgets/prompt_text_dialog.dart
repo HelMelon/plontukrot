@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../theme/theme_context.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 /// Shows a text prompt dialog without disposing the controller while the
 /// TextField is still attached (which crashes on dismiss with empty focus).
@@ -20,7 +21,7 @@ Future<String?> showPromptTextDialog({
   List<TextInputFormatter>? inputFormatters,
   TextCapitalization textCapitalization = TextCapitalization.sentences,
 }) {
-  return showDialog<String>(
+  return showAppDialog<String>(
     context: context,
     builder: (context) => _PromptTextDialog(
       title: title,

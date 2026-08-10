@@ -4,6 +4,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/growth_event.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 Future<LeafRemovalReason?> showLeafRemovalReasonSheet(BuildContext context) {
   final l10n = AppLocalizations.of(context);
@@ -11,7 +12,7 @@ Future<LeafRemovalReason?> showLeafRemovalReasonSheet(BuildContext context) {
   final spacing = context.spacing;
   final sheets = context.components.sheets;
   final typography = context.typography;
-  return showModalBottomSheet<LeafRemovalReason>(
+  return showAppModalBottomSheet<LeafRemovalReason>(
     context: context,
     backgroundColor: colors.modal,
     shape: RoundedRectangleBorder(

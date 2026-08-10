@@ -7,6 +7,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import 'package:plontukrot/models/plant_photo.dart';
 
 import '../../../../core/theme/theme_context.dart';
+import '../../../../core/widgets/focusable_tap.dart';
 
 class PlantImageCard extends StatefulWidget {
   final List<PlantPhoto> photos;
@@ -90,7 +91,8 @@ class _PlantImageCardState extends State<PlantImageCard> {
                 button: true,
                 enabled: !widget.isUploading,
                 label: l10n.plantPhotoAdd,
-                child: GestureDetector(
+                child: FocusableTap(
+                  enabled: !widget.isUploading,
                   onTap: widget.isUploading ? null : widget.onAdd,
                   child: const Align(
                     alignment: Alignment.topCenter,

@@ -4,13 +4,14 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/component.dart';
 import '../tags/soil_component_tags.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 Future<void> showSoilCompositionDialog({
   required BuildContext context,
   required String title,
   required List<SoilComponent> components,
 }) {
-  return showDialog<void>(
+  return showAppDialog<void>(
     context: context,
     builder: (context) {
       final l10n = AppLocalizations.of(context);

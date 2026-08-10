@@ -10,6 +10,7 @@ import '../dialogs/soil_composition_dialog.dart';
 import 'add_repotting_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class RepottingHistorySheet extends StatefulWidget {
   final String plantId;
@@ -47,7 +48,7 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
   }
 
   Future<void> _showAddSheet() async {
-    await showModalBottomSheet(
+    await showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -57,7 +58,7 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
   }
 
   Future<void> _showEditSheet(RepottingEntry entry) async {
-    await showModalBottomSheet(
+    await showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -71,7 +72,7 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
 
   Future<void> _confirmDelete(String repottingId) async {
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(

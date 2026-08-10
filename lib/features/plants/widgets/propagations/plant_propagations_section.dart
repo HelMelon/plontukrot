@@ -10,6 +10,7 @@ import '../common/expandable_side_scroll_list.dart';
 import '../sheets/add_propagation_sheet.dart';
 import '../sheets/propagation_details_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class PlantPropagationsSection extends StatefulWidget {
   final String plantId;
@@ -39,7 +40,7 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
   }
 
   Future<void> _openAdd(BuildContext context) async {
-    await showModalBottomSheet(
+    await showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -55,7 +56,7 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
     BuildContext context,
     Propagation propagation,
   ) async {
-    await showModalBottomSheet(
+    await showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,

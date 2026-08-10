@@ -19,6 +19,7 @@ import '../sheets/fertilizing_history_sheet.dart';
 import '../sheets/repotting_history_sheet.dart';
 import '../sheets/watering_history_sheet.dart';
 import 'info_card.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class PlantInfoCard extends StatefulWidget {
   final Plant plant;
@@ -177,7 +178,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     }
 
     void openWateringHistory() {
-      showModalBottomSheet(
+      showAppModalBottomSheet(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
@@ -187,7 +188,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     }
 
     void openFertilizingHistory() {
-      showModalBottomSheet(
+      showAppModalBottomSheet(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
@@ -197,7 +198,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     }
 
     void openRepottingHistory() {
-      showModalBottomSheet(
+      showAppModalBottomSheet(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
@@ -367,7 +368,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
               ),
               TextButton.icon(
                 onPressed: () {
-                  showModalBottomSheet(
+                  showAppModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,

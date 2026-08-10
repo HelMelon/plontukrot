@@ -4,6 +4,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/fertilizer_dose.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 Future<void> showFertilizerCompositionDialog({
   required BuildContext context,
@@ -11,7 +12,7 @@ Future<void> showFertilizerCompositionDialog({
   required List<FertilizerDose> components,
   int? waterMl,
 }) {
-  return showDialog<void>(
+  return showAppDialog<void>(
     context: context,
     builder: (context) {
       final l10n = AppLocalizations.of(context);

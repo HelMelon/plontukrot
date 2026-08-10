@@ -19,6 +19,7 @@ import 'add_plant_sheet.dart';
 import 'change_propagation_stage_sheet.dart';
 import 'sell_lose_propagation_sheet.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class PropagationDetailsSheet extends StatelessWidget {
   final Propagation propagation;
@@ -39,7 +40,7 @@ class PropagationDetailsSheet extends StatelessWidget {
     BuildContext context,
     Propagation current,
   ) async {
-    await showModalBottomSheet(
+    await showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -52,7 +53,7 @@ class PropagationDetailsSheet extends StatelessWidget {
     Propagation current,
     PropagationOutcome outcome,
   ) async {
-    final result = await showModalBottomSheet<MarkPropagationOutcomeResult>(
+    final result = await showAppModalBottomSheet<MarkPropagationOutcomeResult>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -65,7 +66,7 @@ class PropagationDetailsSheet extends StatelessWidget {
     if (result == null || !result.success || !result.linkWishList) return;
     if (!context.mounted) return;
 
-    final wishItem = await showModalBottomSheet<WishListItem>(
+    final wishItem = await showAppModalBottomSheet<WishListItem>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -75,7 +76,7 @@ class PropagationDetailsSheet extends StatelessWidget {
 
     if (wishItem == null || !context.mounted) return;
 
-    await showModalBottomSheet(
+    await showAppModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -114,7 +115,7 @@ class PropagationDetailsSheet extends StatelessWidget {
     }
 
     final colors = context.colors;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (context) {
@@ -403,7 +404,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                             ),
                             TextButton.icon(
                               onPressed: () {
-                                showModalBottomSheet(
+                                showAppModalBottomSheet(
                                   context: context,
                                   isScrollControlled: true,
                                   backgroundColor: Colors.transparent,

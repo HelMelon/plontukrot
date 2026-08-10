@@ -7,6 +7,7 @@ import '../../../../models/catalog_component.dart';
 import '../../../../services/component_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class ManageComponentsSheet extends StatefulWidget {
   final void Function(String oldName, String newName)? onRenamed;
@@ -82,7 +83,7 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
 
   Future<void> _delete(CatalogComponent component) async {
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(

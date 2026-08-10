@@ -37,6 +37,8 @@ import '../../wish_list/pages/wish_list_page.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
+import 'package:plontukrot/core/widgets/focusable_tap.dart';
 
 enum _PlantSortField {
   species,
@@ -701,7 +703,7 @@ class _HomePageState extends State<HomePage> {
     final selectedPlants = _latestPlants
         .where((plant) => _selectedPlantIds.contains(plant.id))
         .toList();
-    final applied = await showModalBottomSheet<bool>(
+    final applied = await showAppModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       builder: (_) => AddFertilizingSheet(
@@ -718,7 +720,7 @@ class _HomePageState extends State<HomePage> {
     final selectedPlants = _latestPlants
         .where((plant) => _selectedPlantIds.contains(plant.id))
         .toList();
-    final applied = await showModalBottomSheet<bool>(
+    final applied = await showAppModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -735,7 +737,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _deletePlants() async {
     final l10n = AppLocalizations.of(context);
     final count = _selectedPlantIds.length;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.homeDeleteSelectedTitle),
@@ -780,7 +782,7 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    final merged = await showModalBottomSheet<bool>(
+    final merged = await showAppModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -878,7 +880,8 @@ class _HomePageState extends State<HomePage> {
       child: Semantics(
         button: true,
         label: l10n.a11yOpenSearch,
-        child: GestureDetector(
+        child: FocusableTap(
+          borderRadius: radii.mdAll,
           onTap: () {
             showSearch(
               context: context,
@@ -1077,7 +1080,7 @@ class _HomePageState extends State<HomePage> {
               tooltip: l10n.plantAdd,
               foregroundColor: colors.onPrimary,
               onPressed: () {
-                showModalBottomSheet(
+                showAppModalBottomSheet(
                   context: context,
                   backgroundColor: Colors.transparent,
                   isScrollControlled: true,

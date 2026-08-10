@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
+import '../../../../core/widgets/focusable_tap.dart';
 import '../../../../models/plant.dart';
 import '../../pages/plant_details_page.dart';
 import '../common/plant_network_image.dart';
@@ -80,7 +81,8 @@ class PlantCard extends StatelessWidget {
       button: true,
       selected: isSelected,
       label: semanticsLabel,
-      child: GestureDetector(
+      child: FocusableTap(
+        borderRadius: BorderRadius.circular(radii.md),
         onTap: onTap ??
             () {
               Navigator.push(

@@ -18,6 +18,7 @@ import 'manage_fertilizer_ingredients_sheet.dart';
 import 'manage_fertilizers_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 enum _FertilizerMode { saved, newMix }
 
@@ -158,7 +159,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
   }
 
   Future<void> _openManageIngredients() async {
-    await showModalBottomSheet(
+    await showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (_) => ManageFertilizerIngredientsSheet(
@@ -188,7 +189,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
   }
 
   Future<void> _openManageFertilizers() async {
-    await showModalBottomSheet(
+    await showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (_) => ManageFertilizersSheet(

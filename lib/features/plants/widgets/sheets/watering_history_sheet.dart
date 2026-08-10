@@ -7,6 +7,7 @@ import '../../../../models/watering_entry.dart';
 import '../../../../services/watering_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class WateringHistorySheet extends StatefulWidget {
   final String plantId;
@@ -54,7 +55,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
     final spacing = context.spacing;
     final typography = context.typography;
 
-    await showModalBottomSheet(
+    await showAppModalBottomSheet(
       context: context,
       backgroundColor: colors.modal,
       enableDrag: true,
@@ -164,7 +165,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
 
   Future<void> _confirmDelete(String wateringId) async {
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(

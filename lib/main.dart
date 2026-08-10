@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import 'core/currency/app_currency_controller.dart';
+import 'core/keyboard/app_keyboard.dart';
 import 'core/locale/app_locale_controller.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_context.dart';
@@ -55,23 +56,25 @@ class MyApp extends StatelessWidget {
             final width = MediaQuery.sizeOf(context).width;
             return Theme(
               data: AppTheme.themeForWidth(width),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  const ExcludeSemantics(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/images/background.webp'),
-                          repeat: ImageRepeat.repeat,
-                          fit: BoxFit.contain,
+              child: AppKeyboardScope(
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    const ExcludeSemantics(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('assets/images/background.webp'),
+                            repeat: ImageRepeat.repeat,
+                            fit: BoxFit.contain,
+                          ),
                         ),
+                        child: SizedBox.expand(),
                       ),
-                      child: SizedBox.expand(),
                     ),
-                  ),
-                  if (child != null) child,
-                ],
+                    if (child != null) child,
+                  ],
+                ),
               ),
             );
           },

@@ -13,6 +13,7 @@ import '../../../services/wish_list_service.dart';
 import '../widgets/sheets/add_wish_list_item_sheet.dart';
 import '../widgets/sheets/wish_list_acquire_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class WishListPage extends StatefulWidget {
   const WishListPage({super.key});
@@ -35,7 +36,7 @@ class _WishListPageState extends State<WishListPage> {
   }
 
   Future<void> _openAddSheet({WishListItem? item}) async {
-    await showModalBottomSheet(
+    await showAppModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -48,7 +49,7 @@ class _WishListPageState extends State<WishListPage> {
 
   Future<void> _confirmDelete(WishListItem item) async {
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(

@@ -4,14 +4,16 @@ import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
+import '../../../../core/widgets/focusable_tap.dart';
 import '../../../../models/fertilizer_dose.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 Future<FertilizerDose?> showFertilizerDoseDialog({
   required BuildContext context,
   required String component,
   FertilizerDose? initial,
 }) {
-  return showDialog<FertilizerDose>(
+  return showAppDialog<FertilizerDose>(
     context: context,
     builder: (context) => _FertilizerDoseDialog(
       component: component,
@@ -232,8 +234,9 @@ class FertilizerComponentTags extends StatelessWidget {
     return Semantics(
       button: true,
       label: l10n.commonAdd,
-      child: GestureDetector(
+      child: FocusableTap(
         onTap: onAddCustom,
+        borderRadius: BorderRadius.circular(catalog.tagRadius),
         child: Container(
           padding: catalog.tagPadding,
           decoration: BoxDecoration(
@@ -292,8 +295,9 @@ class FertilizerComponentTags extends StatelessWidget {
                 button: true,
                 selected: isSelected,
                 label: chipLabel,
-                child: GestureDetector(
+                child: FocusableTap(
                   onTap: () => _onTap(context, name),
+                  borderRadius: BorderRadius.circular(catalog.tagRadius),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: chipMaxWidth),
                     child: AnimatedContainer(

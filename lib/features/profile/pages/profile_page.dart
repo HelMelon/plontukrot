@@ -22,6 +22,7 @@ import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../friends/pages/friends_page.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class ProfilePage extends StatefulWidget {
   final AppUser user;
@@ -196,7 +197,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _deleteAccount() async {
     if (_busy) return;
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.profileDeleteAccountConfirmTitle),

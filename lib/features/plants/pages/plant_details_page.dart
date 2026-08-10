@@ -28,6 +28,7 @@ import '../widgets/growth/leaf_removal_reason_sheet.dart';
 import 'plant_image_crop_page.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class PlantDetailsPage extends StatefulWidget {
   final String plantId;
@@ -60,7 +61,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
   Future<ImageSource?> selectImageSource() async {
     final l10n = AppLocalizations.of(context);
     final sheets = context.components.sheets;
-    return showModalBottomSheet<ImageSource>(
+    return showAppModalBottomSheet<ImageSource>(
       context: context,
       backgroundColor: sheets.background,
       shape: RoundedRectangleBorder(
@@ -147,7 +148,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
 
   Future<void> _deleteCurrentPhoto(PlantPhoto photo) async {
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.plantPhotoDeleteTitle),
@@ -183,7 +184,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
   }
 
   void _openWateringHistory() {
-    showModalBottomSheet(
+    showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -193,7 +194,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
   }
 
   void _openFertilizing() {
-    showModalBottomSheet(
+    showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (_) => AddFertilizingSheet.forPlant(plantId: widget.plantId),
@@ -201,7 +202,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
   }
 
   void _openRepotting() {
-    showModalBottomSheet(
+    showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -212,7 +213,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
 
   void _openPropagation(Plant plant) {
     final l10n = AppLocalizations.of(context);
-    showModalBottomSheet(
+    showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -226,7 +227,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
   }
 
   void _openUpdatePlant(Plant plant) {
-    showModalBottomSheet(
+    showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -236,7 +237,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
   }
 
   void _openAddNote() {
-    showModalBottomSheet(
+    showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -245,7 +246,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
   }
 
   Future<void> _openDispose(Plant plant) async {
-    final archived = await showModalBottomSheet<bool>(
+    final archived = await showAppModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,

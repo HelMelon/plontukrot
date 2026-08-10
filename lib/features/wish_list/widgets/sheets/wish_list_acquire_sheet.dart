@@ -10,6 +10,7 @@ import '../../../../services/finance_service.dart';
 import '../../../plants/widgets/sheets/add_plant_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 enum WishListAcquireMode { bought, exchanged }
 
@@ -220,7 +221,7 @@ Future<void> openWishListAcquireFlow(
   BuildContext context,
   WishListItem item,
 ) async {
-  final result = await showModalBottomSheet<WishListAcquireResult>(
+  final result = await showAppModalBottomSheet<WishListAcquireResult>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
@@ -230,7 +231,7 @@ Future<void> openWishListAcquireFlow(
 
   if (result == null || !context.mounted) return;
 
-  await showModalBottomSheet(
+  await showAppModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,

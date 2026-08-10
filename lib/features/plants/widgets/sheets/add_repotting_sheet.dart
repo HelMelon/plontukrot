@@ -18,6 +18,7 @@ import '../dialogs/soil_composition_dialog.dart';
 import 'manage_components_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 enum _SoilMode { saved, newMix }
 
@@ -149,7 +150,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
   }
 
   Future<void> _openManageComponents() async {
-    await showModalBottomSheet(
+    await showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (_) => ManageComponentsSheet(

@@ -6,12 +6,13 @@ import '../../../../models/friendship.dart';
 import '../../../../models/plant.dart';
 import '../../../../services/friends_service.dart';
 import '../../../../services/gift_service.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 Future<void> showGiftPlantSheet({
   required BuildContext context,
   required Plant plant,
 }) {
-  return showModalBottomSheet<void>(
+  return showAppModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,

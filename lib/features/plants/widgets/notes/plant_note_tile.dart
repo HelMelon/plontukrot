@@ -6,6 +6,7 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../models/note.dart';
 import '../../../../services/note_service.dart';
 import '../sheets/update_note_sheet.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class PlantNoteTile extends StatelessWidget {
   final NoteParent parent;
@@ -22,7 +23,7 @@ class PlantNoteTile extends StatelessWidget {
     final dialogs = context.components.dialogs;
     final colors = context.colors;
     final typography = context.typography;
-    final bool? confirmed = await showDialog<bool>(
+    final bool? confirmed = await showAppDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -67,7 +68,7 @@ class PlantNoteTile extends StatelessWidget {
   }
 
   void _editNote(BuildContext context) {
-    showModalBottomSheet(
+    showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,

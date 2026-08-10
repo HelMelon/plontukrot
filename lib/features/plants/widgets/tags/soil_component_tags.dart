@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
+import '../../../../core/widgets/focusable_tap.dart';
 import '../../../../models/component.dart';
 
 String formatParts(double parts) {
@@ -99,9 +100,10 @@ class SoilComponentTags extends StatelessWidget {
                 button: true,
                 selected: isSelected,
                 label: chipLabel,
-                child: GestureDetector(
+                child: FocusableTap(
                   onTap: () => _onTap(name),
                   onLongPress: () => _onLongPress(name),
+                  borderRadius: BorderRadius.circular(catalog.tagRadius),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: chipMaxWidth),
                     child: AnimatedContainer(
@@ -136,8 +138,9 @@ class SoilComponentTags extends StatelessWidget {
               Semantics(
                 button: true,
                 label: l10n.commonAdd,
-                child: GestureDetector(
+                child: FocusableTap(
                   onTap: onAddCustom,
+                  borderRadius: BorderRadius.circular(catalog.tagRadius),
                   child: Container(
                     padding: catalog.tagPadding,
                     decoration: BoxDecoration(

@@ -13,6 +13,7 @@ class AppDimensionTokens {
     required this.dragHandleWidth,
     required this.dragHandleHeight,
     required this.minTapTarget,
+    required this.focusRingWidth,
   });
 
   static const standard = AppDimensionTokens(
@@ -26,6 +27,7 @@ class AppDimensionTokens {
     dragHandleWidth: 40,
     dragHandleHeight: 4,
     minTapTarget: 40,
+    focusRingWidth: 2,
   );
 
   final double buttonHeight;
@@ -38,6 +40,7 @@ class AppDimensionTokens {
   final double dragHandleWidth;
   final double dragHandleHeight;
   final double minTapTarget;
+  final double focusRingWidth;
 
   Size get buttonMinSize => Size(64, buttonHeight);
   Size get buttonMaxSize => Size(double.infinity, buttonHeight);
@@ -56,6 +59,7 @@ class AppDimensionTokens {
       dragHandleWidth: l(dragHandleWidth, other.dragHandleWidth),
       dragHandleHeight: l(dragHandleHeight, other.dragHandleHeight),
       minTapTarget: l(minTapTarget, other.minTapTarget),
+      focusRingWidth: l(focusRingWidth, other.focusRingWidth),
     );
   }
 }

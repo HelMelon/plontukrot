@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../privacy/privacy_constants.dart';
 import '../theme/theme_context.dart';
+import 'focusable_tap.dart';
 
 /// Checkbox + Privacy Policy link used on login and the consent gate.
 class PersonalDataConsentCheckbox extends StatelessWidget {
@@ -56,7 +57,7 @@ class PersonalDataConsentCheckbox extends StatelessWidget {
                 checked: value,
                 button: true,
                 label: l10n.authConsentLabel,
-                child: GestureDetector(
+                child: FocusableTap(
                   onTap: () => onChanged(!value),
                   child: Text(
                     '${l10n.authConsentLabel}. ',
@@ -68,7 +69,7 @@ class PersonalDataConsentCheckbox extends StatelessWidget {
                 link: true,
                 button: true,
                 label: l10n.privacyPolicyLink,
-                child: GestureDetector(
+                child: FocusableTap(
                   onTap: _openPrivacyPolicy,
                   child: Text(
                     l10n.privacyPolicyLink,

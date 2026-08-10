@@ -5,9 +5,10 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../services/auth_service.dart';
 import '../../auth_failure_messages.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 Future<void> showEmailRegisterSheet(BuildContext context) {
-  return showModalBottomSheet<void>(
+  return showAppModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,

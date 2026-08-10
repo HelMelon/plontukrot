@@ -89,6 +89,8 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: c.screen,
+      focusColor: c.primary.withValues(alpha: 0.28),
+      highlightColor: c.primary.withValues(alpha: 0.12),
       colorScheme: ColorScheme.dark(
         primary: c.primary,
         onPrimary: c.onPrimary,

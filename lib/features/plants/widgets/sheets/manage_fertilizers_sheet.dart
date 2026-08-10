@@ -9,6 +9,7 @@ import '../../../../models/fertilizer_dose.dart';
 import '../../../../services/fertilize_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class ManageFertilizersSheet extends StatefulWidget {
   final void Function(String fertilizerId)? onDeleted;
@@ -27,7 +28,7 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
 
   Future<void> _addPurchased() async {
     final l10n = AppLocalizations.of(context);
-    final result = await showDialog<_FertilizerFormResult>(
+    final result = await showAppDialog<_FertilizerFormResult>(
       context: context,
       builder: (_) => _FertilizerFormDialog(
         title: l10n.fertilizerPurchasedAddTitle,
@@ -56,7 +57,7 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
 
   Future<void> _edit(Fertilizer fertilizer) async {
     final l10n = AppLocalizations.of(context);
-    final result = await showDialog<_FertilizerFormResult>(
+    final result = await showAppDialog<_FertilizerFormResult>(
       context: context,
       builder: (_) => _FertilizerFormDialog(
         title: l10n.fertilizerEditTitle,
@@ -89,7 +90,7 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
 
   Future<void> _delete(Fertilizer fertilizer) async {
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(

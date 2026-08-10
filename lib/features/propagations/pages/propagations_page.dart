@@ -14,6 +14,7 @@ import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../plants/widgets/sheets/propagation_details_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class PropagationsPage extends StatefulWidget {
   const PropagationsPage({super.key});
@@ -52,7 +53,7 @@ class _PropagationsPageState extends State<PropagationsPage>
     BuildContext context,
     Propagation propagation,
   ) async {
-    await showModalBottomSheet(
+    await showAppModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
