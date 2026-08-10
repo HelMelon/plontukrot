@@ -46,9 +46,9 @@ class _PlantGenusDetailsPageState extends State<PlantGenusDetailsPage> {
     final genus = widget.genus.trim();
 
     return Scaffold(
-      backgroundColor: colors.screen,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: colors.screen,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: colors.icon),
         title: Text(

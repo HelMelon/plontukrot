@@ -62,18 +62,7 @@ class MyApp extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    const ExcludeSemantics(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('assets/images/background.webp'),
-                            repeat: ImageRepeat.repeat,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        child: SizedBox.expand(),
-                      ),
-                    ),
+                    const _AppTiledBackground(),
                     if (child != null) child,
                   ],
                 ),
@@ -83,6 +72,46 @@ class MyApp extends StatelessWidget {
           home: const AppStartup(),
         );
       },
+    );
+  }
+}
+
+/// Global wallpaper under every route. Decoded at a capped width and precached
+/// so secondary pages do not flash an opaque scaffold while the tile resolves.
+class _AppTiledBackground extends StatefulWidget {
+  const _AppTiledBackground();
+
+  @override
+  State<_AppTiledBackground> createState() => _AppTiledBackgroundState();
+}
+
+class _AppTiledBackgroundState extends State<_AppTiledBackground> {
+  static const AssetImage _asset =
+      AssetImage('assets/images/background.webp');
+
+  /// Source is 1536×1024 (~200KB); cap decode for cheaper tiling on large DPI.
+  static final ImageProvider _image = ResizeImage(_asset, width: 1024);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    unawaited(precacheImage(_image, context));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ExcludeSemantics(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: _image,
+            repeat: ImageRepeat.repeat,
+            fit: BoxFit.contain,
+            filterQuality: FilterQuality.low,
+          ),
+        ),
+        child: const SizedBox.expand(),
+      ),
     );
   }
 }

@@ -347,7 +347,6 @@ class _PropagationsPageState extends State<PropagationsPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final colors = context.colors;
     final spacing = context.spacing;
     final typography = context.typography;
 
@@ -376,7 +375,7 @@ class _PropagationsPageState extends State<PropagationsPage> {
                 return Scaffold(
                   backgroundColor: Colors.transparent,
                   appBar: AppBar(
-                    backgroundColor: colors.screen,
+                    backgroundColor: Colors.transparent,
                     surfaceTintColor: Colors.transparent,
                     elevation: 0,
                     title: Text(

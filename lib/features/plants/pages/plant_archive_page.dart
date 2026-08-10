@@ -475,7 +475,7 @@ class _PlantArchivePageState extends State<PlantArchivePage>
             return Scaffold(
               backgroundColor: Colors.transparent,
               appBar: AppBar(
-                backgroundColor: colors.screen,
+                backgroundColor: Colors.transparent,
                 surfaceTintColor: Colors.transparent,
                 elevation: 0,
                 title: Text(l10n.plantArchiveTitle),

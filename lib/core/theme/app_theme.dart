@@ -88,7 +88,9 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: c.screen,
+      // Global tiled wallpaper lives under MaterialApp.builder; scaffolds and
+      // app bars stay transparent so it shows through (ADR-007).
+      scaffoldBackgroundColor: Colors.transparent,
       focusColor: c.primary.withValues(alpha: 0.28),
       highlightColor: c.primary.withValues(alpha: 0.12),
       colorScheme: ColorScheme.dark(
@@ -122,8 +124,9 @@ class AppTheme {
         ),
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: c.screen,
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0,
         foregroundColor: c.heading,
         iconTheme: IconThemeData(color: c.icon),
         titleTextStyle: t.titleMedium.copyWith(fontSize: titleMediumSize + 4),

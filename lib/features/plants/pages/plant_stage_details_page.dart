@@ -46,9 +46,9 @@ class _PlantStageDetailsPageState extends State<PlantStageDetailsPage> {
     final typography = context.typography;
 
     return Scaffold(
-      backgroundColor: colors.screen,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: colors.screen,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: colors.icon),
         title: Text(
