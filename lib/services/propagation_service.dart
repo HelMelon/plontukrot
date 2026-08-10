@@ -28,6 +28,28 @@ class PropagationService {
     return _propagationsRef.doc(propagationId).collection('stageHistory');
   }
 
+  CollectionReference<Map<String, dynamic>> _notesRef(String propagationId) {
+    return _propagationsRef.doc(propagationId).collection('notes');
+  }
+
+  Future<void> _deleteQueryInBatches(
+    Query<Map<String, dynamic>> query, {
+    int pageSize = 200,
+  }) async {
+    while (true) {
+      final snapshot = await query.limit(pageSize).get();
+      if (snapshot.docs.isEmpty) break;
+
+      final batch = _db.batch();
+      for (final doc in snapshot.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+
+      if (snapshot.docs.length < pageSize) break;
+    }
+  }
+
   Map<String, dynamic> _archiveFields({
     required PropagationStatus status,
     required DateTime at,
@@ -412,13 +434,10 @@ class PropagationService {
   }
 
   Future<void> deletePropagation(String propagationId) async {
-    final history = await _stageHistoryRef(propagationId).get();
-    final batch = _db.batch();
-    for (final doc in history.docs) {
-      batch.delete(doc.reference);
-    }
-    batch.delete(_propagationsRef.doc(propagationId));
-    await batch.commit();
+    final propRef = _propagationsRef.doc(propagationId);
+    await _deleteQueryInBatches(_notesRef(propagationId));
+    await _deleteQueryInBatches(_stageHistoryRef(propagationId));
+    await propRef.delete();
   }
 
   /// Deletes a stage-history entry.

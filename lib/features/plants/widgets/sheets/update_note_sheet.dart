@@ -5,13 +5,13 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../services/note_service.dart';
 
 class UpdateNoteSheet extends StatefulWidget {
-  final String plantId;
+  final NoteParent parent;
   final String noteId;
   final String initialText;
 
   const UpdateNoteSheet({
     super.key,
-    required this.plantId,
+    required this.parent,
     required this.noteId,
     required this.initialText,
   });
@@ -48,7 +48,7 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
 
     try {
       await NoteService().updateNote(
-        plantId: widget.plantId,
+        parent: widget.parent,
         noteId: widget.noteId,
         text: text,
       );

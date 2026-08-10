@@ -124,8 +124,16 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
               ],
-              onChanged: (_) {
+              onChanged: (value) {
                 if (_errorText != null) setState(() => _errorText = null);
+                // After typing 0, append a decimal point so doses like 0.5
+                // are easy to enter without switching to the punctuation key.
+                if (value == '0') {
+                  _amountController.value = const TextEditingValue(
+                    text: '0.',
+                    selection: TextSelection.collapsed(offset: 2),
+                  );
+                }
               },
               onSubmitted: (_) => _save(),
               decoration: InputDecoration(

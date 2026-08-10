@@ -8,9 +8,9 @@ import '../common/expandable_side_scroll_list.dart';
 import 'plant_note_tile.dart';
 
 class PlantNotesSection extends StatefulWidget {
-  final String plantId;
+  final NoteParent parent;
 
-  const PlantNotesSection({super.key, required this.plantId});
+  const PlantNotesSection({super.key, required this.parent});
 
   @override
   State<PlantNotesSection> createState() => _PlantNotesSectionState();
@@ -25,7 +25,17 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
   void initState() {
     super.initState();
     _notesStream =
-        NoteService().notesStream(widget.plantId, limit: _streamLimit);
+        NoteService().notesStream(widget.parent, limit: _streamLimit);
+  }
+
+  @override
+  void didUpdateWidget(covariant PlantNotesSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.parent.kind != widget.parent.kind ||
+        oldWidget.parent.id != widget.parent.id) {
+      _notesStream =
+          NoteService().notesStream(widget.parent, limit: _streamLimit);
+    }
   }
 
   @override
@@ -79,7 +89,7 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
           itemExtent: 120,
           itemBuilder: (context, index) {
             return PlantNoteTile(
-              plantId: widget.plantId,
+              parent: widget.parent,
               note: notes[index],
             );
           },

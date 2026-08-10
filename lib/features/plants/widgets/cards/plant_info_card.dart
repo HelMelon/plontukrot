@@ -11,6 +11,7 @@ import '../../../../models/stage_info.dart';
 import '../../../../models/variegation.dart';
 import '../../pages/plant_genus_details_page.dart';
 import '../growth/plant_growth_stats_section.dart';
+import '../../../../services/note_service.dart';
 import '../notes/plant_notes_section.dart';
 import '../propagations/plant_propagations_section.dart';
 import '../sheets/add_note_sheet.dart';
@@ -363,7 +364,9 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
                     enableDrag: true,
-                    builder: (_) => AddNoteSheet(plantId: plantId),
+                    builder: (_) => AddNoteSheet(
+                      parent: NoteParent.plant(plantId),
+                    ),
                   );
                 },
                 icon: Icon(Icons.add, size: context.dimensions.iconMd),
@@ -375,7 +378,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
             ],
           ),
           spacing.vXs,
-          PlantNotesSection(plantId: plantId),
+          PlantNotesSection(parent: NoteParent.plant(plantId)),
         ],
       ),
     );

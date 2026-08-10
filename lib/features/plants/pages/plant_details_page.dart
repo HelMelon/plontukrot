@@ -9,6 +9,7 @@ import '../../../models/growth_event.dart';
 import '../../../models/plant.dart';
 import '../../../models/plant_photo.dart';
 import '../../../services/growth_event_service.dart';
+import '../../../services/note_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/storage_service.dart';
 import '../widgets/sheets/update_plant_sheet.dart';
@@ -238,7 +239,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => AddNoteSheet(plantId: widget.plantId),
+      builder: (_) => AddNoteSheet(parent: NoteParent.plant(widget.plantId)),
     );
   }
 

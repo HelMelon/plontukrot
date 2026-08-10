@@ -9,8 +9,11 @@ import '../../../../models/propagation_outcome.dart';
 import '../../../../models/propagation_stage_entry.dart';
 import '../../../../models/stage_info.dart';
 import '../../../../models/wish_list_item.dart';
+import '../../../../services/note_service.dart';
 import '../../../../services/propagation_service.dart';
 import '../../../wish_list/widgets/sheets/select_wish_list_item_sheet.dart';
+import '../notes/plant_notes_section.dart';
+import 'add_note_sheet.dart';
 import 'add_plant_sheet.dart';
 import 'change_propagation_stage_sheet.dart';
 import 'sell_lose_propagation_sheet.dart';
@@ -201,286 +204,365 @@ class PropagationDetailsSheet extends StatelessWidget {
                   ),
                 ),
                 spacing.vXl,
-                Text(
-                  shown.parentPlantName,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: typography.titleLarge,
-                ),
-                spacing.vXxs,
-                Text(
-                  isActive
-                      ? '${l10n.propagationAliveWithMethod(shown.quantityAlive, l10n.propagationMethodPlural(shown.method))} · ${l10n.propagationMethodLabel(shown.method)}'
-                      : '${l10n.propagationMethodLabel(shown.method)} · ${l10n.propagationStatusLabel(shown.status)}',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: typography.bodyLarge.copyWith(
-                    color: colors.textSecondary,
-                  ),
-                ),
-                spacing.vXxs,
-                Text(
-                  isActive
-                      ? '${l10n.stageInfoTitle(stage)} · ${l10n.daysCount(shown.daysSinceStart)} · ${l10n.propagationSinceDate(startedAtLabel)}'
-                      : '${l10n.stageInfoTitle(stage)} · ${l10n.propagationSinceDate(startedAtLabel)}',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: typography.bodyMedium.copyWith(
-                    color: colors.icon,
-                  ),
-                ),
-                if (shown.soldQuantity > 0 ||
-                    shown.giftedQuantity > 0 ||
-                    shown.tradedQuantity > 0 ||
-                    shown.lostQuantity > 0) ...[
-                  spacing.vXxs,
-                  Text(
-                    [
-                      if (shown.soldQuantity > 0)
-                        l10n.propagationSoldCountLabel(shown.soldQuantity),
-                      if (shown.giftedQuantity > 0)
-                        l10n.propagationGiftedCountLabel(shown.giftedQuantity),
-                      if (shown.tradedQuantity > 0)
-                        l10n.propagationTradedCountLabel(shown.tradedQuantity),
-                      if (shown.lostQuantity > 0)
-                        l10n.propagationLostCountLabel(shown.lostQuantity),
-                      l10n.propagationOfTotal(shown.quantity),
-                    ].join(' · '),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: typography.bodyMedium.copyWith(
-                      color: colors.textSecondary,
-                    ),
-                  ),
-                ],
-                spacing.vXl,
-                Text(
-                  l10n.propagationTimeline,
-                  style: typography.sectionTitle,
-                ),
-                spacing.vSm,
                 Expanded(
-                  child: StreamBuilder<List<PropagationStageEntry>>(
-                    stream: service.watchStageHistory(shown.id),
-                    builder: (context, historySnapshot) {
-                      if (!historySnapshot.hasData) {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            color: colors.primary,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          shown.parentPlantName,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: typography.titleLarge,
+                        ),
+                        spacing.vXxs,
+                        Text(
+                          isActive
+                              ? '${l10n.propagationAliveWithMethod(shown.quantityAlive, l10n.propagationMethodPlural(shown.method))} · ${l10n.propagationMethodLabel(shown.method)}'
+                              : '${l10n.propagationMethodLabel(shown.method)} · ${l10n.propagationStatusLabel(shown.status)}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: typography.bodyLarge.copyWith(
+                            color: colors.textSecondary,
                           ),
-                        );
-                      }
-
-                      final history = historySnapshot.data!;
-                      if (history.isEmpty) {
-                        return Text(
-                          l10n.propagationTimelineEmpty,
-                          style: typography.bodySmall,
-                        );
-                      }
-
-                      return ListView.separated(
-                        itemCount: history.length,
-                        separatorBuilder: (_, __) => spacing.vSm,
-                        itemBuilder: (context, index) {
-                          final entry = history[index];
-                          final entryStage = _stageInfo(entry.stage);
-                          return Container(
-                            padding: spacing.allMd,
-                            decoration: BoxDecoration(
-                              color: colors.card,
-                              borderRadius: BorderRadius.circular(radii.md),
-                              border: Border.all(color: colors.outline),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        l10n.stageInfoTitle(entryStage),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: typography.bodyMedium.copyWith(
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ),
-                                    spacing.hXs,
-                                    Text(
-                                      DateFormat('d MMM y')
-                                          .format(entry.changedAt),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: typography.bodySmall,
-                                    ),
-                                    IconButton(
-                                      tooltip: l10n.commonDelete,
-                                      visualDensity: VisualDensity.compact,
-                                      onPressed: () => _confirmDeleteStage(
-                                        context,
-                                        shown,
-                                        entry,
-                                        historyLength: history.length,
-                                      ),
-                                      icon: Icon(
-                                        Icons.delete_outline,
-                                        color: colors.textSecondary,
-                                      ),
-                                    ),
-                                  ],
+                        ),
+                        spacing.vXxs,
+                        Text(
+                          isActive
+                              ? '${l10n.stageInfoTitle(stage)} · ${l10n.daysCount(shown.daysSinceStart)} · ${l10n.propagationSinceDate(startedAtLabel)}'
+                              : '${l10n.stageInfoTitle(stage)} · ${l10n.propagationSinceDate(startedAtLabel)}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.icon,
+                          ),
+                        ),
+                        if (shown.soldQuantity > 0 ||
+                            shown.giftedQuantity > 0 ||
+                            shown.tradedQuantity > 0 ||
+                            shown.lostQuantity > 0) ...[
+                          spacing.vXxs,
+                          Text(
+                            [
+                              if (shown.soldQuantity > 0)
+                                l10n.propagationSoldCountLabel(
+                                  shown.soldQuantity,
                                 ),
-                                if (entry.outcome != null) ...[
-                                  spacing.vXxs,
-                                  Text(
-                                    l10n.propagationOutcomeLabel(entry.outcome!),
-                                    style: typography.bodySmall.copyWith(
-                                      color: colors.icon,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                                if (entry.quantityAlive != null) ...[
-                                  spacing.vXxs,
-                                  Text(
-                                    l10n.propagationQuantityPieces(
-                                      entry.quantityAlive!,
-                                    ),
-                                    style: typography.bodySmall.copyWith(
-                                      color: colors.icon,
-                                    ),
-                                  ),
-                                ],
-                                if (entry.note != null &&
-                                    entry.note!.isNotEmpty) ...[
-                                  spacing.vXxs,
-                                  Text(
-                                    entry.note!,
-                                    style: typography.bodyMedium.copyWith(
-                                      color: colors.textSecondary,
-                                    ),
-                                  ),
-                                ],
-                              ],
+                              if (shown.giftedQuantity > 0)
+                                l10n.propagationGiftedCountLabel(
+                                  shown.giftedQuantity,
+                                ),
+                              if (shown.tradedQuantity > 0)
+                                l10n.propagationTradedCountLabel(
+                                  shown.tradedQuantity,
+                                ),
+                              if (shown.lostQuantity > 0)
+                                l10n.propagationLostCountLabel(
+                                  shown.lostQuantity,
+                                ),
+                              l10n.propagationOfTotal(shown.quantity),
+                            ].join(' · '),
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.textSecondary,
                             ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
-                if (isActive) ...[
-                  spacing.vMd,
-                  SizedBox(
-                    width: double.infinity,
-                    height: dimensions.buttonHeight,
-                    child: ElevatedButton(
-                      onPressed: () => _openChangeStage(context, shown),
-                      child: Text(l10n.propagationChangeStage),
+                          ),
+                        ],
+                        spacing.vXl,
+                        Text(
+                          l10n.propagationTimeline,
+                          style: typography.sectionTitle,
+                        ),
+                        spacing.vSm,
+                        StreamBuilder<List<PropagationStageEntry>>(
+                          stream: service.watchStageHistory(shown.id),
+                          builder: (context, historySnapshot) {
+                            if (!historySnapshot.hasData) {
+                              return SizedBox(
+                                height: dimensions.buttonHeight * 2,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: colors.primary,
+                                  ),
+                                ),
+                              );
+                            }
+
+                            final history = historySnapshot.data!;
+                            if (history.isEmpty) {
+                              return Text(
+                                l10n.propagationTimelineEmpty,
+                                style: typography.bodySmall,
+                              );
+                            }
+
+                            return ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: history.length,
+                              separatorBuilder: (_, __) => spacing.vSm,
+                              itemBuilder: (context, index) {
+                                final entry = history[index];
+                                final entryStage = _stageInfo(entry.stage);
+                                return Container(
+                                  padding: spacing.allMd,
+                                  decoration: BoxDecoration(
+                                    color: colors.card,
+                                    borderRadius:
+                                        BorderRadius.circular(radii.md),
+                                    border: Border.all(color: colors.outline),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              l10n.stageInfoTitle(entryStage),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: typography.bodyMedium
+                                                  .copyWith(
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ),
+                                          spacing.hXs,
+                                          Text(
+                                            DateFormat('d MMM y')
+                                                .format(entry.changedAt),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: typography.bodySmall,
+                                          ),
+                                          IconButton(
+                                            tooltip: l10n.commonDelete,
+                                            visualDensity:
+                                                VisualDensity.compact,
+                                            onPressed: () =>
+                                                _confirmDeleteStage(
+                                              context,
+                                              shown,
+                                              entry,
+                                              historyLength: history.length,
+                                            ),
+                                            icon: Icon(
+                                              Icons.delete_outline,
+                                              color: colors.textSecondary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (entry.outcome != null) ...[
+                                        spacing.vXxs,
+                                        Text(
+                                          l10n.propagationOutcomeLabel(
+                                            entry.outcome!,
+                                          ),
+                                          style: typography.bodySmall.copyWith(
+                                            color: colors.icon,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                      if (entry.quantityAlive != null) ...[
+                                        spacing.vXxs,
+                                        Text(
+                                          l10n.propagationQuantityPieces(
+                                            entry.quantityAlive!,
+                                          ),
+                                          style: typography.bodySmall.copyWith(
+                                            color: colors.icon,
+                                          ),
+                                        ),
+                                      ],
+                                      if (entry.note != null &&
+                                          entry.note!.isNotEmpty) ...[
+                                        spacing.vXxs,
+                                        Text(
+                                          entry.note!,
+                                          style:
+                                              typography.bodyMedium.copyWith(
+                                            color: colors.textSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                        spacing.vXl,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                l10n.plantJournal,
+                                style: typography.sectionTitle.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            TextButton.icon(
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  enableDrag: true,
+                                  builder: (_) => AddNoteSheet(
+                                    parent: NoteParent.propagation(shown.id),
+                                  ),
+                                );
+                              },
+                              icon: Icon(
+                                Icons.add,
+                                size: dimensions.iconMd,
+                              ),
+                              label: Text(l10n.commonAdd),
+                              style: TextButton.styleFrom(
+                                foregroundColor: colors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        spacing.vXs,
+                        PlantNotesSection(
+                          parent: NoteParent.propagation(shown.id),
+                        ),
+                        if (isActive) ...[
+                          spacing.vMd,
+                          SizedBox(
+                            width: double.infinity,
+                            height: dimensions.buttonHeight,
+                            child: ElevatedButton(
+                              onPressed: () =>
+                                  _openChangeStage(context, shown),
+                              child: Text(l10n.propagationChangeStage),
+                            ),
+                          ),
+                          spacing.vSm,
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () => _openOutcome(
+                                    context,
+                                    shown,
+                                    PropagationOutcome.sold,
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: colors.primary,
+                                    side: BorderSide(color: colors.primary),
+                                    minimumSize:
+                                        Size.fromHeight(buttons.height),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        buttons.radius,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    l10n.propagationSell,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                              spacing.hSm,
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () => _openOutcome(
+                                    context,
+                                    shown,
+                                    PropagationOutcome.gifted,
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: colors.primary,
+                                    side: BorderSide(color: colors.primary),
+                                    minimumSize:
+                                        Size.fromHeight(buttons.height),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        buttons.radius,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    l10n.propagationGift,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          spacing.vSm,
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () => _openOutcome(
+                                    context,
+                                    shown,
+                                    PropagationOutcome.traded,
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: colors.textSecondary,
+                                    side: BorderSide(color: colors.outline),
+                                    minimumSize:
+                                        Size.fromHeight(buttons.height),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        buttons.radius,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    l10n.propagationTrade,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                              spacing.hSm,
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () => _openOutcome(
+                                    context,
+                                    shown,
+                                    PropagationOutcome.lost,
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: colors.textSecondary,
+                                    side: BorderSide(color: colors.outline),
+                                    minimumSize:
+                                        Size.fromHeight(buttons.height),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        buttons.radius,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    l10n.propagationLose,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                  spacing.vSm,
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => _openOutcome(
-                            context,
-                            shown,
-                            PropagationOutcome.sold,
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: colors.primary,
-                            side: BorderSide(color: colors.primary),
-                            minimumSize: Size.fromHeight(buttons.height),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(buttons.radius),
-                            ),
-                          ),
-                          child: Text(
-                            l10n.propagationSell,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      spacing.hSm,
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => _openOutcome(
-                            context,
-                            shown,
-                            PropagationOutcome.gifted,
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: colors.primary,
-                            side: BorderSide(color: colors.primary),
-                            minimumSize: Size.fromHeight(buttons.height),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(buttons.radius),
-                            ),
-                          ),
-                          child: Text(
-                            l10n.propagationGift,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  spacing.vSm,
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => _openOutcome(
-                            context,
-                            shown,
-                            PropagationOutcome.traded,
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: colors.textSecondary,
-                            side: BorderSide(color: colors.outline),
-                            minimumSize: Size.fromHeight(buttons.height),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(buttons.radius),
-                            ),
-                          ),
-                          child: Text(
-                            l10n.propagationTrade,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      spacing.hSm,
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => _openOutcome(
-                            context,
-                            shown,
-                            PropagationOutcome.lost,
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: colors.textSecondary,
-                            side: BorderSide(color: colors.outline),
-                            minimumSize: Size.fromHeight(buttons.height),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(buttons.radius),
-                            ),
-                          ),
-                          child: Text(
-                            l10n.propagationLose,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ],
             ),
           );

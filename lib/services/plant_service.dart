@@ -441,6 +441,7 @@ class PlantService {
 
     for (final prop in propagations.docs) {
       await _deleteQueryInBatches(prop.reference.collection('stageHistory'));
+      await _deleteQueryInBatches(prop.reference.collection('notes'));
       await prop.reference.delete();
     }
 

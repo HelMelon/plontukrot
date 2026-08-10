@@ -8,12 +8,12 @@ import '../../../../services/note_service.dart';
 import '../sheets/update_note_sheet.dart';
 
 class PlantNoteTile extends StatelessWidget {
-  final String plantId;
+  final NoteParent parent;
   final Note note;
 
   const PlantNoteTile({
     super.key,
-    required this.plantId,
+    required this.parent,
     required this.note,
   });
 
@@ -60,7 +60,7 @@ class PlantNoteTile extends StatelessWidget {
 
     if (confirmed == true && context.mounted) {
       await NoteService().deleteNote(
-        plantId: plantId,
+        parent: parent,
         noteId: note.id,
       );
     }
@@ -72,7 +72,7 @@ class PlantNoteTile extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => UpdateNoteSheet(
-        plantId: plantId,
+        parent: parent,
         noteId: note.id,
         initialText: note.text,
       ),

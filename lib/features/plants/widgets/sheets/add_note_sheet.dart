@@ -5,9 +5,9 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../services/note_service.dart';
 
 class AddNoteSheet extends StatefulWidget {
-  final String plantId;
+  final NoteParent parent;
 
-  const AddNoteSheet({super.key, required this.plantId});
+  const AddNoteSheet({super.key, required this.parent});
 
   @override
   State<AddNoteSheet> createState() => _AddNoteSheetState();
@@ -34,7 +34,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
     });
 
     try {
-      await NoteService().addNote(plantId: widget.plantId, text: text);
+      await NoteService().addNote(parent: widget.parent, text: text);
 
       if (mounted) {
         Navigator.pop(context);

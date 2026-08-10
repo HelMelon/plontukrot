@@ -123,7 +123,7 @@ class _ArchivePlantSheetState extends State<ArchivePlantSheet> {
           note: note,
         );
         await _noteService.addNote(
-          plantId: widget.plant.id,
+          parent: NoteParent.plant(widget.plant.id),
           text: note,
         );
       }

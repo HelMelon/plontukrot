@@ -29,39 +29,43 @@ class PersonalDataConsentCheckbox extends StatelessWidget {
     final typography = context.typography;
     final linkColor = context.screens.profile.privacyLinkColor;
 
+    final labelStyle = typography.bodyMedium.copyWith(
+      color: colors.heading,
+    );
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Shrink the Material tap target so the box lines up with the
+        // first line of body text instead of floating in a 48px square.
         Checkbox(
           value: value,
           onChanged: (next) => onChanged(next ?? false),
           activeColor: colors.primary,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.compact,
         ),
+        spacing.hXs,
         Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(top: spacing.sm),
-            child: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                Text(
-                  '${l10n.authConsentLabel}. ',
-                  style: typography.bodyMedium.copyWith(
-                    color: colors.heading,
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text(
+                '${l10n.authConsentLabel}. ',
+                style: labelStyle,
+              ),
+              GestureDetector(
+                onTap: _openPrivacyPolicy,
+                child: Text(
+                  l10n.privacyPolicyLink,
+                  style: labelStyle.copyWith(
+                    color: linkColor,
+                    decoration: TextDecoration.underline,
+                    decorationColor: linkColor,
                   ),
                 ),
-                GestureDetector(
-                  onTap: _openPrivacyPolicy,
-                  child: Text(
-                    l10n.privacyPolicyLink,
-                    style: typography.bodyMedium.copyWith(
-                      color: linkColor,
-                      decoration: TextDecoration.underline,
-                      decorationColor: linkColor,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],
