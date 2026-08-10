@@ -10,6 +10,10 @@ import '../../../services/firestore_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 /// Blocks Home until `personalDataConsentAt` exists on the user document.
+///
+/// If the user already accepted on this device (login checkbox), consent is
+/// synced to Firestore automatically — no second consent screen after Google
+/// / email sign-in (Auth can open this gate before `createUserDocument` finishes).
 class PersonalDataConsentGatePage extends StatefulWidget {
   final Widget child;
   final VoidCallback? onContentReady;
@@ -32,6 +36,7 @@ class _PersonalDataConsentGatePageState
   bool _saving = false;
   bool _readySignaled = false;
   bool _consentError = false;
+  bool _autoSyncStarted = false;
 
   /// Device already remembered consent — hide the checkbox row.
   bool get _consentRememberedOnDevice =>
@@ -83,6 +88,26 @@ class _PersonalDataConsentGatePageState
     }
   }
 
+  void _autoSyncDeviceConsent() {
+    if (_autoSyncStarted || _saving) return;
+    _autoSyncStarted = true;
+    unawaited(_submit());
+  }
+
+  Widget _waitingPlaceholder(BuildContext context) {
+    // Splash covers cold start; avoid a visible spinner flash.
+    if (widget.onContentReady != null) {
+      return const SizedBox.expand();
+    }
+    final colors = context.colors;
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Center(
+        child: AccessibleProgressIndicator(color: colors.primary),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<bool>(
@@ -90,22 +115,25 @@ class _PersonalDataConsentGatePageState
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting &&
             !snapshot.hasData) {
-          // Splash covers cold start; avoid a visible spinner flash.
-          if (widget.onContentReady != null) {
-            return const SizedBox.expand();
-          }
-          final colors = context.colors;
-          return Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Center(
-              child: AccessibleProgressIndicator(color: colors.primary),
-            ),
-          );
+          return _waitingPlaceholder(context);
         }
 
         if (snapshot.data == true) {
           unawaited(DeviceConsentStore.instance.rememberAccepted());
           return widget.child;
+        }
+
+        // Wait until we know the device flag before choosing UI vs auto-sync.
+        if (!_deviceConsentLoaded) {
+          return _waitingPlaceholder(context);
+        }
+
+        // Already accepted on this device (e.g. login checkbox) — sync to
+        // Firestore without asking again. Covers the race where AuthGate
+        // opens before createUserDocument(recordConsent: true) completes.
+        if (_consentRememberedOnDevice) {
+          _autoSyncDeviceConsent();
+          return _waitingPlaceholder(context);
         }
 
         _signalReadyOnce();
@@ -115,7 +143,7 @@ class _PersonalDataConsentGatePageState
         final spacing = context.spacing;
         final typography = context.typography;
         final dimensions = context.dimensions;
-        final canContinue = _deviceConsentLoaded && !_saving;
+        final canContinue = !_saving;
 
         return Scaffold(
           backgroundColor: Colors.transparent,
@@ -140,18 +168,16 @@ class _PersonalDataConsentGatePageState
                         height: 1.4,
                       ),
                     ),
-                    if (!_consentRememberedOnDevice) ...[
-                      spacing.vXl,
-                      PersonalDataConsentCheckbox(
-                        value: _accepted,
-                        onChanged: (v) => setState(() {
-                          _accepted = v;
-                          if (v) _consentError = false;
-                        }),
-                        errorText:
-                            _consentError ? l10n.authConsentRequired : null,
-                      ),
-                    ],
+                    spacing.vXl,
+                    PersonalDataConsentCheckbox(
+                      value: _accepted,
+                      onChanged: (v) => setState(() {
+                        _accepted = v;
+                        if (v) _consentError = false;
+                      }),
+                      errorText:
+                          _consentError ? l10n.authConsentRequired : null,
+                    ),
                     spacing.vXl,
                     SizedBox(
                       height: dimensions.buttonHeight,

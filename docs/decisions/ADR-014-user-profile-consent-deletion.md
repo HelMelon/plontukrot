@@ -12,7 +12,7 @@ Language and currency lived on a dedicated Settings page reached from a Home gea
 
 1. **Profile hub** (`ProfilePage`) opens from the Home avatar. Settings gear and Home logout are removed. Language and currency are dropdowns on the profile page (same controllers as before).
 2. **Stats** (client-side): active plant count, mode of `plantFamily` and `genus`, count of active propagation batches.
-3. **Consent:** First visit on a device requires a checked consent box linking to `https://helmelon.github.io/plontukrot/privacy.html`. Successful sign-in writes `users/{uid}.personalDataConsentAt` (server timestamp). Existing sessions without the field see a blocking gate before Home. Acceptance is cached on the device (`SharedPreferences` via `DeviceConsentStore`). When the device flag is already set, login and gate **hide** the checkbox row and treat consent as given for enabling actions; the gate still requires Continue to write Firestore for that account. Clearing the device flag happens on account deletion. Firestore remains the account source of truth.
+3. **Consent:** First visit on a device requires a checked consent box linking to `https://helmelon.github.io/plontukrot/privacy.html`. Successful sign-in writes `users/{uid}.personalDataConsentAt` (server timestamp). Existing sessions without the field see a blocking gate before Home. Acceptance is cached on the device (`SharedPreferences` via `DeviceConsentStore`). When the device flag is already set, login **hides** the checkbox; the post-auth gate **auto-syncs** consent to Firestore (no second consent screen) — this also covers the race where Auth opens the shell before `createUserDocument(recordConsent: true)` finishes. Clearing the device flag happens on account deletion. Firestore remains the account source of truth.
 4. **Delete profile:** Google reauth, wipe all `users/{uid}` data (plants and care subtrees, catalogs, wish list, finances, remaining propagations), delete Storage under `plants/{uid}/`, delete the user document, then delete the Firebase Auth user. Shared `plantSpecies` is not deleted.
 
 ## Implementation
@@ -25,8 +25,8 @@ Language and currency lived on a dedicated Settings page reached from a Home gea
 
 ## Behavior
 
-- Without consent on a fresh device, sign-in buttons stay disabled until the checkbox is checked.
-- If the device already remembered consent, the checkbox is not shown; sign-in / Continue are enabled.
+- Without consent on a fresh device, sign-in is blocked until the user accepts (red hint on press).
+- If the device already remembered consent, the checkbox is not shown on login; after sign-in the gate syncs Firestore quietly (no second consent UI).
 - Profile shows name/email from Firestore, stats, prefs, Privacy Policy link, Sign out, Delete profile (confirm dialog).
 - Delete may prompt Google again for reauthentication; long-running wipe shows a blocking overlay.
 
