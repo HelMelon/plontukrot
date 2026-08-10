@@ -8,6 +8,7 @@ import '../../../models/stage_info.dart';
 import '../../../services/plant_service.dart';
 import '../../plants/widgets/cards/placeholder_widget.dart';
 import '../../plants/widgets/common/plant_network_image.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 /// Read-only plant details for a friend's collection (card fields only).
 class FriendPlantDetailsPage extends StatelessWidget {
@@ -50,7 +51,7 @@ class FriendPlantDetailsPage extends StatelessWidget {
             backgroundColor: Colors.transparent,
             appBar: AppBar(),
             body: Center(
-              child: CircularProgressIndicator(color: colors.primary),
+              child: AccessibleProgressIndicator(color: colors.primary),
             ),
           );
         }

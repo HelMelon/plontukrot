@@ -7,6 +7,7 @@ import 'package:plontukrot/core/theme/theme_context.dart';
 import '../../../models/plant.dart';
 import '../../../services/plant_service.dart';
 import '../widgets/cards/plant_card.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class PlantStageDetailsPage extends StatefulWidget {
   final int stage;
@@ -63,7 +64,7 @@ class _PlantStageDetailsPageState extends State<PlantStageDetailsPage> {
           if (snapshot.connectionState == ConnectionState.waiting &&
               !snapshot.hasData) {
             return Center(
-              child: CircularProgressIndicator(color: colors.primary),
+              child: AccessibleProgressIndicator(color: colors.primary),
             );
           }
 

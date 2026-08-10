@@ -9,6 +9,7 @@ import '../../../../services/propagation_service.dart';
 import '../common/expandable_side_scroll_list.dart';
 import '../sheets/add_propagation_sheet.dart';
 import '../sheets/propagation_details_sheet.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class PlantPropagationsSection extends StatefulWidget {
   final String plantId;
@@ -72,48 +73,58 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
     final radii = context.radii;
     final spacing = context.spacing;
     final typography = context.typography;
+    final title =
+        '${l10n.stageTitle(item.stage)} · ${l10n.daysCount(item.daysSinceStart)}';
+    final subtitle =
+        '${l10n.propagationAliveWithMethod(item.quantityAlive, l10n.propagationMethodPlural(item.method))} · ${DateFormat('d MMM y', dateLocale).format(item.startedAt)}';
     return Material(
       color: colors.card,
       borderRadius: BorderRadius.circular(radii.md),
-      child: InkWell(
-        onTap: () => _openDetails(context, item),
-        borderRadius: BorderRadius.circular(radii.md),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(spacing.sm + 2),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(radii.md),
-            border: Border.all(color: colors.outline),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${l10n.stageTitle(item.stage)} · ${l10n.daysCount(item.daysSinceStart)}',
-                      style: typography.bodyLarge.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: colors.textPrimary,
+      child: Semantics(
+        button: true,
+        label: '$title. $subtitle',
+        child: InkWell(
+          onTap: () => _openDetails(context, item),
+          borderRadius: BorderRadius.circular(radii.md),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(spacing.sm + 2),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(radii.md),
+              border: Border.all(color: colors.outline),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        title,
+                        style: typography.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: colors.textPrimary,
+                        ),
                       ),
-                    ),
-                    spacing.vXxs,
-                    Text(
-                      '${l10n.propagationAliveWithMethod(item.quantityAlive, l10n.propagationMethodPlural(item.method))} · ${DateFormat('d MMM y', dateLocale).format(item.startedAt)}',
-                      style: typography.bodySmall.copyWith(
-                        color: colors.textSecondary,
+                      spacing.vXxs,
+                      Text(
+                        subtitle,
+                        style: typography.bodySmall.copyWith(
+                          color: colors.textSecondary,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: colors.textSecondary,
-              ),
-            ],
+                ExcludeSemantics(
+                  child: Icon(
+                    Icons.chevron_right,
+                    color: colors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -162,7 +173,7 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
               return Padding(
                 padding: EdgeInsets.symmetric(vertical: spacing.md),
                 child: Center(
-                  child: CircularProgressIndicator(color: colors.primary),
+                  child: AccessibleProgressIndicator(color: colors.primary),
                 ),
               );
             }

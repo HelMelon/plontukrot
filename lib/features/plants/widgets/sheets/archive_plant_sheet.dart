@@ -12,6 +12,7 @@ import '../../../../models/plant_archive_reason.dart';
 import '../../../../services/finance_service.dart';
 import '../../../../services/note_service.dart';
 import '../../../../services/plant_service.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class ArchivePlantSheet extends StatefulWidget {
   final Plant plant;
@@ -330,10 +331,7 @@ class _ArchivePlantSheetState extends State<ArchivePlantSheet> {
                             ? SizedBox(
                                 width: dimensions.iconXl,
                                 height: dimensions.iconXl,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: colors.onPrimary,
-                                ),
+                                child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
                               )
                             : Text(
                                 l10n.plantDisposeConfirm,

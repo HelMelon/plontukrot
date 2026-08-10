@@ -10,6 +10,7 @@ import '../../../models/plant_archive_reason.dart';
 import '../../../services/plant_service.dart';
 import '../widgets/common/plant_network_image.dart';
 import 'plant_details_page.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class PlantArchivePage extends StatefulWidget {
   const PlantArchivePage({super.key});
@@ -70,7 +71,7 @@ class _PlantArchivePageState extends State<PlantArchivePage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting &&
               !snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: AccessibleProgressIndicator());
           }
 
           final plants = snapshot.data ?? const <Plant>[];
@@ -120,91 +121,106 @@ class _PlantArchivePageState extends State<PlantArchivePage> {
                   ? null
                   : DateFormat('d MMM y').format(archivedAt);
               final note = plant.archiveNote?.trim();
+              final title = _titleFor(plant, l10n);
+              final reason = _reasonLabel(l10n, plant.archiveReason);
+              final semanticsParts = <String>[
+                title,
+                reason,
+                if (dateLabel != null) l10n.plantArchiveDate(dateLabel),
+                if (note != null && note.isNotEmpty)
+                  l10n.plantArchiveNoteLabel(note),
+              ];
 
               return Material(
                 color: colors.modal,
                 borderRadius: BorderRadius.circular(radii.md),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(radii.md),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => PlantDetailsPage(plantId: plant.id),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.all(spacing.sm),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(radii.sm),
-                          child: SizedBox(
-                            width: dimensions.avatar,
-                            height: dimensions.avatar,
-                            child: imageUrl != null
-                                ? PlantNetworkImage(
-                                    imageUrl: imageUrl,
-                                    fallbackUrl: fullUrl,
-                                    fit: BoxFit.cover,
-                                    errorWidget: archiveThumbError,
-                                    placeholder: archiveThumbError,
-                                  )
-                                : ColoredBox(
-                                    color:
-                                        colors.outline.withValues(alpha: 0.2),
-                                    child: Icon(
-                                      Icons.local_florist_outlined,
-                                      color: colors.icon,
-                                    ),
-                                  ),
-                          ),
+                child: Semantics(
+                  button: true,
+                  label: semanticsParts.join('. '),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(radii.md),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => PlantDetailsPage(plantId: plant.id),
                         ),
-                        spacing.hMd,
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _titleFor(plant, l10n),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: typography.titleSmall,
+                      );
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.all(spacing.sm),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ExcludeSemantics(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(radii.sm),
+                              child: SizedBox(
+                                width: dimensions.avatar,
+                                height: dimensions.avatar,
+                                child: imageUrl != null
+                                    ? PlantNetworkImage(
+                                        imageUrl: imageUrl,
+                                        fallbackUrl: fullUrl,
+                                        fit: BoxFit.cover,
+                                        errorWidget: archiveThumbError,
+                                        placeholder: archiveThumbError,
+                                      )
+                                    : ColoredBox(
+                                        color: colors.outline
+                                            .withValues(alpha: 0.2),
+                                        child: Icon(
+                                          Icons.local_florist_outlined,
+                                          color: colors.icon,
+                                        ),
+                                      ),
                               ),
-                              spacing.vXxs,
-                              Text(
-                                _reasonLabel(l10n, plant.archiveReason),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: typography.bodySmall.copyWith(
-                                  color: colors.textSecondary,
+                            ),
+                          ),
+                          spacing.hMd,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: typography.titleSmall,
                                 ),
-                              ),
-                              if (dateLabel != null) ...[
                                 spacing.vXxs,
                                 Text(
-                                  l10n.plantArchiveDate(dateLabel),
+                                  reason,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: typography.bodySmall.copyWith(
                                     color: colors.textSecondary,
                                   ),
                                 ),
+                                if (dateLabel != null) ...[
+                                  spacing.vXxs,
+                                  Text(
+                                    l10n.plantArchiveDate(dateLabel),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: typography.bodySmall.copyWith(
+                                      color: colors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                                if (note != null && note.isNotEmpty) ...[
+                                  spacing.vXxs,
+                                  Text(
+                                    l10n.plantArchiveNoteLabel(note),
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: typography.bodySmall,
+                                  ),
+                                ],
                               ],
-                              if (note != null && note.isNotEmpty) ...[
-                                spacing.vXxs,
-                                Text(
-                                  l10n.plantArchiveNoteLabel(note),
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: typography.bodySmall,
-                                ),
-                              ],
-                            ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

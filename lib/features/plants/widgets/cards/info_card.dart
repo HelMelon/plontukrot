@@ -23,46 +23,51 @@ class InfoCard extends StatelessWidget {
     final spacing = context.spacing;
     final typography = context.typography;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(radii.md),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(
-          horizontal: spacing.sm,
-          vertical: spacing.sm,
-        ),
-        decoration: BoxDecoration(
-          color: colors.card,
-          borderRadius: BorderRadius.circular(radii.md),
-        ),
-        child: Row(
-          children: [
-            if (icon != null) ...[
-              icon!,
-              SizedBox(width: spacing.sm),
-            ],
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    title,
-                    style: typography.caption.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colors.heading,
+    return Semantics(
+      button: onTap != null,
+      enabled: onTap != null,
+      label: '$title, $value',
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(radii.md),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: spacing.sm,
+            vertical: spacing.sm,
+          ),
+          decoration: BoxDecoration(
+            color: colors.card,
+            borderRadius: BorderRadius.circular(radii.md),
+          ),
+          child: Row(
+            children: [
+              if (icon != null) ...[
+                ExcludeSemantics(child: icon!),
+                SizedBox(width: spacing.sm),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: typography.caption.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colors.heading,
+                      ),
                     ),
-                  ),
-                  spacing.vXxs,
-                  Text(
-                    value,
-                    style: typography.captionSmall,
-                  ),
-                ],
+                    spacing.vXxs,
+                    Text(
+                      value,
+                      style: typography.captionSmall,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

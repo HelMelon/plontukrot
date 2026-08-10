@@ -10,35 +10,34 @@ An accessibility-tree audit found no explicit `Semantics` usage and several high
 
 ## Decision
 
-Address **High** gaps first:
-
-1. Add tooltips / semantic labels for FABs and icon-only controls on primary surfaces (home, search, auth password visibility, gallery actions).
-2. Expose `button` + `selected` on `PlantCard`, home filter chips, and composition tags.
-3. Associate consent checkbox with its label via `MergeSemantics`; keep the privacy policy link as a separate link semantics node.
-4. Introduce `AccessibleProgressIndicator` (labeled live region) and use it on key loading hubs (home, wish list, finances, login/consent).
-
-Medium/Low audit items (images, CustomPaint, sheet handles, remaining spinners) are deferred.
+1. Introduce `AccessibleProgressIndicator` (labeled live region) and replace app `CircularProgressIndicator` usages with it; keep the raw indicator only inside that wrapper.
+2. Wrap list-row and related tap targets with `Semantics(button: …, label: …)` using visible on-screen text; use `selected` where selection applies; `ExcludeSemantics` on decorative chevrons/icons.
+3. Cover composition tags and `PlantCard` with `button` + `selected`.
+4. Cover date-field `InkWell`s in finance/propagation sheets the same way as list rows.
+5. Defer Medium/Low items (image alt text, CustomPaint, sheet handles) and remaining unlabeled hub chrome (e.g. home letter-group headers, gallery add without a dedicated string) until a follow-up pass.
+6. Do not change fonts or type sizes.
 
 ## Implementation
 
-- `lib/core/widgets/accessible_progress_indicator.dart`
-- Consent: `personal_data_consent_checkbox.dart`
-- Home / search / plant card / gallery / tags / wish list / finances / auth sheets
-- l10n keys: `a11y*`, `commonBack`, `commonClear`, `plantPhotoAdd`
+- `lib/core/widgets/accessible_progress_indicator.dart` — sole remaining raw `CircularProgressIndicator`
+- List/selection: `PlantCard`, soil/fertilizer tags, archive rows, propagations list, plant propagations section, care history sheets, wish-list select sheet, `InfoCard`
+- Detail links / controls: botanical / genus links on plant info card, leaf-counter scroll link and ± controls
+- Date pickers: add finance entry, add/change/sell-lose propagation sheets
+- Labels reuse existing visible / l10n strings (no new `a11y*` keys in this pass)
 
 ## Behavior
 
-- Screen readers get named FABs, selection exit, search open, password show/hide, gallery add/delete.
-- Plant cards and filters announce selection state.
-- Consent toggles as one control; privacy policy remains a separate link.
-- Key loading states announce `loading` (or contextual auth strings).
+- Loading states announce via `AccessibleProgressIndicator`.
+- List rows, cards, tags, and date fields announce as buttons with the on-screen title/date/selection text.
+- Decorative chevrons and calendar icons do not duplicate announcements.
 
 ## Consequences
 
-- Not every `CircularProgressIndicator` or list `InkWell` is covered yet.
+- Consent checkbox / privacy link merge, hub FAB tooltips, password visibility labels, and gallery add label may still be incomplete if not restored from earlier work.
+- Medium/Low audit items remain open.
 - Font sizes were not changed.
 
 ## Verification
 
-- `flutter gen-l10n`
-- `flutter analyze` on touched files
+- `flutter analyze` on touched files — no issues
+- Grep: no `CircularProgressIndicator` outside `accessible_progress_indicator.dart`

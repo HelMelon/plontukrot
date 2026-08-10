@@ -4,6 +4,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/wish_list_item.dart';
 import '../../../../services/wish_list_service.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 /// Picks a wish-list plant (e.g. after a propagation trade). No finance entry.
 class SelectWishListItemSheet extends StatelessWidget {
@@ -66,7 +67,7 @@ class SelectWishListItemSheet extends StatelessWidget {
                       if (snapshot.connectionState ==
                               ConnectionState.waiting &&
                           !snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: AccessibleProgressIndicator());
                       }
 
                       if (snapshot.hasError) {
@@ -97,33 +98,38 @@ class SelectWishListItemSheet extends StatelessWidget {
                             color: colors.card,
                             borderRadius:
                                 BorderRadius.circular(wishTheme.cardRadius),
-                            child: InkWell(
-                              borderRadius:
-                                  BorderRadius.circular(wishTheme.cardRadius),
-                              onTap: () => Navigator.pop(context, item),
-                              child: Padding(
-                                padding: wishTheme.cardPadding,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item.nameAlt,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: typography.bodyLarge.copyWith(
-                                        fontWeight: FontWeight.w600,
+                            child: Semantics(
+                              button: true,
+                              label: '${item.nameAlt}. ${item.nameEn}',
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(
+                                    wishTheme.cardRadius),
+                                onTap: () => Navigator.pop(context, item),
+                                child: Padding(
+                                  padding: wishTheme.cardPadding,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.nameAlt,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: typography.bodyLarge.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
-                                    ),
-                                    spacing.vXxs,
-                                    Text(
-                                      item.nameEn,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: typography.bodyMedium.copyWith(
-                                        color: colors.textSecondary,
+                                      spacing.vXxs,
+                                      Text(
+                                        item.nameEn,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: typography.bodyMedium.copyWith(
+                                          color: colors.textSecondary,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),

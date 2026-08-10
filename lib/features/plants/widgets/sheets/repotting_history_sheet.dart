@@ -8,6 +8,7 @@ import '../../../../models/repotting_entry.dart';
 import '../../../../services/repotting_service.dart';
 import '../dialogs/soil_composition_dialog.dart';
 import 'add_repotting_sheet.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class RepottingHistorySheet extends StatefulWidget {
   final String plantId;
@@ -175,7 +176,7 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                       }
 
                       if (!snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: AccessibleProgressIndicator());
                       }
 
                       final items = snapshot.data!;
@@ -208,78 +209,92 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                           final item = items[index];
                           final repottingId = item.id!;
                           final title = l10n.soilDisplayName(item.soilName);
+                          final dateLabel =
+                              DateFormat.yMMMMd().format(item.repottedAt);
+                          final semanticsLabel = item.slowReleaseFertilizer
+                              ? '$title. $dateLabel. ${l10n.repottingSlowRelease}'
+                              : '$title. $dateLabel';
 
-                          return InkWell(
-                            borderRadius: BorderRadius.circular(context.radii.md),
-                            onTap: () {
-                              showSoilCompositionDialog(
-                                context: context,
-                                title: title,
-                                components: item.components,
-                              );
-                            },
-                            child: Container(
-                              padding: spacing.allMd,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(context.radii.md),
-                                color: colors.card,
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.flaky,
-                                    color: colors.icon,
-                                  ),
-                                  spacing.hSm,
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          title,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: typography.bodyLarge.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        spacing.vXxs,
-                                        Text(
-                                          DateFormat.yMMMMd()
-                                              .format(item.repottedAt),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: typography.bodySmall,
-                                        ),
-                                        if (item.slowReleaseFertilizer) ...[
-                                          spacing.vXxs,
+                          return Semantics(
+                            button: true,
+                            label: semanticsLabel,
+                            child: InkWell(
+                              borderRadius:
+                                  BorderRadius.circular(context.radii.md),
+                              onTap: () {
+                                showSoilCompositionDialog(
+                                  context: context,
+                                  title: title,
+                                  components: item.components,
+                                );
+                              },
+                              child: Container(
+                                padding: spacing.allMd,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(
+                                      context.radii.md),
+                                  color: colors.card,
+                                ),
+                                child: Row(
+                                  children: [
+                                    ExcludeSemantics(
+                                      child: Icon(
+                                        Icons.flaky,
+                                        color: colors.icon,
+                                      ),
+                                    ),
+                                    spacing.hSm,
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
                                           Text(
-                                            l10n.repottingSlowRelease,
-                                            maxLines: 1,
+                                            title,
+                                            maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
-                                            style: typography.bodySmall.copyWith(
-                                              color: colors.icon,
+                                            style:
+                                                typography.bodyLarge.copyWith(
+                                              fontWeight: FontWeight.w600,
                                             ),
                                           ),
+                                          spacing.vXxs,
+                                          Text(
+                                            dateLabel,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: typography.bodySmall,
+                                          ),
+                                          if (item.slowReleaseFertilizer) ...[
+                                            spacing.vXxs,
+                                            Text(
+                                              l10n.repottingSlowRelease,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style:
+                                                  typography.bodySmall.copyWith(
+                                                color: colors.icon,
+                                              ),
+                                            ),
+                                          ],
                                         ],
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                  IconButton(
-                                    tooltip: l10n.commonEdit,
-                                    visualDensity: VisualDensity.compact,
-                                    icon: const Icon(Icons.edit_outlined),
-                                    onPressed: () => _showEditSheet(item),
-                                  ),
-                                  IconButton(
-                                    tooltip: l10n.commonDelete,
-                                    visualDensity: VisualDensity.compact,
-                                    icon: const Icon(Icons.delete_outline),
-                                    onPressed: () =>
-                                        _confirmDelete(repottingId),
-                                  ),
-                                ],
+                                    IconButton(
+                                      tooltip: l10n.commonEdit,
+                                      visualDensity: VisualDensity.compact,
+                                      icon: const Icon(Icons.edit_outlined),
+                                      onPressed: () => _showEditSheet(item),
+                                    ),
+                                    IconButton(
+                                      tooltip: l10n.commonDelete,
+                                      visualDensity: VisualDensity.compact,
+                                      icon: const Icon(Icons.delete_outline),
+                                      onPressed: () =>
+                                          _confirmDelete(repottingId),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           );

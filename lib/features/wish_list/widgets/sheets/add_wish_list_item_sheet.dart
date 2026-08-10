@@ -4,6 +4,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/wish_list_item.dart';
 import '../../../../services/wish_list_service.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class AddWishListItemSheet extends StatefulWidget {
   final WishListItem? item;
@@ -222,10 +223,7 @@ class _AddWishListItemSheetState extends State<AddWishListItemSheet> {
                             ? SizedBox(
                                 width: dimensions.iconXl,
                                 height: dimensions.iconXl,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: colors.onPrimary,
-                                ),
+                                child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
                               )
                             : Text(
                                 l10n.commonSave,

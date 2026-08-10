@@ -9,6 +9,7 @@ import '../../../../services/wish_list_service.dart';
 import '../selectors/plant_stage_selector.dart';
 import '../selectors/plant_variegation_selector.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class AddPlantSheet extends StatefulWidget {
   final String? initialTradingName;
@@ -388,10 +389,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             ? SizedBox(
                                 width: dimensions.iconXl,
                                 height: dimensions.iconXl,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: colors.onPrimary,
-                                ),
+                                child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
                               )
                             : Text(
                                 l10n.commonSave,

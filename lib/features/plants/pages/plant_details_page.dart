@@ -27,6 +27,7 @@ import '../widgets/growth/plant_vine_painter.dart';
 import '../widgets/growth/leaf_removal_reason_sheet.dart';
 import 'plant_image_crop_page.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class PlantDetailsPage extends StatefulWidget {
   final String plantId;
@@ -422,7 +423,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
           return Scaffold(
             backgroundColor: Colors.transparent,
             body: Center(
-              child: CircularProgressIndicator(color: colors.primary),
+              child: AccessibleProgressIndicator(color: colors.primary),
             ),
           );
         }

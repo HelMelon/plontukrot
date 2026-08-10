@@ -8,6 +8,7 @@ import '../../../../models/finance_entry.dart';
 import '../../../../models/wish_list_item.dart';
 import '../../../../services/finance_service.dart';
 import '../../../plants/widgets/sheets/add_plant_sheet.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 enum WishListAcquireMode { bought, exchanged }
 
@@ -207,10 +208,7 @@ class _WishListAcquireSheetState extends State<WishListAcquireSheet> {
                           ? SizedBox(
                               width: dimensions.iconXl,
                               height: dimensions.iconXl,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: colors.onPrimary,
-                              ),
+                              child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
                             )
                           : Text(l10n.commonContinue),
                     ),

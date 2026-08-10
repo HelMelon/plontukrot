@@ -278,27 +278,33 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
             ),
           if (hasBotanicalDetails) ...[
             spacing.vXs,
-            InkWell(
-              onTap: _scrollToBotanicalDetails,
-              borderRadius: BorderRadius.circular(radii.sm),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: spacing.xxs),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      l10n.plantBotanicalData,
-                      style: typography.bodyEmphasis.copyWith(
-                        color: colors.primary,
+            Semantics(
+              button: true,
+              label: l10n.plantBotanicalData,
+              child: InkWell(
+                onTap: _scrollToBotanicalDetails,
+                borderRadius: BorderRadius.circular(radii.sm),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: spacing.xxs),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        l10n.plantBotanicalData,
+                        style: typography.bodyEmphasis.copyWith(
+                          color: colors.primary,
+                        ),
                       ),
-                    ),
-                    spacing.hXxs,
-                    Icon(
-                      Icons.arrow_downward,
-                      size: context.dimensions.iconSm,
-                      color: colors.icon,
-                    ),
-                  ],
+                      spacing.hXxs,
+                      ExcludeSemantics(
+                        child: Icon(
+                          Icons.arrow_downward,
+                          size: context.dimensions.iconSm,
+                          color: colors.icon,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -402,25 +408,29 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                   _infoRow(
                     label: l10n.plantGenus,
                     value: plant.genus.trim(),
-                    valueWidget: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => PlantGenusDetailsPage(
-                              genus: plant.genus.trim(),
+                    valueWidget: Semantics(
+                      button: true,
+                      label: '${l10n.plantGenus}: ${plant.genus.trim()}',
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PlantGenusDetailsPage(
+                                genus: plant.genus.trim(),
+                              ),
                             ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(radii.sm),
+                        child: Text(
+                          plant.genus.trim(),
+                          textAlign: TextAlign.end,
+                          style: details.infoRowValueStyle.copyWith(
+                            decoration: TextDecoration.underline,
+                            decorationColor:
+                                colors.heading.withValues(alpha: 0.4),
                           ),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(radii.sm),
-                      child: Text(
-                        plant.genus.trim(),
-                        textAlign: TextAlign.end,
-                        style: details.infoRowValueStyle.copyWith(
-                          decoration: TextDecoration.underline,
-                          decorationColor:
-                              colors.heading.withValues(alpha: 0.4),
                         ),
                       ),
                     ),

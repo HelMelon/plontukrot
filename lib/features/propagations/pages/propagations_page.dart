@@ -13,6 +13,7 @@ import '../../../models/propagation_year_stats.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../plants/widgets/sheets/propagation_details_sheet.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class PropagationsPage extends StatefulWidget {
   const PropagationsPage({super.key});
@@ -240,7 +241,10 @@ class _PropagationsPageState extends State<PropagationsPage>
         ? '${l10n.stageTitle(item.stage)} · ${l10n.propagationStatusLabel(item.status)}'
         : '${l10n.stageTitle(item.stage)} · ${l10n.daysCount(item.daysSinceStart)}';
 
-    return InkWell(
+    return Semantics(
+      button: true,
+      label: '$title. $parentLabel. $subtitle',
+      child: InkWell(
       onTap: () => _openDetails(context, item),
       borderRadius: BorderRadius.circular(propTheme.cardRadius),
       child: Container(
@@ -306,12 +310,15 @@ class _PropagationsPageState extends State<PropagationsPage>
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right,
-              color: colors.textSecondary,
+            ExcludeSemantics(
+              child: Icon(
+                Icons.chevron_right,
+                color: colors.textSecondary,
+              ),
             ),
           ],
         ),
+      ),
       ),
     );
   }
@@ -341,7 +348,7 @@ class _PropagationsPageState extends State<PropagationsPage>
 
     if (!snapshot.hasData) {
       return Center(
-        child: CircularProgressIndicator(color: colors.primary),
+        child: AccessibleProgressIndicator(color: colors.primary),
       );
     }
 

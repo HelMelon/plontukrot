@@ -3,6 +3,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
 import '../../../../services/note_service.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class AddNoteSheet extends StatefulWidget {
   final NoteParent parent;
@@ -134,10 +135,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                         ? SizedBox(
                             width: dimensions.iconXl,
                             height: dimensions.iconXl,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: colors.onPrimary,
-                            ),
+                            child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
                           )
                         : Text(l10n.commonSave),
                   ),

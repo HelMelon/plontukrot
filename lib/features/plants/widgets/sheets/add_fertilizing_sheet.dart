@@ -16,6 +16,7 @@ import '../tags/fertilizer_component_tags.dart';
 import '../dialogs/fertilizer_composition_dialog.dart';
 import 'manage_fertilizer_ingredients_sheet.dart';
 import 'manage_fertilizers_sheet.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 enum _FertilizerMode { saved, newMix }
 
@@ -502,7 +503,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
 
                     if (snapshot.connectionState == ConnectionState.waiting &&
                         !snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(child: AccessibleProgressIndicator());
                     }
 
                     return Column(
@@ -648,7 +649,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                     if (!snapshot.hasData) {
                       return Padding(
                         padding: EdgeInsets.symmetric(vertical: spacing.md),
-                        child: const Center(child: CircularProgressIndicator()),
+                        child: const Center(child: AccessibleProgressIndicator()),
                       );
                     }
 
@@ -697,7 +698,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                     ? SizedBox(
                         width: dimensions.iconLg,
                         height: dimensions.iconLg,
-                        child: const CircularProgressIndicator(strokeWidth: 2),
+                        child: AccessibleProgressIndicator(strokeWidth: 2),
                       )
                     : Text(l10n.commonSave),
               ),

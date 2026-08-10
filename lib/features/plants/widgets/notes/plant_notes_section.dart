@@ -6,6 +6,7 @@ import '../../../../models/note.dart';
 import '../../../../services/note_service.dart';
 import '../common/expandable_side_scroll_list.dart';
 import 'plant_note_tile.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class PlantNotesSection extends StatefulWidget {
   final NoteParent parent;
@@ -60,7 +61,7 @@ class _PlantNotesSectionState extends State<PlantNotesSection> {
           return SizedBox(
             height: 100,
             child: Center(
-              child: CircularProgressIndicator(color: colors.primary),
+              child: AccessibleProgressIndicator(color: colors.primary),
             ),
           );
         }

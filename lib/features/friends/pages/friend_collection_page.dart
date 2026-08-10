@@ -9,6 +9,7 @@ import '../../../services/friends_service.dart';
 import '../../../services/plant_service.dart';
 import '../../plants/widgets/cards/plant_card.dart';
 import 'friend_plant_details_page.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class FriendCollectionPage extends StatefulWidget {
   final Friendship friendship;
@@ -49,7 +50,7 @@ class _FriendCollectionPageState extends State<FriendCollectionPage> {
         future: _profileFuture,
         builder: (context, profileSnap) {
           if (profileSnap.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: AccessibleProgressIndicator());
           }
           final visibility = CollectionVisibility.fromCode(
             profileSnap.data?['collectionVisibility'] as String?,
@@ -79,7 +80,7 @@ class _FriendCollectionPageState extends State<FriendCollectionPage> {
                 );
               }
               if (!snap.hasData) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(child: AccessibleProgressIndicator());
               }
               final plants = snap.data!;
               if (plants.isEmpty) {

@@ -72,32 +72,38 @@ class PlantLeafCounter extends StatelessWidget {
             ),
             if (onScrollToStats != null) ...[
               spacing.vXs,
-              InkWell(
-                onTap: onScrollToStats,
-                borderRadius: BorderRadius.circular(context.radii.sm),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: spacing.xxs,
-                    horizontal: spacing.xs,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          l10n.plantLeafStatsAnchor,
-                          style: typography.bodyEmphasis.copyWith(
-                            color: colors.primary,
+              Semantics(
+                button: true,
+                label: l10n.plantLeafStatsAnchor,
+                child: InkWell(
+                  onTap: onScrollToStats,
+                  borderRadius: BorderRadius.circular(context.radii.sm),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: spacing.xxs,
+                      horizontal: spacing.xs,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            l10n.plantLeafStatsAnchor,
+                            style: typography.bodyEmphasis.copyWith(
+                              color: colors.primary,
+                            ),
                           ),
                         ),
-                      ),
-                      spacing.hXxs,
-                      Icon(
-                        Icons.arrow_downward,
-                        size: dimensions.iconSm,
-                        color: colors.icon,
-                      ),
-                    ],
+                        spacing.hXxs,
+                        ExcludeSemantics(
+                          child: Icon(
+                            Icons.arrow_downward,
+                            size: dimensions.iconSm,
+                            color: colors.icon,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -124,24 +130,31 @@ class _RoundControl extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final size = context.dimensions.minTapTarget + 4;
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: colors.modal,
-        shape: CircleBorder(
-          side: BorderSide(color: colors.outline),
-        ),
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: onPressed,
-          child: SizedBox(
-            width: size,
-            height: size,
-            child: Icon(
-              icon,
-              color: onPressed == null
-                  ? colors.textSecondary.withValues(alpha: 0.4)
-                  : colors.icon,
+    return Semantics(
+      button: true,
+      enabled: onPressed != null,
+      label: tooltip,
+      child: Tooltip(
+        message: tooltip,
+        child: Material(
+          color: colors.modal,
+          shape: CircleBorder(
+            side: BorderSide(color: colors.outline),
+          ),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: onPressed,
+            child: SizedBox(
+              width: size,
+              height: size,
+              child: ExcludeSemantics(
+                child: Icon(
+                  icon,
+                  color: onPressed == null
+                      ? colors.textSecondary.withValues(alpha: 0.4)
+                      : colors.icon,
+                ),
+              ),
             ),
           ),
         ),

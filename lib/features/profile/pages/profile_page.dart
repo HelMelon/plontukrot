@@ -21,6 +21,7 @@ import '../../../services/firestore_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../friends/pages/friends_page.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class ProfilePage extends StatefulWidget {
   final AppUser user;
@@ -391,7 +392,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ? Center(
                                   child: Padding(
                                     padding: spacing.allMd,
-                                    child: CircularProgressIndicator(
+                                    child: AccessibleProgressIndicator(
                                       color: colors.primary,
                                     ),
                                   ),
@@ -577,7 +578,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircularProgressIndicator(color: colors.primary),
+                    AccessibleProgressIndicator(color: colors.primary),
                     if (_busyMessage != null) ...[
                       spacing.vMd,
                       Text(

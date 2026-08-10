@@ -5,6 +5,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/watering_entry.dart';
 import '../../../../services/watering_service.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class WateringHistorySheet extends StatefulWidget {
   final String plantId;
@@ -268,7 +269,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                       }
 
                       if (!snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: AccessibleProgressIndicator());
                       }
 
                       final items = snapshot.data!;

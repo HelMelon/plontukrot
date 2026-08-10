@@ -8,6 +8,7 @@ import '../../../core/theme/theme_context.dart';
 import '../../../models/finance_entry.dart';
 import '../../../services/finance_service.dart';
 import '../widgets/sheets/add_finance_entry_sheet.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class FinancesPage extends StatefulWidget {
   const FinancesPage({super.key});
@@ -366,7 +367,7 @@ class _FinancesPageState extends State<FinancesPage> {
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting &&
                   !snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(child: AccessibleProgressIndicator());
               }
 
               if (snapshot.hasError) {

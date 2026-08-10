@@ -4,6 +4,7 @@ import 'package:crop_your_image/crop_your_image.dart';
 import 'package:flutter/material.dart';
 import 'package:plontukrot/core/theme/theme_context.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 /// Full-screen 1:1 crop step before plant photo upload.
 ///
@@ -88,7 +89,7 @@ class _PlantImageCropPageState extends State<PlantImageCropPage> {
                     radius: radii.sm,
                     baseColor: colors.screen,
                     maskColor: colors.screen.withValues(alpha: 0.72),
-                    progressIndicator: CircularProgressIndicator(
+                    progressIndicator: AccessibleProgressIndicator(
                       color: colors.primary,
                     ),
                   ),
@@ -104,10 +105,7 @@ class _PlantImageCropPageState extends State<PlantImageCropPage> {
                       ? SizedBox(
                           width: dimensions.iconXl,
                           height: dimensions.iconXl,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: colors.onPrimary,
-                          ),
+                          child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
                         )
                       : Text(l10n.plantCropConfirm),
                 ),

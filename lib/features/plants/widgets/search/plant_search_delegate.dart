@@ -8,6 +8,7 @@ import '../../../../models/plant.dart';
 import '../../../../services/plant_service.dart';
 import '../../pages/plant_details_page.dart';
 import '../common/plant_network_image.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class PlantSearchDelegate extends SearchDelegate {
   final String _searchFieldLabel;
@@ -166,7 +167,7 @@ class PlantSearchDelegate extends SearchDelegate {
           }
           return ContainerWithBackground(
             child: Center(
-              child: CircularProgressIndicator(color: colors.primary),
+              child: AccessibleProgressIndicator(color: colors.primary),
             ),
           );
         }
@@ -279,17 +280,10 @@ class PlantSearchDelegate extends SearchDelegate {
                             color: colors.icon,
                             size: dimensions.iconXl,
                           );
-                          final loading = Center(
-                            child: SizedBox(
-                              width: dimensions.iconSm,
-                              height: dimensions.iconSm,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  colors.primary,
-                                ),
-                              ),
-                            ),
+                          final loading = AccessibleProgressIndicator(
+                            size: dimensions.iconSm,
+                            strokeWidth: 2,
+                            color: colors.primary,
                           );
 
                           if (imageUrl != null) {

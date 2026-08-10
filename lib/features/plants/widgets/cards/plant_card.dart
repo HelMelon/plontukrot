@@ -70,116 +70,128 @@ class PlantCard extends StatelessWidget {
     final subtitle =
         showSpeciesOnTop ? (hasNickname ? nickname : null) : species;
     final fertilizerName = _fertilizerLabel;
+    final semanticsLabel = [
+      title,
+      if (subtitle != null) subtitle,
+      if (fertilizerName != null) fertilizerName,
+    ].join('. ');
 
-    return GestureDetector(
-      onTap: onTap ??
-          () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => PlantDetailsPage(plantId: plant.id)),
-            );
-          },
-      onLongPress: onLongPress,
-      child: Container(
-        decoration: BoxDecoration(
-          color: colors.modal,
-          borderRadius: BorderRadius.circular(radii.md),
-          border: Border.all(
-            color: isSelected
-                ? colors.primary
-                : colors.outline.withValues(alpha: 0.3),
-            width: isSelected ? 3 : 1,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: semanticsLabel,
+      child: GestureDetector(
+        onTap: onTap ??
+            () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => PlantDetailsPage(plantId: plant.id)),
+              );
+            },
+        onLongPress: onLongPress,
+        child: Container(
+          decoration: BoxDecoration(
+            color: colors.modal,
+            borderRadius: BorderRadius.circular(radii.md),
+            border: Border.all(
+              color: isSelected
+                  ? colors.primary
+                  : colors.outline.withValues(alpha: 0.3),
+              width: isSelected ? 3 : 1,
+            ),
+            boxShadow: context.shadows.card,
           ),
-          boxShadow: context.shadows.card,
-        ),
-        child: Stack(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(radii.md),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AspectRatio(
-                    aspectRatio: 1.0,
-                    child: hasImage
-                        ? PlantNetworkImage(
-                            imageUrl: imageUrl,
-                            fallbackUrl: fullUrl,
-                            fit: BoxFit.cover,
-                            alignment: Alignment.center,
-                            memCacheWidth: 600,
-                            placeholder: const _PlantAssetPlaceholder(),
-                            errorWidget: const _PlantAssetPlaceholder(),
-                          )
-                        : const _PlantAssetPlaceholder(),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.all(spacing.sm),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: typography.bodyEmphasis.copyWith(
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: -0.3,
-                                color: colors.primary,
-                                height: 1.2,
+          child: Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(radii.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 1.0,
+                      child: hasImage
+                          ? PlantNetworkImage(
+                              imageUrl: imageUrl,
+                              fallbackUrl: fullUrl,
+                              fit: BoxFit.cover,
+                              alignment: Alignment.center,
+                              memCacheWidth: 600,
+                              placeholder: const _PlantAssetPlaceholder(),
+                              errorWidget: const _PlantAssetPlaceholder(),
+                            )
+                          : const _PlantAssetPlaceholder(),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(spacing.sm),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: typography.bodyEmphasis.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: -0.3,
+                                  color: colors.primary,
+                                  height: 1.2,
+                                ),
                               ),
                             ),
-                          ),
-                          if (subtitle != null) ...[
-                            spacing.vXxs,
-                            Text(
-                              subtitle,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                              style: typography.bodySmall.copyWith(
-                                color: colors.textSecondary,
-                                height: 1.2,
+                            if (subtitle != null) ...[
+                              spacing.vXxs,
+                              Text(
+                                subtitle,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: typography.bodySmall.copyWith(
+                                  color: colors.textSecondary,
+                                  height: 1.2,
+                                ),
                               ),
-                            ),
+                            ],
+                            if (fertilizerName != null) ...[
+                              spacing.vXxs,
+                              Text(
+                                fertilizerName,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: typography.bodySmall.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: colors.icon,
+                                  height: 1.2,
+                                ),
+                              ),
+                            ],
                           ],
-                          if (fertilizerName != null) ...[
-                            spacing.vXxs,
-                            Text(
-                              fertilizerName,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: typography.bodySmall.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: colors.icon,
-                                height: 1.2,
-                              ),
-                            ),
-                          ],
-                        ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (isSelected)
+                Positioned(
+                  top: spacing.xs,
+                  right: spacing.xs,
+                  child: ExcludeSemantics(
+                    child: CircleAvatar(
+                      radius: 14,
+                      backgroundColor: colors.primary,
+                      child: Icon(
+                        Icons.check,
+                        color: colors.onPrimary,
+                        size: dimensions.iconMd,
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-            if (isSelected)
-              Positioned(
-                top: spacing.xs,
-                right: spacing.xs,
-                child: CircleAvatar(
-                  radius: 14,
-                  backgroundColor: colors.primary,
-                  child: Icon(
-                    Icons.check,
-                    color: colors.onPrimary,
-                    size: dimensions.iconMd,
-                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -36,6 +36,7 @@ import '../../profile/pages/profile_page.dart';
 import '../../wish_list/pages/wish_list_page.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 enum _PlantSortField {
   species,
@@ -126,7 +127,7 @@ class _HomePageState extends State<HomePage> {
       return const SizedBox.shrink();
     }
     return Center(
-      child: CircularProgressIndicator(color: color),
+      child: AccessibleProgressIndicator(color: color),
     );
   }
 
@@ -1094,7 +1095,7 @@ class _HomePageState extends State<HomePage> {
                               ? SizedBox(
                                   height: dimensions.avatar * 3,
                                 )
-                              : CircularProgressIndicator(
+                              : AccessibleProgressIndicator(
                                   color: colors.primary,
                                 ),
                         ),

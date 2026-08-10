@@ -8,6 +8,7 @@ import '../../../core/widgets/personal_data_consent_checkbox.dart';
 import '../../../services/auth_service.dart';
 import '../auth_failure_messages.dart';
 import '../widgets/sheets/email_sign_in_sheet.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -139,10 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                         ? SizedBox(
                             width: dimensions.iconLg,
                             height: dimensions.iconLg,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: colors.onPrimary,
-                            ),
+                            child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
                           )
                         : const Icon(Icons.login),
                     label: Text(

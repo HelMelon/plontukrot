@@ -5,6 +5,7 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../core/widgets/prompt_text_dialog.dart';
 import '../../../../models/catalog_component.dart';
 import '../../../../services/component_service.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class ManageComponentsSheet extends StatefulWidget {
   final void Function(String oldName, String newName)? onRenamed;
@@ -156,7 +157,7 @@ class _ManageComponentsSheetState extends State<ManageComponentsSheet> {
                     return Center(child: Text(snapshot.error.toString()));
                   }
                   if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: AccessibleProgressIndicator());
                   }
 
                   final items = snapshot.data!;

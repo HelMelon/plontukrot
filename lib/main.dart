@@ -21,6 +21,7 @@ import 'models/app_user.dart';
 import 'services/app_crash_reporting.dart';
 import 'services/auth_service.dart';
 import 'services/gift_service.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -222,7 +223,7 @@ class AuthGate extends StatelessWidget {
           return Scaffold(
             backgroundColor: Colors.transparent,
             body: Center(
-              child: CircularProgressIndicator(color: colors.primary),
+              child: AccessibleProgressIndicator(color: colors.primary),
             ),
           );
         }

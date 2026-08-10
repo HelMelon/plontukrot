@@ -10,6 +10,7 @@ import '../../../../services/plant_service.dart';
 import '../selectors/plant_stage_selector.dart';
 import '../selectors/plant_variegation_selector.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class UpdatePlantSheet extends StatefulWidget {
   final String plantId;
@@ -480,10 +481,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             ? SizedBox(
                                 width: dimensions.iconXl,
                                 height: dimensions.iconXl,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: colors.onPrimary,
-                                ),
+                                child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
                               )
                             : Text(
                                 l10n.commonSave,

@@ -12,6 +12,7 @@ import '../../../models/wish_list_item.dart';
 import '../../../services/wish_list_service.dart';
 import '../widgets/sheets/add_wish_list_item_sheet.dart';
 import '../widgets/sheets/wish_list_acquire_sheet.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class WishListPage extends StatefulWidget {
   const WishListPage({super.key});
@@ -255,10 +256,7 @@ class _WishListPageState extends State<WishListPage> {
                 ? SizedBox(
                     width: dimensions.iconSm,
                     height: dimensions.iconSm,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: colors.icon,
-                    ),
+                    child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.icon),
                   )
                 : Icon(Icons.ios_share_outlined, color: colors.icon),
           ),
@@ -273,7 +271,7 @@ class _WishListPageState extends State<WishListPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting &&
               !snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: AccessibleProgressIndicator());
           }
 
           if (snapshot.hasError) {

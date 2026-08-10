@@ -7,6 +7,7 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../models/fertilizer.dart';
 import '../../../../models/fertilizer_dose.dart';
 import '../../../../services/fertilize_service.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class ManageFertilizersSheet extends StatefulWidget {
   final void Function(String fertilizerId)? onDeleted;
@@ -174,7 +175,7 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
                     return Center(child: Text(snapshot.error.toString()));
                   }
                   if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: AccessibleProgressIndicator());
                   }
 
                   final items = snapshot.data!;

@@ -4,6 +4,7 @@ import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
+import '../../../../core/widgets/accessible_progress_indicator.dart';
 import '../../../../models/propagation.dart';
 import '../../../../models/propagation_outcome.dart';
 import '../../../../models/propagation_stage_entry.dart';
@@ -282,7 +283,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                               return SizedBox(
                                 height: dimensions.buttonHeight * 2,
                                 child: Center(
-                                  child: CircularProgressIndicator(
+                                  child: AccessibleProgressIndicator(
                                     color: colors.primary,
                                   ),
                                 ),

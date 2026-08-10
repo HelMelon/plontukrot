@@ -16,6 +16,7 @@ import '../../../../services/soil_service.dart';
 import '../tags/soil_component_tags.dart';
 import '../dialogs/soil_composition_dialog.dart';
 import 'manage_components_sheet.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 enum _SoilMode { saved, newMix }
 
@@ -406,7 +407,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                                         ConnectionState.waiting &&
                                     !snapshot.hasData) {
                                   return const Center(
-                                      child: CircularProgressIndicator());
+                                      child: const AccessibleProgressIndicator());
                                 }
 
                                 if (soils.isEmpty) {
@@ -507,7 +508,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                                       vertical: spacing.md,
                                     ),
                                     child: const Center(
-                                        child: CircularProgressIndicator()),
+                                        child: const AccessibleProgressIndicator()),
                                   );
                                 }
 
@@ -573,8 +574,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                                 ? SizedBox(
                                     width: dimensions.iconLg,
                                     height: dimensions.iconLg,
-                                    child: const CircularProgressIndicator(
-                                        strokeWidth: 2),
+                                    child: AccessibleProgressIndicator(strokeWidth: 2),
                                   )
                                 : Text(l10n.commonSave),
                           ),

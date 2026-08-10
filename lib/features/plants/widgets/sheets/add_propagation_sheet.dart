@@ -9,6 +9,7 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../models/propagation_initial_stage.dart';
 import '../../../../models/propagation_method.dart';
 import '../../../../services/propagation_service.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class AddPropagationSheet extends StatefulWidget {
   final String parentPlantId;
@@ -211,41 +212,49 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
                 ),
               ),
               spacing.vMd,
-              InkWell(
-                onTap: _pickDate,
-                borderRadius: BorderRadius.circular(radii.lg),
-                child: Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: spacing.md,
-                    vertical: spacing.md,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colors.card,
-                    borderRadius: BorderRadius.circular(radii.lg),
-                    border: Border.all(color: colors.outline),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today_outlined,
-                        color: colors.icon,
-                        size: dimensions.iconLg,
-                      ),
-                      spacing.hSm,
-                      Expanded(
-                        child: Text(
-                          l10n.propagationDate(
-                            DateFormat('d MMM y').format(_startedAt),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: typography.bodyLarge.copyWith(
-                            color: colors.textPrimary,
+              Semantics(
+                button: true,
+                label: l10n.propagationDate(
+                  DateFormat('d MMM y').format(_startedAt),
+                ),
+                child: InkWell(
+                  onTap: _pickDate,
+                  borderRadius: BorderRadius.circular(radii.lg),
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: spacing.md,
+                      vertical: spacing.md,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.card,
+                      borderRadius: BorderRadius.circular(radii.lg),
+                      border: Border.all(color: colors.outline),
+                    ),
+                    child: Row(
+                      children: [
+                        ExcludeSemantics(
+                          child: Icon(
+                            Icons.calendar_today_outlined,
+                            color: colors.icon,
+                            size: dimensions.iconLg,
                           ),
                         ),
-                      ),
-                    ],
+                        spacing.hSm,
+                        Expanded(
+                          child: Text(
+                            l10n.propagationDate(
+                              DateFormat('d MMM y').format(_startedAt),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: typography.bodyLarge.copyWith(
+                              color: colors.textPrimary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -259,10 +268,7 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
                       ? SizedBox(
                           width: dimensions.iconXl,
                           height: dimensions.iconXl,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: colors.onPrimary,
-                          ),
+                          child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
                         )
                       : Text(l10n.commonSave),
                 ),

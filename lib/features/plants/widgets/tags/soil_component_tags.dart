@@ -91,34 +91,41 @@ class SoilComponentTags extends StatelessWidget {
             ...availableComponents.map((name) {
               final selectedComponent = _find(name);
               final isSelected = selectedComponent != null;
+              final chipLabel = isSelected
+                  ? '$name · ${formatParts(selectedComponent.parts)}'
+                  : name;
 
-              return GestureDetector(
-                onTap: () => _onTap(name),
-                onLongPress: () => _onLongPress(name),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: chipMaxWidth),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
-                    padding: catalog.tagPadding,
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? colors.primary.withValues(alpha: 0.25)
-                          : colors.outline,
-                      borderRadius: BorderRadius.circular(catalog.tagRadius),
-                      border: Border.all(
-                        color: isSelected ? colors.primary : colors.divider,
+              return Semantics(
+                button: true,
+                selected: isSelected,
+                label: chipLabel,
+                child: GestureDetector(
+                  onTap: () => _onTap(name),
+                  onLongPress: () => _onLongPress(name),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: chipMaxWidth),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      padding: catalog.tagPadding,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? colors.primary.withValues(alpha: 0.25)
+                            : colors.outline,
+                        borderRadius: BorderRadius.circular(catalog.tagRadius),
+                        border: Border.all(
+                          color: isSelected ? colors.primary : colors.divider,
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      isSelected
-                          ? '$name · ${formatParts(selectedComponent.parts)}'
-                          : name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: typography.label.copyWith(
-                        color: isSelected ? colors.primary : colors.textPrimary,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w400,
+                      child: Text(
+                        chipLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: typography.label.copyWith(
+                          color:
+                              isSelected ? colors.primary : colors.textPrimary,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w400,
+                        ),
                       ),
                     ),
                   ),
@@ -126,29 +133,36 @@ class SoilComponentTags extends StatelessWidget {
               );
             }),
             if (onAddCustom != null)
-              GestureDetector(
-                onTap: onAddCustom,
-                child: Container(
-                  padding: catalog.tagPadding,
-                  decoration: BoxDecoration(
-                    color: colors.modal,
-                    borderRadius: BorderRadius.circular(catalog.tagRadius),
-                    border: Border.all(color: colors.outline),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.add,
-                        size: dimensions.iconSm,
-                        color: colors.icon,
-                      ),
-                      spacing.hXxs,
-                      Text(
-                        l10n.commonAdd,
-                        style: typography.label.copyWith(color: colors.heading),
-                      ),
-                    ],
+              Semantics(
+                button: true,
+                label: l10n.commonAdd,
+                child: GestureDetector(
+                  onTap: onAddCustom,
+                  child: Container(
+                    padding: catalog.tagPadding,
+                    decoration: BoxDecoration(
+                      color: colors.modal,
+                      borderRadius: BorderRadius.circular(catalog.tagRadius),
+                      border: Border.all(color: colors.outline),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ExcludeSemantics(
+                          child: Icon(
+                            Icons.add,
+                            size: dimensions.iconSm,
+                            color: colors.icon,
+                          ),
+                        ),
+                        spacing.hXxs,
+                        Text(
+                          l10n.commonAdd,
+                          style: typography.label
+                              .copyWith(color: colors.heading),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

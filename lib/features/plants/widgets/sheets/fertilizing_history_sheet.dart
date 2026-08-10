@@ -8,6 +8,7 @@ import '../../../../models/fertilizing_entry.dart';
 import '../../../../services/fertilize_service.dart';
 import '../dialogs/fertilizer_composition_dialog.dart';
 import 'add_fertilizing_sheet.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class FertilizingHistorySheet extends StatefulWidget {
   final String plantId;
@@ -172,7 +173,7 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                       }
 
                       if (!snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: AccessibleProgressIndicator());
                       }
 
                       final items = snapshot.data!;
@@ -207,66 +208,79 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                             storedName: item.fertilizerName,
                             fertilizerId: item.fertilizerId,
                           );
+                          final dateLabel =
+                              DateFormat.yMMMMd().format(item.appliedAt);
+                          final subtitle =
+                              '${l10n.applicationMethodLabel(item.applicationMethod)} · $dateLabel';
 
-                          return InkWell(
-                            borderRadius: BorderRadius.circular(context.radii.md),
-                            onTap: () {
-                              showFertilizerCompositionDialog(
-                                context: context,
-                                title: displayName,
-                                components: item.components,
-                                waterMl: item.waterMl,
-                              );
-                            },
-                            child: Container(
-                              padding: spacing.allMd,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(context.radii.md),
-                                color: colors.card,
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.science,
-                                    color: colors.icon,
-                                  ),
-                                  spacing.hSm,
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          displayName,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: typography.bodyLarge.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        spacing.vXxs,
-                                        Text(
-                                          '${l10n.applicationMethodLabel(item.applicationMethod)} · ${DateFormat.yMMMMd().format(item.appliedAt)}',
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: typography.bodySmall,
-                                        ),
-                                      ],
+                          return Semantics(
+                            button: true,
+                            label: '$displayName. $subtitle',
+                            child: InkWell(
+                              borderRadius:
+                                  BorderRadius.circular(context.radii.md),
+                              onTap: () {
+                                showFertilizerCompositionDialog(
+                                  context: context,
+                                  title: displayName,
+                                  components: item.components,
+                                  waterMl: item.waterMl,
+                                );
+                              },
+                              child: Container(
+                                padding: spacing.allMd,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(
+                                      context.radii.md),
+                                  color: colors.card,
+                                ),
+                                child: Row(
+                                  children: [
+                                    ExcludeSemantics(
+                                      child: Icon(
+                                        Icons.science,
+                                        color: colors.icon,
+                                      ),
                                     ),
-                                  ),
-                                  IconButton(
-                                    tooltip: l10n.commonEdit,
-                                    visualDensity: VisualDensity.compact,
-                                    icon: const Icon(Icons.edit_outlined),
-                                    onPressed: () => _showEditSheet(item),
-                                  ),
-                                  IconButton(
-                                    tooltip: l10n.commonDelete,
-                                    visualDensity: VisualDensity.compact,
-                                    icon: const Icon(Icons.delete_outline),
-                                    onPressed: () => _confirmDelete(item),
-                                  ),
-                                ],
+                                    spacing.hSm,
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            displayName,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style:
+                                                typography.bodyLarge.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          spacing.vXxs,
+                                          Text(
+                                            subtitle,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: typography.bodySmall,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    IconButton(
+                                      tooltip: l10n.commonEdit,
+                                      visualDensity: VisualDensity.compact,
+                                      icon: const Icon(Icons.edit_outlined),
+                                      onPressed: () => _showEditSheet(item),
+                                    ),
+                                    IconButton(
+                                      tooltip: l10n.commonDelete,
+                                      visualDensity: VisualDensity.compact,
+                                      icon: const Icon(Icons.delete_outline),
+                                      onPressed: () => _confirmDelete(item),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           );

@@ -8,6 +8,7 @@ import '../../../models/friendship.dart';
 import '../../../models/wish_list_item.dart';
 import '../../../services/friends_service.dart';
 import '../../../services/wish_list_service.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class FriendWishListPage extends StatefulWidget {
   final Friendship friendship;
@@ -87,7 +88,7 @@ class _FriendWishListPageState extends State<FriendWishListPage> {
         future: _profileFuture,
         builder: (context, profileSnap) {
           if (profileSnap.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: AccessibleProgressIndicator());
           }
           final visibility = CollectionVisibility.fromCode(
             profileSnap.data?['collectionVisibility'] as String?,
@@ -121,7 +122,7 @@ class _FriendWishListPageState extends State<FriendWishListPage> {
                 );
               }
               if (!snap.hasData) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(child: AccessibleProgressIndicator());
               }
               final items = snap.data!;
               if (items.isEmpty) {

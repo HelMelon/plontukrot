@@ -7,6 +7,7 @@ import '../../../core/privacy/device_consent_store.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/personal_data_consent_checkbox.dart';
 import '../../../services/firestore_service.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 /// Blocks Home until `personalDataConsentAt` exists on the user document.
 class PersonalDataConsentGatePage extends StatefulWidget {
@@ -72,7 +73,7 @@ class _PersonalDataConsentGatePageState
           return Scaffold(
             backgroundColor: Colors.transparent,
             body: Center(
-              child: CircularProgressIndicator(color: colors.primary),
+              child: AccessibleProgressIndicator(color: colors.primary),
             ),
           );
         }
@@ -127,10 +128,7 @@ class _PersonalDataConsentGatePageState
                             ? SizedBox(
                                 width: dimensions.iconLg,
                                 height: dimensions.iconLg,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: colors.onPrimary,
-                                ),
+                                child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
                               )
                             : Text(l10n.authConsentContinue),
                       ),

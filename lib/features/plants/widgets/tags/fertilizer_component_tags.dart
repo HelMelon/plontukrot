@@ -229,25 +229,35 @@ class FertilizerComponentTags extends StatelessWidget {
     final catalog = context.screens.catalogBuilder;
     final spacing = context.spacing;
     final dimensions = context.dimensions;
-    return GestureDetector(
-      onTap: onAddCustom,
-      child: Container(
-        padding: catalog.tagPadding,
-        decoration: BoxDecoration(
-          color: colors.modal,
-          borderRadius: BorderRadius.circular(catalog.tagRadius),
-          border: Border.all(color: colors.outline),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.add, size: dimensions.iconSm, color: colors.icon),
-            spacing.hXxs,
-            Text(
-              l10n.commonAdd,
-              style: typography.label.copyWith(color: colors.heading),
-            ),
-          ],
+    return Semantics(
+      button: true,
+      label: l10n.commonAdd,
+      child: GestureDetector(
+        onTap: onAddCustom,
+        child: Container(
+          padding: catalog.tagPadding,
+          decoration: BoxDecoration(
+            color: colors.modal,
+            borderRadius: BorderRadius.circular(catalog.tagRadius),
+            border: Border.all(color: colors.outline),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ExcludeSemantics(
+                child: Icon(
+                  Icons.add,
+                  size: dimensions.iconSm,
+                  color: colors.icon,
+                ),
+              ),
+              spacing.hXxs,
+              Text(
+                l10n.commonAdd,
+                style: typography.label.copyWith(color: colors.heading),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -274,33 +284,40 @@ class FertilizerComponentTags extends StatelessWidget {
             ...availableComponents.map((name) {
               final selectedDose = _find(name);
               final isSelected = selectedDose != null;
+              final chipLabel = isSelected
+                  ? l10n.fertilizerDoseLabel(selectedDose)
+                  : name;
 
-              return GestureDetector(
-                onTap: () => _onTap(context, name),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: chipMaxWidth),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
-                    padding: catalog.tagPadding,
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? colors.primary.withValues(alpha: 0.25)
-                          : colors.outline,
-                      borderRadius: BorderRadius.circular(catalog.tagRadius),
-                      border: Border.all(
-                        color: isSelected ? colors.primary : colors.divider,
+              return Semantics(
+                button: true,
+                selected: isSelected,
+                label: chipLabel,
+                child: GestureDetector(
+                  onTap: () => _onTap(context, name),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: chipMaxWidth),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      padding: catalog.tagPadding,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? colors.primary.withValues(alpha: 0.25)
+                            : colors.outline,
+                        borderRadius: BorderRadius.circular(catalog.tagRadius),
+                        border: Border.all(
+                          color: isSelected ? colors.primary : colors.divider,
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      isSelected
-                          ? l10n.fertilizerDoseLabel(selectedDose)
-                          : name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: typography.label.copyWith(
-                        color: isSelected ? colors.primary : colors.textPrimary,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w400,
+                      child: Text(
+                        chipLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: typography.label.copyWith(
+                          color:
+                              isSelected ? colors.primary : colors.textPrimary,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w400,
+                        ),
                       ),
                     ),
                   ),
