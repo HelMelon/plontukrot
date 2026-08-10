@@ -311,21 +311,21 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
       child: Column(
         children: [
           InfoCard(
-            icon: _icon(context, 'assets/icons/watering.png'),
+            icon: _icon(context, 'assets/icons/watering.webp'),
             title: l10n.watering,
             value: careDateLabel(plant.lastWateredAt),
             onTap: openWateringHistory,
           ),
           spacing.vXs,
           InfoCard(
-            icon: _icon(context, 'assets/icons/fertilize.png'),
+            icon: _icon(context, 'assets/icons/fertilize.webp'),
             title: l10n.fertilizing,
             value: careDateLabel(plant.lastFertilizedAt),
             onTap: openFertilizingHistory,
           ),
           spacing.vXs,
           InfoCard(
-            icon: _icon(context, 'assets/icons/potting.png'),
+            icon: _icon(context, 'assets/icons/potting.webp'),
             title: l10n.repotting,
             value: careDateLabel(plant.lastRepottedAt),
             onTap: openRepottingHistory,

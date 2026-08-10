@@ -12,7 +12,7 @@ class PlaceholderWithIcon extends StatelessWidget {
         Opacity(
           opacity: 0.6,
           child: Image.asset(
-            'assets/images/default-img.png',
+            'assets/images/default-img.webp',
             fit: BoxFit.cover,
             alignment: Alignment.topCenter,
             width: double.infinity,

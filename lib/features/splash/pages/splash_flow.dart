@@ -16,7 +16,7 @@ class AppBootstrapPage extends StatefulWidget {
     this.statusText,
   });
 
-  static const logoPath = 'assets/images/app-icon.png';
+  static const logoPath = 'assets/images/app-icon.webp';
 
   @override
   State<AppBootstrapPage> createState() => _AppBootstrapPageState();
@@ -127,9 +127,9 @@ class SplashCarouselPage extends StatefulWidget {
   });
 
   static const images = [
-    'assets/images/splash-screen/splash-screen-1.png',
-    'assets/images/splash-screen/splash-screen-2.png',
-    'assets/images/splash-screen/splash-screen-3.png',
+    'assets/images/splash-screen/splash-screen-1.webp',
+    'assets/images/splash-screen/splash-screen-2.webp',
+    'assets/images/splash-screen/splash-screen-3.webp',
   ];
 
   @override

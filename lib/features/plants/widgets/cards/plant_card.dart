@@ -196,7 +196,7 @@ class _PlantAssetPlaceholder extends StatelessWidget {
     return Container(
       color: colors.modal,
       child: Image.asset(
-        'assets/images/default-img.png',
+        'assets/images/default-img.webp',
         fit: BoxFit.cover,
         alignment: Alignment.topCenter,
         errorBuilder: (context, error, stackTrace) {

@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
               child: Container(
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/images/background.png'),
+                    image: AssetImage('assets/images/background.webp'),
                     repeat: ImageRepeat.repeat,
                     fit: BoxFit.contain,
                   ),
