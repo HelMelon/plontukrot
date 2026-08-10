@@ -616,7 +616,9 @@
     }
   },
 
-  "plantArchiveTitle": "Archives des plantes",
+  "plantArchiveTitle": "Archives",
+  "plantArchivePlantsTab": "Plantes",
+  "plantArchivePropagationsTab": "Boutures",
   "plantArchiveEmpty": "Les archives sont vides",
   "plantArchiveEmptyHint": "Les plantes restent 2 ans dans les archives",
   "plantArchiveReasonMerged": "Fusionnée",

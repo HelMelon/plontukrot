@@ -16,6 +16,7 @@ import '../../plants/widgets/sheets/propagation_details_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
 
+/// Active propagation hub. Archived batches live on [PlantArchivePage].
 class PropagationsPage extends StatefulWidget {
   const PropagationsPage({super.key});
 
@@ -23,9 +24,7 @@ class PropagationsPage extends StatefulWidget {
   State<PropagationsPage> createState() => _PropagationsPageState();
 }
 
-class _PropagationsPageState extends State<PropagationsPage>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
+class _PropagationsPageState extends State<PropagationsPage> {
   late final PropagationService _service;
   late final PlantService _plantService;
   late final Stream<List<Propagation>> _activeStream;
@@ -35,18 +34,11 @@ class _PropagationsPageState extends State<PropagationsPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     _service = PropagationService();
     _plantService = PlantService();
     _activeStream = _service.watchActivePropagations();
     _archivedStream = _service.watchArchivedPropagations();
     _plantsStream = _plantService.getPlants();
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
   }
 
   Future<void> _openDetails(
@@ -219,7 +211,6 @@ class _PropagationsPageState extends State<PropagationsPage>
 
   Widget _propagationTile(
     Propagation item, {
-    required bool archived,
     required Map<String, Plant> plantsById,
   }) {
     final l10n = AppLocalizations.of(context);
@@ -234,99 +225,72 @@ class _PropagationsPageState extends State<PropagationsPage>
         parent: plantsById[item.parentPlantId],
       ),
     );
-    final subtitle = archived
-        ? '${l10n.propagationStatusLabel(item.status)} · ${item.quantity} ${l10n.propagationMethodPlural(item.method)}'
-        : '${l10n.propagationAliveWithMethod(item.quantityAlive, l10n.propagationMethodPlural(item.method))} · ${DateFormat('d MMM y', dateLocale).format(item.startedAt)}';
-
-    final title = archived
-        ? '${l10n.stageTitle(item.stage)} · ${l10n.propagationStatusLabel(item.status)}'
-        : '${l10n.stageTitle(item.stage)} · ${l10n.daysCount(item.daysSinceStart)}';
+    final subtitle =
+        '${l10n.propagationAliveWithMethod(item.quantityAlive, l10n.propagationMethodPlural(item.method))} · ${DateFormat('d MMM y', dateLocale).format(item.startedAt)}';
+    final title =
+        '${l10n.stageTitle(item.stage)} · ${l10n.daysCount(item.daysSinceStart)}';
 
     return Semantics(
       button: true,
       label: '$title. $parentLabel. $subtitle',
       child: InkWell(
-      onTap: () => _openDetails(context, item),
-      borderRadius: BorderRadius.circular(propTheme.cardRadius),
-      child: Container(
-        padding: propTheme.cardPadding,
-        decoration: BoxDecoration(
-          color: colors.modal,
-          borderRadius: BorderRadius.circular(propTheme.cardRadius),
-          border: Border.all(color: colors.outline),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: typography.bodyLarge.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  spacing.vXxs,
-                  Text(
-                    parentLabel,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: typography.bodyLarge.copyWith(
-                      color: colors.heading,
-                    ),
-                  ),
-                  spacing.vXxs,
-                  Text(
-                    subtitle,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: typography.bodySmall,
-                  ),
-                  if (archived &&
-                      (item.soldQuantity > 0 ||
-                          item.giftedQuantity > 0 ||
-                          item.tradedQuantity > 0 ||
-                          item.lostQuantity > 0)) ...[
-                    spacing.vXxs,
+        onTap: () => _openDetails(context, item),
+        borderRadius: BorderRadius.circular(propTheme.cardRadius),
+        child: Container(
+          padding: propTheme.cardPadding,
+          decoration: BoxDecoration(
+            color: colors.modal,
+            borderRadius: BorderRadius.circular(propTheme.cardRadius),
+            border: Border.all(color: colors.outline),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      [
-                        if (item.soldQuantity > 0)
-                          l10n.propagationSoldCount(item.soldQuantity),
-                        if (item.giftedQuantity > 0)
-                          l10n.propagationGiftedCount(item.giftedQuantity),
-                        if (item.tradedQuantity > 0)
-                          l10n.propagationTradedCount(item.tradedQuantity),
-                        if (item.lostQuantity > 0)
-                          l10n.propagationLostCount(item.lostQuantity),
-                      ].join(' · '),
+                      title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: typography.caption
-                          .copyWith(color: colors.icon),
+                      style: typography.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    spacing.vXxs,
+                    Text(
+                      parentLabel,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: typography.bodyLarge.copyWith(
+                        color: colors.heading,
+                      ),
+                    ),
+                    spacing.vXxs,
+                    Text(
+                      subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: typography.bodySmall,
                     ),
                   ],
-                ],
+                ),
               ),
-            ),
-            ExcludeSemantics(
-              child: Icon(
-                Icons.chevron_right,
-                color: colors.textSecondary,
+              ExcludeSemantics(
+                child: Icon(
+                  Icons.chevron_right,
+                  color: colors.textSecondary,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
 
-  Widget _propagationList(
+  Widget _activeList(
     AsyncSnapshot<List<Propagation>> snapshot, {
-    required bool archived,
     required Map<String, Plant> plantsById,
   }) {
     final l10n = AppLocalizations.of(context);
@@ -357,19 +321,13 @@ class _PropagationsPageState extends State<PropagationsPage>
     if (items.isEmpty) {
       final iconSize = context.dimensions.avatar + context.spacing.xs;
       return _emptyState(
-        icon: archived
-            ? Icon(Icons.inventory_2_outlined, size: iconSize, color: colors.icon)
-            : HugeIcon(
-                icon: HugeIcons.strokeRoundedEcoLab01,
-                size: iconSize,
-                color: colors.icon,
-              ),
-        title: archived
-            ? l10n.propagationEmptyArchive
-            : l10n.propagationEmptyActive,
-        subtitle: archived
-            ? l10n.propagationEmptyArchiveHint
-            : l10n.propagationEmptyActiveHint,
+        icon: HugeIcon(
+          icon: HugeIcons.strokeRoundedEcoLab01,
+          size: iconSize,
+          color: colors.icon,
+        ),
+        title: l10n.propagationEmptyActive,
+        subtitle: l10n.propagationEmptyActiveHint,
       );
     }
 
@@ -380,7 +338,6 @@ class _PropagationsPageState extends State<PropagationsPage>
       itemBuilder: (context, index) {
         return _propagationTile(
           items[index],
-          archived: archived,
           plantsById: plantsById,
         );
       },
@@ -426,16 +383,6 @@ class _PropagationsPageState extends State<PropagationsPage>
                       l10n.propagationTitle,
                       style: typography.titleMedium,
                     ),
-                    bottom: TabBar(
-                      controller: _tabController,
-                      indicatorColor: colors.primary,
-                      labelColor: colors.primary,
-                      unselectedLabelColor: colors.textSecondary,
-                      tabs: [
-                        Tab(text: l10n.propagationActiveTab),
-                        Tab(text: l10n.propagationArchiveTab),
-                      ],
-                    ),
                   ),
                   body: Column(
                     children: [
@@ -451,20 +398,9 @@ class _PropagationsPageState extends State<PropagationsPage>
                             : _statsCard(stats),
                       ),
                       Expanded(
-                        child: TabBarView(
-                          controller: _tabController,
-                          children: [
-                            _propagationList(
-                              activeSnapshot,
-                              archived: false,
-                              plantsById: plantsById,
-                            ),
-                            _propagationList(
-                              archivedSnapshot,
-                              archived: true,
-                              plantsById: plantsById,
-                            ),
-                          ],
+                        child: _activeList(
+                          activeSnapshot,
+                          plantsById: plantsById,
                         ),
                       ),
                     ],

@@ -3243,8 +3243,20 @@ abstract class AppLocalizations {
   /// No description provided for @plantArchiveTitle.
   ///
   /// In en, this message translates to:
-  /// **'Plant archive'**
+  /// **'Archive'**
   String get plantArchiveTitle;
+
+  /// No description provided for @plantArchivePlantsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Plants'**
+  String get plantArchivePlantsTab;
+
+  /// No description provided for @plantArchivePropagationsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Propagations'**
+  String get plantArchivePropagationsTab;
 
   /// No description provided for @plantArchiveEmpty.
   ///

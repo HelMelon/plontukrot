@@ -1749,7 +1749,13 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get plantArchiveTitle => 'Архив растений';
+  String get plantArchiveTitle => 'Архив';
+
+  @override
+  String get plantArchivePlantsTab => 'Растения';
+
+  @override
+  String get plantArchivePropagationsTab => 'Размножение';
 
   @override
   String get plantArchiveEmpty => 'Архив пуст';

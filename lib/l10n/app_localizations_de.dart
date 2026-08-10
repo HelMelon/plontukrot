@@ -1752,7 +1752,13 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get plantArchiveTitle => 'Pflanzenarchiv';
+  String get plantArchiveTitle => 'Archiv';
+
+  @override
+  String get plantArchivePlantsTab => 'Pflanzen';
+
+  @override
+  String get plantArchivePropagationsTab => 'Vermehrung';
 
   @override
   String get plantArchiveEmpty => 'Archiv ist leer';

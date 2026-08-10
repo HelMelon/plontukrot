@@ -616,7 +616,9 @@
     }
   },
 
-  "plantArchiveTitle": "Pflanzenarchiv",
+  "plantArchiveTitle": "Archiv",
+  "plantArchivePlantsTab": "Pflanzen",
+  "plantArchivePropagationsTab": "Vermehrung",
   "plantArchiveEmpty": "Archiv ist leer",
   "plantArchiveEmptyHint": "Pflanzen bleiben 2 Jahre im Archiv",
   "plantArchiveReasonMerged": "Zusammengeführt",

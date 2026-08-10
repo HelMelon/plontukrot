@@ -16,7 +16,7 @@ Users sometimes grow up to three cultivars in one pot and need a single collecti
 
 3. **Home filter «Группы»** shows only `isGroup` plants (same chip pattern as «Размножение»).
 
-4. **Plant archive** fields: `archivedAt`, `expiresAt` (= archivedAt + **730 days**), `archiveReason` (`merged` | `died` | `sold`), optional `archiveNote`, optional `mergedIntoPlantId`. Active lists exclude archived plants. Visible archive hides expired items; opening the archive page runs `purgeExpiredArchived` (hard-delete subtree).
+4. **Plant archive** fields: `archivedAt`, `expiresAt` (= archivedAt + **730 days**), `archiveReason` (`merged` | `died` | `sold`), optional `archiveNote`, optional `mergedIntoPlantId`. Active lists exclude archived plants. Visible archive hides expired items; opening the archive page runs `purgeExpiredArchived` (hard-delete subtree). UI hub is shared with archived propagations (see ADR-027).
 
 5. **Disposition from plant details** via `ArchivePlantSheet`:
    - **Died** — required cause text → `archiveNote` + journal note, then archive.

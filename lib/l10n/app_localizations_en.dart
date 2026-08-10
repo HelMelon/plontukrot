@@ -1740,7 +1740,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get plantArchiveTitle => 'Plant archive';
+  String get plantArchiveTitle => 'Archive';
+
+  @override
+  String get plantArchivePlantsTab => 'Plants';
+
+  @override
+  String get plantArchivePropagationsTab => 'Propagations';
 
   @override
   String get plantArchiveEmpty => 'Archive is empty';

@@ -885,7 +885,9 @@
     }
   },
 
-  "plantArchiveTitle": "Plant archive",
+  "plantArchiveTitle": "Archive",
+  "plantArchivePlantsTab": "Plants",
+  "plantArchivePropagationsTab": "Propagations",
   "plantArchiveEmpty": "Archive is empty",
   "plantArchiveEmptyHint": "Plants are kept in the archive for 2 years",
   "plantArchiveReasonMerged": "Merged",

@@ -1758,7 +1758,13 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get plantArchiveTitle => 'Archives des plantes';
+  String get plantArchiveTitle => 'Archives';
+
+  @override
+  String get plantArchivePlantsTab => 'Plantes';
+
+  @override
+  String get plantArchivePropagationsTab => 'Boutures';
 
   @override
   String get plantArchiveEmpty => 'Les archives sont vides';

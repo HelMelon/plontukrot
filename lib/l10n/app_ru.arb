@@ -621,7 +621,9 @@
     }
   },
 
-  "plantArchiveTitle": "Архив растений",
+  "plantArchiveTitle": "Архив",
+  "plantArchivePlantsTab": "Растения",
+  "plantArchivePropagationsTab": "Размножение",
   "plantArchiveEmpty": "Архив пуст",
   "plantArchiveEmptyHint": "Растения хранятся в архиве 2 года",
   "plantArchiveReasonMerged": "Объединено",
