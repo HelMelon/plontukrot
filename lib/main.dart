@@ -38,46 +38,49 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: AppLocaleController.instance,
-      builder: (context, _) {
-        final localeOverride = AppLocaleController.instance.localeOverride;
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.theme,
-          locale: localeOverride,
-          supportedLocales: AppLocalizations.supportedLocales,
-          localeResolutionCallback: AppLocaleController.resolveLocale,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          builder: (context, child) {
-            final width = MediaQuery.sizeOf(context).width;
-            return Theme(
-              data: AppTheme.themeForWidth(width),
-              child: AppKeyboardScope(
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    const _AppTiledBackground(),
-                    if (child != null) child,
-                  ],
-                ),
-              ),
+    // Wallpaper sits above [runApp] and below [MaterialApp] so route changes
+    // only rebuild the navigator layer — the tile is painted once and kept
+    // in its own [RepaintBoundary].
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const RepaintBoundary(child: _AppTiledBackground()),
+        ListenableBuilder(
+          listenable: AppLocaleController.instance,
+          builder: (context, _) {
+            final localeOverride = AppLocaleController.instance.localeOverride;
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              color: Colors.transparent,
+              theme: AppTheme.theme,
+              locale: localeOverride,
+              supportedLocales: AppLocalizations.supportedLocales,
+              localeResolutionCallback: AppLocaleController.resolveLocale,
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              builder: (context, child) {
+                final width = MediaQuery.sizeOf(context).width;
+                return Theme(
+                  data: AppTheme.themeForWidth(width),
+                  child: AppKeyboardScope(
+                    child: child ?? const SizedBox.shrink(),
+                  ),
+                );
+              },
+              home: const AppStartup(),
             );
           },
-          home: const AppStartup(),
-        );
-      },
+        ),
+      ],
     );
   }
 }
 
-/// Global wallpaper under every route. Decoded at a capped width and precached
-/// so secondary pages do not flash an opaque scaffold while the tile resolves.
+/// App-wide tiled wallpaper. Mounted once under [MyApp], not per route.
 class _AppTiledBackground extends StatefulWidget {
   const _AppTiledBackground();
 
@@ -92,9 +95,13 @@ class _AppTiledBackgroundState extends State<_AppTiledBackground> {
   /// Source is 1536×1024 (~200KB); cap decode for cheaper tiling on large DPI.
   static final ImageProvider _image = ResizeImage(_asset, width: 1024);
 
+  var _precached = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (_precached) return;
+    _precached = true;
     unawaited(precacheImage(_image, context));
   }
 

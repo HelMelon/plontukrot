@@ -32,7 +32,8 @@ screen, modal, card, divider, primary, primaryHover, onPrimary, secondaryButton,
 **Sheets:** unified top radius token (`radii.sheet` = 32).
 
 **Exceptions:**
-- `Colors.transparent` for scaffolds and app bars over the tiled wallpaper in `MaterialApp.builder` (Flutter semantic, not a style token). Theme defaults `scaffoldBackgroundColor` / `AppBarTheme.backgroundColor` to transparent for the same reason.
+- `Colors.transparent` for scaffolds and app bars over the tiled wallpaper (Flutter semantic, not a style token). Theme defaults `scaffoldBackgroundColor` / `AppBarTheme.backgroundColor` to transparent for the same reason.
+- Wallpaper (`background.webp`) is mounted **once** in a `RepaintBoundary` under `MyApp`, **outside** `MaterialApp`, so navigator route changes only rebuild the UI layer above it.
 - `lib/models/variegation.dart` icon colors left in the domain model (explicitly out of scope).
 
 ## Implementation
