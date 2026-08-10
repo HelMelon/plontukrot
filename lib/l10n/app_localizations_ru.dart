@@ -1711,6 +1711,36 @@ class AppLocalizationsRu extends AppLocalizations {
   String get financesAsReadyMadeSoil => 'Готовый грунт';
 
   @override
+  String get financesReceiptsLabel => 'Чеки';
+
+  @override
+  String get financesAddReceipt => 'Добавить чек';
+
+  @override
+  String get financesReceiptChip => 'Чек';
+
+  @override
+  String financesReceiptPendingChip(int index) {
+    return 'Новый чек $index';
+  }
+
+  @override
+  String get financesViewReceipts => 'Посмотреть чек';
+
+  @override
+  String get financesReceiptViewerTitle => 'Чек';
+
+  @override
+  String financesReceiptViewerTitlePaged(int current, int total) {
+    return 'Чек $current из $total';
+  }
+
+  @override
+  String financesReceiptImageLabel(int index) {
+    return 'Чек $index';
+  }
+
+  @override
   String financesPropagationSaleTitle(String plantName, int quantity) {
     return 'Продажа: $plantName ×$quantity';
   }

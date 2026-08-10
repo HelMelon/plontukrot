@@ -583,6 +583,30 @@
   "financesAsFertilizer": "Engrais",
   "financesAsPurchasedFertilizer": "Engrais prêt à l'emploi",
   "financesAsReadyMadeSoil": "Mélange de substrat prêt à l'emploi",
+  "financesReceiptsLabel": "Tickets",
+  "financesAddReceipt": "Ajouter un ticket",
+  "financesReceiptChip": "Ticket",
+  "financesReceiptPendingChip": "Nouveau ticket {index}",
+  "@financesReceiptPendingChip": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "financesViewReceipts": "Voir le ticket",
+  "financesReceiptViewerTitle": "Ticket",
+  "financesReceiptViewerTitlePaged": "Ticket {current} sur {total}",
+  "@financesReceiptViewerTitlePaged": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "financesReceiptImageLabel": "Ticket {index}",
+  "@financesReceiptImageLabel": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
   "financesPropagationSaleTitle": "Vente : {plantName} ×{quantity}",
   "@financesPropagationSaleTitle": {
     "placeholders": {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
@@ -13,7 +15,10 @@ import '../../../../services/fertilize_service.dart';
 import '../../../../services/finance_service.dart';
 import '../../../../services/soil_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
+
+import '../finance_receipt_viewer.dart';
 
 enum _CatalogLink {
   none,
@@ -56,7 +61,16 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
   String? _titleError;
   String? _amountError;
 
+  late List<FinanceReceipt> _keptReceipts;
+  final List<Uint8List> _pendingReceiptBytes = [];
+  final List<String> _removedReceiptIds = [];
+
   bool get _isEditing => widget.entry != null;
+
+  int get _receiptCount =>
+      _keptReceipts.length + _pendingReceiptBytes.length;
+
+  bool get _canAddReceipt => _receiptCount < FinanceEntry.maxReceipts;
 
   @override
   void initState() {
@@ -72,6 +86,7 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
     );
     _type = entry?.type ?? widget.initialType;
     _date = entry?.date ?? DateTime.now();
+    _keptReceipts = List<FinanceReceipt>.from(entry?.receipts ?? const []);
   }
 
   @override
@@ -96,6 +111,75 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
   double? _parseAmount() {
     final raw = _amountController.text.trim().replaceAll(',', '.');
     return double.tryParse(raw);
+  }
+
+  Future<ImageSource?> _selectImageSource() async {
+    final l10n = AppLocalizations.of(context);
+    final sheets = context.components.sheets;
+    return showAppModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: sheets.background,
+      shape: RoundedRectangleBorder(borderRadius: sheets.topBorderRadius),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library_outlined),
+                title: Text(l10n.plantGallery),
+                onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt_outlined),
+                title: Text(l10n.plantCamera),
+                onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _addReceipt() async {
+    if (!_canAddReceipt || _saving) return;
+    final source = await _selectImageSource();
+    if (source == null || !mounted) return;
+
+    final picked = await ImagePicker().pickImage(
+      source: source,
+      imageQuality: 80,
+      maxWidth: 1600,
+      maxHeight: 1600,
+    );
+    if (picked == null || !mounted) return;
+
+    final raw = await picked.readAsBytes();
+    final compressed = await FlutterImageCompress.compressWithList(
+      raw,
+      quality: 80,
+      format: CompressFormat.jpeg,
+    );
+    final bytes =
+        compressed.isEmpty ? raw : Uint8List.fromList(compressed);
+    if (!mounted) return;
+    setState(() => _pendingReceiptBytes.add(bytes));
+  }
+
+  void _removeKeptReceipt(FinanceReceipt receipt) {
+    setState(() {
+      _keptReceipts.removeWhere((r) => r.id == receipt.id);
+      _removedReceiptIds.add(receipt.id);
+    });
+  }
+
+  void _removePendingReceipt(int index) {
+    setState(() => _pendingReceiptBytes.removeAt(index));
+  }
+
+  Future<void> _previewKept(FinanceReceipt receipt) {
+    return showFinanceReceiptsViewer(context, receipts: [receipt]);
   }
 
   Future<void> _save() async {
@@ -132,6 +216,9 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
           amount: amount!,
           type: _type,
           date: _date,
+          receipts: _keptReceipts,
+          newReceiptImages: _pendingReceiptBytes,
+          removeReceiptIds: _removedReceiptIds,
         );
       } else {
         var source = FinanceEntrySource.manual;
@@ -163,6 +250,7 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
           type: _type,
           date: _date,
           source: source,
+          receiptImages: _pendingReceiptBytes,
         );
       }
 
@@ -175,6 +263,63 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
         );
       }
     }
+  }
+
+  Widget _receiptChips(AppLocalizations l10n) {
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final dimensions = context.dimensions;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.financesReceiptsLabel,
+          style: typography.bodyMedium.copyWith(color: colors.textSecondary),
+        ),
+        spacing.vSm,
+        Wrap(
+          spacing: spacing.sm,
+          runSpacing: spacing.sm,
+          children: [
+            for (final receipt in _keptReceipts)
+              InputChip(
+                avatar: Icon(
+                  Icons.image_outlined,
+                  size: dimensions.iconMd,
+                  color: colors.icon,
+                ),
+                label: Text(l10n.financesReceiptChip),
+                onPressed: () => _previewKept(receipt),
+                onDeleted: _saving ? null : () => _removeKeptReceipt(receipt),
+                deleteIconColor: colors.icon,
+              ),
+            for (var i = 0; i < _pendingReceiptBytes.length; i++)
+              InputChip(
+                avatar: Icon(
+                  Icons.image_outlined,
+                  size: dimensions.iconMd,
+                  color: colors.icon,
+                ),
+                label: Text(l10n.financesReceiptPendingChip(i + 1)),
+                onDeleted: _saving ? null : () => _removePendingReceipt(i),
+                deleteIconColor: colors.icon,
+              ),
+            if (_canAddReceipt)
+              ActionChip(
+                avatar: Icon(
+                  Icons.add_photo_alternate_outlined,
+                  size: dimensions.iconMd,
+                  color: colors.icon,
+                ),
+                label: Text(l10n.financesAddReceipt),
+                onPressed: _saving ? null : _addReceipt,
+              ),
+          ],
+        ),
+      ],
+    );
   }
 
   @override
@@ -247,9 +392,16 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
                     controller: _titleController,
                     style: inputs.textStyle,
                     textCapitalization: TextCapitalization.sentences,
+                    maxLength: 20,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(20),
+                    ],
                     decoration: inputs
                         .decoration(labelText: l10n.financesTitleLabel)
-                        .copyWith(errorText: _titleError),
+                        .copyWith(
+                          errorText: _titleError,
+                          counterText: '',
+                        ),
                   ),
                   spacing.vMd,
                   TextField(
@@ -311,6 +463,8 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
                       ),
                     ),
                   ),
+                  spacing.vXl,
+                  _receiptChips(l10n),
                   if (!_isEditing && _type == FinanceEntryType.expense) ...[
                     spacing.vXl,
                     Text(
@@ -383,7 +537,10 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
                           ? SizedBox(
                               width: dimensions.iconXl,
                               height: dimensions.iconXl,
-                              child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
+                              child: AccessibleProgressIndicator(
+                                strokeWidth: 2,
+                                color: colors.onPrimary,
+                              ),
                             )
                           : Text(l10n.commonSave),
                     ),

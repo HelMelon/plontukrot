@@ -583,6 +583,30 @@
   "financesAsFertilizer": "Dünger",
   "financesAsPurchasedFertilizer": "Fertiges Düngemittel",
   "financesAsReadyMadeSoil": "Fertige Substratmischung",
+  "financesReceiptsLabel": "Belege",
+  "financesAddReceipt": "Beleg hinzufügen",
+  "financesReceiptChip": "Beleg",
+  "financesReceiptPendingChip": "Neuer Beleg {index}",
+  "@financesReceiptPendingChip": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "financesViewReceipts": "Beleg ansehen",
+  "financesReceiptViewerTitle": "Beleg",
+  "financesReceiptViewerTitlePaged": "Beleg {current} von {total}",
+  "@financesReceiptViewerTitlePaged": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "financesReceiptImageLabel": "Beleg {index}",
+  "@financesReceiptImageLabel": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
   "financesPropagationSaleTitle": "Verkauf: {plantName} ×{quantity}",
   "@financesPropagationSaleTitle": {
     "placeholders": {

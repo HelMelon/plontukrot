@@ -36,7 +36,34 @@ enum FinanceEntrySource {
   }
 }
 
+/// Receipt image metadata stored on a finance entry (URL only; no list thumbs).
+class FinanceReceipt {
+  final String id;
+  final String url;
+
+  const FinanceReceipt({
+    required this.id,
+    required this.url,
+  });
+
+  factory FinanceReceipt.fromMap(Map<String, dynamic> data) {
+    return FinanceReceipt(
+      id: (data['id'] as String?)?.trim() ?? '',
+      url: (data['url'] as String?)?.trim() ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'url': url,
+      };
+
+  bool get isValid => id.isNotEmpty && url.isNotEmpty;
+}
+
 class FinanceEntry {
+  static const int maxReceipts = 5;
+
   final String id;
   final String title;
   final double amount;
@@ -48,6 +75,7 @@ class FinanceEntry {
   final String? plantId;
   final String? wishListItemId;
   final int? quantity;
+  final List<FinanceReceipt> receipts;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -63,14 +91,32 @@ class FinanceEntry {
     this.plantId,
     this.wishListItemId,
     this.quantity,
+    this.receipts = const [],
     this.createdAt,
     this.updatedAt,
   });
 
   bool get isIncome => type == FinanceEntryType.income;
   bool get isExpense => type == FinanceEntryType.expense;
+  bool get hasReceipts => receipts.isNotEmpty;
 
   factory FinanceEntry.fromMap(String id, Map<String, dynamic> data) {
+    final rawReceipts = data['receipts'];
+    final receipts = <FinanceReceipt>[];
+    if (rawReceipts is List) {
+      for (final item in rawReceipts) {
+        if (item is Map<String, dynamic>) {
+          final receipt = FinanceReceipt.fromMap(item);
+          if (receipt.isValid) receipts.add(receipt);
+        } else if (item is Map) {
+          final receipt = FinanceReceipt.fromMap(
+            Map<String, dynamic>.from(item),
+          );
+          if (receipt.isValid) receipts.add(receipt);
+        }
+      }
+    }
+
     return FinanceEntry(
       id: id,
       title: data['title'] as String? ?? '',
@@ -83,6 +129,7 @@ class FinanceEntry {
       plantId: data['plantId'] as String?,
       wishListItemId: data['wishListItemId'] as String?,
       quantity: (data['quantity'] as num?)?.toInt(),
+      receipts: receipts,
       createdAt: readTimestamp(data['createdAt']),
       updatedAt: readTimestamp(data['updatedAt']),
     );
@@ -106,6 +153,8 @@ class FinanceEntry {
       if (plantId != null) 'plantId': plantId,
       if (wishListItemId != null) 'wishListItemId': wishListItemId,
       if (quantity != null) 'quantity': quantity,
+      if (receipts.isNotEmpty)
+        'receipts': receipts.map((r) => r.toMap()).toList(),
       if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
       if (updatedAt != null) 'updatedAt': Timestamp.fromDate(updatedAt!),
     };

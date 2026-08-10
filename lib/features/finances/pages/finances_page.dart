@@ -7,6 +7,7 @@ import '../../../core/currency/app_currency_controller.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../models/finance_entry.dart';
 import '../../../services/finance_service.dart';
+import '../widgets/finance_receipt_viewer.dart';
 import '../widgets/sheets/add_finance_entry_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
@@ -292,6 +293,16 @@ class _FinancesPageState extends State<FinancesPage> {
               ],
             ),
           ),
+          if (entry.hasReceipts)
+            IconButton(
+              tooltip: l10n.financesViewReceipts,
+              visualDensity: VisualDensity.compact,
+              icon: const Icon(Icons.image_outlined),
+              onPressed: () => showFinanceReceiptsViewer(
+                context,
+                receipts: entry.receipts,
+              ),
+            ),
           IconButton(
             tooltip: l10n.commonEdit,
             visualDensity: VisualDensity.compact,

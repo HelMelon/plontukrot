@@ -588,6 +588,30 @@
   "financesAsFertilizer": "Удобрение",
   "financesAsPurchasedFertilizer": "Готовое удобрение",
   "financesAsReadyMadeSoil": "Готовый грунт",
+  "financesReceiptsLabel": "Чеки",
+  "financesAddReceipt": "Добавить чек",
+  "financesReceiptChip": "Чек",
+  "financesReceiptPendingChip": "Новый чек {index}",
+  "@financesReceiptPendingChip": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "financesViewReceipts": "Посмотреть чек",
+  "financesReceiptViewerTitle": "Чек",
+  "financesReceiptViewerTitlePaged": "Чек {current} из {total}",
+  "@financesReceiptViewerTitlePaged": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "financesReceiptImageLabel": "Чек {index}",
+  "@financesReceiptImageLabel": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
   "financesPropagationSaleTitle": "Продажа: {plantName} ×{quantity}",
   "@financesPropagationSaleTitle": {
     "placeholders": {

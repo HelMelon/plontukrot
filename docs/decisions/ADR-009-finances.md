@@ -11,7 +11,7 @@ Users need to track plant-related money: sale income from propagation batches, p
 ## Decision
 
 1. **Feature hub `finances`** with UI under `features/finances/`, model `FinanceEntry` in `lib/models/`, service `FinanceService` in `lib/services/`. No Bloc/router.
-2. **Firestore path:** `users/{uid}/financeEntries/{id}` with fields `title`, `amount`, `type` (`income` | `expense`), `source`, `date`, optional `note`, `propagationId`, `wishListItemId`, `quantity`, timestamps. Covered by existing owner rules on `users/{userId}/**`.
+2. **Firestore path:** `users/{uid}/financeEntries/{id}` with fields `title`, `amount`, `type` (`income` | `expense`), `source`, `date`, optional `note`, `propagationId`, `wishListItemId`, `quantity`, optional `receipts` (`[{id, url}]`, see ADR-028), timestamps. Covered by existing owner rules on `users/{userId}/**`.
 3. **Sources that create entries:**
    - manual income/expense from the finances page;
    - propagation **sold** → income (quantity + amount);

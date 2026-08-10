@@ -852,6 +852,30 @@
   "financesAsFertilizer": "Fertilizer",
   "financesAsPurchasedFertilizer": "Ready-made fertilizer",
   "financesAsReadyMadeSoil": "Ready-made soil mix",
+  "financesReceiptsLabel": "Receipts",
+  "financesAddReceipt": "Add receipt",
+  "financesReceiptChip": "Receipt",
+  "financesReceiptPendingChip": "New receipt {index}",
+  "@financesReceiptPendingChip": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "financesViewReceipts": "View receipt",
+  "financesReceiptViewerTitle": "Receipt",
+  "financesReceiptViewerTitlePaged": "Receipt {current} of {total}",
+  "@financesReceiptViewerTitlePaged": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "financesReceiptImageLabel": "Receipt {index}",
+  "@financesReceiptImageLabel": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
   "financesPropagationSaleTitle": "Sale: {plantName} ×{quantity}",
   "@financesPropagationSaleTitle": {
     "placeholders": {

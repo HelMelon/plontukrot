@@ -1702,6 +1702,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get financesAsReadyMadeSoil => 'Ready-made soil mix';
 
   @override
+  String get financesReceiptsLabel => 'Receipts';
+
+  @override
+  String get financesAddReceipt => 'Add receipt';
+
+  @override
+  String get financesReceiptChip => 'Receipt';
+
+  @override
+  String financesReceiptPendingChip(int index) {
+    return 'New receipt $index';
+  }
+
+  @override
+  String get financesViewReceipts => 'View receipt';
+
+  @override
+  String get financesReceiptViewerTitle => 'Receipt';
+
+  @override
+  String financesReceiptViewerTitlePaged(int current, int total) {
+    return 'Receipt $current of $total';
+  }
+
+  @override
+  String financesReceiptImageLabel(int index) {
+    return 'Receipt $index';
+  }
+
+  @override
   String financesPropagationSaleTitle(String plantName, int quantity) {
     return 'Sale: $plantName ×$quantity';
   }

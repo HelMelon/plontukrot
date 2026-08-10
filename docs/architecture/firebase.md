@@ -240,8 +240,9 @@ CLI scripts talk to Firestore REST with Application Default Credentials (`gcloud
 |--------|---------|
 | `tools/export_plants.dart` | Backup `users/{uid}/plants` (+ subcollections) to JSON |
 | `tools/cleanup_migration_flags.dart` | Delete obsolete `careHistoryMigrated` / `botanicalFieldsMigrated` on plant docs |
+| `tools/cleanup_orphan_plant_species.dart` | Delete `plantSpecies/{id}` not referenced by any plant |
 
-Cleanup (preview, then apply):
+Cleanup migration flags (preview, then apply):
 
 ```bash
 dart run tools/cleanup_migration_flags.dart --dry-run
@@ -250,3 +251,12 @@ dart run tools/cleanup_migration_flags.dart --uid=<uid>
 ```
 
 Does not remove legacy plant keys `name` / `family` (readers still accept them).
+
+Cleanup orphan shared species catalog (preview, then apply):
+
+```bash
+dart run tools/cleanup_orphan_plant_species.dart --dry-run
+dart run tools/cleanup_orphan_plant_species.dart
+```
+
+Keeps `plantSpecies` docs whose id matches `docIdFor(species|name)` on any `users/*/plants/*`. Orphans left after account deletion or renames are removed. Next `ensureSpecies` recreates a row if the name is used again.

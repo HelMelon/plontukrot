@@ -3180,6 +3180,54 @@ abstract class AppLocalizations {
   /// **'Ready-made soil mix'**
   String get financesAsReadyMadeSoil;
 
+  /// No description provided for @financesReceiptsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipts'**
+  String get financesReceiptsLabel;
+
+  /// No description provided for @financesAddReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Add receipt'**
+  String get financesAddReceipt;
+
+  /// No description provided for @financesReceiptChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt'**
+  String get financesReceiptChip;
+
+  /// No description provided for @financesReceiptPendingChip.
+  ///
+  /// In en, this message translates to:
+  /// **'New receipt {index}'**
+  String financesReceiptPendingChip(int index);
+
+  /// No description provided for @financesViewReceipts.
+  ///
+  /// In en, this message translates to:
+  /// **'View receipt'**
+  String get financesViewReceipts;
+
+  /// No description provided for @financesReceiptViewerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt'**
+  String get financesReceiptViewerTitle;
+
+  /// No description provided for @financesReceiptViewerTitlePaged.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt {current} of {total}'**
+  String financesReceiptViewerTitlePaged(int current, int total);
+
+  /// No description provided for @financesReceiptImageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt {index}'**
+  String financesReceiptImageLabel(int index);
+
   /// No description provided for @financesPropagationSaleTitle.
   ///
   /// In en, this message translates to:

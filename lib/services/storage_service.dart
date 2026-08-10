@@ -197,6 +197,62 @@ class StorageService {
     await _deleteRefRecursive(root);
   }
 
+  // --- Finance receipts (same Storage root as plant photos) ---
+
+  /// Folder id under `plants/{uid}/` for receipt JPEGs.
+  static const financeReceiptsFolder = '_receipts';
+
+  Reference _financeReceiptRef(String entryId, String receiptId) {
+    return _storage
+        .ref()
+        .child('plants')
+        .child(uid)
+        .child(financeReceiptsFolder)
+        .child('${entryId}_$receiptId.jpg');
+  }
+
+  /// Uploads a receipt JPEG (full image only — list UI never shows thumbs).
+  Future<({String receiptId, String url})> uploadFinanceReceipt({
+    required Uint8List imageBytes,
+    required String entryId,
+    String? receiptId,
+  }) async {
+    try {
+      final id = (receiptId != null && receiptId.trim().isNotEmpty)
+          ? receiptId.trim()
+          : DateTime.now().microsecondsSinceEpoch.toString();
+      final metadata = SettableMetadata(contentType: 'image/jpeg');
+      final ref = _financeReceiptRef(entryId, id);
+      await ref.putData(imageBytes, metadata);
+      final url = await ref.getDownloadURL();
+      return (receiptId: id, url: url);
+    } catch (error, stack) {
+      await AppCrashReporting.instance.recordError(
+        error,
+        stack,
+        reason: 'storage_upload_finance_receipt_failed',
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> deleteFinanceReceipt({
+    required String entryId,
+    required String receiptId,
+  }) async {
+    await _deleteQuietly(_financeReceiptRef(entryId, receiptId));
+  }
+
+  Future<void> deleteFinanceReceipts({
+    required String entryId,
+    required Iterable<String> receiptIds,
+  }) async {
+    await Future.wait([
+      for (final id in receiptIds.toSet())
+        deleteFinanceReceipt(entryId: entryId, receiptId: id),
+    ]);
+  }
+
   Future<void> _deleteRefRecursive(Reference ref) async {
     final listed = await ref.listAll();
     await Future.wait([

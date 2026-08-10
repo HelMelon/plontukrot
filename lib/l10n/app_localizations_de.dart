@@ -1714,6 +1714,36 @@ class AppLocalizationsDe extends AppLocalizations {
   String get financesAsReadyMadeSoil => 'Fertige Substratmischung';
 
   @override
+  String get financesReceiptsLabel => 'Belege';
+
+  @override
+  String get financesAddReceipt => 'Beleg hinzufügen';
+
+  @override
+  String get financesReceiptChip => 'Beleg';
+
+  @override
+  String financesReceiptPendingChip(int index) {
+    return 'Neuer Beleg $index';
+  }
+
+  @override
+  String get financesViewReceipts => 'Beleg ansehen';
+
+  @override
+  String get financesReceiptViewerTitle => 'Beleg';
+
+  @override
+  String financesReceiptViewerTitlePaged(int current, int total) {
+    return 'Beleg $current von $total';
+  }
+
+  @override
+  String financesReceiptImageLabel(int index) {
+    return 'Beleg $index';
+  }
+
+  @override
   String financesPropagationSaleTitle(String plantName, int quantity) {
     return 'Verkauf: $plantName ×$quantity';
   }
