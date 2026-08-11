@@ -40,16 +40,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // Wallpaper sits above [runApp] and below [MaterialApp] so route changes
     // only rebuild the navigator layer — the tile is painted once and kept
-    // in its own [RepaintBoundary].
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        const RepaintBoundary(child: _AppTiledBackground()),
-        ListenableBuilder(
-          listenable: AppLocaleController.instance,
-          builder: (context, _) {
-            final localeOverride = AppLocaleController.instance.localeOverride;
-            return MaterialApp(
+    // in its own [RepaintBoundary]. Use non-directional [Alignment] so this
+    // [Stack] does not need a [Directionality] ancestor outside [MaterialApp].
+    return ListenableBuilder(
+      listenable: AppLocaleController.instance,
+      builder: (context, _) {
+        final localeOverride = AppLocaleController.instance.localeOverride;
+        return Stack(
+          alignment: Alignment.topLeft,
+          fit: StackFit.expand,
+          children: [
+            const RepaintBoundary(child: _AppTiledBackground()),
+            MaterialApp(
               debugShowCheckedModeBanner: false,
               color: Colors.transparent,
               theme: AppTheme.theme,
@@ -72,10 +74,10 @@ class MyApp extends StatelessWidget {
                 );
               },
               home: const AppStartup(),
-            );
-          },
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
 }

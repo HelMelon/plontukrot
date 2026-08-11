@@ -12,6 +12,7 @@ import '../../../core/currency/app_currency_controller.dart';
 import '../../../core/locale/app_locale_controller.dart';
 import '../../../core/privacy/privacy_constants.dart';
 import '../../../core/theme/theme_context.dart';
+import '../../../core/widgets/app_bar_chrome_actions.dart';
 import '../../../core/widgets/prompt_text_dialog.dart';
 import '../../../models/app_user.dart';
 import '../../../models/plant.dart';
@@ -290,6 +291,11 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: Text(l10n.profileTitle),
+        actions: buildAppBarChromeActions(
+          context,
+          user: widget.user,
+          showProfile: false,
+        ),
       ),
       body: Stack(
         children: [

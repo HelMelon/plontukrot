@@ -14,6 +14,7 @@ import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../plants/widgets/sheets/propagation_details_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/app_bar_chrome_actions.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
 
 /// Active propagation hub. Archived batches live on [PlantArchivePage].
@@ -382,6 +383,7 @@ class _PropagationsPageState extends State<PropagationsPage> {
                       l10n.propagationTitle,
                       style: typography.titleMedium,
                     ),
+                    actions: buildAppBarChromeActions(context),
                   ),
                   body: Column(
                     children: [

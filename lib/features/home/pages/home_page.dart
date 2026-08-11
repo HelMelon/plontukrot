@@ -13,6 +13,7 @@ import 'package:plontukrot/core/theme/tokens/app_radii_tokens.dart';
 import 'package:plontukrot/core/theme/tokens/app_spacing_tokens.dart';
 import 'package:plontukrot/core/theme/tokens/app_typography_tokens.dart';
 import 'package:plontukrot/core/theme/screens/app_screen_themes.dart';
+import '../../../core/widgets/app_bar_chrome_actions.dart';
 import '../../../core/widgets/prompt_text_dialog.dart';
 import '../../../models/app_user.dart';
 import '../../../models/plant.dart';
@@ -29,16 +30,13 @@ import '../../plants/pages/plant_archive_page.dart';
 import '../../plants/pages/plant_genus_details_page.dart';
 import '../../plants/pages/plant_stage_details_page.dart';
 import '../../plants/widgets/cards/plant_card.dart';
-import '../../plants/widgets/search/plant_search_delegate.dart';
 import '../../finances/pages/finances_page.dart';
 import '../../propagations/pages/propagations_page.dart';
-import '../../profile/pages/profile_page.dart';
 import '../../wish_list/pages/wish_list_page.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
-import 'package:plontukrot/core/widgets/focusable_tap.dart';
 
 enum _PlantSortField {
   species,
@@ -870,61 +868,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildHomeSearchField(AppLocalizations l10n) {
+  List<Widget> _buildHomeHubActions(AppLocalizations l10n) {
     final colors = _colors;
-    final spacing = _spacing;
-    final radii = _radii;
-    final typography = _typography;
-
-    return Padding(
-      padding: EdgeInsets.only(
-        left: spacing.md,
-        right: spacing.md,
-        bottom: spacing.sm,
-      ),
-      child: Semantics(
-        button: true,
-        label: l10n.a11yOpenSearch,
-        child: FocusableTap(
-          borderRadius: radii.mdAll,
-          onTap: () {
-            showSearch(
-              context: context,
-              delegate: PlantSearchDelegate(
-                searchFieldLabel: l10n.homeSearchHint,
-              ),
-            );
-          },
-          child: ExcludeSemantics(
-            child: AbsorbPointer(
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: l10n.homeSearchHint,
-                  hintStyle: typography.bodySmall,
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: colors.textSecondary,
-                  ),
-                  filled: true,
-                  fillColor: colors.heading.withValues(alpha: 0.05),
-                  contentPadding: EdgeInsets.symmetric(vertical: spacing.sm),
-                  border: OutlineInputBorder(
-                    borderRadius: radii.mdAll,
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  List<Widget> _buildHomeNavActions(AppLocalizations l10n) {
-    final colors = _colors;
-    final spacing = _spacing;
-    final avatarSize = _homeTheme.avatarSize;
 
     return [
       IconButton(
@@ -980,47 +925,6 @@ class _HomePageState extends State<HomePage> {
           color: colors.icon,
         ),
       ),
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: spacing.xxs),
-        child: Center(
-          child: Semantics(
-            button: true,
-            label: l10n.a11yOpenProfile,
-            child: Tooltip(
-              message: l10n.profileTitle,
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => ProfilePage(user: widget.user),
-                    ),
-                  );
-                },
-                child: SizedBox(
-                  width: avatarSize,
-                  height: avatarSize,
-                  child: ClipOval(
-                    child: ExcludeSemantics(
-                      child: widget.user.photoUrl != null &&
-                              widget.user.photoUrl!.isNotEmpty
-                          ? Image.network(
-                              widget.user.photoUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Icon(
-                                Icons.person,
-                                color: colors.icon,
-                              ),
-                            )
-                          : Icon(Icons.person, color: colors.icon),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
     ];
   }
 
@@ -1028,10 +932,14 @@ class _HomePageState extends State<HomePage> {
     AppLocalizations l10n, {
     required bool isWide,
   }) {
-    final navActions = _buildHomeNavActions(l10n);
+    final hubActions = _buildHomeHubActions(l10n);
+    final trailingActions = buildAppBarChromeActions(
+      context,
+      user: widget.user,
+    );
 
     return AppBar(
-      backgroundColor: _colors.screen,
+      backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       centerTitle: false,
@@ -1044,22 +952,21 @@ class _HomePageState extends State<HomePage> {
           style: _homeTheme.brandStyle,
         ),
       ),
-      actions: isWide ? navActions : null,
-      bottom: PreferredSize(
-        preferredSize: Size.fromHeight(isWide ? 64 : 120),
-        child: isWide
-            ? _buildHomeSearchField(l10n)
-            : Column(
+      // Title left; search + avatar (and hubs on wide) opposite side.
+      actions: [
+        if (isWide) ...hubActions,
+        ...trailingActions,
+      ],
+      bottom: isWide
+          ? null
+          : PreferredSize(
+              preferredSize: Size.fromHeight(_spacing.xxxl + _spacing.md),
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      for (final action in navActions) Expanded(child: action),
-                    ],
-                  ),
-                  _buildHomeSearchField(l10n),
+                  for (final action in hubActions) Expanded(child: action),
                 ],
               ),
-      ),
+            ),
     );
   }
 

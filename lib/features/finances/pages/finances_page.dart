@@ -10,6 +10,7 @@ import '../../../services/finance_service.dart';
 import '../widgets/finance_receipt_viewer.dart';
 import '../widgets/sheets/add_finance_entry_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/app_bar_chrome_actions.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class FinancesPage extends StatefulWidget {
@@ -369,6 +370,7 @@ class _FinancesPageState extends State<FinancesPage> {
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             title: Text(l10n.financesTitle),
+            actions: buildAppBarChromeActions(context),
           ),
           floatingActionButton: FloatingActionButton(
             tooltip: l10n.financesAdd,

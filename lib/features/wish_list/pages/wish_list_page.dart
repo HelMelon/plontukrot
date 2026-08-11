@@ -13,6 +13,7 @@ import '../../../services/wish_list_service.dart';
 import '../widgets/sheets/add_wish_list_item_sheet.dart';
 import '../widgets/sheets/wish_list_acquire_sheet.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/app_bar_chrome_actions.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
 
 class WishListPage extends StatefulWidget {
@@ -261,6 +262,7 @@ class _WishListPageState extends State<WishListPage> {
                   )
                 : Icon(Icons.ios_share_outlined, color: colors.icon),
           ),
+          ...buildAppBarChromeActions(context),
         ],
       ),
       floatingActionButton: FloatingActionButton(

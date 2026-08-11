@@ -3,6 +3,7 @@ import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import 'package:plontukrot/core/theme/theme_context.dart';
+import 'package:plontukrot/core/widgets/app_bar_chrome_actions.dart';
 
 import '../../../models/plant.dart';
 import '../../../services/plant_service.dart';
@@ -57,6 +58,7 @@ class _PlantStageDetailsPageState extends State<PlantStageDetailsPage> {
           overflow: TextOverflow.ellipsis,
           style: typography.titleMedium,
         ),
+        actions: buildAppBarChromeActions(context),
       ),
       body: StreamBuilder<List<Plant>>(
         stream: _plantsStream,

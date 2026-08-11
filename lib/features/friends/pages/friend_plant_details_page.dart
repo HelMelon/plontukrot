@@ -3,6 +3,7 @@ import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../core/theme/theme_context.dart';
+import '../../../core/widgets/app_bar_chrome_actions.dart';
 import '../../../models/plant.dart';
 import '../../../models/stage_info.dart';
 import '../../../services/plant_service.dart';
@@ -37,7 +38,9 @@ class FriendPlantDetailsPage extends StatelessWidget {
         if (snapshot.hasError) {
           return Scaffold(
             backgroundColor: Colors.transparent,
-            appBar: AppBar(),
+            appBar: AppBar(
+              actions: buildAppBarChromeActions(context),
+            ),
             body: Center(
               child: Text(
                 l10n.commonError(snapshot.error.toString()),
@@ -49,7 +52,9 @@ class FriendPlantDetailsPage extends StatelessWidget {
         if (!snapshot.hasData) {
           return Scaffold(
             backgroundColor: Colors.transparent,
-            appBar: AppBar(),
+            appBar: AppBar(
+              actions: buildAppBarChromeActions(context),
+            ),
             body: Center(
               child: AccessibleProgressIndicator(color: colors.primary),
             ),
@@ -59,7 +64,9 @@ class FriendPlantDetailsPage extends StatelessWidget {
         if (plant == null) {
           return Scaffold(
             backgroundColor: Colors.transparent,
-            appBar: AppBar(),
+            appBar: AppBar(
+              actions: buildAppBarChromeActions(context),
+            ),
             body: Center(
               child: Text(
                 l10n.friendsCollectionEmpty,
@@ -85,6 +92,7 @@ class FriendPlantDetailsPage extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
+            actions: buildAppBarChromeActions(context),
           ),
           body: ListView(
             padding: EdgeInsets.all(spacing.lg),

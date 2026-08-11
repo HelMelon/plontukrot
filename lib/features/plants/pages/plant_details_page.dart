@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import 'package:plontukrot/core/theme/theme_context.dart';
+import 'package:plontukrot/core/widgets/app_bar_chrome_actions.dart';
 
 import '../../../models/growth_event.dart';
 import '../../../models/plant.dart';
@@ -504,6 +505,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               overflow: TextOverflow.ellipsis,
               style: titleStyle,
             ),
+            actions: buildAppBarChromeActions(context),
             // Keep actions in a dedicated bar so web/wide layouts do not clip
             // trailing icons (gift/archive) from AppBar.actions.
             bottom: PreferredSize(

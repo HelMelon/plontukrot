@@ -3,6 +3,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../core/theme/theme_context.dart';
+import '../../../core/widgets/app_bar_chrome_actions.dart';
 import '../../../models/collection_visibility.dart';
 import '../../../models/friendship.dart';
 import '../../../models/wish_list_item.dart';
@@ -83,6 +84,7 @@ class _FriendWishListPageState extends State<FriendWishListPage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
+        actions: buildAppBarChromeActions(context),
       ),
       body: FutureBuilder<Map<String, dynamic>?>(
         future: _profileFuture,

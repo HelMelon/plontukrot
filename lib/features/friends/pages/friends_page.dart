@@ -4,6 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../core/theme/theme_context.dart';
+import '../../../core/widgets/app_bar_chrome_actions.dart';
 import '../../../models/collection_visibility.dart';
 import '../../../models/friend_request.dart';
 import '../../../models/friendship.dart';
@@ -171,7 +172,10 @@ class _FriendsPageState extends State<FriendsPage> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(title: Text(l10n.friendsTitle)),
+      appBar: AppBar(
+        title: Text(l10n.friendsTitle),
+        actions: buildAppBarChromeActions(context),
+      ),
       body: ListView(
         padding: EdgeInsets.all(spacing.lg),
         children: [

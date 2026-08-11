@@ -16,6 +16,7 @@ import '../widgets/common/plant_network_image.dart';
 import '../widgets/sheets/propagation_details_sheet.dart';
 import 'plant_details_page.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/app_bar_chrome_actions.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
 
 /// Unified archive: archived plants and archived propagation batches.
@@ -479,6 +480,7 @@ class _PlantArchivePageState extends State<PlantArchivePage>
                 surfaceTintColor: Colors.transparent,
                 elevation: 0,
                 title: Text(l10n.plantArchiveTitle),
+                actions: buildAppBarChromeActions(context),
                 bottom: TabBar(
                   controller: _tabController,
                   indicatorColor: colors.primary,
