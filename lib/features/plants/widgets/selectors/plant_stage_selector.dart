@@ -15,6 +15,8 @@ class PlantStageSelector extends StatelessWidget {
     required this.onChanged,
   });
 
+  bool _hasStageDescription(int stage) => stage >= 1 && stage <= 4;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -23,6 +25,7 @@ class PlantStageSelector extends StatelessWidget {
       (e) => e.value == selectedStage,
       orElse: () => stageInfos.first,
     );
+    final showDescription = _hasStageDescription(selectedStage);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -34,14 +37,16 @@ class PlantStageSelector extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                flex: 2,
+                flex: showDescription ? 2 : 1,
                 child: _buildSelector(l10n),
               ),
-              SizedBox(width: spacing.xl),
-              Expanded(
-                flex: 3,
-                child: _buildDescription(stage, context, l10n),
-              ),
+              if (showDescription) ...[
+                SizedBox(width: spacing.xl),
+                Expanded(
+                  flex: 3,
+                  child: _buildDescription(stage, context, l10n),
+                ),
+              ],
             ],
           );
         }
@@ -50,8 +55,10 @@ class PlantStageSelector extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSelector(l10n),
-            spacing.vMd,
-            _buildDescription(stage, context, l10n),
+            if (showDescription) ...[
+              spacing.vMd,
+              _buildDescription(stage, context, l10n),
+            ],
           ],
         );
       },
@@ -84,28 +91,40 @@ class PlantStageSelector extends StatelessWidget {
   ) {
     final spacing = context.spacing;
     final typography = context.typography;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.stageDescriptionTitle,
-          style: typography.titleMedium,
+    return ExpansionTile(
+      tilePadding: EdgeInsets.zero,
+      childrenPadding: EdgeInsets.only(bottom: spacing.xs),
+      shape: const Border(),
+      collapsedShape: const Border(),
+      title: Text(
+        l10n.stageDescriptionTitle,
+        style: typography.label.copyWith(
+          color: context.colors.textSecondary,
         ),
-        spacing.vXs,
-        ...l10n.stageChecklist(stage.value).map(
-              (text) => Padding(
-                padding: EdgeInsets.only(bottom: spacing.xxs + 1),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('• ', style: typography.bodyLarge),
-                    Expanded(
-                      child: Text(text, style: typography.bodyLarge),
+      ),
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ...l10n.stageChecklist(stage.value).map(
+                    (text) => Padding(
+                      padding: EdgeInsets.only(bottom: spacing.xxs + 1),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('• ', style: typography.bodyLarge),
+                          Expanded(
+                            child: Text(text, style: typography.bodyLarge),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
-            ),
+                  ),
+            ],
+          ),
+        ),
       ],
     );
   }

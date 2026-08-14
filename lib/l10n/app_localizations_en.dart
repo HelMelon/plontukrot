@@ -695,6 +695,87 @@ class AppLocalizationsEn extends AppLocalizations {
   String get plantInvalidWateringFrequency => 'Invalid watering frequency';
 
   @override
+  String get plantFertilizingFrequency => 'Fertilizing frequency';
+
+  @override
+  String get plantFertilizingFrequencyDays => 'Interval (days)';
+
+  @override
+  String get plantFertilizingStop => 'Do not fertilize (STOP)';
+
+  @override
+  String get plantFertilizingResetAuto => 'Reset to automatic';
+
+  @override
+  String get plantFertilizingFrequencyHint =>
+      'These are average intervals by stage and season. You can adjust them for a specific plant. Enter 0 to skip fertilizing.';
+
+  @override
+  String get plantInvalidFertilizingFrequency =>
+      'Enter 1–180 days or select STOP';
+
+  @override
+  String get fertilizingStageGenitiveStart => 'start';
+
+  @override
+  String get fertilizingStageGenitiveBaby => 'baby plant';
+
+  @override
+  String get fertilizingStageGenitiveJuvenile => 'juvenile';
+
+  @override
+  String get fertilizingStageGenitiveAdult => 'adult';
+
+  @override
+  String get fertilizingReminderEveTitle => 'Fertilizing reminder';
+
+  @override
+  String fertilizingReminderEveBody(String stage) {
+    return 'Tomorrow: fertilize $stage';
+  }
+
+  @override
+  String fertilizingReminderDayTitle(String name) {
+    return 'Fertilize $name';
+  }
+
+  @override
+  String fertilizingReminderDayTitleStage(String stage) {
+    return 'Fertilize $stage';
+  }
+
+  @override
+  String get fertilizingReminderDayBody =>
+      'Time to fertilize. Tap Accept when done.';
+
+  @override
+  String get fertilizingReminderAccept => 'Accepted';
+
+  @override
+  String get settingsFertilizingSeason => 'Fertilizing season';
+
+  @override
+  String get settingsSeasonNorthern => 'Northern hemisphere (Apr–Sep active)';
+
+  @override
+  String get settingsSeasonSouthern => 'Southern hemisphere (Oct–Mar active)';
+
+  @override
+  String get settingsSeasonCustom => 'Custom months';
+
+  @override
+  String get settingsSeasonSpringStart => 'Active season starts (month)';
+
+  @override
+  String get settingsSeasonSpringEnd => 'Active season ends (month)';
+
+  @override
+  String get settingsNotifications => 'Notifications';
+
+  @override
+  String get settingsNotificationsEnable => 'Allow fertilizing reminders';
+
+  @override
   String get plantUntitled => 'Untitled';
 
   @override

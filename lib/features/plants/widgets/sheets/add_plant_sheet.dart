@@ -4,8 +4,11 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/variegation.dart';
+import '../../../../core/season/fertilizing_season_controller.dart';
+import '../../../../models/fertilizing_frequency.dart';
 import '../../../../services/plant_service.dart';
 import '../../../../services/wish_list_service.dart';
+import '../selectors/fertilizing_frequency_field.dart';
 import '../selectors/plant_stage_selector.dart';
 import '../selectors/plant_variegation_selector.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -39,6 +42,8 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
   bool isLoading = false;
   int selectedStage = 0;
   Variegation selectedVariegation = Variegation.none;
+  int? fertilizingFrequencyDays;
+  bool isFertilizingFrequencyCustom = false;
   String? genusError;
   String? speciesError;
 
@@ -54,6 +59,12 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
     );
     wateringFrequencyController = TextEditingController();
     initialLeafCountController = TextEditingController(text: '0');
+    fertilizingFrequencyDays = resolveFertilizingFrequencyDays(
+      stage: selectedStage,
+      seasonSettings: FertilizingSeasonController.instance.settings,
+      isCustom: false,
+      currentFrequencyDays: null,
+    );
   }
 
   @override
@@ -144,6 +155,16 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
       return;
     }
 
+    if (fertilizingFrequencyDays != null &&
+        fertilizingFrequencyDays != fertilizingFrequencyStop &&
+        (fertilizingFrequencyDays! < 1 ||
+            fertilizingFrequencyDays! > 180)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.plantInvalidFertilizingFrequency)),
+      );
+      return;
+    }
+
     if (mounted) {
       setState(() {
         isLoading = true;
@@ -163,6 +184,8 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
         nickname: nickname,
         stage: selectedStage,
         initialLeafCount: initialLeafCount,
+        fertilizingFrequencyDays: fertilizingFrequencyDays,
+        isFertilizingFrequencyCustom: isFertilizingFrequencyCustom,
       );
 
       final wishListItemId = widget.wishListItemId;
@@ -329,7 +352,31 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             onChanged: (value) {
                               setState(() {
                                 selectedStage = value;
+                                if (!isFertilizingFrequencyCustom) {
+                                  fertilizingFrequencyDays =
+                                      resolveFertilizingFrequencyDays(
+                                    stage: value,
+                                    seasonSettings: FertilizingSeasonController
+                                        .instance.settings,
+                                    isCustom: false,
+                                    currentFrequencyDays: null,
+                                  );
+                                }
                               });
+                            },
+                          ),
+                          spacing.vMd,
+                          FertilizingFrequencyField(
+                            stage: selectedStage,
+                            frequencyDays: fertilizingFrequencyDays,
+                            isCustom: isFertilizingFrequencyCustom,
+                            onFrequencyChanged: (value) {
+                              setState(() => fertilizingFrequencyDays = value);
+                            },
+                            onCustomChanged: (value) {
+                              setState(
+                                () => isFertilizingFrequencyCustom = value,
+                              );
                             },
                           ),
                           spacing.vMd,

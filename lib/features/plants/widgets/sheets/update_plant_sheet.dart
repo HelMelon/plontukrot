@@ -6,7 +6,10 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../models/plant.dart';
 import '../../../../models/plant_member.dart';
 import '../../../../models/variegation.dart';
+import '../../../../core/season/fertilizing_season_controller.dart';
+import '../../../../models/fertilizing_frequency.dart';
 import '../../../../services/plant_service.dart';
+import '../selectors/fertilizing_frequency_field.dart';
 import '../selectors/plant_stage_selector.dart';
 import '../selectors/plant_variegation_selector.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -55,6 +58,8 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   bool isLoading = false;
   int selectedStage = 0;
   Variegation selectedVariegation = Variegation.none;
+  int? fertilizingFrequencyDays;
+  bool isFertilizingFrequencyCustom = false;
   String? genusError;
   String? speciesError;
 
@@ -78,6 +83,18 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     }
     initialLeafCountController.text = widget.plant.initialLeafCount.toString();
     selectedStage = widget.plant.stage;
+    isFertilizingFrequencyCustom = widget.plant.isFertilizingFrequencyCustom;
+    // Legacy plants predate the frequency field (null in Firestore). For
+    // non-custom plants, resolve the auto value from the current season/stage
+    // instead of showing a bare STOP.
+    fertilizingFrequencyDays = isFertilizingFrequencyCustom
+        ? widget.plant.fertilizingFrequencyDays
+        : resolveFertilizingFrequencyDays(
+            stage: selectedStage,
+            seasonSettings: FertilizingSeasonController.instance.settings,
+            isCustom: false,
+            currentFrequencyDays: null,
+          );
     selectedVariegation = widget.plant.variegation;
 
     _members = widget.plant.members.map((member) {
@@ -190,6 +207,16 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
       return;
     }
 
+    if (fertilizingFrequencyDays != null &&
+        fertilizingFrequencyDays != fertilizingFrequencyStop &&
+        (fertilizingFrequencyDays! < 1 ||
+            fertilizingFrequencyDays! > 180)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.plantInvalidFertilizingFrequency)),
+      );
+      return;
+    }
+
     List<PlantMember>? members;
     if (_isGroup) {
       members = _members
@@ -231,6 +258,8 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
         initialLeafCount: initialLeafCount,
         stage: selectedStage,
         members: members,
+        fertilizingFrequencyDays: fertilizingFrequencyDays,
+        isFertilizingFrequencyCustom: isFertilizingFrequencyCustom,
       );
 
       if (mounted) {
@@ -421,7 +450,33 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                           PlantStageSelector(
                             selectedStage: selectedStage,
                             onChanged: (value) {
-                              setState(() => selectedStage = value);
+                              setState(() {
+                                selectedStage = value;
+                                if (!isFertilizingFrequencyCustom) {
+                                  fertilizingFrequencyDays =
+                                      resolveFertilizingFrequencyDays(
+                                    stage: value,
+                                    seasonSettings: FertilizingSeasonController
+                                        .instance.settings,
+                                    isCustom: false,
+                                    currentFrequencyDays: null,
+                                  );
+                                }
+                              });
+                            },
+                          ),
+                          spacing.vMd,
+                          FertilizingFrequencyField(
+                            stage: selectedStage,
+                            frequencyDays: fertilizingFrequencyDays,
+                            isCustom: isFertilizingFrequencyCustom,
+                            onFrequencyChanged: (value) {
+                              setState(() => fertilizingFrequencyDays = value);
+                            },
+                            onCustomChanged: (value) {
+                              setState(
+                                () => isFertilizingFrequencyCustom = value,
+                              );
                             },
                           ),
                           spacing.vMd,

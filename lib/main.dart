@@ -11,6 +11,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import 'core/currency/app_currency_controller.dart';
 import 'core/keyboard/app_keyboard.dart';
 import 'core/locale/app_locale_controller.dart';
+import 'core/season/fertilizing_season_controller.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_context.dart';
 import 'features/auth/pages/email_verification_page.dart';
@@ -22,7 +23,9 @@ import 'firebase_options.dart';
 import 'models/app_user.dart';
 import 'services/app_crash_reporting.dart';
 import 'services/auth_service.dart';
+import 'services/fertilizing_notification_service.dart';
 import 'services/gift_service.dart';
+import 'services/plant_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 Future<void> main() async {
@@ -30,6 +33,7 @@ Future<void> main() async {
   SemanticsBinding.instance.ensureSemantics();
   await AppLocaleController.instance.load();
   await AppCurrencyController.instance.load();
+  await FertilizingSeasonController.instance.load();
   runApp(const MyApp());
 }
 
@@ -180,6 +184,8 @@ class _AppStartupState extends State<AppStartup> {
 
       await initializeDateFormatting(resolved.languageCode);
       Intl.defaultLocale = resolved.languageCode;
+      await FertilizingNotificationService.instance.initialize();
+      unawaited(FertilizingNotificationService.instance.requestPermission());
       if (!mounted) return;
       setState(() {
         _progress = 1;
@@ -361,6 +367,13 @@ class _AuthenticatedShellState extends State<_AuthenticatedShell> {
   Future<void> _syncPreferences() async {
     await AppLocaleController.instance.syncWithCloud();
     await AppCurrencyController.instance.syncWithCloud();
+    await FertilizingSeasonController.instance.syncWithCloud();
+    await FertilizingNotificationService.instance.initialize();
+    unawaited(FertilizingNotificationService.instance.requestPermission());
+    // Backfill auto frequency for legacy plants (null in Firestore) and
+    // re-sync any that drifted from the current season.
+    unawaited(PlantService().recalculateAutoFertilizingFrequencies());
+    unawaited(FertilizingNotificationService.instance.rescheduleAllActivePlants());
   }
 
   @override

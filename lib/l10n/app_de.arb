@@ -242,6 +242,45 @@
   "plantGenusRequired": "Gattung der Pflanze eingeben",
   "plantSpeciesRequired": "Art der Pflanze eingeben",
   "plantInvalidWateringFrequency": "Ungültige Gießhäufigkeit",
+  "plantFertilizingFrequency": "Düngungsintervall",
+  "plantFertilizingFrequencyDays": "Intervall (Tage)",
+  "plantFertilizingStop": "Nicht düngen (STOP)",
+  "plantFertilizingResetAuto": "Automatisch zurücksetzen",
+  "plantFertilizingFrequencyHint": "Das sind Durchschnittswerte nach Stufe und Saison. Für einzelne Pflanzen können Sie sie anpassen. 0 — nicht düngen.",
+  "plantInvalidFertilizingFrequency": "1–180 Tage eingeben oder STOP wählen",
+  "fertilizingStageGenitiveStart": "Start",
+  "fertilizingStageGenitiveBaby": "Baby",
+  "fertilizingStageGenitiveJuvenile": "Juvenil",
+  "fertilizingStageGenitiveAdult": "Erwachsen",
+  "fertilizingReminderEveTitle": "Düngungserinnerung",
+  "fertilizingReminderEveBody": "Morgen: {stage} düngen",
+  "@fertilizingReminderEveBody": {
+    "placeholders": {
+      "stage": {"type": "String"}
+    }
+  },
+  "fertilizingReminderDayTitle": "Düngen: {name}",
+  "@fertilizingReminderDayTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "fertilizingReminderDayTitleStage": "Düngen: {stage}",
+  "@fertilizingReminderDayTitleStage": {
+    "placeholders": {
+      "stage": {"type": "String"}
+    }
+  },
+  "fertilizingReminderDayBody": "Heute ist Düngungstag. Tippen Sie auf «Akzeptiert», wenn erledigt.",
+  "fertilizingReminderAccept": "Akzeptiert",
+  "settingsFertilizingSeason": "Düngungssaison",
+  "settingsSeasonNorthern": "Nördliche Hemisphäre (aktiv Apr–Sep)",
+  "settingsSeasonSouthern": "Südliche Hemisphäre (aktiv Okt–Mär)",
+  "settingsSeasonCustom": "Eigene Monatsgrenzen",
+  "settingsSeasonSpringStart": "Aktive Saison beginnt (Monat)",
+  "settingsSeasonSpringEnd": "Aktive Saison endet (Monat)",
+  "settingsNotifications": "Benachrichtigungen",
+  "settingsNotificationsEnable": "Düngungserinnerungen erlauben",
   "plantUntitled": "Ohne Titel",
   "plantDefaultTitle": "Pflanze",
   "plantGenusFallback": "Gattung",

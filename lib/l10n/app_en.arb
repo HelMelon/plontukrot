@@ -302,6 +302,45 @@
   "plantGenusRequired": "Enter the plant genus",
   "plantSpeciesRequired": "Enter the plant species",
   "plantInvalidWateringFrequency": "Invalid watering frequency",
+  "plantFertilizingFrequency": "Fertilizing frequency",
+  "plantFertilizingFrequencyDays": "Interval (days)",
+  "plantFertilizingStop": "Do not fertilize (STOP)",
+  "plantFertilizingResetAuto": "Reset to automatic",
+  "plantFertilizingFrequencyHint": "These are average intervals by stage and season. You can adjust them for a specific plant. Enter 0 to skip fertilizing.",
+  "plantInvalidFertilizingFrequency": "Enter 1–180 days or select STOP",
+  "fertilizingStageGenitiveStart": "start",
+  "fertilizingStageGenitiveBaby": "baby plant",
+  "fertilizingStageGenitiveJuvenile": "juvenile",
+  "fertilizingStageGenitiveAdult": "adult",
+  "fertilizingReminderEveTitle": "Fertilizing reminder",
+  "fertilizingReminderEveBody": "Tomorrow: fertilize {stage}",
+  "@fertilizingReminderEveBody": {
+    "placeholders": {
+      "stage": {"type": "String"}
+    }
+  },
+  "fertilizingReminderDayTitle": "Fertilize {name}",
+  "@fertilizingReminderDayTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "fertilizingReminderDayTitleStage": "Fertilize {stage}",
+  "@fertilizingReminderDayTitleStage": {
+    "placeholders": {
+      "stage": {"type": "String"}
+    }
+  },
+  "fertilizingReminderDayBody": "Time to fertilize. Tap Accept when done.",
+  "fertilizingReminderAccept": "Accepted",
+  "settingsFertilizingSeason": "Fertilizing season",
+  "settingsSeasonNorthern": "Northern hemisphere (Apr–Sep active)",
+  "settingsSeasonSouthern": "Southern hemisphere (Oct–Mar active)",
+  "settingsSeasonCustom": "Custom months",
+  "settingsSeasonSpringStart": "Active season starts (month)",
+  "settingsSeasonSpringEnd": "Active season ends (month)",
+  "settingsNotifications": "Notifications",
+  "settingsNotificationsEnable": "Allow fertilizing reminders",
   "plantUntitled": "Untitled",
   "plantDefaultTitle": "Plant",
   "plantGenusFallback": "Genus",

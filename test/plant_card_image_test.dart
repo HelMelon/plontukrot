@@ -44,7 +44,7 @@ void main() {
     await tester.pump();
 
     expect(find.byType(PlantNetworkImage), findsNothing);
-    expect(find.image(const AssetImage('assets/images/default-img.png')),
+    expect(find.image(const AssetImage('assets/images/default-img.webp')),
         findsOneWidget);
   });
 

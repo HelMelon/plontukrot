@@ -49,6 +49,17 @@ extension AppLocalizationsStage on AppLocalizations {
 
   String stageInfoTitle(StageInfo stage) => stageTitle(stage.value);
 
+  String fertilizingStageGenitive(int stage) {
+    final normalized = stage <= 0 ? 1 : (stage > 4 ? 4 : stage);
+    return switch (normalized) {
+      1 => fertilizingStageGenitiveStart,
+      2 => fertilizingStageGenitiveBaby,
+      3 => fertilizingStageGenitiveJuvenile,
+      4 => fertilizingStageGenitiveAdult,
+      _ => fertilizingStageGenitiveStart,
+    };
+  }
+
   String propagationMethodLabel(PropagationMethod method) {
     return switch (method) {
       PropagationMethod.leaf => propagationMethodLeaf,

@@ -22,6 +22,8 @@ class Plant {
   final String? imageThumbUrl;
   final List<PlantPhoto> images;
   final int? wateringFrequency;
+  final int? fertilizingFrequencyDays;
+  final bool isFertilizingFrequencyCustom;
   final DateTime? createdAt;
   final DateTime? lastWateredAt;
   final DateTime? lastFertilizedAt;
@@ -50,6 +52,8 @@ class Plant {
     this.imageThumbUrl,
     this.images = const [],
     this.wateringFrequency,
+    this.fertilizingFrequencyDays,
+    this.isFertilizingFrequencyCustom = false,
     this.createdAt,
     this.lastWateredAt,
     this.lastFertilizedAt,
@@ -166,6 +170,9 @@ class Plant {
       imageThumbUrl: data['imageThumbUrl'] as String?,
       images: _readImages(data['images']),
       wateringFrequency: data['wateringFrequency'] as int?,
+      fertilizingFrequencyDays: data['fertilizingFrequencyDays'] as int?,
+      isFertilizingFrequencyCustom:
+          data['isFertilizingFrequencyCustom'] as bool? ?? false,
       createdAt: readTimestamp(data['createdAt']),
       lastWateredAt: readTimestamp(data['lastWateredAt']),
       lastFertilizedAt: readTimestamp(data['lastFertilizedAt']),
@@ -209,6 +216,8 @@ class Plant {
       'imageThumbUrl': imageThumbUrl,
       'images': images.map((p) => p.toMap()).toList(),
       'wateringFrequency': wateringFrequency,
+      'fertilizingFrequencyDays': fertilizingFrequencyDays,
+      'isFertilizingFrequencyCustom': isFertilizingFrequencyCustom,
       if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
       if (lastWateredAt != null)
         'lastWateredAt': Timestamp.fromDate(lastWateredAt!),

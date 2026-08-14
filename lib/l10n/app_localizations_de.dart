@@ -701,6 +701,87 @@ class AppLocalizationsDe extends AppLocalizations {
   String get plantInvalidWateringFrequency => 'Ungültige Gießhäufigkeit';
 
   @override
+  String get plantFertilizingFrequency => 'Düngungsintervall';
+
+  @override
+  String get plantFertilizingFrequencyDays => 'Intervall (Tage)';
+
+  @override
+  String get plantFertilizingStop => 'Nicht düngen (STOP)';
+
+  @override
+  String get plantFertilizingResetAuto => 'Automatisch zurücksetzen';
+
+  @override
+  String get plantFertilizingFrequencyHint =>
+      'Das sind Durchschnittswerte nach Stufe und Saison. Für einzelne Pflanzen können Sie sie anpassen. 0 — nicht düngen.';
+
+  @override
+  String get plantInvalidFertilizingFrequency =>
+      '1–180 Tage eingeben oder STOP wählen';
+
+  @override
+  String get fertilizingStageGenitiveStart => 'Start';
+
+  @override
+  String get fertilizingStageGenitiveBaby => 'Baby';
+
+  @override
+  String get fertilizingStageGenitiveJuvenile => 'Juvenil';
+
+  @override
+  String get fertilizingStageGenitiveAdult => 'Erwachsen';
+
+  @override
+  String get fertilizingReminderEveTitle => 'Düngungserinnerung';
+
+  @override
+  String fertilizingReminderEveBody(String stage) {
+    return 'Morgen: $stage düngen';
+  }
+
+  @override
+  String fertilizingReminderDayTitle(String name) {
+    return 'Düngen: $name';
+  }
+
+  @override
+  String fertilizingReminderDayTitleStage(String stage) {
+    return 'Düngen: $stage';
+  }
+
+  @override
+  String get fertilizingReminderDayBody =>
+      'Heute ist Düngungstag. Tippen Sie auf «Akzeptiert», wenn erledigt.';
+
+  @override
+  String get fertilizingReminderAccept => 'Akzeptiert';
+
+  @override
+  String get settingsFertilizingSeason => 'Düngungssaison';
+
+  @override
+  String get settingsSeasonNorthern => 'Nördliche Hemisphäre (aktiv Apr–Sep)';
+
+  @override
+  String get settingsSeasonSouthern => 'Südliche Hemisphäre (aktiv Okt–Mär)';
+
+  @override
+  String get settingsSeasonCustom => 'Eigene Monatsgrenzen';
+
+  @override
+  String get settingsSeasonSpringStart => 'Aktive Saison beginnt (Monat)';
+
+  @override
+  String get settingsSeasonSpringEnd => 'Aktive Saison endet (Monat)';
+
+  @override
+  String get settingsNotifications => 'Benachrichtigungen';
+
+  @override
+  String get settingsNotificationsEnable => 'Düngungserinnerungen erlauben';
+
+  @override
   String get plantUntitled => 'Ohne Titel';
 
   @override

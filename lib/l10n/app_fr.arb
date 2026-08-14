@@ -242,6 +242,45 @@
   "plantGenusRequired": "Indiquez le genre de la plante",
   "plantSpeciesRequired": "Indiquez l’espèce de la plante",
   "plantInvalidWateringFrequency": "Fréquence d’arrosage invalide",
+  "plantFertilizingFrequency": "Fréquence de fertilisation",
+  "plantFertilizingFrequencyDays": "Intervalle (jours)",
+  "plantFertilizingStop": "Ne pas fertiliser (STOP)",
+  "plantFertilizingResetAuto": "Réinitialiser en automatique",
+  "plantFertilizingFrequencyHint": "Ce sont des délais moyens selon le stade et la saison. Vous pouvez les ajuster pour chaque plante. 0 — ne pas fertiliser.",
+  "plantInvalidFertilizingFrequency": "Saisissez 1–180 jours ou choisissez STOP",
+  "fertilizingStageGenitiveStart": "début",
+  "fertilizingStageGenitiveBaby": "bébé",
+  "fertilizingStageGenitiveJuvenile": "juvénile",
+  "fertilizingStageGenitiveAdult": "adulte",
+  "fertilizingReminderEveTitle": "Rappel de fertilisation",
+  "fertilizingReminderEveBody": "Demain : fertiliser {stage}",
+  "@fertilizingReminderEveBody": {
+    "placeholders": {
+      "stage": {"type": "String"}
+    }
+  },
+  "fertilizingReminderDayTitle": "Fertiliser : {name}",
+  "@fertilizingReminderDayTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "fertilizingReminderDayTitleStage": "Fertiliser : {stage}",
+  "@fertilizingReminderDayTitleStage": {
+    "placeholders": {
+      "stage": {"type": "String"}
+    }
+  },
+  "fertilizingReminderDayBody": "C’est le jour de fertilisation. Appuyez sur « Accepté » une fois terminé.",
+  "fertilizingReminderAccept": "Accepté",
+  "settingsFertilizingSeason": "Saison de fertilisation",
+  "settingsSeasonNorthern": "Hémisphère nord (actif avr–sep)",
+  "settingsSeasonSouthern": "Hémisphère sud (actif oct–mar)",
+  "settingsSeasonCustom": "Mois personnalisés",
+  "settingsSeasonSpringStart": "Début de saison active (mois)",
+  "settingsSeasonSpringEnd": "Fin de saison active (mois)",
+  "settingsNotifications": "Notifications",
+  "settingsNotificationsEnable": "Autoriser les rappels de fertilisation",
   "plantUntitled": "Sans titre",
   "plantDefaultTitle": "Plante",
   "plantGenusFallback": "Genre",

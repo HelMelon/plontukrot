@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../core/season/fertilizing_season_controller.dart';
+import '../models/fertilizing_frequency.dart';
 import '../models/plant.dart';
 import '../models/plant_archive_reason.dart';
 import '../models/plant_member.dart';
 import '../models/plant_photo.dart';
 import '../models/variegation.dart';
+import 'fertilizing_notification_service.dart';
 import 'plant_species_service.dart';
 import 'storage_service.dart';
 
@@ -23,6 +26,60 @@ class PlantService {
   CollectionReference<Map<String, dynamic>> _plantsRefFor(String ownerUid) =>
       _firestore.collection('users').doc(ownerUid).collection('plants');
 
+  int? _resolveFertilizingFrequency({
+    required int stage,
+    required bool isCustom,
+    int? requestedFrequencyDays,
+  }) {
+    return resolveFertilizingFrequencyDays(
+      stage: stage,
+      seasonSettings: FertilizingSeasonController.instance.settings,
+      isCustom: isCustom,
+      currentFrequencyDays: requestedFrequencyDays,
+    );
+  }
+
+  Future<void> _rescheduleNotifications(String plantId) async {
+    final plant = await getPlant(plantId);
+    if (plant != null) {
+      await FertilizingNotificationService.instance.rescheduleForPlant(plant);
+    }
+  }
+
+  Future<void> markFertilizedToday(String plantId) async {
+    final today = DateTime.now();
+    final normalized = DateTime(today.year, today.month, today.day);
+    await _plantsRef.doc(plantId).update({
+      'lastFertilizedAt': Timestamp.fromDate(normalized),
+    });
+    await _rescheduleNotifications(plantId);
+  }
+
+  /// Recomputes auto fertilizing frequency for plants without custom override.
+  Future<void> recalculateAutoFertilizingFrequencies() async {
+    final snapshot = await _plantsRef.get();
+    final batch = _firestore.batch();
+    var hasUpdates = false;
+
+    for (final doc in snapshot.docs) {
+      final plant = Plant.fromFirestore(doc);
+      if (plant.isArchived || plant.isFertilizingFrequencyCustom) continue;
+      final resolved = _resolveFertilizingFrequency(
+        stage: plant.stage,
+        isCustom: false,
+        requestedFrequencyDays: null,
+      );
+      if (resolved != plant.fertilizingFrequencyDays) {
+        batch.update(doc.reference, {'fertilizingFrequencyDays': resolved});
+        hasUpdates = true;
+      }
+    }
+
+    if (hasUpdates) {
+      await batch.commit();
+    }
+  }
+
   Future<String> addPlant({
     required String genus,
     required String species,
@@ -34,6 +91,8 @@ class PlantService {
     required int stage,
     int initialLeafCount = 0,
     List<PlantMember> members = const [],
+    int? fertilizingFrequencyDays,
+    bool isFertilizingFrequencyCustom = false,
   }) async {
     final trimmedGenus = genus.trim();
     final trimmedSpecies = species.trim();
@@ -42,6 +101,11 @@ class PlantService {
     final trimmedTradingName = tradingName.trim();
     final safeInitialLeafCount =
         initialLeafCount < 0 ? 0 : initialLeafCount;
+    final resolvedFrequency = _resolveFertilizingFrequency(
+      stage: stage,
+      isCustom: isFertilizingFrequencyCustom,
+      requestedFrequencyDays: fertilizingFrequencyDays,
+    );
 
     final doc = await _plantsRef.add({
       'genus': trimmedGenus,
@@ -60,6 +124,8 @@ class PlantService {
       'imageThumbUrl': null,
       'images': <Map<String, dynamic>>[],
       'wateringFrequency': null,
+      'fertilizingFrequencyDays': resolvedFrequency,
+      'isFertilizingFrequencyCustom': isFertilizingFrequencyCustom,
       'initialLeafCount': safeInitialLeafCount,
       if (members.isNotEmpty) 'members': members.map((m) => m.toMap()).toList(),
       'createdAt': FieldValue.serverTimestamp(),
@@ -71,6 +137,7 @@ class PlantService {
       plantFamily: trimmedFamily,
     );
 
+    await _rescheduleNotifications(doc.id);
     return doc.id;
   }
 
@@ -153,6 +220,7 @@ class PlantService {
             giftedToUid: giftedToUid,
           ),
         );
+    await FertilizingNotificationService.instance.cancelForPlant(plantId);
   }
 
   Future<String> mergePlants({
@@ -164,6 +232,8 @@ class PlantService {
     String tradingName = '',
     String nickname = '',
     required int stage,
+    int? fertilizingFrequencyDays,
+    bool isFertilizingFrequencyCustom = false,
   }) async {
     if (sources.length < 2 || sources.length > 3) {
       throw ArgumentError('Merge requires 2–3 source plants');
@@ -181,6 +251,11 @@ class PlantService {
     final trimmedFamily = plantFamily?.trim();
     final trimmedTradingName = tradingName.trim();
     final now = DateTime.now();
+    final resolvedFrequency = _resolveFertilizingFrequency(
+      stage: stage,
+      isCustom: isFertilizingFrequencyCustom,
+      requestedFrequencyDays: fertilizingFrequencyDays,
+    );
 
     final groupRef = _plantsRef.doc();
     final batch = _firestore.batch();
@@ -199,6 +274,8 @@ class PlantService {
       'imageThumbUrl': null,
       'images': <Map<String, dynamic>>[],
       'wateringFrequency': null,
+      'fertilizingFrequencyDays': resolvedFrequency,
+      'isFertilizingFrequencyCustom': isFertilizingFrequencyCustom,
       'initialLeafCount': 0,
       'createdAt': FieldValue.serverTimestamp(),
       'members': members.take(3).map((m) => m.toMap()).toList(),
@@ -223,6 +300,7 @@ class PlantService {
       plantFamily: trimmedFamily,
     );
 
+    await _rescheduleNotifications(groupRef.id);
     return groupRef.id;
   }
 
@@ -340,6 +418,8 @@ class PlantService {
     int initialLeafCount = 0,
     required int stage,
     List<PlantMember>? members,
+    int? fertilizingFrequencyDays,
+    bool isFertilizingFrequencyCustom = false,
   }) async {
     final trimmedGenus = genus.trim();
     final trimmedSpecies = species.trim();
@@ -348,6 +428,11 @@ class PlantService {
     final trimmedTradingName = tradingName.trim();
     final safeInitialLeafCount =
         initialLeafCount < 0 ? 0 : initialLeafCount;
+    final resolvedFrequency = _resolveFertilizingFrequency(
+      stage: stage,
+      isCustom: isFertilizingFrequencyCustom,
+      requestedFrequencyDays: fertilizingFrequencyDays,
+    );
 
     final updates = <String, dynamic>{
       'genus': trimmedGenus,
@@ -362,6 +447,8 @@ class PlantService {
       'tradingName': trimmedTradingName,
       'nickname': nickname,
       'wateringFrequency': wateringFrequency,
+      'fertilizingFrequencyDays': resolvedFrequency,
+      'isFertilizingFrequencyCustom': isFertilizingFrequencyCustom,
       'initialLeafCount': safeInitialLeafCount,
       'stage': stage,
       'name': FieldValue.delete(),
@@ -383,6 +470,8 @@ class PlantService {
       genus: trimmedGenus,
       plantFamily: trimmedFamily,
     );
+
+    await _rescheduleNotifications(plantId);
   }
 
   Future<void> updatePlantsPlantFamily({

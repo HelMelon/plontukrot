@@ -698,6 +698,87 @@ class AppLocalizationsRu extends AppLocalizations {
   String get plantInvalidWateringFrequency => 'Некорректная частота полива';
 
   @override
+  String get plantFertilizingFrequency => 'Частота подкормки';
+
+  @override
+  String get plantFertilizingFrequencyDays => 'Интервал (дни)';
+
+  @override
+  String get plantFertilizingStop => 'Не подкармливать (СТОП)';
+
+  @override
+  String get plantFertilizingResetAuto => 'Сбросить на авто';
+
+  @override
+  String get plantFertilizingFrequencyHint =>
+      'Это среднестатистические сроки по стадии и сезону. Для конкретного растения их можно изменить вручную. 0 — не подкармливать.';
+
+  @override
+  String get plantInvalidFertilizingFrequency =>
+      'Укажите 1–180 дней или выберите СТОП';
+
+  @override
+  String get fertilizingStageGenitiveStart => 'старта';
+
+  @override
+  String get fertilizingStageGenitiveBaby => 'детки';
+
+  @override
+  String get fertilizingStageGenitiveJuvenile => 'ювенила';
+
+  @override
+  String get fertilizingStageGenitiveAdult => 'взрослого';
+
+  @override
+  String get fertilizingReminderEveTitle => 'Напоминание о подкормке';
+
+  @override
+  String fertilizingReminderEveBody(String stage) {
+    return 'Завтра подкормка $stage';
+  }
+
+  @override
+  String fertilizingReminderDayTitle(String name) {
+    return 'Подкормка: $name';
+  }
+
+  @override
+  String fertilizingReminderDayTitleStage(String stage) {
+    return 'Подкормка $stage';
+  }
+
+  @override
+  String get fertilizingReminderDayBody =>
+      'Сегодня день подкормки. Нажмите «Принято», когда выполните.';
+
+  @override
+  String get fertilizingReminderAccept => 'Принято';
+
+  @override
+  String get settingsFertilizingSeason => 'Сезон подкормки';
+
+  @override
+  String get settingsSeasonNorthern => 'Северное полушарие (активный апр–сен)';
+
+  @override
+  String get settingsSeasonSouthern => 'Южное полушарие (активный окт–мар)';
+
+  @override
+  String get settingsSeasonCustom => 'Свои границы месяцев';
+
+  @override
+  String get settingsSeasonSpringStart => 'Начало активного сезона (месяц)';
+
+  @override
+  String get settingsSeasonSpringEnd => 'Конец активного сезона (месяц)';
+
+  @override
+  String get settingsNotifications => 'Уведомления';
+
+  @override
+  String get settingsNotificationsEnable => 'Разрешить напоминания о подкормке';
+
+  @override
   String get plantUntitled => 'Без названия';
 
   @override

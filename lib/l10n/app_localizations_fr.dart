@@ -702,6 +702,88 @@ class AppLocalizationsFr extends AppLocalizations {
   String get plantInvalidWateringFrequency => 'Fréquence d’arrosage invalide';
 
   @override
+  String get plantFertilizingFrequency => 'Fréquence de fertilisation';
+
+  @override
+  String get plantFertilizingFrequencyDays => 'Intervalle (jours)';
+
+  @override
+  String get plantFertilizingStop => 'Ne pas fertiliser (STOP)';
+
+  @override
+  String get plantFertilizingResetAuto => 'Réinitialiser en automatique';
+
+  @override
+  String get plantFertilizingFrequencyHint =>
+      'Ce sont des délais moyens selon le stade et la saison. Vous pouvez les ajuster pour chaque plante. 0 — ne pas fertiliser.';
+
+  @override
+  String get plantInvalidFertilizingFrequency =>
+      'Saisissez 1–180 jours ou choisissez STOP';
+
+  @override
+  String get fertilizingStageGenitiveStart => 'début';
+
+  @override
+  String get fertilizingStageGenitiveBaby => 'bébé';
+
+  @override
+  String get fertilizingStageGenitiveJuvenile => 'juvénile';
+
+  @override
+  String get fertilizingStageGenitiveAdult => 'adulte';
+
+  @override
+  String get fertilizingReminderEveTitle => 'Rappel de fertilisation';
+
+  @override
+  String fertilizingReminderEveBody(String stage) {
+    return 'Demain : fertiliser $stage';
+  }
+
+  @override
+  String fertilizingReminderDayTitle(String name) {
+    return 'Fertiliser : $name';
+  }
+
+  @override
+  String fertilizingReminderDayTitleStage(String stage) {
+    return 'Fertiliser : $stage';
+  }
+
+  @override
+  String get fertilizingReminderDayBody =>
+      'C’est le jour de fertilisation. Appuyez sur « Accepté » une fois terminé.';
+
+  @override
+  String get fertilizingReminderAccept => 'Accepté';
+
+  @override
+  String get settingsFertilizingSeason => 'Saison de fertilisation';
+
+  @override
+  String get settingsSeasonNorthern => 'Hémisphère nord (actif avr–sep)';
+
+  @override
+  String get settingsSeasonSouthern => 'Hémisphère sud (actif oct–mar)';
+
+  @override
+  String get settingsSeasonCustom => 'Mois personnalisés';
+
+  @override
+  String get settingsSeasonSpringStart => 'Début de saison active (mois)';
+
+  @override
+  String get settingsSeasonSpringEnd => 'Fin de saison active (mois)';
+
+  @override
+  String get settingsNotifications => 'Notifications';
+
+  @override
+  String get settingsNotificationsEnable =>
+      'Autoriser les rappels de fertilisation';
+
+  @override
   String get plantUntitled => 'Sans titre';
 
   @override

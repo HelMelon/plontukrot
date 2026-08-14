@@ -7,6 +7,8 @@ import '../models/fertilizer_dose.dart';
 import '../models/fertilizer_ingredient.dart';
 import '../models/fertilizing_entry.dart';
 import 'growth_event_service.dart';
+import 'fertilizing_notification_service.dart';
+import 'plant_service.dart';
 import 'watering_service.dart';
 
 class FertilizeService {
@@ -265,6 +267,11 @@ class FertilizeService {
       wateringFrequency: wateringFrequency,
       skipPlantFetch: skipPlantFetch || lastWateredAt != null,
     );
+
+    final plant = await PlantService().getPlant(plantId);
+    if (plant != null) {
+      await FertilizingNotificationService.instance.rescheduleForPlant(plant);
+    }
   }
 
   /// Bulk fertilizing using known plant denorm fields (no plant doc reads).

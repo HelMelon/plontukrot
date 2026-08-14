@@ -10,15 +10,18 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/currency/app_currency.dart';
 import '../../../core/currency/app_currency_controller.dart';
 import '../../../core/locale/app_locale_controller.dart';
+import '../../../core/season/fertilizing_season_controller.dart';
 import '../../../core/privacy/privacy_constants.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_bar_chrome_actions.dart';
 import '../../../core/widgets/prompt_text_dialog.dart';
 import '../../../models/app_user.dart';
+import '../../../models/fertilizing_growth_season.dart';
 import '../../../models/plant.dart';
 import '../../../models/propagation.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/firestore_service.dart';
+import '../../../services/fertilizing_notification_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../friends/pages/friends_page.dart';
@@ -75,6 +78,24 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     });
     return best;
+  }
+
+  Future<void> _requestNotifications() async {
+    await FertilizingNotificationService.instance.requestPermission();
+    await FertilizingNotificationService.instance.rescheduleAllActivePlants();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context).settingsNotificationsEnable)),
+    );
+  }
+
+  Future<void> _onSeasonSettingsChanged() async {
+    await PlantService().recalculateAutoFertilizingFrequencies();
+    await FertilizingNotificationService.instance.rescheduleAllActivePlants();
+  }
+
+  String _monthLabel(AppLocalizations l10n, int month) {
+    return DateFormat.MMMM(l10n.localeName).format(DateTime(2000, month));
   }
 
   Future<void> _openPrivacyPolicy() async {
@@ -483,8 +504,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 listenable: Listenable.merge([
                   localeController,
                   currencyController,
+                  FertilizingSeasonController.instance,
                 ]),
                 builder: (context, _) {
+                  final seasonController = FertilizingSeasonController.instance;
+                  final seasonSettings = seasonController.settings;
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -542,6 +566,109 @@ class _ProfilePageState extends State<ProfilePage> {
                                 if (currency == null) return;
                                 currencyController.setCurrency(currency);
                               },
+                      ),
+                      spacing.vMd,
+                      DropdownButtonFormField<FertilizingSeasonMode>(
+                        key: ValueKey(seasonSettings.mode.name),
+                        initialValue: seasonSettings.mode,
+                        isExpanded: true,
+                        style: profileTheme.dropdownTextStyle,
+                        decoration: InputDecoration(
+                          labelText: l10n.settingsFertilizingSeason,
+                        ),
+                        items: [
+                          DropdownMenuItem(
+                            value: FertilizingSeasonMode.northern,
+                            child: Text(l10n.settingsSeasonNorthern),
+                          ),
+                          DropdownMenuItem(
+                            value: FertilizingSeasonMode.southern,
+                            child: Text(l10n.settingsSeasonSouthern),
+                          ),
+                          DropdownMenuItem(
+                            value: FertilizingSeasonMode.custom,
+                            child: Text(l10n.settingsSeasonCustom),
+                          ),
+                        ],
+                        onChanged: _busy
+                            ? null
+                            : (mode) async {
+                                if (mode == null) return;
+                                await seasonController.setMode(mode);
+                                await _onSeasonSettingsChanged();
+                              },
+                      ),
+                      if (seasonSettings.mode ==
+                          FertilizingSeasonMode.custom) ...[
+                        spacing.vMd,
+                        DropdownButtonFormField<int>(
+                          key: ValueKey('start-${seasonSettings.springStartMonth}'),
+                          initialValue: seasonSettings.springStartMonth,
+                          isExpanded: true,
+                          style: profileTheme.dropdownTextStyle,
+                          decoration: InputDecoration(
+                            labelText: l10n.settingsSeasonSpringStart,
+                          ),
+                          items: [
+                            for (var m = 1; m <= 12; m++)
+                              DropdownMenuItem(
+                                value: m,
+                                child: Text(_monthLabel(l10n, m)),
+                              ),
+                          ],
+                          onChanged: _busy
+                              ? null
+                              : (month) async {
+                                  if (month == null) return;
+                                  await seasonController.setCustomMonths(
+                                    springStartMonth: month,
+                                    springEndMonth:
+                                        seasonSettings.springEndMonth,
+                                  );
+                                  await _onSeasonSettingsChanged();
+                                },
+                        ),
+                        spacing.vMd,
+                        DropdownButtonFormField<int>(
+                          key: ValueKey('end-${seasonSettings.springEndMonth}'),
+                          initialValue: seasonSettings.springEndMonth,
+                          isExpanded: true,
+                          style: profileTheme.dropdownTextStyle,
+                          decoration: InputDecoration(
+                            labelText: l10n.settingsSeasonSpringEnd,
+                          ),
+                          items: [
+                            for (var m = 1; m <= 12; m++)
+                              DropdownMenuItem(
+                                value: m,
+                                child: Text(_monthLabel(l10n, m)),
+                              ),
+                          ],
+                          onChanged: _busy
+                              ? null
+                              : (month) async {
+                                  if (month == null) return;
+                                  await seasonController.setCustomMonths(
+                                    springStartMonth:
+                                        seasonSettings.springStartMonth,
+                                    springEndMonth: month,
+                                  );
+                                  await _onSeasonSettingsChanged();
+                                },
+                        ),
+                      ],
+                      spacing.vMd,
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: ExcludeSemantics(
+                          child: Icon(Icons.notifications_outlined,
+                              color: colors.icon),
+                        ),
+                        title: Text(
+                          l10n.settingsNotificationsEnable,
+                          style: typography.bodyEmphasis,
+                        ),
+                        onTap: _busy ? null : _requestNotifications,
                       ),
                     ],
                   );

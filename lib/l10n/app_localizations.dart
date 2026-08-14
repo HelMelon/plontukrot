@@ -1380,6 +1380,150 @@ abstract class AppLocalizations {
   /// **'Invalid watering frequency'**
   String get plantInvalidWateringFrequency;
 
+  /// No description provided for @plantFertilizingFrequency.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilizing frequency'**
+  String get plantFertilizingFrequency;
+
+  /// No description provided for @plantFertilizingFrequencyDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Interval (days)'**
+  String get plantFertilizingFrequencyDays;
+
+  /// No description provided for @plantFertilizingStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Do not fertilize (STOP)'**
+  String get plantFertilizingStop;
+
+  /// No description provided for @plantFertilizingResetAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to automatic'**
+  String get plantFertilizingResetAuto;
+
+  /// No description provided for @plantFertilizingFrequencyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'These are average intervals by stage and season. You can adjust them for a specific plant. Enter 0 to skip fertilizing.'**
+  String get plantFertilizingFrequencyHint;
+
+  /// No description provided for @plantInvalidFertilizingFrequency.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter 1–180 days or select STOP'**
+  String get plantInvalidFertilizingFrequency;
+
+  /// No description provided for @fertilizingStageGenitiveStart.
+  ///
+  /// In en, this message translates to:
+  /// **'start'**
+  String get fertilizingStageGenitiveStart;
+
+  /// No description provided for @fertilizingStageGenitiveBaby.
+  ///
+  /// In en, this message translates to:
+  /// **'baby plant'**
+  String get fertilizingStageGenitiveBaby;
+
+  /// No description provided for @fertilizingStageGenitiveJuvenile.
+  ///
+  /// In en, this message translates to:
+  /// **'juvenile'**
+  String get fertilizingStageGenitiveJuvenile;
+
+  /// No description provided for @fertilizingStageGenitiveAdult.
+  ///
+  /// In en, this message translates to:
+  /// **'adult'**
+  String get fertilizingStageGenitiveAdult;
+
+  /// No description provided for @fertilizingReminderEveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilizing reminder'**
+  String get fertilizingReminderEveTitle;
+
+  /// No description provided for @fertilizingReminderEveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow: fertilize {stage}'**
+  String fertilizingReminderEveBody(String stage);
+
+  /// No description provided for @fertilizingReminderDayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilize {name}'**
+  String fertilizingReminderDayTitle(String name);
+
+  /// No description provided for @fertilizingReminderDayTitleStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilize {stage}'**
+  String fertilizingReminderDayTitleStage(String stage);
+
+  /// No description provided for @fertilizingReminderDayBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Time to fertilize. Tap Accept when done.'**
+  String get fertilizingReminderDayBody;
+
+  /// No description provided for @fertilizingReminderAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted'**
+  String get fertilizingReminderAccept;
+
+  /// No description provided for @settingsFertilizingSeason.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilizing season'**
+  String get settingsFertilizingSeason;
+
+  /// No description provided for @settingsSeasonNorthern.
+  ///
+  /// In en, this message translates to:
+  /// **'Northern hemisphere (Apr–Sep active)'**
+  String get settingsSeasonNorthern;
+
+  /// No description provided for @settingsSeasonSouthern.
+  ///
+  /// In en, this message translates to:
+  /// **'Southern hemisphere (Oct–Mar active)'**
+  String get settingsSeasonSouthern;
+
+  /// No description provided for @settingsSeasonCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom months'**
+  String get settingsSeasonCustom;
+
+  /// No description provided for @settingsSeasonSpringStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Active season starts (month)'**
+  String get settingsSeasonSpringStart;
+
+  /// No description provided for @settingsSeasonSpringEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Active season ends (month)'**
+  String get settingsSeasonSpringEnd;
+
+  /// No description provided for @settingsNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get settingsNotifications;
+
+  /// No description provided for @settingsNotificationsEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow fertilizing reminders'**
+  String get settingsNotificationsEnable;
+
   /// No description provided for @plantUntitled.
   ///
   /// In en, this message translates to:

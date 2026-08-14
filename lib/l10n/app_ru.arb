@@ -242,6 +242,45 @@
   "plantGenusRequired": "Укажите род растения",
   "plantSpeciesRequired": "Укажите вид растения",
   "plantInvalidWateringFrequency": "Некорректная частота полива",
+  "plantFertilizingFrequency": "Частота подкормки",
+  "plantFertilizingFrequencyDays": "Интервал (дни)",
+  "plantFertilizingStop": "Не подкармливать (СТОП)",
+  "plantFertilizingResetAuto": "Сбросить на авто",
+  "plantFertilizingFrequencyHint": "Это среднестатистические сроки по стадии и сезону. Для конкретного растения их можно изменить вручную. 0 — не подкармливать.",
+  "plantInvalidFertilizingFrequency": "Укажите 1–180 дней или выберите СТОП",
+  "fertilizingStageGenitiveStart": "старта",
+  "fertilizingStageGenitiveBaby": "детки",
+  "fertilizingStageGenitiveJuvenile": "ювенила",
+  "fertilizingStageGenitiveAdult": "взрослого",
+  "fertilizingReminderEveTitle": "Напоминание о подкормке",
+  "fertilizingReminderEveBody": "Завтра подкормка {stage}",
+  "@fertilizingReminderEveBody": {
+    "placeholders": {
+      "stage": {"type": "String"}
+    }
+  },
+  "fertilizingReminderDayTitle": "Подкормка: {name}",
+  "@fertilizingReminderDayTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "fertilizingReminderDayTitleStage": "Подкормка {stage}",
+  "@fertilizingReminderDayTitleStage": {
+    "placeholders": {
+      "stage": {"type": "String"}
+    }
+  },
+  "fertilizingReminderDayBody": "Сегодня день подкормки. Нажмите «Принято», когда выполните.",
+  "fertilizingReminderAccept": "Принято",
+  "settingsFertilizingSeason": "Сезон подкормки",
+  "settingsSeasonNorthern": "Северное полушарие (активный апр–сен)",
+  "settingsSeasonSouthern": "Южное полушарие (активный окт–мар)",
+  "settingsSeasonCustom": "Свои границы месяцев",
+  "settingsSeasonSpringStart": "Начало активного сезона (месяц)",
+  "settingsSeasonSpringEnd": "Конец активного сезона (месяц)",
+  "settingsNotifications": "Уведомления",
+  "settingsNotificationsEnable": "Разрешить напоминания о подкормке",
   "plantUntitled": "Без названия",
   "plantDefaultTitle": "Растение",
   "plantGenusFallback": "Род",
