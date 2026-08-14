@@ -242,7 +242,9 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => AddNoteSheet(parent: NoteParent.plant(widget.plantId)),
+      builder: (_) => AddNoteSheet(
+        parents: [NoteParent.plant(widget.plantId)],
+      ),
     );
   }
 

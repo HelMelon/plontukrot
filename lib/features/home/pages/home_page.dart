@@ -20,8 +20,10 @@ import '../../../models/plant.dart';
 import '../../../models/stage_info.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
 import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
+import '../../plants/widgets/sheets/add_note_sheet.dart';
 import '../../plants/widgets/sheets/add_repotting_sheet.dart';
 import '../../plants/widgets/sheets/merge_plant_sheet.dart';
+import '../../../services/note_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../../services/startup_warmup_service.dart';
@@ -737,6 +739,20 @@ class _HomePageState extends State<HomePage> {
     if (applied == true && mounted) _exitSelectionMode();
   }
 
+  Future<void> _showNotesSheet() async {
+    final l10n = AppLocalizations.of(context);
+    final added = await showAppModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => AddNoteSheet(
+        parents: _selectedPlantIds.map(NoteParent.plant).toList(),
+        title: l10n.homeNotesSelectedTitle,
+      ),
+    );
+    if (added == true && mounted) _exitSelectionMode();
+  }
+
   Future<void> _deletePlants() async {
     final l10n = AppLocalizations.of(context);
     final count = _selectedPlantIds.length;
@@ -823,6 +839,11 @@ class _HomePageState extends State<HomePage> {
         tooltip: l10n.homeRepotting,
         onPressed: _showRepottingSheet,
         icon: const Icon(Icons.flaky),
+      ),
+      IconButton(
+        tooltip: l10n.homeNotes,
+        onPressed: _showNotesSheet,
+        icon: const Icon(Icons.sticky_note_2_outlined),
       ),
       IconButton(
         tooltip: l10n.homeUpdateFamily,

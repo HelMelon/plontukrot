@@ -374,7 +374,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                     backgroundColor: Colors.transparent,
                     enableDrag: true,
                     builder: (_) => AddNoteSheet(
-                      parent: NoteParent.plant(plantId),
+                      parents: [NoteParent.plant(plantId)],
                     ),
                   );
                 },

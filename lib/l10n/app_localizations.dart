@@ -1236,6 +1236,12 @@ abstract class AppLocalizations {
   /// **'Repotting'**
   String get homeRepotting;
 
+  /// No description provided for @homeNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get homeNotes;
+
   /// No description provided for @homeUpdateFamily.
   ///
   /// In en, this message translates to:
@@ -1265,6 +1271,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Repot selected plants'**
   String get homeRepotSelectedTitle;
+
+  /// No description provided for @homeNotesSelectedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a note to selected plants'**
+  String get homeNotesSelectedTitle;
 
   /// No description provided for @homeDeleteSelectedTitle.
   ///
@@ -2357,6 +2369,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add a new journal entry for this plant.'**
   String get notesAddHint;
+
+  /// No description provided for @notesAddHintBulk.
+  ///
+  /// In en, this message translates to:
+  /// **'The same journal entry will be added to every selected plant.'**
+  String get notesAddHintBulk;
 
   /// No description provided for @notesEdit.
   ///

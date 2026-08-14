@@ -16,6 +16,8 @@ class NoteParent {
 }
 
 class NoteService {
+  static const retention = Duration(days: 183);
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   String get _uid => FirebaseAuth.instance.currentUser!.uid;
@@ -30,28 +32,63 @@ class NoteService {
         .collection('notes');
   }
 
+  Map<String, dynamic> _notePayload({
+    required String text,
+    required DateTime createdAt,
+  }) {
+    return {
+      'text': text,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'expiresAt': Timestamp.fromDate(createdAt.add(retention)),
+    };
+  }
+
   Future<void> addNote({
     required NoteParent parent,
     required String text,
+    DateTime? createdAt,
   }) async {
-    final now = DateTime.now();
+    final at = createdAt ?? DateTime.now();
+    await _notesRef(parent).add(_notePayload(text: text, createdAt: at));
+  }
 
-    await _notesRef(parent).add({
-      'text': text,
-      'createdAt': Timestamp.fromDate(now),
-      'expiresAt': Timestamp.fromDate(now.add(const Duration(days: 183))),
-    });
+  /// Same journal text/date on each parent (home multi-select).
+  Future<void> addNotes({
+    required Iterable<NoteParent> parents,
+    required String text,
+    DateTime? createdAt,
+  }) async {
+    final at = createdAt ?? DateTime.now();
+    final list = parents.toList();
+    const chunkSize = 200;
+    for (var i = 0; i < list.length; i += chunkSize) {
+      final chunk = list.skip(i).take(chunkSize);
+      final batch = _firestore.batch();
+      for (final parent in chunk) {
+        batch.set(
+          _notesRef(parent).doc(),
+          _notePayload(text: text, createdAt: at),
+        );
+      }
+      await batch.commit();
+    }
   }
 
   Future<void> updateNote({
     required NoteParent parent,
     required String noteId,
     required String text,
+    DateTime? createdAt,
   }) async {
-    await _notesRef(parent).doc(noteId).update({
+    final updates = <String, dynamic>{
       'text': text,
       'updatedAt': FieldValue.serverTimestamp(),
-    });
+    };
+    if (createdAt != null) {
+      updates['createdAt'] = Timestamp.fromDate(createdAt);
+      updates['expiresAt'] = Timestamp.fromDate(createdAt.add(retention));
+    }
+    await _notesRef(parent).doc(noteId).update(updates);
   }
 
   Future<void> deleteNote({

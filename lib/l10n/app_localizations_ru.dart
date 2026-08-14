@@ -614,6 +614,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeRepotting => 'Пересадка';
 
   @override
+  String get homeNotes => 'Заметки';
+
+  @override
   String get homeUpdateFamily => 'Изменить семейство';
 
   @override
@@ -627,6 +630,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get homeRepotSelectedTitle => 'Пересадить выбранные растения';
+
+  @override
+  String get homeNotesSelectedTitle => 'Заметка для выбранных растений';
 
   @override
   String get homeDeleteSelectedTitle => 'Удалить выбранные растения?';
@@ -1222,6 +1228,10 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get notesAddHint =>
       'Добавьте новую запись в журнал для этого растения.';
+
+  @override
+  String get notesAddHintBulk =>
+      'Одна и та же запись будет добавлена ко всем выбранным растениям.';
 
   @override
   String get notesEdit => 'Редактировать заметку';

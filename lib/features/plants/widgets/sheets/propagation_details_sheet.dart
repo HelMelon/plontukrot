@@ -410,7 +410,9 @@ class PropagationDetailsSheet extends StatelessWidget {
                                   backgroundColor: Colors.transparent,
                                   enableDrag: true,
                                   builder: (_) => AddNoteSheet(
-                                    parent: NoteParent.propagation(shown.id),
+                                    parents: [
+                                      NoteParent.propagation(shown.id),
+                                    ],
                                   ),
                                 );
                               },

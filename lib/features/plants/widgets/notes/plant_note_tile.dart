@@ -76,6 +76,7 @@ class PlantNoteTile extends StatelessWidget {
         parent: parent,
         noteId: note.id,
         initialText: note.text,
+        initialCreatedAt: note.createdAt,
       ),
     );
   }

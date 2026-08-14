@@ -613,6 +613,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeRepotting => 'Repotting';
 
   @override
+  String get homeNotes => 'Notes';
+
+  @override
   String get homeUpdateFamily => 'Update family';
 
   @override
@@ -626,6 +629,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeRepotSelectedTitle => 'Repot selected plants';
+
+  @override
+  String get homeNotesSelectedTitle => 'Add a note to selected plants';
 
   @override
   String get homeDeleteSelectedTitle => 'Delete selected plants?';
@@ -1217,6 +1223,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notesAddHint => 'Add a new journal entry for this plant.';
+
+  @override
+  String get notesAddHintBulk =>
+      'The same journal entry will be added to every selected plant.';
 
   @override
   String get notesEdit => 'Edit note';

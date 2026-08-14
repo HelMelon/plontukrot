@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
@@ -9,12 +10,14 @@ class UpdateNoteSheet extends StatefulWidget {
   final NoteParent parent;
   final String noteId;
   final String initialText;
+  final DateTime? initialCreatedAt;
 
   const UpdateNoteSheet({
     super.key,
     required this.parent,
     required this.noteId,
     required this.initialText,
+    this.initialCreatedAt,
   });
 
   @override
@@ -23,13 +26,38 @@ class UpdateNoteSheet extends StatefulWidget {
 
 class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
   late final TextEditingController controller;
+  late DateTime _selectedDate;
 
   bool isLoading = false;
+  String? _textError;
 
   @override
   void initState() {
     super.initState();
     controller = TextEditingController(text: widget.initialText);
+    _selectedDate = widget.initialCreatedAt ?? DateTime.now();
+  }
+
+  Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final initial =
+        _selectedDate.isAfter(now) ? now : _selectedDate;
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2020),
+      lastDate: now,
+    );
+    if (picked == null) return;
+    setState(() {
+      _selectedDate = DateTime(
+        picked.year,
+        picked.month,
+        picked.day,
+        _selectedDate.hour,
+        _selectedDate.minute,
+      );
+    });
   }
 
   Future<void> save() async {
@@ -37,14 +65,13 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
     final text = controller.text.trim();
 
     if (text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.notesCannotBeEmpty)),
-      );
+      setState(() => _textError = l10n.notesCannotBeEmpty);
       return;
     }
 
     setState(() {
       isLoading = true;
+      _textError = null;
     });
 
     try {
@@ -52,6 +79,7 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
         parent: widget.parent,
         noteId: widget.noteId,
         text: text,
+        createdAt: _selectedDate,
       );
 
       if (mounted) {
@@ -87,6 +115,7 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
         media.viewInsets.bottom -
         media.padding.top -
         media.padding.bottom;
+    final dateLabel = DateFormat('d MMM y').format(_selectedDate);
 
     return Container(
       constraints: BoxConstraints(maxHeight: maxHeight),
@@ -112,13 +141,31 @@ class _UpdateNoteSheetState extends State<UpdateNoteSheet> {
                 overflow: TextOverflow.ellipsis,
               ),
               spacing.vLg,
+              Semantics(
+                button: true,
+                label: l10n.a11ySelectDate(dateLabel),
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const ExcludeSemantics(
+                    child: Icon(Icons.calendar_today),
+                  ),
+                  title: Text(dateLabel),
+                  onTap: _pickDate,
+                ),
+              ),
+              spacing.vMd,
               TextField(
                 controller: controller,
                 maxLines: 4,
                 style: inputs.textStyle,
+                onChanged: (_) {
+                  if (_textError != null) {
+                    setState(() => _textError = null);
+                  }
+                },
                 decoration: inputs.decoration(
                   labelText: l10n.notesEditLabel,
-                ),
+                ).copyWith(errorText: _textError),
               ),
               spacing.vLg,
               SizedBox(
