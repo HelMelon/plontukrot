@@ -67,6 +67,10 @@ class StartupWarmupService {
           await precacheImage(
             CachedNetworkImageProvider(urls[index]),
             context,
+            onError: (error, stackTrace) {
+              // Missing/expired Storage objects (403/404) must not dump
+              // FlutterError — cards already fall back via PlantNetworkImage.
+            },
           );
         } on Object {
           // Skip failed URLs.
