@@ -228,11 +228,35 @@ abstract class AppLocalizations {
   /// **'Open profile'**
   String get a11yOpenProfile;
 
+  /// No description provided for @a11yLastFertilized.
+  ///
+  /// In en, this message translates to:
+  /// **'Last fertilized: {date}'**
+  String a11yLastFertilized(String date);
+
+  /// No description provided for @a11yLastWatered.
+  ///
+  /// In en, this message translates to:
+  /// **'Last watered: {date}'**
+  String a11yLastWatered(String date);
+
+  /// No description provided for @a11yPropagationBatches.
+  ///
+  /// In en, this message translates to:
+  /// **'Propagation batches: {count}'**
+  String a11yPropagationBatches(int count);
+
   /// No description provided for @plantPhotoAdd.
   ///
   /// In en, this message translates to:
   /// **'Add photo'**
   String get plantPhotoAdd;
+
+  /// No description provided for @plantPhotoAttached.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo selected'**
+  String get plantPhotoAttached;
 
   /// No description provided for @commonToday.
   ///

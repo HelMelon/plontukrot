@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:typed_data';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import 'package:plontukrot/core/theme/theme_context.dart';
@@ -13,6 +11,7 @@ import '../../../services/growth_event_service.dart';
 import '../../../services/note_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/storage_service.dart';
+import '../widgets/common/pick_and_crop_plant_photo.dart';
 import '../widgets/sheets/update_plant_sheet.dart';
 import '../widgets/sheets/add_note_sheet.dart';
 import '../widgets/sheets/add_propagation_sheet.dart';
@@ -26,7 +25,6 @@ import '../widgets/cards/plant_info_card.dart';
 import '../widgets/growth/plant_leaf_counter.dart';
 import '../widgets/growth/plant_vine_painter.dart';
 import '../widgets/growth/leaf_removal_reason_sheet.dart';
-import 'plant_image_crop_page.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
@@ -59,59 +57,8 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
     _growthEventService.purgeExpired(widget.plantId);
   }
 
-  Future<ImageSource?> selectImageSource() async {
-    final l10n = AppLocalizations.of(context);
-    final sheets = context.components.sheets;
-    return showAppModalBottomSheet<ImageSource>(
-      context: context,
-      backgroundColor: sheets.background,
-      shape: RoundedRectangleBorder(
-        borderRadius: sheets.topBorderRadius,
-      ),
-      builder: (context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: Text(l10n.plantGallery),
-                onTap: () => Navigator.pop(context, ImageSource.gallery),
-              ),
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: Text(l10n.plantCamera),
-                onTap: () => Navigator.pop(context, ImageSource.camera),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   Future<void> pickAndUploadImage() async {
-    final source = await selectImageSource();
-    if (source == null) return;
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(
-      source: source,
-      imageQuality: 80,
-      maxWidth: 1280,
-      maxHeight: 1280,
-    );
-
-    if (pickedFile == null) return;
-
-    final Uint8List sourceBytes = await pickedFile.readAsBytes();
-    if (!mounted) return;
-
-    final Uint8List? croppedBytes = await Navigator.of(context).push<Uint8List>(
-      MaterialPageRoute(
-        builder: (_) => PlantImageCropPage(imageBytes: sourceBytes),
-      ),
-    );
-
+    final croppedBytes = await pickAndCropPlantPhoto(context);
     if (croppedBytes == null) return;
 
     setState(() => isUploading = true);

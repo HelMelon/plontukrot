@@ -201,9 +201,20 @@ class PropagationService {
   }
 
   Stream<Set<String>> watchActiveParentPlantIds() {
-    return watchActivePropagations().map(
-      (items) => items.map((item) => item.parentPlantId).toSet(),
-    );
+    return watchActiveBatchCountsByPlantId().map((counts) => counts.keys.toSet());
+  }
+
+  /// Active batch count per parent plant id.
+  Stream<Map<String, int>> watchActiveBatchCountsByPlantId() {
+    return watchActivePropagations().map((items) {
+      final counts = <String, int>{};
+      for (final item in items) {
+        final id = item.parentPlantId;
+        if (id.isEmpty) continue;
+        counts[id] = (counts[id] ?? 0) + 1;
+      }
+      return counts;
+    });
   }
 
   Stream<List<Propagation>> watchPropagationsForPlant(String plantId) {

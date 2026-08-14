@@ -79,7 +79,25 @@ class AppLocalizationsFr extends AppLocalizations {
   String get a11yOpenProfile => 'Ouvrir le profil';
 
   @override
+  String a11yLastFertilized(String date) {
+    return 'Dernière fertilisation : $date';
+  }
+
+  @override
+  String a11yLastWatered(String date) {
+    return 'Dernier arrosage : $date';
+  }
+
+  @override
+  String a11yPropagationBatches(int count) {
+    return 'Lots de propagation : $count';
+  }
+
+  @override
   String get plantPhotoAdd => 'Ajouter une photo';
+
+  @override
+  String get plantPhotoAttached => 'Photo sélectionnée';
 
   @override
   String get commonToday => 'Aujourd’hui';

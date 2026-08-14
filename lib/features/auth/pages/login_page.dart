@@ -24,9 +24,10 @@ class _LoginPageState extends State<LoginPage> {
   bool _consentLoaded = false;
   bool _consentError = false;
 
-  /// Device already remembered consent — hide the checkbox row.
-  bool get _consentRememberedOnDevice =>
-      _consentLoaded && _consentAccepted;
+  /// True only if consent was already stored on this device BEFORE this
+  /// screen opened. Not affected by toggling the checkbox, so the form stays
+  /// visible until the user actually signs in (consent is persisted on sign-in).
+  bool _consentRememberedOnDevice = false;
 
   @override
   void initState() {
@@ -40,15 +41,15 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       _consentAccepted = accepted;
       _consentLoaded = true;
+      _consentRememberedOnDevice = accepted;
     });
   }
 
-  Future<void> _onConsentChanged(bool value) async {
+  void _onConsentChanged(bool value) {
     setState(() {
       _consentAccepted = value;
       if (value) _consentError = false;
     });
-    await DeviceConsentStore.instance.setAccepted(value);
   }
 
   bool _ensureConsent() {

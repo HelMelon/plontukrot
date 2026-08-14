@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
@@ -23,7 +24,7 @@ class PlantCard extends StatelessWidget {
   final Plant plant;
   final bool isSelected;
   final bool preferSpeciesAsTitle;
-  final bool showLastFertilizer;
+  final int propagationBatchCount;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
@@ -32,18 +33,14 @@ class PlantCard extends StatelessWidget {
     required this.plant,
     this.isSelected = false,
     this.preferSpeciesAsTitle = false,
-    this.showLastFertilizer = false,
+    this.propagationBatchCount = 0,
     this.onTap,
     this.onLongPress,
   });
 
-  String? get _fertilizerLabel {
-    if (!showLastFertilizer) return null;
-    final name = plant.lastFertilizerName?.trim();
-    if (name != null && name.isNotEmpty) return name;
-    final at = plant.lastFertilizedAt;
-    if (at == null) return null;
-    return DateFormat('d MMM y').format(at);
+  String _dateLabel(DateTime? date, String empty) {
+    if (date == null) return empty;
+    return DateFormat('d.MM').format(date);
   }
 
   @override
@@ -57,6 +54,10 @@ class PlantCard extends StatelessWidget {
     final imageUrl = plant.listImageUrl;
     final fullUrl = plant.imageUrl?.trim();
     final hasImage = imageUrl != null;
+    final emptyDate = l10n.profileEmDash;
+    final fertilizedLabel = _dateLabel(plant.lastFertilizedAt, emptyDate);
+    final wateredLabel = _dateLabel(plant.lastWateredAt, emptyDate);
+    final batchesLabel = '$propagationBatchCount';
 
     final speciesBase =
         (plant.species.isEmpty ? l10n.commonUntitled : plant.species)
@@ -70,11 +71,12 @@ class PlantCard extends StatelessWidget {
     final title = showSpeciesOnTop ? species : nickname;
     final subtitle =
         showSpeciesOnTop ? (hasNickname ? nickname : null) : species;
-    final fertilizerName = _fertilizerLabel;
     final semanticsLabel = [
       title,
       if (subtitle != null) subtitle,
-      if (fertilizerName != null) fertilizerName,
+      l10n.a11yLastFertilized(fertilizedLabel),
+      l10n.a11yLastWatered(wateredLabel),
+      l10n.a11yPropagationBatches(propagationBatchCount),
     ].join('. ');
 
     return Semantics(
@@ -131,45 +133,69 @@ class PlantCard extends StatelessWidget {
                         padding: EdgeInsets.all(spacing.sm),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Flexible(
-                              child: Text(
-                                title,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: typography.bodyEmphasis.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: -0.3,
-                                  color: colors.primary,
-                                  height: 1.2,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: typography.bodyEmphasis.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: -0.3,
+                                    color: colors.primary,
+                                    height: 1.2,
+                                  ),
                                 ),
-                              ),
+                                if (subtitle != null) ...[
+                                  spacing.vXxs,
+                                  Text(
+                                    subtitle,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: typography.bodySmall.copyWith(
+                                      color: colors.textSecondary,
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
-                            if (subtitle != null) ...[
-                              spacing.vXxs,
-                              Text(
-                                subtitle,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: typography.bodySmall.copyWith(
-                                  color: colors.textSecondary,
-                                  height: 1.2,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Divider(color: colors.primary, thickness: 1),
+                                ExcludeSemantics(
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: _StatChip(
+                                          icon: Icons.science_outlined,
+                                          label: fertilizedLabel,
+                                        ),
+                                      ),
+                                      spacing.hXxs,
+                                      Expanded(
+                                        child: _StatChip(
+                                          icon: Icons.water_drop_outlined,
+                                          label: wateredLabel,
+                                        ),
+                                      ),
+                                      spacing.hXxs,
+                                      Expanded(
+                                        child: _StatChip(
+                                          hugeIcon: HugeIcons
+                                              .strokeRoundedEcoLab01,
+                                          label: batchesLabel,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                            if (fertilizerName != null) ...[
-                              spacing.vXxs,
-                              Text(
-                                fertilizerName,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: typography.bodySmall.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                  color: colors.icon,
-                                  height: 1.2,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -197,6 +223,54 @@ class PlantCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _StatChip extends StatelessWidget {
+  final IconData? icon;
+  final List<List<dynamic>>? hugeIcon;
+  final String label;
+
+  const _StatChip({
+    this.icon,
+    this.hugeIcon,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final iconSize = context.dimensions.iconSm;
+    final Widget leading;
+    if (icon != null) {
+      leading = Icon(icon, size: iconSize, color: colors.icon);
+    } else {
+      leading = HugeIcon(
+        icon: hugeIcon!,
+        size: iconSize,
+        color: colors.icon,
+      );
+    }
+
+    return Row(
+      children: [
+        leading,
+        SizedBox(width: spacing.xxs),
+        Expanded(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: typography.caption.copyWith(
+              color: colors.textSecondary,
+              height: 1.1,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

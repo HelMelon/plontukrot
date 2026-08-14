@@ -9,6 +9,9 @@ import '../../../../models/variegation.dart';
 import '../../../../core/season/fertilizing_season_controller.dart';
 import '../../../../models/fertilizing_frequency.dart';
 import '../../../../services/plant_service.dart';
+import '../../../../services/storage_service.dart';
+import '../common/pick_and_crop_plant_photo.dart';
+import '../common/plant_pending_photo_control.dart';
 import '../selectors/fertilizing_frequency_field.dart';
 import '../selectors/plant_stage_selector.dart';
 import '../selectors/plant_variegation_selector.dart';
@@ -62,8 +65,11 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   bool isFertilizingFrequencyCustom = false;
   String? genusError;
   String? speciesError;
+  Uint8List? _pendingPhotoBytes;
 
   bool get _isGroup => widget.plant.isGroup;
+
+  bool get _canAddFirstPhoto => widget.plant.galleryPhotos.isEmpty;
 
   @override
   void initState() {
@@ -120,6 +126,27 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
       member.dispose();
     }
     super.dispose();
+  }
+
+  Future<void> _pickPhoto() async {
+    final bytes = await pickAndCropPlantPhoto(context);
+    if (bytes == null || !mounted) return;
+    setState(() => _pendingPhotoBytes = bytes);
+  }
+
+  Future<void> _uploadPendingPhoto() async {
+    final bytes = _pendingPhotoBytes;
+    if (bytes == null || !_canAddFirstPhoto) return;
+    final upload = await StorageService().uploadPlantPhoto(
+      imageBytes: bytes,
+      plantId: widget.plantId,
+    );
+    await PlantService().addPlantPhoto(
+      plantId: widget.plantId,
+      photoId: upload.photoId,
+      imageUrl: upload.imageUrl,
+      imageThumbUrl: upload.imageThumbUrl,
+    );
   }
 
   InputDecoration _fieldDecoration({
@@ -262,9 +289,20 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
         isFertilizingFrequencyCustom: isFertilizingFrequencyCustom,
       );
 
-      if (mounted) {
-        Navigator.pop(context);
+      Object? photoError;
+      try {
+        await _uploadPendingPhoto();
+      } catch (e) {
+        photoError = e;
       }
+
+      if (!mounted) return;
+      if (photoError != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.plantUploadError(photoError.toString()))),
+        );
+      }
+      Navigator.pop(context);
     } catch (e) {
       if (mounted) {
         setState(() => isLoading = false);
@@ -332,6 +370,13 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          if (_canAddFirstPhoto) ...[
+                            PlantPendingPhotoControl(
+                              hasPhoto: _pendingPhotoBytes != null,
+                              onPick: _pickPhoto,
+                            ),
+                            spacing.vMd,
+                          ],
                           TextField(
                             controller: genusController,
                             style: inputs.textStyle,

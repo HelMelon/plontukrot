@@ -79,7 +79,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get a11yOpenProfile => 'Open profile';
 
   @override
+  String a11yLastFertilized(String date) {
+    return 'Last fertilized: $date';
+  }
+
+  @override
+  String a11yLastWatered(String date) {
+    return 'Last watered: $date';
+  }
+
+  @override
+  String a11yPropagationBatches(int count) {
+    return 'Propagation batches: $count';
+  }
+
+  @override
   String get plantPhotoAdd => 'Add photo';
+
+  @override
+  String get plantPhotoAttached => 'Photo selected';
 
   @override
   String get commonToday => 'Today';

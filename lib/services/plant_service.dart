@@ -91,6 +91,7 @@ class PlantService {
     required int stage,
     int initialLeafCount = 0,
     List<PlantMember> members = const [],
+    int? wateringFrequency,
     int? fertilizingFrequencyDays,
     bool isFertilizingFrequencyCustom = false,
   }) async {
@@ -123,7 +124,7 @@ class PlantService {
       'imageUrl': null,
       'imageThumbUrl': null,
       'images': <Map<String, dynamic>>[],
-      'wateringFrequency': null,
+      'wateringFrequency': wateringFrequency,
       'fertilizingFrequencyDays': resolvedFrequency,
       'isFertilizingFrequencyCustom': isFertilizingFrequencyCustom,
       'initialLeafCount': safeInitialLeafCount,

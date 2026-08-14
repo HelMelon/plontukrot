@@ -38,9 +38,10 @@ class _PersonalDataConsentGatePageState
   bool _consentError = false;
   bool _autoSyncStarted = false;
 
-  /// Device already remembered consent — hide the checkbox row.
-  bool get _consentRememberedOnDevice =>
-      _deviceConsentLoaded && _accepted;
+  /// True only if consent was already stored on this device BEFORE this
+  /// screen opened. Not affected by toggling the checkbox, so the form stays
+  /// visible until the user actually submits (consent is persisted on submit).
+  bool _consentRememberedOnDevice = false;
 
   @override
   void initState() {
@@ -54,6 +55,7 @@ class _PersonalDataConsentGatePageState
     setState(() {
       _accepted = accepted;
       _deviceConsentLoaded = true;
+      _consentRememberedOnDevice = accepted;
     });
   }
 

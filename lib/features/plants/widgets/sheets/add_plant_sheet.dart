@@ -7,7 +7,10 @@ import '../../../../models/variegation.dart';
 import '../../../../core/season/fertilizing_season_controller.dart';
 import '../../../../models/fertilizing_frequency.dart';
 import '../../../../services/plant_service.dart';
+import '../../../../services/storage_service.dart';
 import '../../../../services/wish_list_service.dart';
+import '../common/pick_and_crop_plant_photo.dart';
+import '../common/plant_pending_photo_control.dart';
 import '../selectors/fertilizing_frequency_field.dart';
 import '../selectors/plant_stage_selector.dart';
 import '../selectors/plant_variegation_selector.dart';
@@ -46,6 +49,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
   bool isFertilizingFrequencyCustom = false;
   String? genusError;
   String? speciesError;
+  Uint8List? _pendingPhotoBytes;
 
   @override
   void initState() {
@@ -57,7 +61,9 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
     tradingNameController = TextEditingController(
       text: widget.initialTradingName ?? '',
     );
-    wateringFrequencyController = TextEditingController();
+    wateringFrequencyController = TextEditingController(
+      text: selectedStage == 0 ? '0' : '',
+    );
     initialLeafCountController = TextEditingController(text: '0');
     fertilizingFrequencyDays = resolveFertilizingFrequencyDays(
       stage: selectedStage,
@@ -78,6 +84,27 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
     wateringFrequencyController.dispose();
     initialLeafCountController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickPhoto() async {
+    final bytes = await pickAndCropPlantPhoto(context);
+    if (bytes == null || !mounted) return;
+    setState(() => _pendingPhotoBytes = bytes);
+  }
+
+  Future<void> _uploadPendingPhoto(String plantId) async {
+    final bytes = _pendingPhotoBytes;
+    if (bytes == null) return;
+    final upload = await StorageService().uploadPlantPhoto(
+      imageBytes: bytes,
+      plantId: plantId,
+    );
+    await PlantService().addPlantPhoto(
+      plantId: plantId,
+      photoId: upload.photoId,
+      imageUrl: upload.imageUrl,
+      imageThumbUrl: upload.imageThumbUrl,
+    );
   }
 
   InputDecoration _fieldDecoration({
@@ -128,6 +155,9 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
     final plantFamily = plantFamilyController.text.trim();
     final tradingName = tradingNameController.text.trim();
     final nickname = nickNameController.text.trim();
+    final wateringRaw = wateringFrequencyController.text.trim();
+    final wateringFrequency =
+        wateringRaw.isEmpty ? null : int.tryParse(wateringRaw);
     final initialLeafRaw = initialLeafCountController.text.trim();
     final initialLeafCount =
         initialLeafRaw.isEmpty ? 0 : int.tryParse(initialLeafRaw);
@@ -145,6 +175,13 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
         genusError = nextGenusError;
         speciesError = nextSpeciesError;
       });
+      return;
+    }
+
+    if (wateringRaw.isNotEmpty && wateringFrequency == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.plantInvalidWateringFrequency)),
+      );
       return;
     }
 
@@ -174,7 +211,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
     }
 
     try {
-      await PlantService().addPlant(
+      final plantId = await PlantService().addPlant(
         genus: genus,
         species: species,
         cultivar: cultivar.isEmpty ? null : cultivar,
@@ -184,18 +221,30 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
         nickname: nickname,
         stage: selectedStage,
         initialLeafCount: initialLeafCount,
+        wateringFrequency: wateringFrequency,
         fertilizingFrequencyDays: fertilizingFrequencyDays,
         isFertilizingFrequencyCustom: isFertilizingFrequencyCustom,
       );
+
+      Object? photoError;
+      try {
+        await _uploadPendingPhoto(plantId);
+      } catch (e) {
+        photoError = e;
+      }
 
       final wishListItemId = widget.wishListItemId;
       if (wishListItemId != null) {
         await WishListService().deleteItem(wishListItemId);
       }
 
-      if (mounted) {
-        Navigator.pop(context);
+      if (!mounted) return;
+      if (photoError != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.plantUploadError(photoError.toString()))),
+        );
       }
+      Navigator.pop(context);
     } catch (e) {
       if (mounted) {
         setState(() => isLoading = false);
@@ -263,6 +312,11 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          PlantPendingPhotoControl(
+                            hasPhoto: _pendingPhotoBytes != null,
+                            onPick: _pickPhoto,
+                          ),
+                          spacing.vMd,
                           TextField(
                             controller: genusController,
                             style: inputs.textStyle,
@@ -352,6 +406,9 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             onChanged: (value) {
                               setState(() {
                                 selectedStage = value;
+                                if (value == 0) {
+                                  wateringFrequencyController.text = '0';
+                                }
                                 if (!isFertilizingFrequencyCustom) {
                                   fertilizingFrequencyDays =
                                       resolveFertilizingFrequencyDays(

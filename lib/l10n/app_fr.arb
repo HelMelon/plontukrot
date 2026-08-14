@@ -39,7 +39,26 @@
   },
   "a11yProfilePhoto": "Photo de profil",
   "a11yOpenProfile": "Ouvrir le profil",
+  "a11yLastFertilized": "Dernière fertilisation : {date}",
+  "@a11yLastFertilized": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "a11yLastWatered": "Dernier arrosage : {date}",
+  "@a11yLastWatered": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "a11yPropagationBatches": "Lots de propagation : {count}",
+  "@a11yPropagationBatches": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "plantPhotoAdd": "Ajouter une photo",
+  "plantPhotoAttached": "Photo sélectionnée",
   "commonToday": "Aujourd’hui",
   "commonError": "Erreur : {error}",
   "commonShowMore": "Afficher plus",

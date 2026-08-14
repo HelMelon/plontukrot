@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
   final Set<String> _collapsedLetterGroups = {};
   late final Stream<bool> _userDocumentExistsStream;
   late final Stream<List<Plant>> _plantsStream;
-  late final Stream<Set<String>> _activeParentPlantIdsStream;
+  late final Stream<Map<String, int>> _activeBatchCountsStream;
   List<Plant> _latestPlants = const [];
   _PlantSortField _sortField = _PlantSortField.createdAt;
   bool _sortAscending = false;
@@ -101,8 +101,8 @@ class _HomePageState extends State<HomePage> {
     // open their own PlantService().getPlants() listeners — sharing a
     // broadcast without per-listener replay left them on an infinite spinner.
     _plantsStream = PlantService().getPlants();
-    _activeParentPlantIdsStream =
-        PropagationService().watchActiveParentPlantIds();
+    _activeBatchCountsStream =
+        PropagationService().watchActiveBatchCountsByPlantId();
   }
 
   Future<void> _signalFirstContentReady(List<Plant> plants) async {
@@ -327,6 +327,7 @@ class _HomePageState extends State<HomePage> {
     Map<String, List<Plant>> groups,
     int crossAxisCount, {
     required String Function(String key) titleForKey,
+    required Map<String, int> batchCounts,
   }) {
     final colors = _colors;
     final spacing = _spacing;
@@ -387,6 +388,7 @@ class _HomePageState extends State<HomePage> {
                 _buildPlantGrid(
                   entry.value,
                   crossAxisCount,
+                  batchCounts: batchCounts,
                 ),
             ],
           ),
@@ -395,11 +397,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildPlantGrid(List<Plant> plants, int crossAxisCount) {
+  Widget _buildPlantGrid(
+    List<Plant> plants,
+    int crossAxisCount, {
+    required Map<String, int> batchCounts,
+  }) {
     final preferSpeciesAsTitle = _sortField == _PlantSortField.species ||
         _sortField == _PlantSortField.plantFamily;
-    final showLastFertilizer = _sortField == _PlantSortField.lastFertilizedAt;
-    final childAspectRatio = showLastFertilizer ? 0.48 : 0.55;
+    const childAspectRatio = 0.625;
 
     return GridView.builder(
       shrinkWrap: true,
@@ -417,7 +422,7 @@ class _HomePageState extends State<HomePage> {
           plant: plant,
           isSelected: _selectedPlantIds.contains(plant.id),
           preferSpeciesAsTitle: preferSpeciesAsTitle,
-          showLastFertilizer: showLastFertilizer,
+          propagationBatchCount: batchCounts[plant.id] ?? 0,
           onTap:
               _isSelectionMode ? () => _togglePlantSelection(plant.id) : null,
           onLongPress: () => _togglePlantSelection(plant.id),
@@ -1101,16 +1106,16 @@ class _HomePageState extends State<HomePage> {
                     _latestPlants = plants;
                     unawaited(_signalFirstContentReady(plants));
 
-                    return StreamBuilder<Set<String>>(
-                      stream: _activeParentPlantIdsStream,
+                    return StreamBuilder<Map<String, int>>(
+                      stream: _activeBatchCountsStream,
                       builder: (context, propagatingSnapshot) {
-                        final propagatingIds =
-                            propagatingSnapshot.data ?? const <String>{};
+                        final batchCounts =
+                            propagatingSnapshot.data ?? const <String, int>{};
                         var workingPlants = plants;
                         if (_filterPropagatingOnly) {
                           workingPlants = workingPlants
                               .where(
-                                (plant) => propagatingIds.contains(plant.id),
+                                (plant) => batchCounts.containsKey(plant.id),
                               )
                               .toList();
                         }
@@ -1376,6 +1381,7 @@ class _HomePageState extends State<HomePage> {
                                     _groupPlantsByLetter(sortedPlants),
                                     crossAxisCount,
                                     titleForKey: (key) => key,
+                                    batchCounts: batchCounts,
                                   )
                                 else if (_sortField ==
                                     _PlantSortField.plantFamily)
@@ -1383,6 +1389,7 @@ class _HomePageState extends State<HomePage> {
                                     _groupPlantsByFamily(sortedPlants),
                                     crossAxisCount,
                                     titleForKey: groupTitle,
+                                    batchCounts: batchCounts,
                                   )
                                 else if (_sortField ==
                                     _PlantSortField.lastWateredAt)
@@ -1394,6 +1401,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     crossAxisCount,
                                     titleForKey: (key) => key,
+                                    batchCounts: batchCounts,
                                   )
                                 else if (_sortField ==
                                     _PlantSortField.lastFertilizedAt)
@@ -1405,11 +1413,13 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     crossAxisCount,
                                     titleForKey: (key) => key,
+                                    batchCounts: batchCounts,
                                   )
                                 else
                                   _buildPlantGrid(
                                     sortedPlants,
                                     crossAxisCount,
+                                    batchCounts: batchCounts,
                                   ),
                               ],
                             );

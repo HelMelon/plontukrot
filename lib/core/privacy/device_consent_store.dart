@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Device-local cache of personal-data consent.
@@ -35,4 +36,9 @@ class DeviceConsentStore {
   Future<void> rememberAccepted() => setAccepted(true);
 
   Future<void> clear() => setAccepted(false);
+
+  /// Test-only: drop the cached prefs handle so the next read re-fetches
+  /// from the (possibly re-mocked) backing store.
+  @visibleForTesting
+  void resetCache() => _prefs = null;
 }
