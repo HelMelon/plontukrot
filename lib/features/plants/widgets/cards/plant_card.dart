@@ -54,6 +54,7 @@ class PlantCard extends StatelessWidget {
     final imageUrl = plant.listImageUrl;
     final fullUrl = plant.imageUrl?.trim();
     final hasImage = imageUrl != null;
+    final isMobile = MediaQuery.sizeOf(context).width < 600;
     final emptyDate = l10n.profileEmDash;
     final fertilizedLabel = _dateLabel(plant.lastFertilizedAt, emptyDate);
     final wateredLabel = _dateLabel(plant.lastWateredAt, emptyDate);
@@ -168,31 +169,54 @@ class PlantCard extends StatelessWidget {
                               children: [
                                 Divider(color: colors.primary, thickness: 1),
                                 ExcludeSemantics(
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: _StatChip(
-                                          icon: Icons.science_outlined,
-                                          label: fertilizedLabel,
+                                  child: isMobile
+                                      ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            _StatChip(
+                                              icon: Icons.science_outlined,
+                                              label: fertilizedLabel,
+                                            ),
+                                            spacing.vXxs,
+                                            _StatChip(
+                                              icon: Icons.water_drop_outlined,
+                                              label: wateredLabel,
+                                            ),
+                                            spacing.vXxs,
+                                            _StatChip(
+                                              hugeIcon: HugeIcons
+                                                  .strokeRoundedEcoLab01,
+                                              label: batchesLabel,
+                                            ),
+                                          ],
+                                        )
+                                      : Row(
+                                          children: [
+                                            Expanded(
+                                              child: _StatChip(
+                                                icon: Icons.science_outlined,
+                                                label: fertilizedLabel,
+                                              ),
+                                            ),
+                                            spacing.hXxs,
+                                            Expanded(
+                                              child: _StatChip(
+                                                icon:
+                                                    Icons.water_drop_outlined,
+                                                label: wateredLabel,
+                                              ),
+                                            ),
+                                            spacing.hXxs,
+                                            Expanded(
+                                              child: _StatChip(
+                                                hugeIcon: HugeIcons
+                                                    .strokeRoundedEcoLab01,
+                                                label: batchesLabel,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      spacing.hXxs,
-                                      Expanded(
-                                        child: _StatChip(
-                                          icon: Icons.water_drop_outlined,
-                                          label: wateredLabel,
-                                        ),
-                                      ),
-                                      spacing.hXxs,
-                                      Expanded(
-                                        child: _StatChip(
-                                          hugeIcon: HugeIcons
-                                              .strokeRoundedEcoLab01,
-                                          label: batchesLabel,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
                                 ),
                               ],
                             ),

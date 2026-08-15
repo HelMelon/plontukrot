@@ -404,7 +404,8 @@ class _HomePageState extends State<HomePage> {
   }) {
     final preferSpeciesAsTitle = _sortField == _PlantSortField.species ||
         _sortField == _PlantSortField.plantFamily;
-    const childAspectRatio = 0.625;
+    final childAspectRatio =
+        crossAxisCount <= 2 ? 0.45 : 0.625;
 
     return GridView.builder(
       shrinkWrap: true,
