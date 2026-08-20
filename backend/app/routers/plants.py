@@ -1,0 +1,95 @@
+"""Plants endpoints (JWT-protected, scoped to the caller)."""
+import uuid
+
+from fastapi import APIRouter, Depends, HTTPException, status
+
+from ..db import get_pool
+from ..routers.auth import get_current_user_id
+from ..schemas import PlantCreate, PlantOut
+
+router = APIRouter(prefix="/plants", tags=["plants"])
+
+# Map Firestore-style field names to column names.
+_FIELDS = {
+    "genus": "genus",
+    "species": "species",
+    "cultivar": "cultivar",
+    "trading_name": "trading_name",
+    "plant_family": "plant_family",
+    "nickname": "nickname",
+    "stage": "stage",
+    "variegation": "variegation",
+    "watering_frequency": "watering_frequency",
+    "fertilizing_frequency_days": "fertilizing_frequency_days",
+    "initial_leaf_count": "initial_leaf_count",
+}
+
+
+@router.get("", response_model=list[PlantOut])
+def list_plants(user_id: str = Depends(get_current_user_id)):
+    """Return all plants belonging to the current user."""
+    with get_pool().connection() as conn:
+        rows = conn.execute(
+            "SELECT id, genus, species, cultivar, trading_name, plant_family, "
+            "nickname, stage, variegation, watering_frequency, "
+            "fertilizing_frequency_days, initial_leaf_count, last_watered_at, "
+            "last_fertilized_at, last_repotted_at, created_at "
+            "FROM plants WHERE user_id = %s ORDER BY created_at",
+            (user_id,),
+        ).fetchall()
+    return [_row_to_plant(r) for r in rows]
+
+
+@router.post("", response_model=PlantOut, status_code=201)
+def create_plant(payload: PlantCreate, user_id: str = Depends(get_current_user_id)):
+    plant_id = uuid.uuid4().hex[:20]
+    values = {
+        "id": plant_id,
+        "user_id": user_id,
+    }
+    for schema_field, column in _FIELDS.items():
+        val = getattr(payload, schema_field, None)
+        if val is not None:
+            values[column] = val
+    if payload.stage is None:
+        values["stage"] = 0
+    if payload.initial_leaf_count is None:
+        values["initial_leaf_count"] = 0
+
+    columns = ", ".join(values.keys())
+    placeholders = ", ".join(["%s"] * len(values))
+    with get_pool().connection() as conn:
+        conn.execute(
+            f"INSERT INTO plants ({columns}) VALUES ({placeholders})",
+            tuple(values.values()),
+        )
+        row = conn.execute(
+            "SELECT id, genus, species, cultivar, trading_name, plant_family, "
+            "nickname, stage, variegation, watering_frequency, "
+            "fertilizing_frequency_days, initial_leaf_count, last_watered_at, "
+            "last_fertilized_at, last_repotted_at, created_at "
+            "FROM plants WHERE id = %s",
+            (plant_id,),
+        ).fetchone()
+    return _row_to_plant(row)
+
+
+def _row_to_plant(row) -> PlantOut:
+    return PlantOut(
+        id=row["id"],
+        genus=row["genus"],
+        species=row["species"],
+        cultivar=row["cultivar"],
+        trading_name=row["trading_name"],
+        plant_family=row["plant_family"],
+        nickname=row["nickname"],
+        stage=row["stage"],
+        variegation=row["variegation"],
+        watering_frequency=row["watering_frequency"],
+        fertilizing_frequency_days=row["fertilizing_frequency_days"],
+        initial_leaf_count=row["initial_leaf_count"],
+        last_watered_at=row["last_watered_at"],
+        last_fertilized_at=row["last_fertilized_at"],
+        last_repotted_at=row["last_repotted_at"],
+        created_at=row["created_at"],
+    )

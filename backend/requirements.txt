@@ -1,0 +1,9 @@
+fastapi==0.141.1
+uvicorn[standard]==0.52.4
+psycopg[binary]==3.3.4
+psycopg-pool==3.3.2
+python-jose[cryptography]==3.5.0
+bcrypt==5.0.0
+pydantic[email]==2.13.4
+python-multipart==0.0.32
+boto3==1.43.75

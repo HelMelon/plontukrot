@@ -33,6 +33,15 @@ Thumbs.db
 *.keystore
 *.jks
 
+# Backend migrator artefacts / local venv
+backend/.venv/
+backend/migrated_users.txt
+backend/migrated_unmapped.json
+
+# Python build artefacts
+__pycache__/
+*.pyc
+
 
 ios/Podfile.lock
 tools/export_plants.dart
