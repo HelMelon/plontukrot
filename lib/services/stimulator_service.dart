@@ -1,27 +1,32 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
+import '../models/model_helpers.dart';
 import '../models/stimulator.dart';
+import 'api_client.dart';
+import 'api_exception.dart';
+import 'rest_stream.dart';
 
 class StimulatorService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final ApiClient _api = ApiClient.instance;
 
-  String get uid => FirebaseAuth.instance.currentUser!.uid;
+  String get uid => '';
 
-  CollectionReference<Map<String, dynamic>> get _stimulatorsRef =>
-      _db.collection('users').doc(uid).collection('stimulators');
+  Future<List<Stimulator>> _fetchAll() async {
+    final list = jsonMapList(await _api.get('/stimulators'));
+    return list
+        .map((m) => Stimulator.fromMap(readString(m, 'id') ?? '', m))
+        .toList()
+      ..sort((a, b) {
+        final aAt = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final bAt = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return bAt.compareTo(aAt);
+      });
+  }
 
   Future<Stimulator?> findStimulatorByName(String name) async {
     final trimmed = name.trim();
     if (trimmed.isEmpty) return null;
-
     final lower = trimmed.toLowerCase();
-    final snapshot = await _stimulatorsRef.get();
-    for (final doc in snapshot.docs) {
-      final existingName = (doc.data()['name'] as String?)?.trim() ?? '';
-      if (existingName.toLowerCase() == lower) {
-        return Stimulator.fromMap(doc.id, doc.data());
-      }
+    for (final item in await _fetchAll()) {
+      if (item.name.trim().toLowerCase() == lower) return item;
     }
     return null;
   }
@@ -30,13 +35,13 @@ class StimulatorService {
     required String name,
     String? defaultDosage,
   }) async {
-    final doc = await _stimulatorsRef.add({
+    final created = jsonMap(await _api.post('/stimulators', body: {
       'name': name.trim(),
-      if (defaultDosage != null && defaultDosage.trim().isNotEmpty)
-        'defaultDosage': defaultDosage.trim(),
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-    return doc.id;
+      'default_dosage': (defaultDosage != null && defaultDosage.trim().isNotEmpty)
+          ? defaultDosage.trim()
+          : null,
+    }));
+    return readString(created, 'id') ?? '';
   }
 
   Future<void> updateStimulator({
@@ -44,35 +49,27 @@ class StimulatorService {
     required String name,
     String? defaultDosage,
   }) async {
-    final updates = <String, dynamic>{
-      'name': name.trim(),
-    };
     final dosage = defaultDosage?.trim();
-    if (dosage != null && dosage.isNotEmpty) {
-      updates['defaultDosage'] = dosage;
-    } else {
-      updates['defaultDosage'] = FieldValue.delete();
+    try {
+      await _api.patch('/stimulators/$stimulatorId', body: {
+        'name': name.trim(),
+        'default_dosage': (dosage != null && dosage.isNotEmpty) ? dosage : null,
+      });
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
     }
-    await _stimulatorsRef.doc(stimulatorId).update(updates);
   }
 
   Future<void> deleteStimulator(String stimulatorId) async {
-    await _stimulatorsRef.doc(stimulatorId).delete();
+    await _api.delete('/stimulators/$stimulatorId');
   }
 
-  Stream<List<Stimulator>> watchStimulators() {
-    return _stimulatorsRef
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) =>
-              snapshot.docs.map(Stimulator.fromFirestore).toList(),
-        );
-  }
+  Stream<List<Stimulator>> watchStimulators() => restPollStream(_fetchAll);
 
   Future<Stimulator?> getStimulator(String stimulatorId) async {
-    final doc = await _stimulatorsRef.doc(stimulatorId).get();
-    if (!doc.exists || doc.data() == null) return null;
-    return Stimulator.fromMap(doc.id, doc.data()!);
+    for (final item in await _fetchAll()) {
+      if (item.id == stimulatorId) return item;
+    }
+    return null;
   }
 }

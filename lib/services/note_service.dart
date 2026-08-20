@@ -1,11 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 import '../models/note.dart';
+import '../models/model_helpers.dart';
+import 'api_client.dart';
+import 'api_exception.dart';
+import 'rest_stream.dart';
 
 enum NoteParentKind { plant, propagation }
 
-/// Owner of a journal notes subcollection (plant or propagation batch).
+/// Owner of a journal notes collection (plant or propagation batch).
 class NoteParent {
   final NoteParentKind kind;
   final String id;
@@ -18,29 +19,12 @@ class NoteParent {
 class NoteService {
   static const retention = Duration(days: 183);
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final ApiClient _api = ApiClient.instance;
 
-  String get _uid => FirebaseAuth.instance.currentUser!.uid;
-
-  CollectionReference<Map<String, dynamic>> _notesRef(NoteParent parent) {
-    final root = parent.kind == NoteParentKind.plant ? 'plants' : 'propagations';
-    return _firestore
-        .collection('users')
-        .doc(_uid)
-        .collection(root)
-        .doc(parent.id)
-        .collection('notes');
-  }
-
-  Map<String, dynamic> _notePayload({
-    required String text,
-    required DateTime createdAt,
-  }) {
-    return {
-      'text': text,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'expiresAt': Timestamp.fromDate(createdAt.add(retention)),
-    };
+  String _base(NoteParent parent) {
+    return parent.kind == NoteParentKind.plant
+        ? '/plants/${parent.id}/notes'
+        : '/propagations/${parent.id}/notes';
   }
 
   Future<void> addNote({
@@ -49,28 +33,19 @@ class NoteService {
     DateTime? createdAt,
   }) async {
     final at = createdAt ?? DateTime.now();
-    await _notesRef(parent).add(_notePayload(text: text, createdAt: at));
+    await _api.post(_base(parent), body: {
+      'text': text,
+      'expires_at': isoDate(at.add(retention)),
+    });
   }
 
-  /// Same journal text/date on each parent (home multi-select).
   Future<void> addNotes({
     required Iterable<NoteParent> parents,
     required String text,
     DateTime? createdAt,
   }) async {
-    final at = createdAt ?? DateTime.now();
-    final list = parents.toList();
-    const chunkSize = 200;
-    for (var i = 0; i < list.length; i += chunkSize) {
-      final chunk = list.skip(i).take(chunkSize);
-      final batch = _firestore.batch();
-      for (final parent in chunk) {
-        batch.set(
-          _notesRef(parent).doc(),
-          _notePayload(text: text, createdAt: at),
-        );
-      }
-      await batch.commit();
+    for (final parent in parents) {
+      await addNote(parent: parent, text: text, createdAt: createdAt);
     }
   }
 
@@ -80,31 +55,42 @@ class NoteService {
     required String text,
     DateTime? createdAt,
   }) async {
-    final updates = <String, dynamic>{
-      'text': text,
-      'updatedAt': FieldValue.serverTimestamp(),
-    };
-    if (createdAt != null) {
-      updates['createdAt'] = Timestamp.fromDate(createdAt);
-      updates['expiresAt'] = Timestamp.fromDate(createdAt.add(retention));
+    try {
+      await _api.patch('${_base(parent)}/$noteId', body: {
+        'text': text,
+        if (createdAt != null) ...{
+          'expires_at': isoDate(createdAt.add(retention)),
+        },
+      });
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
     }
-    await _notesRef(parent).doc(noteId).update(updates);
   }
 
   Future<void> deleteNote({
     required NoteParent parent,
     required String noteId,
   }) async {
-    await _notesRef(parent).doc(noteId).delete();
+    try {
+      await _api.delete('${_base(parent)}/$noteId');
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
+    }
   }
 
   Stream<List<Note>> notesStream(NoteParent parent, {int limit = 20}) {
-    return _notesRef(parent)
-        .orderBy('createdAt', descending: true)
-        .limit(limit)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs.map(Note.fromFirestore).toList(),
-        );
+    return restPollStream(() async {
+      final list = jsonMapList(await _api.get(_base(parent)));
+      final notes = list
+          .map((m) => Note.fromMap(readString(m, 'id') ?? '', m))
+          .toList()
+        ..sort((a, b) {
+          final aAt = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          final bAt = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          return bAt.compareTo(aAt);
+        });
+      if (notes.length <= limit) return notes;
+      return notes.take(limit).toList();
+    });
   }
 }

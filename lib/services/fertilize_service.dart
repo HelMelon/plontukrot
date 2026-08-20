@@ -1,55 +1,51 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 import '../models/fertilizer.dart';
 import '../models/fertilizer_application_method.dart';
 import '../models/fertilizer_dose.dart';
 import '../models/fertilizer_ingredient.dart';
 import '../models/fertilizing_entry.dart';
+import '../models/model_helpers.dart';
+import 'api_client.dart';
+import 'api_exception.dart';
 import 'growth_event_service.dart';
 import 'fertilizing_notification_service.dart';
 import 'plant_service.dart';
+import 'rest_stream.dart';
 import 'watering_service.dart';
 
 class FertilizeService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final ApiClient _api = ApiClient.instance;
 
-  String get uid => FirebaseAuth.instance.currentUser!.uid;
+  String? get uid => null;
 
-  CollectionReference<Map<String, dynamic>> get _fertilizersRef =>
-      _db.collection('users').doc(uid).collection('fertilizers');
-
-  CollectionReference<Map<String, dynamic>> get _ingredientsRef =>
-      _db.collection('users').doc(uid).collection('fertilizerComponents');
-
-  CollectionReference<Map<String, dynamic>> _fertilizingRef(String plantId) {
-    return _db
-        .collection('users')
-        .doc(uid)
-        .collection('plants')
-        .doc(plantId)
-        .collection('fertilizing');
+  Future<List<FertilizerIngredient>> _fetchIngredients() async {
+    final list = jsonMapList(await _api.get('/components'));
+    return list
+        .map((m) => FertilizerIngredient.fromMap(readString(m, 'id') ?? '', m))
+        .toList();
   }
 
-  // --- Ingredient catalog ---
+  Future<List<Fertilizer>> _fetchFertilizers() async {
+    final list = jsonMapList(await _api.get('/fertilizers'));
+    return list
+        .map((m) => Fertilizer.fromMap(readString(m, 'id') ?? '', m))
+        .toList()
+      ..sort((a, b) {
+        final aAt = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final bAt = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return bAt.compareTo(aAt);
+      });
+  }
 
   Future<FertilizerIngredient?> findIngredientByName(String name) async {
     final trimmed = name.trim();
     if (trimmed.isEmpty) return null;
-
     final lower = trimmed.toLowerCase();
-    final snapshot = await _ingredientsRef.get();
-    for (final doc in snapshot.docs) {
-      final existingName = (doc.data()['name'] as String?)?.trim() ?? '';
-      if (existingName.toLowerCase() == lower) {
-        return FertilizerIngredient.fromMap(doc.id, doc.data());
-      }
+    for (final item in await _fetchIngredients()) {
+      if (item.name.trim().toLowerCase() == lower) return item;
     }
     return null;
   }
 
-  /// Creates an ingredient, or returns the existing id if the name already
-  /// exists (case-insensitive).
   Future<String> ensureIngredient({required String name}) async {
     final existing = await findIngredientByName(name);
     if (existing != null) return existing.id;
@@ -57,52 +53,47 @@ class FertilizeService {
   }
 
   Future<String> addIngredient({required String name}) async {
-    final doc = await _ingredientsRef.add({
+    final created = jsonMap(await _api.post('/components', body: {
       'name': name.trim(),
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-    return doc.id;
+    }));
+    return readString(created, 'id') ?? '';
   }
 
   Future<void> updateIngredient({
     required String ingredientId,
     required String name,
   }) async {
-    await _ingredientsRef.doc(ingredientId).update({
-      'name': name.trim(),
-    });
+    try {
+      await _api.patch('/components/$ingredientId', body: {
+        'name': name.trim(),
+      });
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
+    }
   }
 
   Future<void> deleteIngredient(String ingredientId) async {
-    await _ingredientsRef.doc(ingredientId).delete();
+    await _api.delete('/components/$ingredientId');
   }
 
   Stream<List<FertilizerIngredient>> getIngredients() {
-    return _ingredientsRef.orderBy('name').snapshots().map(
-          (snapshot) =>
-              snapshot.docs.map(FertilizerIngredient.fromFirestore).toList(),
-        );
+    return restPollStream(() async {
+      final items = await _fetchIngredients();
+      items.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      return items;
+    });
   }
-
-  // --- Fertilizer catalog (named mixes) ---
 
   Future<Fertilizer?> findFertilizerByName(String name) async {
     final trimmed = name.trim();
     if (trimmed.isEmpty) return null;
-
     final lower = trimmed.toLowerCase();
-    final snapshot = await _fertilizersRef.get();
-    for (final doc in snapshot.docs) {
-      final existingName = (doc.data()['name'] as String?)?.trim() ?? '';
-      if (existingName.toLowerCase() == lower) {
-        return Fertilizer.fromMap(doc.id, doc.data());
-      }
+    for (final item in await _fetchFertilizers()) {
+      if (item.name.trim().toLowerCase() == lower) return item;
     }
     return null;
   }
 
-  /// Creates a fertilizer, or returns the existing id if the name already
-  /// exists (case-insensitive). Does not overwrite an existing entry.
   Future<String> ensureFertilizer({
     required String name,
     FertilizerKind kind = FertilizerKind.mix,
@@ -125,15 +116,13 @@ class FertilizeService {
     int waterMl = 250,
     List<FertilizerDose> components = const [],
   }) async {
-    final doc = await _fertilizersRef.add({
+    final created = jsonMap(await _api.post('/fertilizers', body: {
       'name': name.trim(),
-      'kind': kind.code,
-      'waterMl': normalizeWaterMl(waterMl),
+      'kind': kind.index,
+      'water_ml': normalizeWaterMl(waterMl),
       'components': components.map((e) => e.toMap()).toList(),
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-
-    return doc.id;
+    }));
+    return readString(created, 'id') ?? '';
   }
 
   Future<void> updateFertilizer({
@@ -143,67 +132,50 @@ class FertilizeService {
     required int waterMl,
     required List<FertilizerDose> components,
   }) async {
-    await _fertilizersRef.doc(fertilizerId).update({
-      'name': name.trim(),
-      'kind': kind.code,
-      'waterMl': normalizeWaterMl(waterMl),
-      'components': components.map((e) => e.toMap()).toList(),
-      'type': FieldValue.delete(),
-    });
+    try {
+      await _api.patch('/fertilizers/$fertilizerId', body: {
+        'name': name.trim(),
+        'kind': kind.index,
+        'water_ml': normalizeWaterMl(waterMl),
+        'components': components.map((e) => e.toMap()).toList(),
+      });
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
+    }
   }
 
   Future<void> deleteFertilizer(String fertilizerId) async {
-    await _fertilizersRef.doc(fertilizerId).delete();
+    await _api.delete('/fertilizers/$fertilizerId');
   }
 
   Stream<List<Fertilizer>> getFertilizers() {
-    return _fertilizersRef.orderBy('createdAt', descending: true).snapshots().map(
-          (snapshot) => snapshot.docs.map(Fertilizer.fromFirestore).toList(),
-        );
+    return restPollStream(_fetchFertilizers);
   }
 
   Future<Fertilizer?> getFertilizer(String fertilizerId) async {
-    final doc = await _fertilizersRef.doc(fertilizerId).get();
-    if (!doc.exists || doc.data() == null) return null;
-    return Fertilizer.fromMap(doc.id, doc.data()!);
+    for (final item in await _fetchFertilizers()) {
+      if (item.id == fertilizerId) return item;
+    }
+    return null;
   }
 
-  // --- Plant fertilizing history ---
-
-  DocumentReference<Map<String, dynamic>> _plantRef(String plantId) {
-    return _db.collection('users').doc(uid).collection('plants').doc(plantId);
-  }
-
-  /// Returns stored UGC fertilizer name only. Never invents presentation fallbacks.
   static String? resolveStoredFertilizerName(Map<String, dynamic> data) {
-    final stored = (data['fertilizerName'] as String?)?.trim();
+    final stored = readString(data, 'fertilizerName')?.trim();
     if (stored != null && stored.isNotEmpty) return stored;
     return null;
   }
 
-  Future<void> _syncLastFertilizedAt(String plantId) async {
-    final snapshot = await _fertilizingRef(plantId)
-        .orderBy('appliedAt', descending: true)
-        .limit(1)
-        .get();
-
-    if (snapshot.docs.isEmpty) {
-      await _plantRef(plantId).update({
-        'lastFertilizedAt': FieldValue.delete(),
-        'lastFertilizerName': FieldValue.delete(),
-      });
-      return;
-    }
-
-    final data = snapshot.docs.first.data();
-    final storedName = resolveStoredFertilizerName(data);
-    await _plantRef(plantId).update({
-      'lastFertilizedAt': data['appliedAt'],
-      if (storedName != null)
-        'lastFertilizerName': storedName
-      else
-        'lastFertilizerName': FieldValue.delete(),
-    });
+  Future<List<FertilizingEntry>> _fetchHistory(String plantId) async {
+    final list = jsonMapList(await _api.get('/plants/$plantId/fertilizings'));
+    final entries = list.map((data) {
+      return FertilizingEntry.fromFirestoreData(
+        id: readString(data, 'id') ?? '',
+        data: data,
+        fertilizerName: resolveStoredFertilizerName(data) ?? '',
+      );
+    }).toList()
+      ..sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
+    return entries;
   }
 
   Future<void> addFertilizing({
@@ -220,43 +192,19 @@ class FertilizeService {
     int? wateringFrequency,
     bool skipPlantFetch = false,
   }) async {
-    final plantRef = _plantRef(plantId);
-    var lastFertilized = lastFertilizedAt;
-
-    if (!skipPlantFetch && lastFertilized == null) {
-      final plant = await plantRef.get();
-      lastFertilized =
-          (plant.data()?['lastFertilizedAt'] as Timestamp?)?.toDate();
-    }
-
     final trimmedName = fertilizerName?.trim();
     final storedName =
         (trimmedName != null && trimmedName.isNotEmpty) ? trimmedName : null;
 
-    final batch = _db.batch();
-    batch.set(_fertilizingRef(plantId).doc(), {
-      if (fertilizerId != null) 'fertilizerId': fertilizerId,
-      if (storedName != null) 'fertilizerName': storedName,
-      'waterMl': normalizeWaterMl(waterMl),
+    await _api.post('/plants/$plantId/fertilizings', body: {
+      if (fertilizerId != null) 'fertilizer_id': fertilizerId,
+      if (storedName != null) 'fertilizer_name': storedName,
+      'water_ml': normalizeWaterMl(waterMl),
       'components': components.map((e) => e.toMap()).toList(),
-      'appliedAt': Timestamp.fromDate(appliedAt),
-      'applicationMethod': applicationMethod.code,
-      'nextFertilizing':
-          nextFertilizing != null ? Timestamp.fromDate(nextFertilizing) : null,
-      'createdAt': FieldValue.serverTimestamp(),
+      'applied_at': isoDate(appliedAt),
+      'application_method': applicationMethod.code,
+      'next_fertilizing': isoDateOrNull(nextFertilizing),
     });
-
-    if (lastFertilized == null || appliedAt.isAfter(lastFertilized)) {
-      batch.update(plantRef, {
-        'lastFertilizedAt': Timestamp.fromDate(appliedAt),
-        if (storedName != null)
-          'lastFertilizerName': storedName
-        else
-          'lastFertilizerName': FieldValue.delete(),
-      });
-    }
-
-    await batch.commit();
 
     await GrowthEventService().addFertilizingEvent(plantId, at: appliedAt);
 
@@ -274,7 +222,6 @@ class FertilizeService {
     }
   }
 
-  /// Bulk fertilizing using known plant denorm fields (no plant doc reads).
   Future<void> addFertilizings({
     required Iterable<String> plantIds,
     required DateTime appliedAt,
@@ -288,53 +235,17 @@ class FertilizeService {
     Map<String, DateTime?> lastWateredAtByPlantId = const {},
     Map<String, int?> wateringFrequencyByPlantId = const {},
   }) async {
-    final ids = plantIds.toList();
-    const chunkSize = 200;
-    final trimmedName = fertilizerName?.trim();
-    final storedName =
-        (trimmedName != null && trimmedName.isNotEmpty) ? trimmedName : null;
-
-    for (var i = 0; i < ids.length; i += chunkSize) {
-      final chunk = ids.skip(i).take(chunkSize);
-      final batch = _db.batch();
-
-      for (final plantId in chunk) {
-        final lastFertilized = lastFertilizedAtByPlantId[plantId];
-        batch.set(_fertilizingRef(plantId).doc(), {
-          if (fertilizerId != null) 'fertilizerId': fertilizerId,
-          if (storedName != null) 'fertilizerName': storedName,
-          'waterMl': normalizeWaterMl(waterMl),
-          'components': components.map((e) => e.toMap()).toList(),
-          'appliedAt': Timestamp.fromDate(appliedAt),
-          'applicationMethod': applicationMethod.code,
-          'nextFertilizing': nextFertilizing != null
-              ? Timestamp.fromDate(nextFertilizing)
-              : null,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-
-        if (lastFertilized == null || appliedAt.isAfter(lastFertilized)) {
-          batch.update(_plantRef(plantId), {
-            'lastFertilizedAt': Timestamp.fromDate(appliedAt),
-            if (storedName != null)
-              'lastFertilizerName': storedName
-            else
-              'lastFertilizerName': FieldValue.delete(),
-          });
-        }
-      }
-
-      await batch.commit();
-
-      for (final plantId in chunk) {
-        await GrowthEventService().addFertilizingEvent(plantId, at: appliedAt);
-      }
-    }
-
-    for (final plantId in ids) {
-      await WateringService().addWateringIfMissingBeforeFertilizing(
+    for (final plantId in plantIds) {
+      await addFertilizing(
         plantId: plantId,
-        fertilizedAt: appliedAt,
+        appliedAt: appliedAt,
+        components: components,
+        waterMl: waterMl,
+        applicationMethod: applicationMethod,
+        fertilizerId: fertilizerId,
+        fertilizerName: fertilizerName,
+        nextFertilizing: nextFertilizing,
+        lastFertilizedAt: lastFertilizedAtByPlantId[plantId],
         lastWateredAt: lastWateredAtByPlantId[plantId],
         wateringFrequency: wateringFrequencyByPlantId[plantId],
         skipPlantFetch: true,
@@ -356,56 +267,37 @@ class FertilizeService {
     final trimmedName = fertilizerName?.trim();
     final storedName =
         (trimmedName != null && trimmedName.isNotEmpty) ? trimmedName : null;
-
-    await _fertilizingRef(plantId).doc(fertilizingId).update({
-      'fertilizerId': fertilizerId ?? FieldValue.delete(),
-      'fertilizerName': storedName ?? FieldValue.delete(),
-      'waterMl': normalizeWaterMl(waterMl),
-      'components': components.map((e) => e.toMap()).toList(),
-      'appliedAt': Timestamp.fromDate(appliedAt),
-      'applicationMethod': applicationMethod.code,
-      'nextFertilizing':
-          nextFertilizing != null ? Timestamp.fromDate(nextFertilizing) : null,
-    });
-
-    await _syncLastFertilizedAt(plantId);
+    try {
+      await _api.patch('/plants/$plantId/fertilizings/$fertilizingId', body: {
+        'fertilizer_id': fertilizerId,
+        'fertilizer_name': storedName,
+        'water_ml': normalizeWaterMl(waterMl),
+        'components': components.map((e) => e.toMap()).toList(),
+        'applied_at': isoDate(appliedAt),
+        'application_method': applicationMethod.code,
+        'next_fertilizing': isoDateOrNull(nextFertilizing),
+      });
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
+    }
   }
 
   Stream<List<FertilizingEntry>> getFertilizingHistory(
     String plantId, {
     int limit = 40,
   }) {
-    return _fertilizingRef(plantId)
-        .orderBy('appliedAt', descending: true)
-        .limit(limit)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        return FertilizingEntry.fromFirestoreData(
-          id: doc.id,
-          data: data,
-          fertilizerName: resolveStoredFertilizerName(data) ?? '',
-        );
-      }).toList();
+    return restPollStream(() async {
+      final entries = await _fetchHistory(plantId);
+      if (entries.length <= limit) return entries;
+      return entries.take(limit).toList();
     });
   }
 
   Stream<FertilizingEntry?> watchLastFertilizing(String plantId) {
-    return _fertilizingRef(plantId)
-        .orderBy('appliedAt', descending: true)
-        .limit(1)
-        .snapshots()
-        .map((snapshot) {
-      if (snapshot.docs.isEmpty) return null;
-
-      final doc = snapshot.docs.first;
-      final data = doc.data();
-      return FertilizingEntry.fromFirestoreData(
-        id: doc.id,
-        data: data,
-        fertilizerName: resolveStoredFertilizerName(data) ?? '',
-      );
+    return restPollStream(() async {
+      final entries = await _fetchHistory(plantId);
+      if (entries.isEmpty) return null;
+      return entries.first;
     });
   }
 
@@ -413,7 +305,10 @@ class FertilizeService {
     required String plantId,
     required String fertilizingId,
   }) async {
-    await _fertilizingRef(plantId).doc(fertilizingId).delete();
-    await _syncLastFertilizedAt(plantId);
+    try {
+      await _api.delete('/plants/$plantId/fertilizings/$fertilizingId');
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
+    }
   }
 }

@@ -1,7 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'fertilizer_dose.dart';
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 
 enum FertilizerKind {
   mix,
@@ -9,11 +7,8 @@ enum FertilizerKind {
 
   String get code => name;
 
-  static FertilizerKind fromCode(String? code) {
-    return FertilizerKind.values.firstWhere(
-      (kind) => kind.name == code,
-      orElse: () => FertilizerKind.mix,
-    );
+  static FertilizerKind fromCode(dynamic code) {
+    return readEnum(code, FertilizerKind.values, FertilizerKind.mix);
   }
 }
 
@@ -37,37 +32,34 @@ class Fertilizer {
   bool get isPurchased => kind == FertilizerKind.purchased;
 
   factory Fertilizer.fromMap(String id, Map<String, dynamic> data) {
-    final rawComponents = data['components'] as List<dynamic>?;
+    final rawComponents = readField(data, 'components') as List<dynamic>?;
 
     return Fertilizer(
       id: id,
-      name: data['name'] as String? ?? '',
-      kind: FertilizerKind.fromCode(data['kind'] as String?),
-      createdAt: readTimestamp(data['createdAt']),
-      waterMl: normalizeWaterMl((data['waterMl'] as num?)?.toInt()),
+      name: readString(data, 'name') ?? '',
+      kind: FertilizerKind.fromCode(readField(data, 'kind')),
+      createdAt: readDate(data, 'createdAt'),
+      waterMl: normalizeWaterMl(readInt(data, 'waterMl')),
       components: rawComponents != null
           ? rawComponents
+              .whereType<Map>()
               .map(
-                (item) =>
-                    FertilizerDose.fromMap(item as Map<String, dynamic>),
+                (item) => FertilizerDose.fromMap(
+                  Map<String, dynamic>.from(item),
+                ),
               )
               .toList()
           : const [],
     );
   }
 
-  factory Fertilizer.fromFirestore(
-    QueryDocumentSnapshot<Map<String, dynamic>> doc,
-  ) {
-    return Fertilizer.fromMap(doc.id, doc.data());
-  }
-
   Map<String, dynamic> toMap() {
     return {
       'name': name,
-      'kind': kind.code,
+      'kind': kind.index,
       'waterMl': waterMl,
-      if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
+      'water_ml': waterMl,
+      if (createdAt != null) 'createdAt': isoOrNull(createdAt),
       'components': components.map((e) => e.toMap()).toList(),
     };
   }

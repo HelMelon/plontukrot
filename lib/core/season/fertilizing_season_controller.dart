@@ -1,11 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/fertilizing_growth_season.dart';
+import '../../services/auth_service.dart';
+import '../../services/user_profile_service.dart';
 
-/// Season boundaries for fertilizing: SharedPreferences + Firestore user doc.
+/// Season boundaries for fertilizing: SharedPreferences + user profile.
 class FertilizingSeasonController extends ChangeNotifier {
   FertilizingSeasonController._();
 
@@ -67,15 +67,11 @@ class FertilizingSeasonController extends ChangeNotifier {
   }
 
   Future<void> syncWithCloud() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+    if (AuthService().currentUser == null) return;
 
     try {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-      final remote = FertilizingSeasonSettings.fromMap(doc.data());
+      final json = await UserProfileService().fetchMe();
+      final remote = FertilizingSeasonSettings.fromMap(json);
       if (remote.mode == _settings.mode &&
           remote.springStartMonth == _settings.springStartMonth &&
           remote.springEndMonth == _settings.springEndMonth) {
@@ -86,22 +82,13 @@ class FertilizingSeasonController extends ChangeNotifier {
       await _prefs?.setInt(_prefsSpringStartKey, remote.springStartMonth);
       await _prefs?.setInt(_prefsSpringEndKey, remote.springEndMonth);
       notifyListeners();
-    } catch (_) {
-      // Keep local settings if cloud sync fails.
-    }
+    } catch (_) {}
   }
 
   Future<void> _writeToCloud(FertilizingSeasonSettings settings) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
+    if (AuthService().currentUser == null) return;
     try {
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
-            settings.toMap(),
-            SetOptions(merge: true),
-          );
-    } catch (_) {
-      // Local preference is already saved.
-    }
+      await UserProfileService().patchProfile(settings.toMap());
+    } catch (_) {}
   }
 }

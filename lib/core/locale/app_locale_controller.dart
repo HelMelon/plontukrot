@@ -1,10 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Locale preference: SharedPreferences cache + Firestore `users/{uid}.localeCode`.
+import '../../models/model_helpers.dart';
+import '../../services/auth_service.dart';
+import '../../services/user_profile_service.dart';
+
+/// Locale preference: SharedPreferences cache + `GET/PATCH /auth/me`.
 class AppLocaleController extends ChangeNotifier {
   AppLocaleController._();
 
@@ -19,7 +21,6 @@ class AppLocaleController extends ChangeNotifier {
   SharedPreferences? _prefs;
   String _preference = systemCode;
 
-  /// `null` means follow device locale (with English fallback).
   Locale? get localeOverride {
     if (_preference == systemCode) return null;
     return Locale(_preference);
@@ -45,18 +46,12 @@ class AppLocaleController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// After sign-in: prefer Firestore value when present; otherwise push local
-  /// only if the user has an explicit local preference.
   Future<void> syncWithCloud() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+    if (AuthService().currentUser == null) return;
 
     try {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-      final remote = doc.data()?[firestoreField] as String?;
+      final json = await UserProfileService().fetchMe();
+      final remote = readString(json, firestoreField);
 
       if (remote != null && _isValidCode(remote)) {
         if (remote == _preference) return;
@@ -71,23 +66,14 @@ class AppLocaleController extends ChangeNotifier {
       if (hasLocal) {
         await _writeToCloud(_preference);
       }
-    } catch (_) {
-      // Keep local preference if cloud sync fails.
-    }
+    } catch (_) {}
   }
 
   Future<void> _writeToCloud(String code) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
+    if (AuthService().currentUser == null) return;
     try {
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
-        {firestoreField: code},
-        SetOptions(merge: true),
-      );
-    } catch (_) {
-      // Local preference is already saved.
-    }
+      await UserProfileService().patchProfile({'locale_code': code});
+    } catch (_) {}
   }
 
   void _applyIntlLocale() {
@@ -103,7 +89,6 @@ class AppLocaleController extends ChangeNotifier {
     return code == systemCode || supportedLanguageCodes.contains(code);
   }
 
-  /// Resolve MaterialApp locale from device locale.
   static Locale? resolveLocale(
     Locale? deviceLocale,
     Iterable<Locale> supportedLocales,

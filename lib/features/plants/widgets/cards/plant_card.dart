@@ -7,7 +7,7 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../core/widgets/focusable_tap.dart';
 import '../../../../models/plant.dart';
 import '../../pages/plant_details_page.dart';
-import '../common/plant_network_image.dart';
+import '../common/plant_image.dart';
 
 extension CapitalizeString on String {
   String toTitleCase() {
@@ -117,7 +117,7 @@ class PlantCard extends StatelessWidget {
                     AspectRatio(
                       aspectRatio: 1.0,
                       child: hasImage
-                          ? PlantNetworkImage(
+                          ? PlantImage(
                               imageUrl: imageUrl,
                               fallbackUrl: fullUrl,
                               fit: BoxFit.cover,

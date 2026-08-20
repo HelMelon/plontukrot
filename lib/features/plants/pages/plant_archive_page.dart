@@ -12,7 +12,7 @@ import '../../../models/propagation.dart';
 import '../../../models/propagation_parent_label.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
-import '../widgets/common/plant_network_image.dart';
+import '../widgets/common/plant_image.dart';
 import '../widgets/sheets/propagation_details_sheet.dart';
 import 'plant_details_page.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
@@ -196,7 +196,7 @@ class _PlantArchivePageState extends State<PlantArchivePage>
                           width: dimensions.avatar,
                           height: dimensions.avatar,
                           child: imageUrl != null
-                              ? PlantNetworkImage(
+                              ? PlantImage(
                                   imageUrl: imageUrl,
                                   fallbackUrl: fullUrl,
                                   fit: BoxFit.cover,

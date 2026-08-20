@@ -1,4 +1,4 @@
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 
 class Friendship {
   final String friendUid;
@@ -22,9 +22,9 @@ class Friendship {
   factory Friendship.fromMap(String friendUid, Map<String, dynamic> data) {
     return Friendship(
       friendUid: friendUid,
-      since: readTimestamp(data['since']),
-      displayNameSnap: (data['displayNameSnap'] as String?)?.trim(),
-      photoUrlSnap: (data['photoUrlSnap'] as String?)?.trim(),
+      since: readDate(data, 'since') ?? readDate(data, 'createdAt'),
+      displayNameSnap: readString(data, 'displayNameSnap')?.trim(),
+      photoUrlSnap: readString(data, 'photoUrlSnap')?.trim(),
     );
   }
 }

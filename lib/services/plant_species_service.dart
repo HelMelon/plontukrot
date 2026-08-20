@@ -1,12 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../models/plant_species.dart';
+import '../models/model_helpers.dart';
+import 'api_client.dart';
+import 'rest_stream.dart';
 
 class PlantSpeciesService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  CollectionReference<Map<String, dynamic>> get _ref =>
-      _firestore.collection('plantSpecies');
+  final ApiClient _api = ApiClient.instance;
 
   Future<void> ensureSpecies({
     required String species,
@@ -15,19 +13,12 @@ class PlantSpeciesService {
   }) async {
     final trimmedSpecies = species.trim();
     if (trimmedSpecies.isEmpty) return;
-
-    final docId = PlantSpecies.docIdFor(trimmedSpecies);
-    final docRef = _ref.doc(docId);
-    final existing = await docRef.get();
-    if (existing.exists) return;
-
     final trimmedFamily = plantFamily?.trim();
-    await docRef.set({
+    await _api.post('/species', body: {
       'species': trimmedSpecies,
       'genus': genus.trim(),
-      'plantFamily':
+      'plant_family':
           (trimmedFamily == null || trimmedFamily.isEmpty) ? null : trimmedFamily,
-      'createdAt': FieldValue.serverTimestamp(),
     });
   }
 
@@ -36,8 +27,16 @@ class PlantSpeciesService {
     if (trimmed.isEmpty) {
       return Stream.value(null);
     }
-    return _ref.doc(PlantSpecies.docIdFor(trimmed)).snapshots().map(
-          (doc) => doc.exists ? PlantSpecies.fromDocument(doc) : null,
-        );
+    final id = PlantSpecies.docIdFor(trimmed);
+    return restPollStream(() async {
+      final list = jsonMapList(await _api.get('/species'));
+      for (final map in list) {
+        final item = PlantSpecies.fromMap(readString(map, 'id') ?? '', map);
+        if (item.id == id || item.species.toLowerCase() == trimmed.toLowerCase()) {
+          return item;
+        }
+      }
+      return null;
+    });
   }
 }

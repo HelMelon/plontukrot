@@ -11,7 +11,7 @@ import '../../../models/friendship.dart';
 import '../../../models/incoming_gift.dart';
 import '../../../models/plant.dart';
 import '../../../services/auth_service.dart';
-import '../../../services/firestore_service.dart';
+import '../../../services/user_profile_service.dart';
 import '../../../services/friends_service.dart';
 import '../../../services/gift_service.dart';
 import '../../../services/plant_service.dart';
@@ -203,7 +203,7 @@ class _FriendsPageState extends State<FriendsPage> {
             ],
           ),
           StreamBuilder<UserProfileDoc>(
-            stream: FirestoreService().watchUserProfile(),
+            stream: UserProfileService().watchUserProfile(),
             builder: (context, snap) {
               final visibility = snap.data?.collectionVisibility ??
                   CollectionVisibility.friends;

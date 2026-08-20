@@ -77,17 +77,24 @@ class FertilizingSeasonSettings {
 
   factory FertilizingSeasonSettings.fromMap(Map<String, dynamic>? data) {
     if (data == null) return const FertilizingSeasonSettings();
-    final modeRaw = data['fertilizingSeasonMode'] as String?;
+    final modeRaw = data['fertilizingSeasonMode'] as String? ??
+        data['fertilizing_season_mode'] as String?;
     final mode = FertilizingSeasonMode.values.firstWhere(
       (m) => m.name == modeRaw,
       orElse: () => FertilizingSeasonMode.northern,
     );
     return FertilizingSeasonSettings(
       mode: mode,
-      springStartMonth:
-          _clampMonth(data['fertilizingSpringStartMonth'] as int? ?? northernSpringStart),
-      springEndMonth:
-          _clampMonth(data['fertilizingSpringEndMonth'] as int? ?? northernSpringEnd),
+      springStartMonth: _clampMonth(
+        (data['fertilizingSpringStartMonth'] as num?)?.toInt() ??
+            (data['fertilizing_spring_start_month'] as num?)?.toInt() ??
+            northernSpringStart,
+      ),
+      springEndMonth: _clampMonth(
+        (data['fertilizingSpringEndMonth'] as num?)?.toInt() ??
+            (data['fertilizing_spring_end_month'] as num?)?.toInt() ??
+            northernSpringEnd,
+      ),
     );
   }
 

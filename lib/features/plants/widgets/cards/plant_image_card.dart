@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/features/plants/widgets/cards/placeholder_widget.dart';
-import 'package:plontukrot/features/plants/widgets/common/plant_network_image.dart';
+import 'package:plontukrot/features/plants/widgets/common/plant_image.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 import 'package:plontukrot/models/plant_photo.dart';
 
@@ -111,7 +111,7 @@ class _PlantImageCardState extends State<PlantImageCard> {
                       ? null
                       : DateFormat('d MMM y', dateLocale)
                           .format(photo.addedAt);
-                  return PlantNetworkImage(
+                  return PlantImage(
                     imageUrl: photo.imageUrl,
                     fallbackUrl: photo.imageThumbUrl,
                     fit: BoxFit.cover,

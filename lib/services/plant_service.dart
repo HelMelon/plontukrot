@@ -1,31 +1,27 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 import '../core/season/fertilizing_season_controller.dart';
 import '../models/fertilizing_frequency.dart';
+import '../models/model_helpers.dart';
 import '../models/plant.dart';
 import '../models/plant_archive_reason.dart';
 import '../models/plant_member.dart';
 import '../models/plant_photo.dart';
 import '../models/variegation.dart';
+import 'api_client.dart';
+import 'api_exception.dart';
+import 'auth_service.dart';
 import 'fertilizing_notification_service.dart';
 import 'app_crash_reporting.dart';
 import 'plant_species_service.dart';
+import 'rest_stream.dart';
 import 'storage_service.dart';
 
 class PlantService {
   static const archiveRetention = Duration(days: 730);
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final ApiClient _api = ApiClient.instance;
   final PlantSpeciesService _plantSpeciesService = PlantSpeciesService();
 
-  final String uid = FirebaseAuth.instance.currentUser!.uid;
-
-  CollectionReference<Map<String, dynamic>> get _plantsRef =>
-      _plantsRefFor(uid);
-
-  CollectionReference<Map<String, dynamic>> _plantsRefFor(String ownerUid) =>
-      _firestore.collection('users').doc(ownerUid).collection('plants');
+  String get uid => AuthService().requireUid;
 
   int? _resolveFertilizingFrequency({
     required int stage,
@@ -47,38 +43,73 @@ class PlantService {
         await FertilizingNotificationService.instance.rescheduleForPlant(plant);
       }
     } catch (error, stack) {
-      // Notification scheduling must never break the plant operation that
-      // triggered it (e.g. exact-alarm permission denied on Android 14+).
-      // The plant is already persisted; a reminder failure is non-fatal.
       try {
         await AppCrashReporting.instance.recordError(
           error,
           stack,
           reason: 'plant_notification_reschedule_failed',
         );
-      } catch (_) {
-        // Crash reporting must not rethrow and break the caller either.
-      }
+      } catch (_) {}
     }
+  }
+
+  Future<List<PlantPhoto>> _fetchPhotos(String plantId) async {
+    try {
+      final list = jsonMapList(await _api.get('/plants/$plantId/photos'));
+      final photos = list
+          .map((m) => PlantPhoto.fromMap(m))
+          .where((p) => p.imageUrl.isNotEmpty)
+          .toList();
+      photos.sort((a, b) => b.addedAt.compareTo(a.addedAt));
+      return photos;
+    } on ApiException {
+      return const [];
+    }
+  }
+
+  Plant _plantFrom(Map<String, dynamic> map, List<PlantPhoto> photos) {
+    final id = readString(map, 'id') ?? '';
+    final merged = Map<String, dynamic>.from(map);
+    if (photos.isNotEmpty) {
+      merged['images'] = photos.map((p) => p.toMap()).toList();
+      merged['imageUrl'] = photos.first.imageUrl;
+      merged['imageThumbUrl'] = photos.first.imageThumbUrl;
+    }
+    return Plant.fromMap(id, merged);
+  }
+
+  Future<List<Plant>> _fetchAllPlants() async {
+    final list = jsonMapList(await _api.get('/plants'));
+    return Future.wait([
+      for (final map in list)
+        () async {
+          final id = readString(map, 'id') ?? '';
+          final photos = id.isEmpty ? const <PlantPhoto>[] : await _fetchPhotos(id);
+          return _plantFrom(map, photos);
+        }(),
+    ]);
   }
 
   Future<void> markFertilizedToday(String plantId) async {
     final today = DateTime.now();
     final normalized = DateTime(today.year, today.month, today.day);
-    await _plantsRef.doc(plantId).update({
-      'lastFertilizedAt': Timestamp.fromDate(normalized),
+    await _patchPlant(plantId, {
+      'last_fertilized_at': isoDate(normalized),
     });
     await _rescheduleNotifications(plantId);
   }
 
-  /// Recomputes auto fertilizing frequency for plants without custom override.
-  Future<void> recalculateAutoFertilizingFrequencies() async {
-    final snapshot = await _plantsRef.get();
-    final batch = _firestore.batch();
-    var hasUpdates = false;
+  Future<void> _patchPlant(String plantId, Map<String, dynamic> body) async {
+    try {
+      await _api.patch('/plants/$plantId', body: body);
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
+    }
+  }
 
-    for (final doc in snapshot.docs) {
-      final plant = Plant.fromFirestore(doc);
+  Future<void> recalculateAutoFertilizingFrequencies() async {
+    final plants = await _fetchAllPlants();
+    for (final plant in plants) {
       if (plant.isArchived || plant.isFertilizingFrequencyCustom) continue;
       final resolved = _resolveFertilizingFrequency(
         stage: plant.stage,
@@ -86,13 +117,10 @@ class PlantService {
         requestedFrequencyDays: null,
       );
       if (resolved != plant.fertilizingFrequencyDays) {
-        batch.update(doc.reference, {'fertilizingFrequencyDays': resolved});
-        hasUpdates = true;
+        await _patchPlant(plant.id, {
+          'fertilizing_frequency_days': resolved,
+        });
       }
-    }
-
-    if (hasUpdates) {
-      await batch.commit();
     }
   }
 
@@ -116,37 +144,33 @@ class PlantService {
     final trimmedCultivar = cultivar?.trim();
     final trimmedFamily = plantFamily?.trim();
     final trimmedTradingName = tradingName.trim();
-    final safeInitialLeafCount =
-        initialLeafCount < 0 ? 0 : initialLeafCount;
+    final safeInitialLeafCount = initialLeafCount < 0 ? 0 : initialLeafCount;
     final resolvedFrequency = _resolveFertilizingFrequency(
       stage: stage,
       isCustom: isFertilizingFrequencyCustom,
       requestedFrequencyDays: fertilizingFrequencyDays,
     );
 
-    final doc = await _plantsRef.add({
-      'genus': trimmedGenus,
-      'species': trimmedSpecies,
-      'cultivar':
-          (trimmedCultivar == null || trimmedCultivar.isEmpty)
-              ? null
-              : trimmedCultivar,
-      'plantFamily':
-          (trimmedFamily == null || trimmedFamily.isEmpty) ? null : trimmedFamily,
-      'variegation': variegation.storageValue,
-      'tradingName': trimmedTradingName,
-      'nickname': nickname,
-      'stage': stage,
-      'imageUrl': null,
-      'imageThumbUrl': null,
-      'images': <Map<String, dynamic>>[],
-      'wateringFrequency': wateringFrequency,
-      'fertilizingFrequencyDays': resolvedFrequency,
-      'isFertilizingFrequencyCustom': isFertilizingFrequencyCustom,
-      'initialLeafCount': safeInitialLeafCount,
-      if (members.isNotEmpty) 'members': members.map((m) => m.toMap()).toList(),
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    final created = jsonMap(
+      await _api.post('/plants', body: {
+        'genus': trimmedGenus,
+        'species': trimmedSpecies,
+        'cultivar':
+            (trimmedCultivar == null || trimmedCultivar.isEmpty)
+                ? null
+                : trimmedCultivar,
+        'plant_family':
+            (trimmedFamily == null || trimmedFamily.isEmpty) ? null : trimmedFamily,
+        'variegation': variegation.index,
+        'trading_name': trimmedTradingName,
+        'nickname': nickname,
+        'stage': stage,
+        'watering_frequency': wateringFrequency,
+        'fertilizing_frequency_days': resolvedFrequency,
+        'initial_leaf_count': safeInitialLeafCount,
+      }),
+    );
+    final id = readString(created, 'id') ?? '';
 
     await _plantSpeciesService.ensureSpecies(
       species: trimmedSpecies,
@@ -154,50 +178,52 @@ class PlantService {
       plantFamily: trimmedFamily,
     );
 
-    await _rescheduleNotifications(doc.id);
-    return doc.id;
+    await _rescheduleNotifications(id);
+    return id;
   }
 
-  /// Active plants for [ownerUid] (own or friend-visible collection).
   Stream<List<Plant>> getPlantsForUser(String ownerUid) {
-    return _plantsRefFor(ownerUid)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map(Plant.fromFirestore)
-              .where((plant) => !plant.isArchived)
-              .toList(),
-        );
+    if (ownerUid != uid) {
+      // Viewing another user's collection is not on the REST surface yet.
+      return restPollStream(() async => <Plant>[]);
+    }
+    return restPollStream(() async {
+      final plants = await _fetchAllPlants();
+      return plants.where((plant) => !plant.isArchived).toList()
+        ..sort((a, b) {
+          final aAt = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          final bAt = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          return bAt.compareTo(aAt);
+        });
+    });
   }
 
   Stream<List<Plant>> getPlants() => getPlantsForUser(uid);
 
   Stream<Plant?> watchPlantForUser(String ownerUid, String plantId) {
-    return _plantsRefFor(ownerUid)
-        .doc(plantId)
-        .snapshots()
-        .map((doc) => doc.exists ? Plant.fromDocument(doc) : null);
+    return restPollStream(() => getPlant(plantId));
   }
 
   Stream<Plant?> watchPlant(String plantId) => watchPlantForUser(uid, plantId);
 
   Future<Plant?> getPlant(String plantId) async {
-    final doc = await _plantsRef.doc(plantId).get();
-    if (!doc.exists) return null;
-    return Plant.fromDocument(doc);
+    final plants = await _fetchAllPlants();
+    for (final plant in plants) {
+      if (plant.id == plantId) return plant;
+    }
+    return null;
   }
 
   Stream<List<Plant>> watchArchivedPlants() {
-    return _plantsRef
-        .orderBy('archivedAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map(Plant.fromFirestore)
-              .where((plant) => plant.isArchiveVisible)
-              .toList(),
-        );
+    return restPollStream(() async {
+      final plants = await _fetchAllPlants();
+      return plants.where((plant) => plant.isArchiveVisible).toList()
+        ..sort((a, b) {
+          final aAt = a.archivedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          final bAt = b.archivedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          return bAt.compareTo(aAt);
+        });
+    });
   }
 
   Map<String, dynamic> _archiveFields({
@@ -209,13 +235,13 @@ class PlantService {
   }) {
     final trimmedNote = note?.trim();
     return {
-      'archivedAt': Timestamp.fromDate(at),
-      'expiresAt': Timestamp.fromDate(at.add(archiveRetention)),
-      'archiveReason': reason.code,
+      'archived_at': isoDate(at),
+      'expires_at': isoDate(at.add(archiveRetention)),
+      'archive_reason': reason.code,
       if (trimmedNote != null && trimmedNote.isNotEmpty)
-        'archiveNote': trimmedNote,
-      if (mergedIntoPlantId != null) 'mergedIntoPlantId': mergedIntoPlantId,
-      if (giftedToUid != null) 'giftedToUid': giftedToUid,
+        'archive_note': trimmedNote,
+      if (mergedIntoPlantId != null) 'merged_into_plant_id': mergedIntoPlantId,
+      if (giftedToUid != null) 'gifted_to_uid': giftedToUid,
     };
   }
 
@@ -228,15 +254,16 @@ class PlantService {
     String? giftedToUid,
   }) async {
     final when = at ?? DateTime.now();
-    await _plantsRef.doc(plantId).update(
-          _archiveFields(
-            reason: reason,
-            at: when,
-            note: note,
-            mergedIntoPlantId: mergedIntoPlantId,
-            giftedToUid: giftedToUid,
-          ),
-        );
+    await _patchPlant(
+      plantId,
+      _archiveFields(
+        reason: reason,
+        at: when,
+        note: note,
+        mergedIntoPlantId: mergedIntoPlantId,
+        giftedToUid: giftedToUid,
+      ),
+    );
     await FertilizingNotificationService.instance.cancelForPlant(plantId);
   }
 
@@ -263,74 +290,39 @@ class PlantService {
       throw ArgumentError('All source plants must share the same genus');
     }
 
-    final trimmedGenus = genus.trim();
-    final trimmedSpecies = species.trim();
-    final trimmedFamily = plantFamily?.trim();
-    final trimmedTradingName = tradingName.trim();
-    final now = DateTime.now();
-    final resolvedFrequency = _resolveFertilizingFrequency(
+    final groupId = await addPlant(
+      genus: genus,
+      species: species,
+      plantFamily: plantFamily,
+      tradingName: tradingName,
+      nickname: nickname,
       stage: stage,
-      isCustom: isFertilizingFrequencyCustom,
-      requestedFrequencyDays: fertilizingFrequencyDays,
+      fertilizingFrequencyDays: fertilizingFrequencyDays,
+      isFertilizingFrequencyCustom: isFertilizingFrequencyCustom,
+      members: members,
     );
 
-    final groupRef = _plantsRef.doc();
-    final batch = _firestore.batch();
-
-    batch.set(groupRef, {
-      'genus': trimmedGenus,
-      'species': trimmedSpecies,
-      'cultivar': null,
-      'plantFamily':
-          (trimmedFamily == null || trimmedFamily.isEmpty) ? null : trimmedFamily,
-      'variegation': Variegation.none.storageValue,
-      'tradingName': trimmedTradingName,
-      'nickname': nickname,
-      'stage': stage,
-      'imageUrl': null,
-      'imageThumbUrl': null,
-      'images': <Map<String, dynamic>>[],
-      'wateringFrequency': null,
-      'fertilizingFrequencyDays': resolvedFrequency,
-      'isFertilizingFrequencyCustom': isFertilizingFrequencyCustom,
-      'initialLeafCount': 0,
-      'createdAt': FieldValue.serverTimestamp(),
-      'members': members.take(3).map((m) => m.toMap()).toList(),
-    });
-
+    final now = DateTime.now();
     for (final source in sources) {
-      batch.update(
-        _plantsRef.doc(source.id),
-        _archiveFields(
-          reason: PlantArchiveReason.merged,
-          at: now,
-          mergedIntoPlantId: groupRef.id,
-        ),
+      await archivePlant(
+        plantId: source.id,
+        reason: PlantArchiveReason.merged,
+        at: now,
+        mergedIntoPlantId: groupId,
       );
     }
-
-    await batch.commit();
-
-    await _plantSpeciesService.ensureSpecies(
-      species: trimmedSpecies,
-      genus: trimmedGenus,
-      plantFamily: trimmedFamily,
-    );
-
-    await _rescheduleNotifications(groupRef.id);
-    return groupRef.id;
+    return groupId;
   }
 
   Future<void> purgeExpiredArchived() async {
     final now = DateTime.now();
-    final snapshot = await _plantsRef
-        .where('expiresAt', isLessThan: Timestamp.fromDate(now))
-        .get();
-
-    for (final doc in snapshot.docs) {
-      final plant = Plant.fromFirestore(doc);
+    final plants = await _fetchAllPlants();
+    for (final plant in plants) {
       if (!plant.isArchived) continue;
-      await _deletePlantSubtree(plant.id);
+      final expires = plant.expiresAt;
+      if (expires != null && expires.isBefore(now)) {
+        await _deletePlantSubtree(plant.id);
+      }
     }
   }
 
@@ -339,14 +331,14 @@ class PlantService {
     required String imageUrl,
     String? imageThumbUrl,
   }) async {
-    await _plantsRef.doc(plantId).update({
-      'imageUrl': imageUrl,
-      if (imageThumbUrl != null) 'imageThumbUrl': imageThumbUrl,
-    });
+    await addPlantPhoto(
+      plantId: plantId,
+      photoId: DateTime.now().microsecondsSinceEpoch.toString(),
+      imageUrl: imageUrl,
+      imageThumbUrl: imageThumbUrl ?? imageUrl,
+    );
   }
 
-  /// Prepends a gallery photo (newest first). If the plant already has
-  /// [Plant.maxGalleryPhotos], the oldest photo is deleted first.
   Future<void> addPlantPhoto({
     required String plantId,
     required String photoId,
@@ -354,33 +346,19 @@ class PlantService {
     required String imageThumbUrl,
     DateTime? addedAt,
   }) async {
-    final doc = await _plantsRef.doc(plantId).get();
-    if (!doc.exists) {
-      throw StateError('Plant $plantId not found');
-    }
-    final plant = Plant.fromDocument(doc);
-    final photos = List<PlantPhoto>.from(plant.galleryPhotos);
-    final storage = StorageService();
+    final photos = await _fetchPhotos(plantId);
     final evicted = <PlantPhoto>[];
-
-    while (photos.length >= Plant.maxGalleryPhotos) {
-      evicted.add(photos.removeLast());
+    final next = List<PlantPhoto>.from(photos);
+    while (next.length >= Plant.maxGalleryPhotos) {
+      evicted.add(next.removeLast());
     }
-
-    photos.insert(
-      0,
-      PlantPhoto(
-        id: photoId,
-        imageUrl: imageUrl,
-        imageThumbUrl: imageThumbUrl,
-        addedAt: addedAt ?? DateTime.now(),
-      ),
-    );
-
-    await _plantsRef.doc(plantId).update(_galleryWritePayload(photos));
-
+    await _api.post('/plants/$plantId/photos', body: {
+      'image_url': imageUrl,
+      'image_thumb_url': imageThumbUrl,
+      'is_legacy': photoId == PlantPhoto.legacyId,
+    });
     for (final old in evicted) {
-      await storage.deletePlantPhoto(plantId, old.id);
+      await StorageService().deletePlantPhoto(plantId, old.id);
     }
   }
 
@@ -388,38 +366,7 @@ class PlantService {
     required String plantId,
     required String photoId,
   }) async {
-    final doc = await _plantsRef.doc(plantId).get();
-    if (!doc.exists) {
-      throw StateError('Plant $plantId not found');
-    }
-    final plant = Plant.fromDocument(doc);
-    final photos = List<PlantPhoto>.from(plant.galleryPhotos);
-    final removed = photos.where((p) => p.id == photoId).toList();
-    if (removed.isEmpty) return;
-
-    photos.removeWhere((p) => p.id == photoId);
-    await _plantsRef.doc(plantId).update(_galleryWritePayload(photos));
-
-    final storage = StorageService();
-    for (final photo in removed) {
-      await storage.deletePlantPhoto(plantId, photo.id);
-    }
-  }
-
-  Map<String, dynamic> _galleryWritePayload(List<PlantPhoto> photos) {
-    if (photos.isEmpty) {
-      return {
-        'images': <Map<String, dynamic>>[],
-        'imageUrl': null,
-        'imageThumbUrl': null,
-      };
-    }
-    final newest = photos.first;
-    return {
-      'images': photos.map((p) => p.toMap()).toList(),
-      'imageUrl': newest.imageUrl,
-      'imageThumbUrl': newest.imageThumbUrl,
-    };
+    await StorageService().deletePlantPhoto(plantId, photoId);
   }
 
   Future<void> updatePlant({
@@ -443,44 +390,30 @@ class PlantService {
     final trimmedCultivar = cultivar?.trim();
     final trimmedFamily = plantFamily?.trim();
     final trimmedTradingName = tradingName.trim();
-    final safeInitialLeafCount =
-        initialLeafCount < 0 ? 0 : initialLeafCount;
+    final safeInitialLeafCount = initialLeafCount < 0 ? 0 : initialLeafCount;
     final resolvedFrequency = _resolveFertilizingFrequency(
       stage: stage,
       isCustom: isFertilizingFrequencyCustom,
       requestedFrequencyDays: fertilizingFrequencyDays,
     );
 
-    final updates = <String, dynamic>{
+    await _patchPlant(plantId, {
       'genus': trimmedGenus,
       'species': trimmedSpecies,
       'cultivar':
           (trimmedCultivar == null || trimmedCultivar.isEmpty)
               ? null
               : trimmedCultivar,
-      'plantFamily':
+      'plant_family':
           (trimmedFamily == null || trimmedFamily.isEmpty) ? null : trimmedFamily,
-      'variegation': variegation.storageValue,
-      'tradingName': trimmedTradingName,
+      'variegation': variegation.index,
+      'trading_name': trimmedTradingName,
       'nickname': nickname,
-      'wateringFrequency': wateringFrequency,
-      'fertilizingFrequencyDays': resolvedFrequency,
-      'isFertilizingFrequencyCustom': isFertilizingFrequencyCustom,
-      'initialLeafCount': safeInitialLeafCount,
+      'watering_frequency': wateringFrequency,
+      'fertilizing_frequency_days': resolvedFrequency,
+      'initial_leaf_count': safeInitialLeafCount,
       'stage': stage,
-      'name': FieldValue.delete(),
-      'family': FieldValue.delete(),
-    };
-
-    if (members != null) {
-      final capped = members.take(3).toList();
-      updates['members'] = capped.map((m) => m.toMap()).toList();
-      if (capped.length >= 2) {
-        updates['cultivar'] = null;
-      }
-    }
-
-    await _plantsRef.doc(plantId).update(updates);
+    });
 
     await _plantSpeciesService.ensureSpecies(
       species: trimmedSpecies,
@@ -495,68 +428,20 @@ class PlantService {
     required Iterable<String> plantIds,
     required String plantFamily,
   }) async {
-    final batch = _firestore.batch();
     final trimmed = plantFamily.trim();
     final value = trimmed.isEmpty ? null : trimmed;
-
     for (final plantId in plantIds) {
-      batch.update(
-        _plantsRef.doc(plantId),
-        {'plantFamily': value},
-      );
-    }
-
-    await batch.commit();
-  }
-
-  Future<void> _deleteQueryInBatches(
-    Query<Map<String, dynamic>> query, {
-    int pageSize = 200,
-  }) async {
-    while (true) {
-      final snapshot = await query.limit(pageSize).get();
-      if (snapshot.docs.isEmpty) break;
-
-      final batch = _firestore.batch();
-      for (final doc in snapshot.docs) {
-        batch.delete(doc.reference);
-      }
-      await batch.commit();
-
-      if (snapshot.docs.length < pageSize) break;
+      await _patchPlant(plantId, {'plant_family': value});
     }
   }
 
   Future<void> _deletePlantSubtree(String plantId) async {
-    final plantRef = _plantsRef.doc(plantId);
-    final plantSnap = await plantRef.get();
-    final plant = plantSnap.exists ? Plant.fromDocument(plantSnap) : null;
-
-    await _deleteQueryInBatches(plantRef.collection('watering'));
-    await _deleteQueryInBatches(plantRef.collection('fertilizing'));
-    await _deleteQueryInBatches(plantRef.collection('repotting'));
-    await _deleteQueryInBatches(plantRef.collection('manipulations'));
-    await _deleteQueryInBatches(plantRef.collection('notes'));
-    await _deleteQueryInBatches(plantRef.collection('growthEvents'));
-
-    final propagations = await _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('propagations')
-        .where('parentPlantId', isEqualTo: plantId)
-        .get();
-
-    for (final prop in propagations.docs) {
-      await _deleteQueryInBatches(prop.reference.collection('stageHistory'));
-      await _deleteQueryInBatches(prop.reference.collection('notes'));
-      await prop.reference.delete();
+    try {
+      await _api.delete('/plants/$plantId');
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
     }
-
-    await StorageService().deleteAllPlantImages(
-      plantId: plantId,
-      photoIds: plant?.galleryPhotos.map((p) => p.id) ?? const <String>[],
-    );
-    await plantRef.delete();
+    await FertilizingNotificationService.instance.cancelForPlant(plantId);
   }
 
   Future<void> deletePlants(Iterable<String> plantIds) async {
@@ -565,15 +450,10 @@ class PlantService {
     }
   }
 
-  /// Deletes every plant document (active + archived) and their subtrees.
   Future<void> deleteAllUserPlants() async {
-    while (true) {
-      final snapshot = await _plantsRef.limit(50).get();
-      if (snapshot.docs.isEmpty) break;
-      for (final doc in snapshot.docs) {
-        await _deletePlantSubtree(doc.id);
-      }
-      if (snapshot.docs.length < 50) break;
+    final plants = await _fetchAllPlants();
+    for (final plant in plants) {
+      await _deletePlantSubtree(plant.id);
     }
   }
 }

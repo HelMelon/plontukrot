@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 import 'propagation_method.dart';
 import 'propagation_status.dart';
 
@@ -64,54 +62,61 @@ class Propagation {
   }
 
   factory Propagation.fromMap(String id, Map<String, dynamic> data) {
-    final quantity = data['quantity'] as int? ?? 0;
-    final quantityAlive = data['quantityAlive'] as int? ?? quantity;
+    final quantity = readInt(data, 'quantity') ?? 0;
+    final quantityAlive = readInt(data, 'quantityAlive') ?? quantity;
 
     return Propagation(
       id: id,
-      parentPlantId: data['parentPlantId'] as String? ?? '',
-      parentPlantName: data['parentPlantName'] as String? ?? '',
-      parentPlantFamily: data['parentPlantFamily'] as String? ?? '',
-      method: PropagationMethod.fromCode(data['method'] as String?),
+      parentPlantId: readString(data, 'parentPlantId') ?? '',
+      parentPlantName: readString(data, 'parentPlantName') ?? '',
+      parentPlantFamily: readString(data, 'parentPlantFamily') ?? '',
+      method: PropagationMethod.fromCode(readField(data, 'method')),
       quantity: quantity,
       quantityAlive: quantityAlive,
-      soldQuantity: data['soldQuantity'] as int? ?? 0,
-      giftedQuantity: data['giftedQuantity'] as int? ?? 0,
-      tradedQuantity: data['tradedQuantity'] as int? ?? 0,
-      lostQuantity: data['lostQuantity'] as int? ?? 0,
-      stage: data['stage'] as int? ?? 1,
-      status: PropagationStatus.fromCode(data['status'] as String?),
-      startedAt: readTimestamp(data['startedAt']) ?? DateTime.now(),
-      soldAt: readTimestamp(data['soldAt']),
-      archivedAt: readTimestamp(data['archivedAt']),
-      expiresAt: readTimestamp(data['expiresAt']),
-      createdAt: readTimestamp(data['createdAt']),
+      soldQuantity: readInt(data, 'soldQuantity') ?? 0,
+      giftedQuantity: readInt(data, 'giftedQuantity') ?? 0,
+      tradedQuantity: readInt(data, 'tradedQuantity') ?? 0,
+      lostQuantity: readInt(data, 'lostQuantity') ?? 0,
+      stage: readInt(data, 'stage') ?? 1,
+      status: PropagationStatus.fromCode(readField(data, 'status')),
+      startedAt: readDate(data, 'startedAt') ?? DateTime.now(),
+      soldAt: readDate(data, 'soldAt'),
+      archivedAt: readDate(data, 'archivedAt'),
+      expiresAt: readDate(data, 'expiresAt'),
+      createdAt: readDate(data, 'createdAt'),
     );
-  }
-
-  factory Propagation.fromFirestore(QueryDocumentSnapshot doc) {
-    return Propagation.fromMap(doc.id, doc.data() as Map<String, dynamic>);
   }
 
   Map<String, dynamic> toMap() {
     return {
       'parentPlantId': parentPlantId,
+      'parent_plant_id': parentPlantId,
       'parentPlantName': parentPlantName,
+      'parent_plant_name': parentPlantName,
       'parentPlantFamily': parentPlantFamily,
-      'method': method.code,
+      'parent_plant_family': parentPlantFamily,
+      'method': method.index,
       'quantity': quantity,
       'quantityAlive': quantityAlive,
+      'quantity_alive': quantityAlive,
       'soldQuantity': soldQuantity,
+      'sold_quantity': soldQuantity,
       'giftedQuantity': giftedQuantity,
+      'gifted_quantity': giftedQuantity,
       'tradedQuantity': tradedQuantity,
+      'traded_quantity': tradedQuantity,
       'lostQuantity': lostQuantity,
+      'lost_quantity': lostQuantity,
       'stage': stage,
-      'status': status.code,
-      'startedAt': Timestamp.fromDate(startedAt),
-      if (soldAt != null) 'soldAt': Timestamp.fromDate(soldAt!),
-      if (archivedAt != null) 'archivedAt': Timestamp.fromDate(archivedAt!),
-      if (expiresAt != null) 'expiresAt': Timestamp.fromDate(expiresAt!),
-      if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
+      'status': status.index,
+      'startedAt': isoOrNull(startedAt),
+      'started_at': isoOrNull(startedAt),
+      if (soldAt != null) 'soldAt': isoOrNull(soldAt),
+      if (soldAt != null) 'sold_at': isoOrNull(soldAt),
+      if (archivedAt != null) 'archivedAt': isoOrNull(archivedAt),
+      if (expiresAt != null) 'expiresAt': isoOrNull(expiresAt),
+      if (createdAt != null) 'createdAt': isoOrNull(createdAt),
+      if (createdAt != null) 'created_at': isoOrNull(createdAt),
     };
   }
 }

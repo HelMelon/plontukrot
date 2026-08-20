@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 import 'propagation_outcome.dart';
 
 class PropagationStageEntry {
@@ -21,31 +19,26 @@ class PropagationStageEntry {
   });
 
   factory PropagationStageEntry.fromMap(String? id, Map<String, dynamic> data) {
-    final outcomeCode = data['outcome'] as String?;
+    final outcomeCode = readString(data, 'outcome');
     return PropagationStageEntry(
       id: id,
-      stage: data['stage'] as int? ?? 1,
-      changedAt: readTimestamp(data['changedAt']) ?? DateTime.now(),
-      quantityAlive: data['quantityAlive'] as int?,
-      note: data['note'] as String?,
+      stage: readInt(data, 'stage') ?? 1,
+      changedAt: readDate(data, 'changedAt') ?? DateTime.now(),
+      quantityAlive: readInt(data, 'quantityAlive'),
+      note: readString(data, 'note'),
       outcome: outcomeCode == null
           ? null
           : PropagationOutcome.fromCode(outcomeCode),
     );
   }
 
-  factory PropagationStageEntry.fromFirestore(QueryDocumentSnapshot doc) {
-    return PropagationStageEntry.fromMap(
-      doc.id,
-      doc.data() as Map<String, dynamic>,
-    );
-  }
-
   Map<String, dynamic> toMap() {
     return {
       'stage': stage,
-      'changedAt': Timestamp.fromDate(changedAt),
+      'changedAt': isoOrNull(changedAt),
+      'changed_at': isoOrNull(changedAt),
       if (quantityAlive != null) 'quantityAlive': quantityAlive,
+      if (quantityAlive != null) 'quantity_alive': quantityAlive,
       if (note != null && note!.trim().isNotEmpty) 'note': note!.trim(),
       if (outcome != null) 'outcome': outcome!.code,
     };

@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 
 enum FinanceEntryType {
   income,
@@ -8,11 +6,8 @@ enum FinanceEntryType {
 
   String get code => name;
 
-  static FinanceEntryType fromCode(String? code) {
-    return FinanceEntryType.values.firstWhere(
-      (value) => value.name == code,
-      orElse: () => FinanceEntryType.expense,
-    );
+  static FinanceEntryType fromCode(dynamic code) {
+    return readEnum(code, FinanceEntryType.values, FinanceEntryType.expense);
   }
 }
 
@@ -28,10 +23,11 @@ enum FinanceEntrySource {
 
   String get code => name;
 
-  static FinanceEntrySource fromCode(String? code) {
-    return FinanceEntrySource.values.firstWhere(
-      (value) => value.name == code,
-      orElse: () => FinanceEntrySource.manual,
+  static FinanceEntrySource fromCode(dynamic code) {
+    return readEnum(
+      code,
+      FinanceEntrySource.values,
+      FinanceEntrySource.manual,
     );
   }
 }
@@ -101,14 +97,11 @@ class FinanceEntry {
   bool get hasReceipts => receipts.isNotEmpty;
 
   factory FinanceEntry.fromMap(String id, Map<String, dynamic> data) {
-    final rawReceipts = data['receipts'];
+    final rawReceipts = readField(data, 'receipts');
     final receipts = <FinanceReceipt>[];
     if (rawReceipts is List) {
       for (final item in rawReceipts) {
-        if (item is Map<String, dynamic>) {
-          final receipt = FinanceReceipt.fromMap(item);
-          if (receipt.isValid) receipts.add(receipt);
-        } else if (item is Map) {
+        if (item is Map) {
           final receipt = FinanceReceipt.fromMap(
             Map<String, dynamic>.from(item),
           );
@@ -119,44 +112,39 @@ class FinanceEntry {
 
     return FinanceEntry(
       id: id,
-      title: data['title'] as String? ?? '',
-      amount: (data['amount'] as num?)?.toDouble() ?? 0,
-      type: FinanceEntryType.fromCode(data['type'] as String?),
-      source: FinanceEntrySource.fromCode(data['source'] as String?),
-      date: readTimestamp(data['date']) ?? DateTime.now(),
-      note: data['note'] as String?,
-      propagationId: data['propagationId'] as String?,
-      plantId: data['plantId'] as String?,
-      wishListItemId: data['wishListItemId'] as String?,
-      quantity: (data['quantity'] as num?)?.toInt(),
+      title: readString(data, 'title') ?? '',
+      amount: readDouble(data, 'amount') ?? 0,
+      type: FinanceEntryType.fromCode(readField(data, 'type')),
+      source: FinanceEntrySource.fromCode(readField(data, 'source')),
+      date: readDate(data, 'date') ?? DateTime.now(),
+      note: readString(data, 'note'),
+      propagationId: readString(data, 'propagationId'),
+      plantId: readString(data, 'plantId'),
+      wishListItemId: readString(data, 'wishListItemId'),
+      quantity: readInt(data, 'quantity'),
       receipts: receipts,
-      createdAt: readTimestamp(data['createdAt']),
-      updatedAt: readTimestamp(data['updatedAt']),
+      createdAt: readDate(data, 'createdAt'),
+      updatedAt: readDate(data, 'updatedAt'),
     );
-  }
-
-  factory FinanceEntry.fromFirestore(
-    QueryDocumentSnapshot<Map<String, dynamic>> doc,
-  ) {
-    return FinanceEntry.fromMap(doc.id, doc.data());
   }
 
   Map<String, dynamic> toMap() {
     return {
       'title': title,
       'amount': amount,
-      'type': type.code,
+      'type': type.index,
       'source': source.code,
-      'date': Timestamp.fromDate(date),
+      'date': isoOrNull(date),
       if (note != null && note!.isNotEmpty) 'note': note,
       if (propagationId != null) 'propagationId': propagationId,
       if (plantId != null) 'plantId': plantId,
       if (wishListItemId != null) 'wishListItemId': wishListItemId,
+      if (wishListItemId != null) 'wish_list_item_id': wishListItemId,
       if (quantity != null) 'quantity': quantity,
       if (receipts.isNotEmpty)
         'receipts': receipts.map((r) => r.toMap()).toList(),
-      if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
-      if (updatedAt != null) 'updatedAt': Timestamp.fromDate(updatedAt!),
+      if (createdAt != null) 'createdAt': isoOrNull(createdAt),
+      if (updatedAt != null) 'updatedAt': isoOrNull(updatedAt),
     };
   }
 }

@@ -69,7 +69,7 @@ class StartupWarmupService {
             context,
             onError: (error, stackTrace) {
               // Missing/expired Storage objects (403/404) must not dump
-              // FlutterError — cards already fall back via PlantNetworkImage.
+              // FlutterError — cards already fall back via PlantImage.
             },
           );
         } on Object {

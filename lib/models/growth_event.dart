@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 
 enum GrowthEventType {
   newLeaf,
@@ -13,11 +11,8 @@ enum GrowthEventType {
 
   String get code => name;
 
-  static GrowthEventType fromCode(String? code) {
-    return GrowthEventType.values.firstWhere(
-      (type) => type.name == code,
-      orElse: () => GrowthEventType.newLeaf,
-    );
+  static GrowthEventType fromCode(dynamic code) {
+    return readEnum(code, GrowthEventType.values, GrowthEventType.newLeaf);
   }
 }
 
@@ -69,17 +64,11 @@ class GrowthEvent {
   factory GrowthEvent.fromMap(String id, Map<String, dynamic> data) {
     return GrowthEvent(
       id: id,
-      type: GrowthEventType.fromCode(data['type'] as String?),
-      createdAt: readTimestamp(data['createdAt']),
-      expiresAt: readTimestamp(data['expiresAt']),
-      reason: LeafRemovalReason.fromCode(data['reason'] as String?),
+      type: GrowthEventType.fromCode(readField(data, 'type')),
+      createdAt: readDate(data, 'createdAt'),
+      expiresAt: readDate(data, 'expiresAt'),
+      reason: LeafRemovalReason.fromCode(readString(data, 'reason')),
     );
-  }
-
-  factory GrowthEvent.fromFirestore(
-    QueryDocumentSnapshot<Map<String, dynamic>> doc,
-  ) {
-    return GrowthEvent.fromMap(doc.id, doc.data());
   }
 
   /// Visible leaf count on the vine: baseline + new − removed (never below 0).

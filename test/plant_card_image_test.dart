@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plontukrot/core/theme/app_theme.dart';
 import 'package:plontukrot/features/plants/widgets/cards/plant_card.dart';
-import 'package:plontukrot/features/plants/widgets/common/plant_network_image.dart';
+import 'package:plontukrot/features/plants/widgets/common/plant_image.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 import 'package:plontukrot/models/plant.dart';
 
@@ -43,12 +43,12 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.byType(PlantNetworkImage), findsNothing);
+    expect(find.byType(PlantImage), findsNothing);
     expect(find.image(const AssetImage('assets/images/default-img.webp')),
         findsOneWidget);
   });
 
-  testWidgets('PlantCard with urls builds PlantNetworkImage', (tester) async {
+  testWidgets('PlantCard with urls builds PlantImage', (tester) async {
     const plant = Plant(
       id: '1',
       genus: 'Monstera',
@@ -69,9 +69,9 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.byType(PlantNetworkImage), findsOneWidget);
-    final image = tester.widget<PlantNetworkImage>(
-      find.byType(PlantNetworkImage),
+    expect(find.byType(PlantImage), findsOneWidget);
+    final image = tester.widget<PlantImage>(
+      find.byType(PlantImage),
     );
     expect(image.imageUrl, 'https://example.com/thumb.jpg');
     expect(image.fallbackUrl, 'https://example.com/full.jpg');

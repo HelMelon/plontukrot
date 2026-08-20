@@ -1,7 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 import '../models/catalog_component.dart';
+import '../models/model_helpers.dart';
+import 'api_client.dart';
+import 'api_exception.dart';
+import 'rest_stream.dart';
 
 const List<String> kDefaultSoilComponentNames = [
   'Perlite',
@@ -17,30 +18,25 @@ const List<String> kDefaultSoilComponentNames = [
 ];
 
 class ComponentService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final ApiClient _api = ApiClient.instance;
 
-  String get _uid => FirebaseAuth.instance.currentUser!.uid;
-
-  CollectionReference<Map<String, dynamic>> get _componentsRef =>
-      _db.collection('users').doc(_uid).collection('components');
+  Future<List<CatalogComponent>> _fetchAll() async {
+    final list = jsonMapList(await _api.get('/components'));
+    return list
+        .map((m) => CatalogComponent.fromMap(readString(m, 'id') ?? '', m))
+        .toList();
+  }
 
   Future<CatalogComponent?> findComponentByName(String name) async {
     final trimmed = name.trim();
     if (trimmed.isEmpty) return null;
-
     final lower = trimmed.toLowerCase();
-    final snapshot = await _componentsRef.get();
-    for (final doc in snapshot.docs) {
-      final existingName = (doc.data()['name'] as String?)?.trim() ?? '';
-      if (existingName.toLowerCase() == lower) {
-        return CatalogComponent.fromMap(doc.id, doc.data());
-      }
+    for (final item in await _fetchAll()) {
+      if (item.name.trim().toLowerCase() == lower) return item;
     }
     return null;
   }
 
-  /// Creates a component, or returns the existing id if the name already exists
-  /// (case-insensitive).
   Future<String> ensureComponent({required String name}) async {
     final existing = await findComponentByName(name);
     if (existing != null) return existing.id;
@@ -48,46 +44,40 @@ class ComponentService {
   }
 
   Future<String> addComponent({required String name}) async {
-    final trimmed = name.trim();
-    final doc = await _componentsRef.add({
-      'name': trimmed,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-    return doc.id;
+    final created = jsonMap(await _api.post('/components', body: {
+      'name': name.trim(),
+    }));
+    return readString(created, 'id') ?? '';
   }
 
   Future<void> updateComponent({
     required String componentId,
     required String name,
   }) async {
-    await _componentsRef.doc(componentId).update({
-      'name': name.trim(),
-    });
+    try {
+      await _api.patch('/components/$componentId', body: {'name': name.trim()});
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
+    }
   }
 
   Future<void> deleteComponent(String componentId) async {
-    await _componentsRef.doc(componentId).delete();
+    await _api.delete('/components/$componentId');
   }
 
   Stream<List<CatalogComponent>> getComponents() {
-    return _componentsRef.orderBy('name').snapshots().map(
-          (snapshot) => snapshot.docs.map(CatalogComponent.fromFirestore).toList(),
-        );
+    return restPollStream(() async {
+      final items = await _fetchAll();
+      items.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      return items;
+    });
   }
 
-  /// Seeds the catalog with defaults once if it is empty.
   Future<void> ensureDefaultComponents() async {
-    final existing = await _componentsRef.limit(1).get();
-    if (existing.docs.isNotEmpty) return;
-
-    final batch = _db.batch();
+    final existing = await _fetchAll();
+    if (existing.isNotEmpty) return;
     for (final name in kDefaultSoilComponentNames) {
-      final ref = _componentsRef.doc();
-      batch.set(ref, {
-        'name': name,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+      await addComponent(name: name);
     }
-    await batch.commit();
   }
 }

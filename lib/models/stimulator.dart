@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 
 class Stimulator {
   final String id;
@@ -18,16 +16,10 @@ class Stimulator {
   factory Stimulator.fromMap(String id, Map<String, dynamic> data) {
     return Stimulator(
       id: id,
-      name: data['name'] as String? ?? '',
-      defaultDosage: _nullableTrimmed(data['defaultDosage'] as String?),
-      createdAt: readTimestamp(data['createdAt']),
+      name: readString(data, 'name') ?? '',
+      defaultDosage: _nullableTrimmed(readString(data, 'defaultDosage')),
+      createdAt: readDate(data, 'createdAt'),
     );
-  }
-
-  factory Stimulator.fromFirestore(
-    QueryDocumentSnapshot<Map<String, dynamic>> doc,
-  ) {
-    return Stimulator.fromMap(doc.id, doc.data());
   }
 
   static String? _nullableTrimmed(String? value) {
@@ -40,7 +32,8 @@ class Stimulator {
     return {
       'name': name,
       if (defaultDosage != null) 'defaultDosage': defaultDosage,
-      if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
+      if (defaultDosage != null) 'default_dosage': defaultDosage,
+      if (createdAt != null) 'createdAt': isoOrNull(createdAt),
     };
   }
 }

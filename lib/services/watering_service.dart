@@ -1,39 +1,22 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
+import '../models/model_helpers.dart';
 import '../models/watering_entry.dart';
+import 'api_client.dart';
+import 'api_exception.dart';
 import 'growth_event_service.dart';
+import 'rest_stream.dart';
 
 class WateringService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final ApiClient _api = ApiClient.instance;
 
-  static const int _batchPlantChunk = 200;
-
-  String get _uid => FirebaseAuth.instance.currentUser!.uid;
-
-  CollectionReference<Map<String, dynamic>> get _plantsCollection {
-    return _db.collection('users').doc(_uid).collection('plants');
+  Future<List<WateringEntry>> _fetchHistory(String plantId) async {
+    final list = jsonMapList(await _api.get('/plants/$plantId/waterings'));
+    final entries = list
+        .map((m) => WateringEntry.fromMap(readString(m, 'id'), m))
+        .toList()
+      ..sort((a, b) => b.wateredAt.compareTo(a.wateredAt));
+    return entries;
   }
 
-  CollectionReference<Map<String, dynamic>> _wateringRef(String plantId) {
-    return _plantsCollection.doc(plantId).collection('watering');
-  }
-
-  Future<void> _syncLastWateredAt(String plantId) async {
-    final snapshot = await _wateringRef(plantId)
-        .orderBy('wateredAt', descending: true)
-        .limit(1)
-        .get();
-
-    await _plantsCollection.doc(plantId).update({
-      'lastWateredAt': snapshot.docs.isEmpty
-          ? FieldValue.delete()
-          : snapshot.docs.first.data()['wateredAt'],
-    });
-  }
-
-  /// When [skipPlantFetch] is true, uses [wateringFrequency] / [lastWateredAt]
-  /// as provided (including null) and does not read the plant document.
   Future<void> addWatering({
     required String plantId,
     required DateTime wateredAt,
@@ -41,81 +24,33 @@ class WateringService {
     DateTime? lastWateredAt,
     bool skipPlantFetch = false,
   }) async {
-    var frequency = wateringFrequency;
-    var last = lastWateredAt;
-
-    if (!skipPlantFetch) {
-      final plantDoc = await _plantsCollection.doc(plantId).get();
-      final plantData = plantDoc.data();
-      frequency ??= plantData?['wateringFrequency'] as int?;
-      last ??= (plantData?['lastWateredAt'] as Timestamp?)?.toDate();
-    }
-
     DateTime? nextWatering;
-    if (frequency != null && frequency > 0) {
-      nextWatering = wateredAt.add(Duration(days: frequency));
+    if (wateringFrequency != null && wateringFrequency > 0) {
+      nextWatering = wateredAt.add(Duration(days: wateringFrequency));
     }
 
-    final batch = _db.batch();
-    final entryRef = _wateringRef(plantId).doc();
-    batch.set(entryRef, {
-      'wateredAt': Timestamp.fromDate(wateredAt),
-      'nextWatering':
-          nextWatering != null ? Timestamp.fromDate(nextWatering) : null,
-      'createdAt': FieldValue.serverTimestamp(),
+    await _api.post('/plants/$plantId/waterings', body: {
+      'watered_at': isoDate(wateredAt),
+      'next_watering': isoDateOrNull(nextWatering),
     });
-
-    if (last == null || wateredAt.isAfter(last)) {
-      batch.update(_plantsCollection.doc(plantId), {
-        'lastWateredAt': Timestamp.fromDate(wateredAt),
-      });
-    }
-
-    await batch.commit();
 
     await GrowthEventService().addWateringEvent(plantId, at: wateredAt);
   }
 
-  /// Bulk watering without per-plant plant-document reads when maps are supplied.
   Future<void> addWaterings({
     required Iterable<String> plantIds,
     required DateTime wateredAt,
     Map<String, int?> wateringFrequencyByPlantId = const {},
     Map<String, DateTime?> lastWateredAtByPlantId = const {},
   }) async {
-    final ids = plantIds.toList();
-    for (var i = 0; i < ids.length; i += _batchPlantChunk) {
-      final chunk = ids.skip(i).take(_batchPlantChunk);
-      final batch = _db.batch();
-
-      for (final plantId in chunk) {
-        final frequency = wateringFrequencyByPlantId[plantId];
-        final last = lastWateredAtByPlantId[plantId];
-
-        DateTime? nextWatering;
-        if (frequency != null && frequency > 0) {
-          nextWatering = wateredAt.add(Duration(days: frequency));
-        }
-
-        batch.set(_wateringRef(plantId).doc(), {
-          'wateredAt': Timestamp.fromDate(wateredAt),
-          'nextWatering':
-              nextWatering != null ? Timestamp.fromDate(nextWatering) : null,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-
-        if (last == null || wateredAt.isAfter(last)) {
-          batch.update(_plantsCollection.doc(plantId), {
-            'lastWateredAt': Timestamp.fromDate(wateredAt),
-          });
-        }
-      }
-
-      await batch.commit();
-
-      for (final plantId in chunk) {
-        await GrowthEventService().addWateringEvent(plantId, at: wateredAt);
-      }
+    for (final plantId in plantIds) {
+      await addWatering(
+        plantId: plantId,
+        wateredAt: wateredAt,
+        wateringFrequency: wateringFrequencyByPlantId[plantId],
+        lastWateredAt: lastWateredAtByPlantId[plantId],
+        skipPlantFetch: true,
+      );
     }
   }
 
@@ -123,34 +58,21 @@ class WateringService {
     String plantId, {
     int limit = 40,
   }) {
-    return _wateringRef(plantId)
-        .orderBy('wateredAt', descending: true)
-        .limit(limit)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs.map(WateringEntry.fromFirestore).toList(),
-        );
-  }
-
-  Stream<WateringEntry?> watchLastWatering(String plantId) {
-    return _wateringRef(plantId)
-        .orderBy('wateredAt', descending: true)
-        .limit(1)
-        .snapshots()
-        .map((snapshot) {
-      if (snapshot.docs.isEmpty) return null;
-      return WateringEntry.fromFirestore(snapshot.docs.first);
+    return restPollStream(() async {
+      final entries = await _fetchHistory(plantId);
+      if (entries.length <= limit) return entries;
+      return entries.take(limit).toList();
     });
   }
 
-  Future<WateringEntry?> getLastWatering(String plantId) async {
-    final snapshot = await _wateringRef(plantId)
-        .orderBy('wateredAt', descending: true)
-        .limit(1)
-        .get();
+  Stream<WateringEntry?> watchLastWatering(String plantId) {
+    return restPollStream(() => getLastWatering(plantId));
+  }
 
-    if (snapshot.docs.isEmpty) return null;
-    return WateringEntry.fromFirestore(snapshot.docs.first);
+  Future<WateringEntry?> getLastWatering(String plantId) async {
+    final entries = await _fetchHistory(plantId);
+    if (entries.isEmpty) return null;
+    return entries.first;
   }
 
   DateTime _startOfDay(DateTime date) =>
@@ -162,18 +84,13 @@ class WateringService {
   }) async {
     final start = _startOfDay(day);
     final end = start.add(const Duration(days: 1));
-
-    final snapshot = await _wateringRef(plantId)
-        .where('wateredAt', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
-        .where('wateredAt', isLessThan: Timestamp.fromDate(end))
-        .limit(1)
-        .get();
-
-    return snapshot.docs.isNotEmpty;
+    final entries = await _fetchHistory(plantId);
+    return entries.any((e) {
+      final at = e.wateredAt;
+      return !at.isBefore(start) && at.isBefore(end);
+    });
   }
 
-  /// After fertilizing on [fertilizedAt], add watering on the same day unless
-  /// the plant was already watered the day before (or already on that day).
   Future<void> addWateringIfMissingBeforeFertilizing({
     required String plantId,
     required DateTime fertilizedAt,
@@ -211,8 +128,11 @@ class WateringService {
     required String plantId,
     required String wateringId,
   }) async {
-    await _wateringRef(plantId).doc(wateringId).delete();
-    await _syncLastWateredAt(plantId);
+    try {
+      await _api.delete('/plants/$plantId/waterings/$wateringId');
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
+    }
   }
 
   Future<void> updateWatering({
@@ -222,25 +142,17 @@ class WateringService {
     int? wateringFrequency,
     bool skipPlantFetch = false,
   }) async {
-    final updateData = <String, dynamic>{
-      'wateredAt': Timestamp.fromDate(wateredAt),
-    };
-
-    var frequency = wateringFrequency;
-    if (!skipPlantFetch && frequency == null) {
-      final plantDoc = await _plantsCollection.doc(plantId).get();
-      frequency = plantDoc.data()?['wateringFrequency'] as int?;
+    DateTime? nextWatering;
+    if (wateringFrequency != null && wateringFrequency > 0) {
+      nextWatering = wateredAt.add(Duration(days: wateringFrequency));
     }
-
-    if (frequency != null && frequency > 0) {
-      updateData['nextWatering'] = Timestamp.fromDate(
-        wateredAt.add(Duration(days: frequency)),
-      );
-    } else {
-      updateData['nextWatering'] = null;
+    try {
+      await _api.patch('/plants/$plantId/waterings/$wateringId', body: {
+        'watered_at': isoDate(wateredAt),
+        'next_watering': isoDateOrNull(nextWatering),
+      });
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
     }
-
-    await _wateringRef(plantId).doc(wateringId).update(updateData);
-    await _syncLastWateredAt(plantId);
   }
 }

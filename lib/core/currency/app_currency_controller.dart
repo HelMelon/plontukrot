@@ -1,12 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../models/model_helpers.dart';
+import '../../services/auth_service.dart';
+import '../../services/user_profile_service.dart';
 import 'app_currency.dart';
 
-/// Currency preference: SharedPreferences cache + Firestore `users/{uid}.currencyCode`.
+/// Currency preference: SharedPreferences cache + `GET/PATCH /auth/me`.
 class AppCurrencyController extends ChangeNotifier {
   AppCurrencyController._();
 
@@ -36,18 +37,12 @@ class AppCurrencyController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// After sign-in: prefer Firestore value when present; otherwise push local
-  /// only if the user has an explicit local preference.
   Future<void> syncWithCloud() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+    if (AuthService().currentUser == null) return;
 
     try {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-      final remote = doc.data()?[firestoreField] as String?;
+      final json = await UserProfileService().fetchMe();
+      final remote = readString(json, firestoreField);
 
       if (remote != null && remote.trim().isNotEmpty) {
         final next = AppCurrency.fromCode(remote);
@@ -62,23 +57,14 @@ class AppCurrencyController extends ChangeNotifier {
       if (hasLocal) {
         await _writeToCloud(_currency.code);
       }
-    } catch (_) {
-      // Keep local preference if cloud sync fails.
-    }
+    } catch (_) {}
   }
 
   Future<void> _writeToCloud(String code) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
+    if (AuthService().currentUser == null) return;
     try {
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
-        {firestoreField: code},
-        SetOptions(merge: true),
-      );
-    } catch (_) {
-      // Local preference is already saved.
-    }
+      await UserProfileService().patchProfile({'currency_code': code});
+    } catch (_) {}
   }
 
   String format(num amount, {String? locale}) {

@@ -5,7 +5,7 @@ import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/accessible_progress_indicator.dart';
 import '../../../core/widgets/app_modal.dart';
 import '../../../models/finance_entry.dart';
-import '../../plants/widgets/common/plant_network_image.dart';
+import '../../plants/widgets/common/plant_image.dart';
 
 /// Opens a full-screen-ish dialog and only then loads receipt image(s).
 Future<void> showFinanceReceiptsViewer(
@@ -122,7 +122,7 @@ class _FinanceReceiptsViewerDialogState
                     return InteractiveViewer(
                       minScale: 1,
                       maxScale: 4,
-                      child: PlantNetworkImage(
+                      child: PlantImage(
                         imageUrl: receipt.url,
                         fit: BoxFit.contain,
                         semanticLabel: l10n.financesReceiptImageLabel(

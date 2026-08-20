@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 
 /// One photo in a plant gallery (max [Plant.maxGalleryPhotos]).
 class PlantPhoto {
@@ -22,14 +20,14 @@ class PlantPhoto {
   bool get isLegacy => id == legacyId;
 
   factory PlantPhoto.fromMap(Map<String, dynamic> data) {
-    final id = (data['id'] as String?)?.trim() ?? '';
-    final imageUrl = (data['imageUrl'] as String?)?.trim() ?? '';
-    final thumb = (data['imageThumbUrl'] as String?)?.trim() ?? '';
+    final id = readString(data, 'id')?.trim() ?? '';
+    final imageUrl = readString(data, 'imageUrl')?.trim() ?? '';
+    final thumb = readString(data, 'imageThumbUrl')?.trim() ?? '';
     return PlantPhoto(
       id: id,
       imageUrl: imageUrl,
       imageThumbUrl: thumb.isEmpty ? imageUrl : thumb,
-      addedAt: readTimestamp(data['addedAt']) ?? DateTime.now(),
+      addedAt: readDate(data, 'addedAt') ?? DateTime.now(),
     );
   }
 
@@ -38,7 +36,10 @@ class PlantPhoto {
       'id': id,
       'imageUrl': imageUrl,
       'imageThumbUrl': imageThumbUrl,
-      'addedAt': Timestamp.fromDate(addedAt),
+      'image_url': imageUrl,
+      'image_thumb_url': imageThumbUrl,
+      'addedAt': isoOrNull(addedAt),
+      'added_at': isoOrNull(addedAt),
     };
   }
 }

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 /// Network plant photo with optional fallback URL (e.g. thumb → full).
 ///
 /// Load failures are logged in debug mode so silent placeholders are diagnosable.
-class PlantNetworkImage extends StatefulWidget {
+class PlantImage extends StatefulWidget {
   final String? imageUrl;
   final String? fallbackUrl;
   final BoxFit fit;
@@ -24,7 +24,7 @@ class PlantNetworkImage extends StatefulWidget {
   /// labeled card/list row).
   final bool excludeFromSemantics;
 
-  const PlantNetworkImage({
+  const PlantImage({
     super.key,
     required this.imageUrl,
     this.fallbackUrl,
@@ -41,10 +41,10 @@ class PlantNetworkImage extends StatefulWidget {
   });
 
   @override
-  State<PlantNetworkImage> createState() => _PlantNetworkImageState();
+  State<PlantImage> createState() => _PlantImageState();
 }
 
-class _PlantNetworkImageState extends State<PlantNetworkImage> {
+class _PlantImageState extends State<PlantImage> {
   late String? _activeUrl;
   var _triedFallback = false;
 
@@ -55,7 +55,7 @@ class _PlantNetworkImageState extends State<PlantNetworkImage> {
   }
 
   @override
-  void didUpdateWidget(covariant PlantNetworkImage oldWidget) {
+  void didUpdateWidget(covariant PlantImage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.imageUrl != widget.imageUrl ||
         oldWidget.fallbackUrl != widget.fallbackUrl) {
@@ -80,7 +80,7 @@ class _PlantNetworkImageState extends State<PlantNetworkImage> {
 
   void _onError(String url, Object error) {
     if (kDebugMode) {
-      debugPrint('PlantNetworkImage failed url=$url error=$error');
+      debugPrint('PlantImage failed url=$url error=$error');
     }
     final fallback = _fallback;
     if (!_triedFallback && fallback != null && fallback != url) {
@@ -122,7 +122,7 @@ class _PlantNetworkImageState extends State<PlantNetworkImage> {
           }
           if (kDebugMode) {
             debugPrint(
-              'PlantNetworkImage final failure url=$failedUrl error=$error',
+              'PlantImage final failure url=$failedUrl error=$error',
             );
           }
           return widget.errorWidget;

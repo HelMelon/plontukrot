@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
+import '../models/model_helpers.dart';
 import '../models/propagation.dart';
 import '../models/propagation_initial_stage.dart';
 import '../models/propagation_method.dart';
@@ -10,54 +8,38 @@ import '../models/propagation_outcome.dart';
 import '../models/propagation_stage_entry.dart';
 import '../models/propagation_status.dart';
 import '../models/propagation_year_stats.dart';
+import 'api_client.dart';
+import 'api_exception.dart';
+import 'rest_stream.dart';
 
 class PropagationService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final ApiClient _api = ApiClient.instance;
 
   static const archiveRetention = Duration(days: 365);
 
-  String get _uid => FirebaseAuth.instance.currentUser!.uid;
-
-  CollectionReference<Map<String, dynamic>> get _propagationsRef {
-    return _db.collection('users').doc(_uid).collection('propagations');
+  Future<List<Propagation>> _fetchAll() async {
+    final list = jsonMapList(await _api.get('/propagations'));
+    return list
+        .map((m) => Propagation.fromMap(readString(m, 'id') ?? '', m))
+        .toList();
   }
 
-  CollectionReference<Map<String, dynamic>> _stageHistoryRef(
-    String propagationId,
-  ) {
-    return _propagationsRef.doc(propagationId).collection('stageHistory');
-  }
-
-  CollectionReference<Map<String, dynamic>> _notesRef(String propagationId) {
-    return _propagationsRef.doc(propagationId).collection('notes');
-  }
-
-  Future<void> _deleteQueryInBatches(
-    Query<Map<String, dynamic>> query, {
-    int pageSize = 200,
-  }) async {
-    while (true) {
-      final snapshot = await query.limit(pageSize).get();
-      if (snapshot.docs.isEmpty) break;
-
-      final batch = _db.batch();
-      for (final doc in snapshot.docs) {
-        batch.delete(doc.reference);
-      }
-      await batch.commit();
-
-      if (snapshot.docs.length < pageSize) break;
-    }
-  }
-
-  Map<String, dynamic> _archiveFields({
-    required PropagationStatus status,
-    required DateTime at,
-  }) {
+  Map<String, dynamic> _toPayload(Propagation item) {
     return {
-      'status': status.code,
-      'archivedAt': Timestamp.fromDate(at),
-      'expiresAt': Timestamp.fromDate(at.add(archiveRetention)),
+      'parent_plant_id': item.parentPlantId,
+      'parent_plant_name': item.parentPlantName,
+      'parent_plant_family': item.parentPlantFamily,
+      'method': item.method.index,
+      'stage': item.stage,
+      'status': item.status.index,
+      'quantity': item.quantity,
+      'quantity_alive': item.quantityAlive,
+      'gifted_quantity': item.giftedQuantity,
+      'sold_quantity': item.soldQuantity,
+      'traded_quantity': item.tradedQuantity,
+      'lost_quantity': item.lostQuantity,
+      'started_at': isoDate(item.startedAt),
+      'sold_at': isoDateOrNull(item.soldAt),
     };
   }
 
@@ -71,74 +53,55 @@ class PropagationService {
     int? divisionStage,
     int? stage,
   }) async {
-    final resolvedStage = stage ??
-        initialStageFor(method, divisionStage: divisionStage);
-    final docRef = _propagationsRef.doc();
-
-    final batch = _db.batch();
-    batch.set(docRef, {
-      'parentPlantId': parentPlantId,
-      'parentPlantName': parentPlantName,
-      'parentPlantFamily': parentPlantFamily,
-      'method': method.code,
+    final resolvedStage =
+        stage ?? initialStageFor(method, divisionStage: divisionStage);
+    final created = jsonMap(await _api.post('/propagations', body: {
+      'parent_plant_id': parentPlantId,
+      'parent_plant_name': parentPlantName,
+      'parent_plant_family': parentPlantFamily,
+      'method': method.index,
       'quantity': quantity,
-      'quantityAlive': quantity,
-      'soldQuantity': 0,
-      'giftedQuantity': 0,
-      'tradedQuantity': 0,
-      'lostQuantity': 0,
+      'quantity_alive': quantity,
+      'sold_quantity': 0,
+      'gifted_quantity': 0,
+      'traded_quantity': 0,
+      'lost_quantity': 0,
       'stage': resolvedStage,
-      'status': PropagationStatus.active.code,
-      'startedAt': Timestamp.fromDate(startedAt),
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-
-    batch.set(_stageHistoryRef(docRef.id).doc(), {
-      'stage': resolvedStage,
-      'changedAt': Timestamp.fromDate(startedAt),
-      'quantityAlive': quantity,
-    });
-
-    await batch.commit();
-    return docRef.id;
+      'status': PropagationStatus.active.index,
+      'started_at': isoDate(startedAt),
+    }));
+    final id = readString(created, 'id') ?? '';
+    if (id.isNotEmpty) {
+      await _api.post('/propagations/$id/stage-history', body: {
+        'stage': resolvedStage,
+        'quantity_alive': quantity,
+      });
+    }
+    return id;
   }
 
   Stream<List<Propagation>> watchActivePropagations() {
-    return _propagationsRef
-        .where('status', isEqualTo: PropagationStatus.active.code)
-        .snapshots()
-        .map((snapshot) {
-      final items = snapshot.docs
-          .map(Propagation.fromFirestore)
-          .where((item) => item.quantityAlive > 0)
-          .toList();
-      items.sort((a, b) => b.startedAt.compareTo(a.startedAt));
+    return restPollStream(() async {
+      final items = (await _fetchAll())
+          .where((item) =>
+              item.status == PropagationStatus.active &&
+              item.quantityAlive > 0)
+          .toList()
+        ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
       return items;
     });
   }
 
   Stream<List<Propagation>> watchArchivedPropagations() {
-    return _propagationsRef
-        .where(
-          'status',
-          whereIn: [
-            PropagationStatus.sold.code,
-            PropagationStatus.gifted.code,
-            PropagationStatus.traded.code,
-            PropagationStatus.lost.code,
-          ],
-        )
-        .snapshots()
-        .map((snapshot) {
-      final items = snapshot.docs
-          .map(Propagation.fromFirestore)
+    return restPollStream(() async {
+      final items = (await _fetchAll())
           .where((item) => item.isArchiveVisible)
-          .toList();
-      items.sort((a, b) {
-        final aDate = a.archivedAt ?? a.soldAt ?? a.startedAt;
-        final bDate = b.archivedAt ?? b.soldAt ?? b.startedAt;
-        return bDate.compareTo(aDate);
-      });
+          .toList()
+        ..sort((a, b) {
+          final aDate = a.archivedAt ?? a.soldAt ?? a.startedAt;
+          final bDate = b.archivedAt ?? b.soldAt ?? b.startedAt;
+          return bDate.compareTo(aDate);
+        });
       return items;
     });
   }
@@ -151,7 +114,6 @@ class PropagationService {
     );
   }
 
-  /// Derive year stats from already-open active/archive streams (no extra queries).
   Stream<PropagationYearStats> yearStatsFrom(
     Stream<List<Propagation>> active,
     Stream<List<Propagation>> archived, [
@@ -204,7 +166,6 @@ class PropagationService {
     return watchActiveBatchCountsByPlantId().map((counts) => counts.keys.toSet());
   }
 
-  /// Active batch count per parent plant id.
   Stream<Map<String, int>> watchActiveBatchCountsByPlantId() {
     return watchActivePropagations().map((items) {
       final counts = <String, int>{};
@@ -218,45 +179,55 @@ class PropagationService {
   }
 
   Stream<List<Propagation>> watchPropagationsForPlant(String plantId) {
-    return _propagationsRef
-        .where('parentPlantId', isEqualTo: plantId)
-        .snapshots()
-        .map((snapshot) {
-      final items = snapshot.docs
-          .map(Propagation.fromFirestore)
+    return restPollStream(() async {
+      final items = (await _fetchAll())
           .where(
             (item) =>
+                item.parentPlantId == plantId &&
                 item.status == PropagationStatus.active &&
                 item.quantityAlive > 0,
           )
-          .toList();
-      items.sort((a, b) => b.startedAt.compareTo(a.startedAt));
+          .toList()
+        ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
       return items;
     });
   }
 
   Stream<Propagation?> watchPropagation(String propagationId) {
-    return _propagationsRef.doc(propagationId).snapshots().map((doc) {
-      if (!doc.exists || doc.data() == null) return null;
-      return Propagation.fromMap(doc.id, doc.data()!);
+    return restPollStream(() async {
+      for (final item in await _fetchAll()) {
+        if (item.id == propagationId) return item;
+      }
+      return null;
     });
   }
 
   Stream<List<PropagationStageEntry>> watchStageHistory(String propagationId) {
-    return _stageHistoryRef(propagationId)
-        .orderBy('changedAt', descending: false)
-        .snapshots()
-        .map((snapshot) {
-          final entries =
-              snapshot.docs.map(PropagationStageEntry.fromFirestore).toList();
-          // Secondary sort by document id keeps same-timestamp order stable.
-          entries.sort((a, b) {
-            final byTime = a.changedAt.compareTo(b.changedAt);
-            if (byTime != 0) return byTime;
-            return (a.id ?? '').compareTo(b.id ?? '');
-          });
-          return entries;
-        });
+    return restPollStream(() async {
+      final list = jsonMapList(
+        await _api.get('/propagations/$propagationId/stage-history'),
+      );
+      final entries = list
+          .map((m) => PropagationStageEntry.fromMap(readString(m, 'id'), m))
+          .toList();
+      entries.sort((a, b) {
+        final byTime = a.changedAt.compareTo(b.changedAt);
+        if (byTime != 0) return byTime;
+        return (a.id ?? '').compareTo(b.id ?? '');
+      });
+      return entries;
+    });
+  }
+
+  Future<Propagation?> _get(String id) async {
+    for (final item in await _fetchAll()) {
+      if (item.id == id) return item;
+    }
+    return null;
+  }
+
+  Future<void> _patch(Propagation item) async {
+    await _api.patch('/propagations/${item.id}', body: _toPayload(item));
   }
 
   Future<void> changeStage({
@@ -266,54 +237,60 @@ class PropagationService {
     int? quantityAlive,
     String? note,
   }) async {
-    final docRef = _propagationsRef.doc(propagationId);
-    final current = await docRef.get();
-    if (!current.exists) return;
+    final current = await _get(propagationId);
+    if (current == null) return;
 
-    final data = current.data()!;
-    final previousAlive = data['quantityAlive'] as int? ?? 0;
+    final previousAlive = current.quantityAlive;
     final alive = quantityAlive ?? previousAlive;
-    final previousLost = data['lostQuantity'] as int? ?? 0;
+    final previousLost = current.lostQuantity;
     final lostDelta = previousAlive > alive ? previousAlive - alive : 0;
     final newLost = previousLost + lostDelta;
 
-    final updates = <String, dynamic>{
-      'stage': stage,
-      'quantityAlive': alive,
-      if (lostDelta > 0) 'lostQuantity': newLost,
-    };
+    var status = current.status;
+    DateTime? soldAt = current.soldAt;
+    DateTime? archivedAt = current.archivedAt;
+    DateTime? expiresAt = current.expiresAt;
 
     if (alive <= 0) {
-      final sold = data['soldQuantity'] as int? ?? 0;
-      final gifted = data['giftedQuantity'] as int? ?? 0;
-      final traded = data['tradedQuantity'] as int? ?? 0;
-      updates.addAll(
-        _archiveFields(
-          status: PropagationStatus.archiveFromCounters(
-            soldQuantity: sold,
-            giftedQuantity: gifted,
-            tradedQuantity: traded,
-            lostQuantity: newLost,
-          ),
-          at: changedAt,
-        ),
+      status = PropagationStatus.archiveFromCounters(
+        soldQuantity: current.soldQuantity,
+        giftedQuantity: current.giftedQuantity,
+        tradedQuantity: current.tradedQuantity,
+        lostQuantity: newLost,
       );
-      if (sold > 0) {
-        updates['soldAt'] = Timestamp.fromDate(changedAt);
+      archivedAt = changedAt;
+      expiresAt = changedAt.add(archiveRetention);
+      if (current.soldQuantity > 0) {
+        soldAt = changedAt;
       }
     }
 
-    final batch = _db.batch();
-    batch.update(docRef, updates);
-
-    batch.set(_stageHistoryRef(propagationId).doc(), {
+    final updated = Propagation(
+      id: current.id,
+      parentPlantId: current.parentPlantId,
+      parentPlantName: current.parentPlantName,
+      parentPlantFamily: current.parentPlantFamily,
+      method: current.method,
+      quantity: current.quantity,
+      quantityAlive: alive,
+      soldQuantity: current.soldQuantity,
+      giftedQuantity: current.giftedQuantity,
+      tradedQuantity: current.tradedQuantity,
+      lostQuantity: newLost,
+      stage: stage,
+      status: status,
+      startedAt: current.startedAt,
+      soldAt: soldAt,
+      archivedAt: archivedAt,
+      expiresAt: expiresAt,
+      createdAt: current.createdAt,
+    );
+    await _patch(updated);
+    await _api.post('/propagations/$propagationId/stage-history', body: {
       'stage': stage,
-      'changedAt': Timestamp.fromDate(changedAt),
-      'quantityAlive': alive,
+      'quantity_alive': alive,
       if (note != null && note.trim().isNotEmpty) 'note': note.trim(),
     });
-
-    await batch.commit();
   }
 
   Future<void> markOutcome({
@@ -324,55 +301,67 @@ class PropagationService {
     String? note,
   }) async {
     if (quantity < 1) return;
+    final current = await _get(propagationId);
+    if (current == null) return;
 
-    final docRef = _propagationsRef.doc(propagationId);
-    final current = await docRef.get();
-    if (!current.exists) return;
-
-    final data = current.data()!;
-    final alive = data['quantityAlive'] as int? ?? 0;
-    final stage = data['stage'] as int? ?? 1;
+    final alive = current.quantityAlive;
     final count = quantity > alive ? alive : quantity;
     if (count < 1) return;
-
     final newAlive = alive - count;
-    final field = switch (outcome) {
-      PropagationOutcome.sold => 'soldQuantity',
-      PropagationOutcome.gifted => 'giftedQuantity',
-      PropagationOutcome.traded => 'tradedQuantity',
-      PropagationOutcome.lost => 'lostQuantity',
-    };
-    final previous = data[field] as int? ?? 0;
 
-    final updates = <String, dynamic>{
-      'quantityAlive': newAlive,
-      field: previous + count,
-    };
-
-    if (outcome == PropagationOutcome.sold) {
-      updates['soldAt'] = Timestamp.fromDate(at);
+    var sold = current.soldQuantity;
+    var gifted = current.giftedQuantity;
+    var traded = current.tradedQuantity;
+    var lost = current.lostQuantity;
+    DateTime? soldAt = current.soldAt;
+    switch (outcome) {
+      case PropagationOutcome.sold:
+        sold += count;
+        soldAt = at;
+      case PropagationOutcome.gifted:
+        gifted += count;
+      case PropagationOutcome.traded:
+        traded += count;
+      case PropagationOutcome.lost:
+        lost += count;
     }
 
+    var status = current.status;
+    DateTime? archivedAt = current.archivedAt;
+    DateTime? expiresAt = current.expiresAt;
     if (newAlive <= 0) {
-      updates.addAll(
-        _archiveFields(
-          status: PropagationStatus.archiveForOutcome(outcome),
-          at: at,
-        ),
-      );
+      status = PropagationStatus.archiveForOutcome(outcome);
+      archivedAt = at;
+      expiresAt = at.add(archiveRetention);
     }
 
-    final batch = _db.batch();
-    batch.update(docRef, updates);
-    batch.set(_stageHistoryRef(propagationId).doc(), {
-      'stage': stage,
-      'changedAt': Timestamp.fromDate(at),
-      'quantityAlive': newAlive,
+    final updated = Propagation(
+      id: current.id,
+      parentPlantId: current.parentPlantId,
+      parentPlantName: current.parentPlantName,
+      parentPlantFamily: current.parentPlantFamily,
+      method: current.method,
+      quantity: current.quantity,
+      quantityAlive: newAlive,
+      soldQuantity: sold,
+      giftedQuantity: gifted,
+      tradedQuantity: traded,
+      lostQuantity: lost,
+      stage: current.stage,
+      status: status,
+      startedAt: current.startedAt,
+      soldAt: soldAt,
+      archivedAt: archivedAt,
+      expiresAt: expiresAt,
+      createdAt: current.createdAt,
+    );
+    await _patch(updated);
+    await _api.post('/propagations/$propagationId/stage-history', body: {
+      'stage': current.stage,
+      'quantity_alive': newAlive,
       'outcome': outcome.code,
       if (note?.trim().isNotEmpty == true) 'note': note!.trim(),
     });
-
-    await batch.commit();
   }
 
   Future<void> sell({
@@ -439,21 +428,40 @@ class PropagationService {
     required String propagationId,
     required int quantityAlive,
   }) async {
-    await _propagationsRef.doc(propagationId).update({
-      'quantityAlive': quantityAlive,
-    });
+    final current = await _get(propagationId);
+    if (current == null) return;
+    await _patch(
+      Propagation(
+        id: current.id,
+        parentPlantId: current.parentPlantId,
+        parentPlantName: current.parentPlantName,
+        parentPlantFamily: current.parentPlantFamily,
+        method: current.method,
+        quantity: current.quantity,
+        quantityAlive: quantityAlive,
+        soldQuantity: current.soldQuantity,
+        giftedQuantity: current.giftedQuantity,
+        tradedQuantity: current.tradedQuantity,
+        lostQuantity: current.lostQuantity,
+        stage: current.stage,
+        status: current.status,
+        startedAt: current.startedAt,
+        soldAt: current.soldAt,
+        archivedAt: current.archivedAt,
+        expiresAt: current.expiresAt,
+        createdAt: current.createdAt,
+      ),
+    );
   }
 
   Future<void> deletePropagation(String propagationId) async {
-    final propRef = _propagationsRef.doc(propagationId);
-    await _deleteQueryInBatches(_notesRef(propagationId));
-    await _deleteQueryInBatches(_stageHistoryRef(propagationId));
-    await propRef.delete();
+    try {
+      await _api.delete('/propagations/$propagationId');
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
+    }
   }
 
-  /// Deletes a stage-history entry.
-  /// Start (stage 1) removes the whole propagation batch.
-  /// Later stages remove only that entry and sync current stage.
   Future<void> deleteStageEntry({
     required String propagationId,
     required String entryId,
@@ -463,25 +471,45 @@ class PropagationService {
       await deletePropagation(propagationId);
       return;
     }
-
-    final historyRef = _stageHistoryRef(propagationId);
-    await historyRef.doc(entryId).delete();
-
+    try {
+      await _api.delete('/propagations/$propagationId/stage-history/$entryId');
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
+    }
     final remaining =
-        await historyRef.orderBy('changedAt', descending: true).get();
-    if (remaining.docs.isEmpty) {
+        await _api.get('/propagations/$propagationId/stage-history');
+    final entries = jsonMapList(remaining)
+        .map((m) => PropagationStageEntry.fromMap(readString(m, 'id'), m))
+        .toList()
+      ..sort((a, b) => b.changedAt.compareTo(a.changedAt));
+    if (entries.isEmpty) {
       await deletePropagation(propagationId);
       return;
     }
-
-    final latest = PropagationStageEntry.fromFirestore(remaining.docs.first);
-    final updates = <String, dynamic>{
-      'stage': latest.stage,
-    };
-    if (latest.quantityAlive != null) {
-      updates['quantityAlive'] = latest.quantityAlive;
-    }
-
-    await _propagationsRef.doc(propagationId).update(updates);
+    final latest = entries.first;
+    final current = await _get(propagationId);
+    if (current == null) return;
+    await _patch(
+      Propagation(
+        id: current.id,
+        parentPlantId: current.parentPlantId,
+        parentPlantName: current.parentPlantName,
+        parentPlantFamily: current.parentPlantFamily,
+        method: current.method,
+        quantity: current.quantity,
+        quantityAlive: latest.quantityAlive ?? current.quantityAlive,
+        soldQuantity: current.soldQuantity,
+        giftedQuantity: current.giftedQuantity,
+        tradedQuantity: current.tradedQuantity,
+        lostQuantity: current.lostQuantity,
+        stage: latest.stage,
+        status: current.status,
+        startedAt: current.startedAt,
+        soldAt: current.soldAt,
+        archivedAt: current.archivedAt,
+        expiresAt: current.expiresAt,
+        createdAt: current.createdAt,
+      ),
+    );
   }
 }

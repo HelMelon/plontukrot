@@ -1,34 +1,29 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 import '../models/growth_event.dart';
+import '../models/model_helpers.dart';
+import 'api_client.dart';
+import 'rest_stream.dart';
 
 class GrowthEventService {
   static const retention = Duration(days: 730);
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  String get _uid => FirebaseAuth.instance.currentUser!.uid;
-
-  CollectionReference<Map<String, dynamic>> _growthEventsRef(String plantId) {
-    return _firestore
-        .collection('users')
-        .doc(_uid)
-        .collection('plants')
-        .doc(plantId)
-        .collection('growthEvents');
-  }
+  final ApiClient _api = ApiClient.instance;
 
   Stream<List<GrowthEvent>> watchGrowthEvents(String plantId) {
-    return _growthEventsRef(plantId)
-        .orderBy('createdAt')
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs.map(GrowthEvent.fromFirestore).toList(),
-        );
+    return restPollStream(() async {
+      final list =
+          jsonMapList(await _api.get('/plants/$plantId/growth-events'));
+      final events = list
+          .map((m) => GrowthEvent.fromMap(readString(m, 'id') ?? '', m))
+          .toList()
+        ..sort((a, b) {
+          final aAt = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          final bAt = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          return aAt.compareTo(bAt);
+        });
+      return events;
+    });
   }
 
-  /// Persists a growth/care event. Not shown in UI for care types yet.
   Future<void> addEvent({
     required String plantId,
     required GrowthEventType type,
@@ -36,11 +31,9 @@ class GrowthEventService {
     LeafRemovalReason? reason,
   }) async {
     final when = at ?? DateTime.now();
-    await _growthEventsRef(plantId).add({
-      'type': type.code,
-      'createdAt': Timestamp.fromDate(when),
-      'expiresAt': Timestamp.fromDate(when.add(retention)),
-      if (reason != null) 'reason': reason.code,
+    await _api.post('/plants/$plantId/growth-events', body: {
+      'type': type.index,
+      'expires_at': isoDate(when.add(retention)),
     });
   }
 
@@ -48,8 +41,6 @@ class GrowthEventService {
     return addEvent(plantId: plantId, type: GrowthEventType.newLeaf);
   }
 
-  /// Adds one [GrowthEventType.leafRemoved] with [reason].
-  /// No-op when [currentDisplayCount] ≤ 0.
   Future<void> removeLeaf(
     String plantId, {
     required int currentDisplayCount,
@@ -104,23 +95,6 @@ class GrowthEventService {
   }
 
   Future<void> purgeExpired(String plantId) async {
-    final now = DateTime.now();
-    final snapshot = await _growthEventsRef(plantId)
-        .where('expiresAt', isLessThan: Timestamp.fromDate(now))
-        .get();
-
-    if (snapshot.docs.isEmpty) return;
-
-    const pageSize = 200;
-    for (var i = 0; i < snapshot.docs.length; i += pageSize) {
-      final end = (i + pageSize < snapshot.docs.length)
-          ? i + pageSize
-          : snapshot.docs.length;
-      final batch = _firestore.batch();
-      for (final doc in snapshot.docs.sublist(i, end)) {
-        batch.delete(doc.reference);
-      }
-      await batch.commit();
-    }
+    // Expiry is enforced client-side when listing; no bulk delete route yet.
   }
 }

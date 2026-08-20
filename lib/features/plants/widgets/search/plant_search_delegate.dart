@@ -7,7 +7,7 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../models/plant.dart';
 import '../../../../services/plant_service.dart';
 import '../../pages/plant_details_page.dart';
-import '../common/plant_network_image.dart';
+import '../common/plant_image.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class PlantSearchDelegate extends SearchDelegate {
@@ -291,7 +291,7 @@ class PlantSearchDelegate extends SearchDelegate {
                           );
 
                           if (imageUrl != null) {
-                            return PlantNetworkImage(
+                            return PlantImage(
                               imageUrl: imageUrl,
                               fallbackUrl: fullUrl,
                               fit: BoxFit.cover,

@@ -1,7 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'firestore_helpers.dart';
 import 'component.dart';
+import 'model_helpers.dart';
 
 class Soil {
   final String id;
@@ -17,32 +15,29 @@ class Soil {
   });
 
   factory Soil.fromMap(String id, Map<String, dynamic> data) {
-    var rawComponents = data['components'] as List<dynamic>?;
+    final rawComponents = readField(data, 'components') as List<dynamic>?;
 
-    List<SoilComponent> parsedComponents = rawComponents != null
+    final parsedComponents = rawComponents != null
         ? rawComponents
-            .map((item) => SoilComponent.fromMap(item as Map<String, dynamic>))
+            .whereType<Map>()
+            .map(
+              (item) => SoilComponent.fromMap(Map<String, dynamic>.from(item)),
+            )
             .toList()
-        : [];
+        : <SoilComponent>[];
 
     return Soil(
       id: id,
-      name: data['name'] as String? ?? '',
-      createdAt: readTimestamp(data['createdAt']),
+      name: readString(data, 'name') ?? '',
+      createdAt: readDate(data, 'createdAt'),
       components: parsedComponents,
     );
-  }
-
-  factory Soil.fromFirestore(
-    QueryDocumentSnapshot<Map<String, dynamic>> doc,
-  ) {
-    return Soil.fromMap(doc.id, doc.data());
   }
 
   Map<String, dynamic> toMap() {
     return {
       'name': name,
-      'createdAt': createdAt,
+      'createdAt': isoOrNull(createdAt),
       'components': components.map((e) => e.toMap()).toList(),
     };
   }

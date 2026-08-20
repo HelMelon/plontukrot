@@ -1,166 +1,152 @@
+import 'dart:async';
 import 'dart:io';
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 import '../core/privacy/device_consent_store.dart';
 import '../models/app_user.dart';
+import '../models/model_helpers.dart';
+import 'api_client.dart';
+import 'api_exception.dart';
 import 'app_crash_reporting.dart';
-import 'firestore_service.dart';
+import 'user_profile_service.dart';
+import 'token_store.dart';
 
-/// User-facing category for Google / Firebase Auth failures.
+/// User-facing category for auth failures.
 enum AuthFailureKind {
-  /// User dismissed the account picker / popup — usually no snackbar.
+  /// User dismissed a flow — usually no snackbar.
   cancelled,
 
-  /// Offline or network failure (including offline disguised as cancel/reauth).
+  /// Offline or network failure.
   network,
 
-  /// Google returned no ID token.
+  /// Google returned no ID token (unused after Google sign-in removal).
   missingIdToken,
 
   /// Malformed email address.
   invalidEmail,
 
-  /// Password does not meet Firebase strength rules.
+  /// Password does not meet strength rules.
   weakPassword,
 
   /// Email is already registered.
   emailAlreadyInUse,
 
-  /// Wrong password, unknown user, or invalid credential.
+  /// Wrong password or unknown user.
   invalidCredentials,
 
-  /// Firebase rate limit.
+  /// Rate limit.
   tooManyRequests,
 
   /// Anything else — show a generic retry message.
   unknown,
 }
 
+/// Email/password auth against the FastAPI backend (JWT).
+///
+/// `AuthService()` is a singleton so [watchAuthState] is shared across the tree.
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
-
-  bool _initialized = false;
-
-  Future<void> _initializeGoogleSignIn() async {
-    if (_initialized) return;
-
-    await _googleSignIn.initialize();
-
-    _initialized = true;
+  AuthService._() {
+    ApiClient.instance.onUnauthorized = () async {
+      await _clearSession();
+    };
   }
 
-  AppUser? _mapUser(User? user) {
-    if (user == null) return null;
-    return AppUser(
-      uid: user.uid,
-      photoUrl: user.photoURL,
+  static final AuthService instance = AuthService._();
+
+  factory AuthService() => instance;
+
+  final ApiClient _api = ApiClient.instance;
+  final StreamController<AppUser?> _authChanges =
+      StreamController<AppUser?>.broadcast();
+
+  AppUser? _user;
+  String? _email;
+
+  AppUser? get currentUser => _user;
+
+  String? get currentUserEmail => _email ?? _user?.email;
+
+  String get requireUid {
+    final uid = _user?.uid;
+    if (uid == null || uid.isEmpty) {
+      throw StateError('Not signed in');
+    }
+    return uid;
+  }
+
+  /// Backend v1 has no email verification; always false.
+  bool get needsEmailVerification => false;
+
+  /// Password reauth is used for account deletion.
+  bool get requiresPasswordToDelete => currentUser != null;
+
+  Stream<AppUser?> watchAuthState() async* {
+    yield _user;
+    yield* _authChanges.stream;
+  }
+
+  Future<void> restoreSession() async {
+    await TokenStore.instance.load();
+    if (!TokenStore.instance.hasToken) {
+      _emit(null);
+      return;
+    }
+    try {
+      await _loadMe();
+    } on ApiException catch (error) {
+      if (error.isUnauthorized || error.isNotFound) {
+        await _clearSession();
+        return;
+      }
+      rethrow;
+    } catch (_) {
+      // Keep the JWT if the backend is unreachable.
+      _emit(null);
+    }
+  }
+
+  Future<void> _loadMe() async {
+    final json = jsonMap(await _api.get('/auth/me'));
+    final id = readString(json, 'id') ?? '';
+    _email = readString(json, 'email');
+    _emit(
+      AppUser(
+        uid: id,
+        email: _email,
+        name: readString(json, 'name'),
+        photoUrl: readString(json, 'photoUrl'),
+      ),
     );
   }
 
-  /// Current session mapped for UI (null when signed out).
-  AppUser? get currentUser => _mapUser(_auth.currentUser);
-
-  /// Fires on sign-in/out and after [User.reload] (e.g. email verification).
-  Stream<AppUser?> watchAuthState() {
-    return _auth.userChanges().map(_mapUser);
+  void _emit(AppUser? user) {
+    _user = user;
+    if (user == null) _email = null;
+    if (!_authChanges.isClosed) {
+      _authChanges.add(user);
+    }
   }
 
-  bool _hasPasswordProvider(User user) {
-    return user.providerData.any((info) => info.providerId == 'password');
+  Future<void> _clearSession() async {
+    await TokenStore.instance.clear();
+    _emit(null);
+    await AppCrashReporting.instance.setUserId(null);
   }
 
-  /// Password-provider accounts must verify email before using the app.
-  bool get needsEmailVerification {
-    final user = _auth.currentUser;
-    if (user == null) return false;
-    return _hasPasswordProvider(user) && !user.emailVerified;
-  }
-
-  /// True when account deletion must reauthenticate with the account password.
-  bool get requiresPasswordToDelete {
-    final user = _auth.currentUser;
-    return user != null && _hasPasswordProvider(user);
-  }
-
-  String? get currentUserEmail => _auth.currentUser?.email;
-
-  /// Maps a thrown auth error to a UI category (no raw exception text).
   static AuthFailureKind classifyFailure(Object error) {
-    if (error is FirebaseAuthException) {
-      switch (error.code) {
-        case 'popup-closed-by-user':
-        case 'cancelled-popup-request':
-        case 'web-context-cancelled':
-          return AuthFailureKind.cancelled;
-        case 'network-request-failed':
-          return AuthFailureKind.network;
-        case 'google-id-token-null':
-          return AuthFailureKind.missingIdToken;
-        case 'invalid-email':
-          return AuthFailureKind.invalidEmail;
-        case 'weak-password':
-          return AuthFailureKind.weakPassword;
-        case 'email-already-in-use':
-          return AuthFailureKind.emailAlreadyInUse;
-        case 'user-not-found':
-        case 'wrong-password':
-        case 'invalid-credential':
-        case 'invalid-login-credentials':
-        case 'missing-password':
-          return AuthFailureKind.invalidCredentials;
-        case 'too-many-requests':
-          return AuthFailureKind.tooManyRequests;
+    if (error is ApiException) {
+      if (error.statusCode == 409) return AuthFailureKind.emailAlreadyInUse;
+      if (error.statusCode == 401) return AuthFailureKind.invalidCredentials;
+      if (error.statusCode == 422 || error.statusCode == 400) {
+        final lower = error.message.toLowerCase();
+        if (lower.contains('email')) return AuthFailureKind.invalidEmail;
+        if (lower.contains('password')) return AuthFailureKind.weakPassword;
+        return AuthFailureKind.invalidCredentials;
       }
+      if (error.statusCode == 429) return AuthFailureKind.tooManyRequests;
     }
-
-    if (error is GoogleSignInException) {
-      final description = (error.description ?? '').toLowerCase();
-      switch (error.code) {
-        case GoogleSignInExceptionCode.canceled:
-        case GoogleSignInExceptionCode.interrupted:
-          // Offline sign-in often surfaces as canceled + "Account reauth failed".
-          if (_looksLikeNetworkFailure(description)) {
-            return AuthFailureKind.network;
-          }
-          return AuthFailureKind.cancelled;
-        case GoogleSignInExceptionCode.uiUnavailable:
-          return AuthFailureKind.cancelled;
-        case GoogleSignInExceptionCode.clientConfigurationError:
-        case GoogleSignInExceptionCode.providerConfigurationError:
-        case GoogleSignInExceptionCode.userMismatch:
-        case GoogleSignInExceptionCode.unknownError:
-          break;
-      }
-    }
-
-    if (error is SocketException) {
-      return AuthFailureKind.network;
-    }
-
+    if (error is SocketException) return AuthFailureKind.network;
     final message = error.toString().toLowerCase();
-    if (_looksLikeNetworkFailure(message)) {
-      return AuthFailureKind.network;
-    }
-    if (message.contains('popup-closed-by-user') ||
-        message.contains('cancelled-popup-request') ||
-        message.contains('web-context-cancelled')) {
-      return AuthFailureKind.cancelled;
-    }
-    if (message.contains('canceled') || message.contains('cancelled')) {
-      if (_looksLikeNetworkFailure(message) || message.contains('reauth')) {
-        return AuthFailureKind.network;
-      }
-      return AuthFailureKind.cancelled;
-    }
-    if (message.contains('google-id-token-null')) {
-      return AuthFailureKind.missingIdToken;
-    }
-
+    if (_looksLikeNetworkFailure(message)) return AuthFailureKind.network;
     return AuthFailureKind.unknown;
   }
 
@@ -173,12 +159,14 @@ class AuthService {
         lowercased.contains('connection refused') ||
         lowercased.contains('timed out') ||
         lowercased.contains('timeout') ||
-        lowercased.contains('offline') ||
-        lowercased.contains('reauth failed') ||
-        lowercased.contains('account reauth');
+        lowercased.contains('offline');
   }
 
-  Future<void> _recordAuthError(Object error, StackTrace stack, String reason) async {
+  Future<void> _recordAuthError(
+    Object error,
+    StackTrace stack,
+    String reason,
+  ) async {
     if (classifyFailure(error) != AuthFailureKind.cancelled) {
       await AppCrashReporting.instance.recordError(
         error,
@@ -188,50 +176,17 @@ class AuthService {
     }
   }
 
-  /// [recordConsent] writes `personalDataConsentAt` on the user document.
-  Future<void> signInWithGoogle({bool recordConsent = false}) async {
-    try {
-      if (kIsWeb) {
-        final provider = GoogleAuthProvider();
-
-        provider.addScope('email');
-        provider.addScope('profile');
-
-        await _auth.signInWithPopup(provider);
-
-        await FirestoreService().createUserDocument(recordConsent: recordConsent);
-        return;
-      }
-
-      await _initializeGoogleSignIn();
-
-      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
-
-      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
-
-      final idToken = googleAuth.idToken;
-
-      if (idToken == null) {
-        throw FirebaseAuthException(
-          code: 'google-id-token-null',
-        );
-      }
-
-      final credential = GoogleAuthProvider.credential(
-        idToken: idToken,
-      );
-
-      await _auth.signInWithCredential(credential);
-
-      await FirestoreService().createUserDocument(recordConsent: recordConsent);
-    } catch (error, stack) {
-      await _recordAuthError(error, stack, 'auth_sign_in_failed');
-      rethrow;
+  Future<void> _persistToken(dynamic json) async {
+    final map = jsonMap(json);
+    final token = readString(map, 'accessToken') ??
+        readString(map, 'access_token') ??
+        '';
+    if (token.isEmpty) {
+      throw StateError('Missing access_token');
     }
+    await TokenStore.instance.save(token);
   }
 
-  /// Creates an email/password account, sets site display name, sends
-  /// verification email, and seeds the Firestore profile.
   Future<void> registerWithEmail({
     required String email,
     required String password,
@@ -241,19 +196,19 @@ class AuthService {
     final trimmedName = displayName.trim();
     final trimmedEmail = email.trim();
     try {
-      final credential = await _auth.createUserWithEmailAndPassword(
-        email: trimmedEmail,
-        password: password,
+      await _persistToken(
+        await _api.post(
+          '/auth/register',
+          body: {
+            'email': trimmedEmail,
+            'password': password,
+            if (trimmedName.isNotEmpty) 'name': trimmedName,
+          },
+          ping: false,
+        ),
       );
-      final user = credential.user;
-      if (user == null) {
-        throw StateError('User missing after registration');
-      }
-      // Send verification before profile updates — the first send right after
-      // create+updateDisplayName often never arrives; resend then works.
-      await _sendEmailVerificationReliably(user, retryAfterCreate: true);
-      await user.updateDisplayName(trimmedName);
-      await FirestoreService().createUserDocument(
+      await _loadMe();
+      await UserProfileService().createUserDocument(
         recordConsent: recordConsent,
         displayName: trimmedName,
       );
@@ -263,166 +218,78 @@ class AuthService {
     }
   }
 
-  /// Signs in with email/password and ensures the Firestore profile exists.
   Future<void> signInWithEmail({
     required String email,
     required String password,
     bool recordConsent = false,
   }) async {
     try {
-      await _auth.signInWithEmailAndPassword(
-        email: email.trim(),
-        password: password,
+      await _persistToken(
+        await _api.post(
+          '/auth/login',
+          body: {
+            'email': email.trim(),
+            'password': password,
+          },
+          ping: false,
+        ),
       );
-      await FirestoreService().createUserDocument(recordConsent: recordConsent);
+      await _loadMe();
+      await UserProfileService().createUserDocument(recordConsent: recordConsent);
     } catch (error, stack) {
       await _recordAuthError(error, stack, 'auth_email_sign_in_failed');
       rethrow;
     }
   }
 
-  /// Reloads the Firebase user so [needsEmailVerification] can clear.
+  /// Kept so older call sites compile; Google sign-in is removed.
+  Future<void> signInWithGoogle({bool recordConsent = false}) async {
+    throw UnsupportedError('Google sign-in is no longer available');
+  }
+
   Future<void> reloadCurrentUser() async {
-    await _auth.currentUser?.reload();
+    if (!TokenStore.instance.hasToken) return;
+    await _loadMe();
   }
 
-  /// Resends the verification email for the signed-in password user.
   Future<void> sendEmailVerification() async {
-    final user = _auth.currentUser;
-    if (user == null) {
-      throw StateError('No signed-in user');
-    }
-    try {
-      await _sendEmailVerificationReliably(user, retryAfterCreate: false);
-    } catch (error, stack) {
-      await _recordAuthError(error, stack, 'auth_send_verification_failed');
-      rethrow;
-    }
-  }
-
-  /// Firebase Auth often accepts the first [User.sendEmailVerification] call
-  /// after account creation without delivering mail; a short delayed retry
-  /// matches the manual "resend" that users otherwise need.
-  Future<void> _sendEmailVerificationReliably(
-    User user, {
-    required bool retryAfterCreate,
-  }) async {
-    Future<void> sendOnce() async {
-      final fresh = _auth.currentUser ?? user;
-      await fresh.sendEmailVerification();
-    }
-
-    try {
-      await sendOnce();
-    } catch (_) {
-      await Future<void>.delayed(const Duration(seconds: 1));
-      await _auth.currentUser?.reload();
-      await sendOnce();
-      return;
-    }
-
-    if (!retryAfterCreate) return;
-
-    await Future<void>.delayed(const Duration(seconds: 1));
-    try {
-      await _auth.currentUser?.reload();
-      await sendOnce();
-    } on FirebaseAuthException catch (e) {
-      // Rate limit / duplicate send — first attempt may still arrive.
-      if (e.code == 'too-many-requests') return;
-      rethrow;
-    }
+    // Email verification is deferred on the FastAPI backend (ADR-033).
   }
 
   Future<void> signOut() async {
-    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
-      await _initializeGoogleSignIn();
-      await _googleSignIn.signOut();
-    }
-
-    await _auth.signOut();
-    await AppCrashReporting.instance.setUserId(null);
+    await _clearSession();
   }
 
-  Future<void> _reauthenticateWithGoogle() async {
-    final user = _auth.currentUser;
-    if (user == null) {
-      throw StateError('No signed-in user');
-    }
-
-    if (kIsWeb) {
-      final provider = GoogleAuthProvider();
-      provider.addScope('email');
-      provider.addScope('profile');
-      await user.reauthenticateWithPopup(provider);
-      return;
-    }
-
-    await _initializeGoogleSignIn();
-    final googleUser = await _googleSignIn.authenticate();
-    final googleAuth = googleUser.authentication;
-    final idToken = googleAuth.idToken;
-    if (idToken == null) {
-      throw FirebaseAuthException(code: 'google-id-token-null');
-    }
-    final credential = GoogleAuthProvider.credential(idToken: idToken);
-    await user.reauthenticateWithCredential(credential);
-  }
-
-  Future<void> _reauthenticateWithPassword(String password) async {
-    final user = _auth.currentUser;
-    if (user == null) {
-      throw StateError('No signed-in user');
-    }
-    final email = user.email;
-    if (email == null || email.isEmpty) {
-      throw FirebaseAuthException(code: 'invalid-email');
-    }
-    if (password.isEmpty) {
-      throw FirebaseAuthException(code: 'missing-password');
-    }
-    final credential = EmailAuthProvider.credential(
-      email: email,
-      password: password,
-    );
-    await user.reauthenticateWithCredential(credential);
-  }
-
-  /// Reauthenticates, wipes Firestore + Storage user data, then deletes Auth.
-  ///
-  /// Password accounts require [password]; Google accounts use Google reauth.
+  /// Deletes account data when the backend supports it, then signs out.
   Future<void> deleteAccount({String? password}) async {
     try {
-      final user = _auth.currentUser;
-      if (user == null) {
+      if (currentUser == null) {
         throw StateError('No signed-in user');
       }
-
-      if (_hasPasswordProvider(user)) {
-        await _reauthenticateWithPassword(password ?? '');
-      } else {
-        await _reauthenticateWithGoogle();
+      if (password == null || password.isEmpty) {
+        throw ApiException(400, 'missing-password');
       }
-
-      await FirestoreService().deleteAllUserData();
-
-      final freshUser = _auth.currentUser;
-      if (freshUser == null) {
-        throw StateError('User missing after data wipe');
+      // Re-check credentials before destructive delete.
+      await _api.post(
+        '/auth/login',
+        body: {
+          'email': currentUserEmail ?? '',
+          'password': password,
+        },
+        ping: false,
+      );
+      try {
+        await UserProfileService().deleteAllUserData();
+      } catch (_) {
+        // Best-effort wipe; still sign out.
       }
-      await freshUser.delete();
-
-      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
-        try {
-          await _initializeGoogleSignIn();
-          await _googleSignIn.signOut();
-        } catch (_) {
-          // Auth user already deleted; ignore Google sign-out failures.
-        }
+      try {
+        await _api.delete('/auth/me');
+      } on ApiException catch (error) {
+        if (!error.isNotFound) rethrow;
       }
-
-      await AppCrashReporting.instance.setUserId(null);
       await DeviceConsentStore.instance.clear();
+      await _clearSession();
     } catch (error, stack) {
       await _recordAuthError(error, stack, 'auth_delete_account_failed');
       rethrow;

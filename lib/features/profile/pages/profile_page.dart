@@ -20,7 +20,7 @@ import '../../../models/fertilizing_growth_season.dart';
 import '../../../models/plant.dart';
 import '../../../models/propagation.dart';
 import '../../../services/auth_service.dart';
-import '../../../services/firestore_service.dart';
+import '../../../services/user_profile_service.dart';
 import '../../../services/fertilizing_notification_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
@@ -49,7 +49,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     _plantsStream = PlantService().getPlants();
     _propagationsStream = PropagationService().watchActivePropagations();
-    _profileStream = FirestoreService().watchUserProfile();
+    _profileStream = UserProfileService().watchUserProfile();
   }
 
   String _currencyLabel(AppLocalizations l10n, AppCurrency currency) {

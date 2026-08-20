@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 import 'plant_archive_reason.dart';
 import 'plant_member.dart';
 import 'plant_photo.dart';
@@ -157,51 +155,42 @@ class Plant {
   }
 
   factory Plant.fromMap(String id, Map<String, dynamic> data) {
-    final rawFamily = data['plantFamily'] as String? ?? data['family'] as String?;
+    final rawFamily =
+        readString(data, 'plantFamily') ?? readString(data, 'family');
     return Plant(
       id: id,
-      genus: data['genus'] as String? ?? '',
-      species: data['species'] as String? ?? data['name'] as String? ?? '',
-      cultivar: _nullableTrimmed(data['cultivar'] as String?),
+      genus: readString(data, 'genus') ?? '',
+      species: readString(data, 'species') ?? readString(data, 'name') ?? '',
+      cultivar: _nullableTrimmed(readString(data, 'cultivar')),
       plantFamily: _nullableTrimmed(rawFamily),
-      variegation: Variegation.fromStorage(data['variegation'] as String?),
-      tradingName: data['tradingName'] as String? ?? '',
-      nickname: data['nickname'] as String? ?? '',
-      stage: data['stage'] as int? ?? 0,
-      imageUrl: data['imageUrl'] as String?,
-      imageThumbUrl: data['imageThumbUrl'] as String?,
-      images: _readImages(data['images']),
-      wateringFrequency: data['wateringFrequency'] as int?,
-      fertilizingFrequencyDays: data['fertilizingFrequencyDays'] as int?,
+      variegation: Variegation.fromJson(readField(data, 'variegation')),
+      tradingName: readString(data, 'tradingName') ?? '',
+      nickname: readString(data, 'nickname') ?? '',
+      stage: readInt(data, 'stage') ?? 0,
+      imageUrl: readString(data, 'imageUrl'),
+      imageThumbUrl: readString(data, 'imageThumbUrl'),
+      images: _readImages(readField(data, 'images')),
+      wateringFrequency: readInt(data, 'wateringFrequency'),
+      fertilizingFrequencyDays: readInt(data, 'fertilizingFrequencyDays'),
       isFertilizingFrequencyCustom:
-          data['isFertilizingFrequencyCustom'] as bool? ?? false,
-      createdAt: readTimestamp(data['createdAt']),
-      lastWateredAt: readTimestamp(data['lastWateredAt']),
-      lastFertilizedAt: readTimestamp(data['lastFertilizedAt']),
-      lastFertilizerName: _nullableTrimmed(data['lastFertilizerName'] as String?),
-      lastRepottedAt: readTimestamp(data['lastRepottedAt']),
-      lastManipulationAt: readTimestamp(data['lastManipulationAt']),
-      initialLeafCount: data['initialLeafCount'] as int? ?? 0,
-      members: _readMembers(data['members']),
-      archivedAt: readTimestamp(data['archivedAt']),
-      expiresAt: readTimestamp(data['expiresAt']),
+          readBool(data, 'isFertilizingFrequencyCustom'),
+      createdAt: readDate(data, 'createdAt'),
+      lastWateredAt: readDate(data, 'lastWateredAt'),
+      lastFertilizedAt: readDate(data, 'lastFertilizedAt'),
+      lastFertilizerName:
+          _nullableTrimmed(readString(data, 'lastFertilizerName')),
+      lastRepottedAt: readDate(data, 'lastRepottedAt'),
+      lastManipulationAt: readDate(data, 'lastManipulationAt'),
+      initialLeafCount: readInt(data, 'initialLeafCount') ?? 0,
+      members: _readMembers(readField(data, 'members')),
+      archivedAt: readDate(data, 'archivedAt'),
+      expiresAt: readDate(data, 'expiresAt'),
       archiveReason: PlantArchiveReason.fromCode(
-        data['archiveReason'] as String?,
+        readString(data, 'archiveReason'),
       ),
-      archiveNote: _nullableTrimmed(data['archiveNote'] as String?),
-      mergedIntoPlantId: data['mergedIntoPlantId'] as String?,
-      giftedToUid: data['giftedToUid'] as String?,
-    );
-  }
-
-  factory Plant.fromFirestore(QueryDocumentSnapshot doc) {
-    return Plant.fromMap(doc.id, doc.data() as Map<String, dynamic>);
-  }
-
-  factory Plant.fromDocument(DocumentSnapshot doc) {
-    return Plant.fromMap(
-      doc.id,
-      doc.data() as Map<String, dynamic>? ?? {},
+      archiveNote: _nullableTrimmed(readString(data, 'archiveNote')),
+      mergedIntoPlantId: readString(data, 'mergedIntoPlantId'),
+      giftedToUid: readString(data, 'giftedToUid'),
     );
   }
 
@@ -211,31 +200,40 @@ class Plant {
       'species': species,
       'cultivar': cultivar,
       'plantFamily': plantFamily,
-      'variegation': variegation.storageValue,
+      'plant_family': plantFamily,
+      'variegation': variegation.index,
       'tradingName': tradingName,
+      'trading_name': tradingName,
       'nickname': nickname,
       'stage': stage,
       'imageUrl': imageUrl,
+      'image_url': imageUrl,
       'imageThumbUrl': imageThumbUrl,
+      'image_thumb_url': imageThumbUrl,
       'images': images.map((p) => p.toMap()).toList(),
       'wateringFrequency': wateringFrequency,
+      'watering_frequency': wateringFrequency,
       'fertilizingFrequencyDays': fertilizingFrequencyDays,
+      'fertilizing_frequency_days': fertilizingFrequencyDays,
       'isFertilizingFrequencyCustom': isFertilizingFrequencyCustom,
-      if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
-      if (lastWateredAt != null)
-        'lastWateredAt': Timestamp.fromDate(lastWateredAt!),
+      if (createdAt != null) 'createdAt': isoOrNull(createdAt),
+      if (createdAt != null) 'created_at': isoOrNull(createdAt),
+      if (lastWateredAt != null) 'lastWateredAt': isoOrNull(lastWateredAt),
+      if (lastWateredAt != null) 'last_watered_at': isoOrNull(lastWateredAt),
       if (lastFertilizedAt != null)
-        'lastFertilizedAt': Timestamp.fromDate(lastFertilizedAt!),
-      if (lastFertilizerName != null)
-        'lastFertilizerName': lastFertilizerName,
-      if (lastRepottedAt != null)
-        'lastRepottedAt': Timestamp.fromDate(lastRepottedAt!),
+        'lastFertilizedAt': isoOrNull(lastFertilizedAt),
+      if (lastFertilizedAt != null)
+        'last_fertilized_at': isoOrNull(lastFertilizedAt),
+      if (lastFertilizerName != null) 'lastFertilizerName': lastFertilizerName,
+      if (lastRepottedAt != null) 'lastRepottedAt': isoOrNull(lastRepottedAt),
+      if (lastRepottedAt != null) 'last_repotted_at': isoOrNull(lastRepottedAt),
       if (lastManipulationAt != null)
-        'lastManipulationAt': Timestamp.fromDate(lastManipulationAt!),
+        'lastManipulationAt': isoOrNull(lastManipulationAt),
       'initialLeafCount': initialLeafCount,
+      'initial_leaf_count': initialLeafCount,
       if (members.isNotEmpty) 'members': members.map((m) => m.toMap()).toList(),
-      if (archivedAt != null) 'archivedAt': Timestamp.fromDate(archivedAt!),
-      if (expiresAt != null) 'expiresAt': Timestamp.fromDate(expiresAt!),
+      if (archivedAt != null) 'archivedAt': isoOrNull(archivedAt),
+      if (expiresAt != null) 'expiresAt': isoOrNull(expiresAt),
       if (archiveReason != null) 'archiveReason': archiveReason!.code,
       if (archiveNote != null) 'archiveNote': archiveNote,
       if (mergedIntoPlantId != null) 'mergedIntoPlantId': mergedIntoPlantId,

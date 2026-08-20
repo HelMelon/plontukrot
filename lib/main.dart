@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -19,10 +18,10 @@ import 'features/auth/pages/login_page.dart';
 import 'features/auth/pages/personal_data_consent_gate_page.dart';
 import 'features/home/pages/home_page.dart';
 import 'features/splash/pages/splash_flow.dart';
-import 'firebase_options.dart';
 import 'models/app_user.dart';
 import 'services/app_crash_reporting.dart';
 import 'services/auth_service.dart';
+import 'services/token_store.dart';
 import 'services/fertilizing_notification_service.dart';
 import 'services/gift_service.dart';
 import 'services/plant_service.dart';
@@ -169,9 +168,8 @@ class _AppStartupState extends State<AppStartup> {
         _statusText = l10n.loading;
       });
 
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      await TokenStore.instance.load();
+      await AuthService().restoreSession();
       await AppCrashReporting.instance.install();
       await AppCrashReporting.instance.setUserId(
         AuthService().currentUser?.uid,

@@ -1,4 +1,4 @@
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 
 enum FriendRequestStatus {
   pending,
@@ -7,10 +7,11 @@ enum FriendRequestStatus {
 
   String get code => name;
 
-  static FriendRequestStatus fromCode(String? code) {
-    return FriendRequestStatus.values.firstWhere(
-      (value) => value.name == code,
-      orElse: () => FriendRequestStatus.pending,
+  static FriendRequestStatus fromCode(dynamic code) {
+    return readEnum(
+      code,
+      FriendRequestStatus.values,
+      FriendRequestStatus.pending,
     );
   }
 }
@@ -37,12 +38,12 @@ class FriendRequest {
   factory FriendRequest.fromMap(String id, Map<String, dynamic> data) {
     return FriendRequest(
       id: id,
-      fromUid: (data['fromUid'] as String?)?.trim() ?? '',
-      toUid: (data['toUid'] as String?)?.trim() ?? '',
-      status: FriendRequestStatus.fromCode(data['status'] as String?),
-      createdAt: readTimestamp(data['createdAt']),
-      fromDisplayName: (data['fromDisplayName'] as String?)?.trim(),
-      fromPhotoUrl: (data['fromPhotoUrl'] as String?)?.trim(),
+      fromUid: readString(data, 'fromUid')?.trim() ?? '',
+      toUid: readString(data, 'toUid')?.trim() ?? '',
+      status: FriendRequestStatus.fromCode(readField(data, 'status')),
+      createdAt: readDate(data, 'createdAt'),
+      fromDisplayName: readString(data, 'fromDisplayName')?.trim(),
+      fromPhotoUrl: readString(data, 'fromPhotoUrl')?.trim(),
     );
   }
 }

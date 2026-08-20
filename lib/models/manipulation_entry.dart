@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 import 'manipulation_type.dart';
 
 class ManipulationEntry {
@@ -29,21 +27,14 @@ class ManipulationEntry {
   factory ManipulationEntry.fromMap(String id, Map<String, dynamic> data) {
     return ManipulationEntry(
       id: id,
-      type: ManipulationType.fromCode(data['type'] as String?),
-      appliedAt: readTimestamp(data['appliedAt']) ?? DateTime.now(),
-      note: _nullableTrimmed(data['note'] as String?),
-      stageBefore: data['stageBefore'] as int?,
-      stageAfter: data['stageAfter'] as int?,
-      stimulatorId: data['stimulatorId'] as String?,
-      stimulatorName: _nullableTrimmed(data['stimulatorName'] as String?),
-      dosage: _nullableTrimmed(data['dosage'] as String?),
-    );
-  }
-
-  factory ManipulationEntry.fromFirestore(QueryDocumentSnapshot doc) {
-    return ManipulationEntry.fromMap(
-      doc.id,
-      doc.data() as Map<String, dynamic>,
+      type: ManipulationType.fromCode(readField(data, 'type')),
+      appliedAt: readDate(data, 'appliedAt') ?? DateTime.now(),
+      note: _nullableTrimmed(readString(data, 'note')),
+      stageBefore: readInt(data, 'stageBefore'),
+      stageAfter: readInt(data, 'stageAfter'),
+      stimulatorId: readString(data, 'stimulatorId'),
+      stimulatorName: _nullableTrimmed(readString(data, 'stimulatorName')),
+      dosage: _nullableTrimmed(readString(data, 'dosage')),
     );
   }
 
@@ -55,13 +46,18 @@ class ManipulationEntry {
 
   Map<String, dynamic> toMap() {
     return {
-      'type': type.code,
-      'appliedAt': Timestamp.fromDate(appliedAt),
+      'type': type.index,
+      'appliedAt': isoOrNull(appliedAt),
+      'applied_at': isoOrNull(appliedAt),
       if (note != null) 'note': note,
       if (stageBefore != null) 'stageBefore': stageBefore,
+      if (stageBefore != null) 'stage_before': stageBefore,
       if (stageAfter != null) 'stageAfter': stageAfter,
+      if (stageAfter != null) 'stage_after': stageAfter,
       if (stimulatorId != null) 'stimulatorId': stimulatorId,
+      if (stimulatorId != null) 'stimulator_id': stimulatorId,
       if (stimulatorName != null) 'stimulatorName': stimulatorName,
+      if (stimulatorName != null) 'stimulator_name': stimulatorName,
       if (dosage != null) 'dosage': dosage,
     };
   }

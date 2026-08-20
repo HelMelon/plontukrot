@@ -16,8 +16,9 @@ class PlantMember {
     final trimmed = rawCultivar?.trim();
     return PlantMember(
       cultivar: (trimmed == null || trimmed.isEmpty) ? null : trimmed,
-      variegation: Variegation.fromStorage(data['variegation'] as String?),
-      sourcePlantId: data['sourcePlantId'] as String?,
+      variegation: Variegation.fromJson(data['variegation']),
+      sourcePlantId: data['sourcePlantId'] as String? ??
+          data['source_plant_id'] as String?,
     );
   }
 

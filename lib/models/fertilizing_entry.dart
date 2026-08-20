@@ -1,6 +1,6 @@
 import 'fertilizer_application_method.dart';
 import 'fertilizer_dose.dart';
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 
 class FertilizingEntry {
   final String id;
@@ -24,24 +24,27 @@ class FertilizingEntry {
   });
 
   factory FertilizingEntry.fromMap(String id, Map<String, dynamic> data) {
-    final rawComponents = data['components'] as List<dynamic>?;
+    final rawComponents = readField(data, 'components') as List<dynamic>?;
 
     return FertilizingEntry(
       id: id,
-      fertilizerId: data['fertilizerId'] as String?,
-      fertilizerName: data['fertilizerName'] as String? ??
-          data['name'] as String? ??
+      fertilizerId: readString(data, 'fertilizerId'),
+      fertilizerName: readString(data, 'fertilizerName') ??
+          readString(data, 'name') ??
           '',
-      appliedAt: readTimestamp(data['appliedAt']) ?? DateTime.now(),
-      nextFertilizing: readTimestamp(data['nextFertilizing']),
-      waterMl: normalizeWaterMl((data['waterMl'] as num?)?.toInt()),
+      appliedAt: readDate(data, 'appliedAt') ?? DateTime.now(),
+      nextFertilizing: readDate(data, 'nextFertilizing'),
+      waterMl: normalizeWaterMl(readInt(data, 'waterMl')),
       components: rawComponents != null
           ? rawComponents
-              .map((item) => FertilizerDose.fromMap(item as Map<String, dynamic>))
+              .whereType<Map>()
+              .map((item) => FertilizerDose.fromMap(
+                    Map<String, dynamic>.from(item),
+                  ))
               .toList()
           : const [],
       applicationMethod: FertilizerApplicationMethod.fromCode(
-        data['applicationMethod'] as String?,
+        readString(data, 'applicationMethod'),
       ),
     );
   }
@@ -51,23 +54,16 @@ class FertilizingEntry {
     required Map<String, dynamic> data,
     required String fertilizerName,
   }) {
-    final rawComponents = data['components'] as List<dynamic>?;
-
+    final parsed = FertilizingEntry.fromMap(id, data);
     return FertilizingEntry(
-      id: id,
-      fertilizerId: data['fertilizerId'] as String?,
+      id: parsed.id,
+      fertilizerId: parsed.fertilizerId,
       fertilizerName: fertilizerName,
-      appliedAt: readTimestamp(data['appliedAt']) ?? DateTime.now(),
-      nextFertilizing: readTimestamp(data['nextFertilizing']),
-      waterMl: normalizeWaterMl((data['waterMl'] as num?)?.toInt()),
-      components: rawComponents != null
-          ? rawComponents
-              .map((item) => FertilizerDose.fromMap(item as Map<String, dynamic>))
-              .toList()
-          : const [],
-      applicationMethod: FertilizerApplicationMethod.fromCode(
-        data['applicationMethod'] as String?,
-      ),
+      appliedAt: parsed.appliedAt,
+      nextFertilizing: parsed.nextFertilizing,
+      waterMl: parsed.waterMl,
+      components: parsed.components,
+      applicationMethod: parsed.applicationMethod,
     );
   }
 }

@@ -6,7 +6,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../core/privacy/device_consent_store.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/personal_data_consent_checkbox.dart';
-import '../../../services/firestore_service.dart';
+import '../../../services/user_profile_service.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 /// Blocks Home until `personalDataConsentAt` exists on the user document.
@@ -77,7 +77,7 @@ class _PersonalDataConsentGatePageState
     }
     setState(() => _saving = true);
     try {
-      await FirestoreService().recordPersonalDataConsent();
+      await UserProfileService().recordPersonalDataConsent();
       await DeviceConsentStore.instance.rememberAccepted();
     } catch (e) {
       if (!mounted) return;
@@ -113,7 +113,7 @@ class _PersonalDataConsentGatePageState
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<bool>(
-      stream: FirestoreService().watchHasPersonalDataConsent(),
+      stream: UserProfileService().watchHasPersonalDataConsent(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting &&
             !snapshot.hasData) {

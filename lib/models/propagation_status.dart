@@ -15,11 +15,17 @@ enum PropagationStatus {
       this == PropagationStatus.traded ||
       this == PropagationStatus.lost;
 
-  static PropagationStatus fromCode(String? code) {
-    return PropagationStatus.values.firstWhere(
-      (status) => status.name == code,
-      orElse: () => PropagationStatus.active,
-    );
+  static PropagationStatus fromCode(dynamic code) {
+    if (code is int && code >= 0 && code < PropagationStatus.values.length) {
+      return PropagationStatus.values[code];
+    }
+    if (code is String) {
+      return PropagationStatus.values.firstWhere(
+        (status) => status.name == code,
+        orElse: () => PropagationStatus.active,
+      );
+    }
+    return PropagationStatus.active;
   }
 
   /// Archive label when the last unit leaves via an explicit outcome.

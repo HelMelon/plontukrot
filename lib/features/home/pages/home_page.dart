@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import './../../../services/firestore_service.dart';
+import './../../../services/user_profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
@@ -96,7 +96,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _userDocumentExistsStream = FirestoreService().watchUserDocumentExists();
+    _userDocumentExistsStream = UserProfileService().watchUserDocumentExists();
     // Single-subscription stream for this page only. Search / genus / stage
     // open their own PlantService().getPlants() listeners — sharing a
     // broadcast without per-listener replay left them on an infinite spinner.

@@ -50,4 +50,19 @@ enum Variegation {
       orElse: () => Variegation.unknown,
     );
   }
+
+  /// Backend stores an int index; legacy maps stored the enum name.
+  static Variegation fromJson(dynamic value) {
+    if (value is int && value >= 0 && value < Variegation.values.length) {
+      return Variegation.values[value];
+    }
+    if (value is num) {
+      final index = value.toInt();
+      if (index >= 0 && index < Variegation.values.length) {
+        return Variegation.values[index];
+      }
+    }
+    if (value is String) return fromStorage(value);
+    return Variegation.none;
+  }
 }

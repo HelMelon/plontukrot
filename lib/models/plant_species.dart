@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 
 class PlantSpecies {
   final String id;
@@ -18,26 +16,14 @@ class PlantSpecies {
   });
 
   factory PlantSpecies.fromMap(String id, Map<String, dynamic> data) {
-    final rawFamily = data['plantFamily'] as String?;
-    final trimmedFamily = rawFamily?.trim();
+    final trimmedFamily = readString(data, 'plantFamily')?.trim();
     return PlantSpecies(
       id: id,
-      species: data['species'] as String? ?? '',
-      genus: data['genus'] as String? ?? '',
+      species: readString(data, 'species') ?? '',
+      genus: readString(data, 'genus') ?? '',
       plantFamily:
           (trimmedFamily == null || trimmedFamily.isEmpty) ? null : trimmedFamily,
-      createdAt: readTimestamp(data['createdAt']),
-    );
-  }
-
-  factory PlantSpecies.fromFirestore(QueryDocumentSnapshot doc) {
-    return PlantSpecies.fromMap(doc.id, doc.data() as Map<String, dynamic>);
-  }
-
-  factory PlantSpecies.fromDocument(DocumentSnapshot doc) {
-    return PlantSpecies.fromMap(
-      doc.id,
-      doc.data() as Map<String, dynamic>? ?? {},
+      createdAt: readDate(data, 'createdAt'),
     );
   }
 
@@ -46,12 +32,13 @@ class PlantSpecies {
       'species': species,
       'genus': genus,
       'plantFamily': plantFamily,
-      if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
+      'plant_family': plantFamily,
+      if (createdAt != null) 'createdAt': isoOrNull(createdAt),
     };
   }
 
-  /// Deterministic Firestore document id from a species display name.
+  /// Deterministic catalog id from a species display name.
   static String docIdFor(String species) {
-    return species.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '_');
+    return species.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '-');
   }
 }

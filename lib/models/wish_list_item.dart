@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 
 class WishListItem {
   final String id;
@@ -20,26 +18,23 @@ class WishListItem {
   factory WishListItem.fromMap(String id, Map<String, dynamic> data) {
     return WishListItem(
       id: id,
-      nameEn: data['nameEn'] as String? ?? '',
-      // Prefer nameAlt; fall back to legacy nameRu from early WishLeafs docs.
-      nameAlt: data['nameAlt'] as String? ?? data['nameRu'] as String? ?? '',
-      createdAt: readTimestamp(data['createdAt']),
-      updatedAt: readTimestamp(data['updatedAt']),
+      nameEn: readString(data, 'nameEn') ?? '',
+      nameAlt: readString(data, 'nameAlt') ??
+          readString(data, 'nameRu') ??
+          '',
+      createdAt: readDate(data, 'createdAt'),
+      updatedAt: readDate(data, 'updatedAt'),
     );
-  }
-
-  factory WishListItem.fromFirestore(
-    QueryDocumentSnapshot<Map<String, dynamic>> doc,
-  ) {
-    return WishListItem.fromMap(doc.id, doc.data());
   }
 
   Map<String, dynamic> toMap() {
     return {
       'nameEn': nameEn,
+      'name_en': nameEn,
       'nameAlt': nameAlt,
-      if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
-      if (updatedAt != null) 'updatedAt': Timestamp.fromDate(updatedAt!),
+      'name_alt': nameAlt,
+      if (createdAt != null) 'createdAt': isoOrNull(createdAt),
+      if (updatedAt != null) 'updatedAt': isoOrNull(updatedAt),
     };
   }
 }

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plontukrot/models/manipulation_entry.dart';
 import 'package:plontukrot/models/manipulation_type.dart';
@@ -29,7 +28,7 @@ void main() {
       final appliedAt = DateTime(2026, 3, 10);
       final entry = ManipulationEntry.fromMap('id1', {
         'type': 'pinching',
-        'appliedAt': Timestamp.fromDate(appliedAt),
+        'appliedAt': appliedAt,
         'note': 'верхушку',
       });
 
@@ -42,7 +41,7 @@ void main() {
     test('fromMap parses rerooting with stages', () {
       final entry = ManipulationEntry.fromMap('id2', {
         'type': 'rerooting',
-        'appliedAt': Timestamp.fromDate(DateTime(2026, 3, 11)),
+        'appliedAt': DateTime(2026, 3, 11),
         'stageBefore': 3,
         'stageAfter': 1,
         'note': 'гнилые корни',
@@ -57,7 +56,7 @@ void main() {
     test('fromMap parses stimulator entry', () {
       final entry = ManipulationEntry.fromMap('id3', {
         'type': 'stimulator',
-        'appliedAt': Timestamp.fromDate(DateTime(2026, 3, 12)),
+        'appliedAt': DateTime(2026, 3, 12),
         'stimulatorId': 'stim1',
         'stimulatorName': 'Kornevin',
         'dosage': '1 мл / л',
@@ -80,10 +79,10 @@ void main() {
       );
 
       final map = entry.toMap();
-      expect(map['type'], 'stimulator');
+      expect(map['type'], ManipulationType.stimulator.index);
       expect(map['stimulatorName'], 'Kornevin');
       expect(map['dosage'], '1 мл / л');
-      expect((map['appliedAt'] as Timestamp).toDate(), appliedAt);
+      expect(DateTime.parse(map['appliedAt'] as String).toUtc(), appliedAt.toUtc());
     });
   });
 }

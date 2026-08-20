@@ -408,7 +408,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                                         ConnectionState.waiting &&
                                     !snapshot.hasData) {
                                   return const Center(
-                                      child: const AccessibleProgressIndicator());
+                                      child: AccessibleProgressIndicator());
                                 }
 
                                 if (soils.isEmpty) {
@@ -509,7 +509,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                                       vertical: spacing.md,
                                     ),
                                     child: const Center(
-                                        child: const AccessibleProgressIndicator()),
+                                        child: AccessibleProgressIndicator()),
                                   );
                                 }
 

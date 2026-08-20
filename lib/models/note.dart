@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 
 class Note {
   final String id;
@@ -20,14 +18,10 @@ class Note {
   factory Note.fromMap(String id, Map<String, dynamic> data) {
     return Note(
       id: id,
-      text: data['text'] as String? ?? '',
-      createdAt: readTimestamp(data['createdAt']),
-      expiresAt: readTimestamp(data['expiresAt']),
-      updatedAt: readTimestamp(data['updatedAt']),
+      text: readString(data, 'text') ?? '',
+      createdAt: readDate(data, 'createdAt'),
+      expiresAt: readDate(data, 'expiresAt'),
+      updatedAt: readDate(data, 'updatedAt'),
     );
-  }
-
-  factory Note.fromFirestore(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
-    return Note.fromMap(doc.id, doc.data());
   }
 }

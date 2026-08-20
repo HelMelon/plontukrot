@@ -1,52 +1,41 @@
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 
-/// Thin Crashlytics wrapper: mobile only (no-op on web).
-///
-/// Collection is enabled outside debug builds. Use [recordError] for caught
-/// failures (startup, auth, storage) so they appear in the Firebase console.
+/// Local error reporting (replaces Crashlytics after Firebase removal).
 class AppCrashReporting {
   AppCrashReporting._();
 
   static final AppCrashReporting instance = AppCrashReporting._();
 
-  bool get _supported => !kIsWeb;
-
-  /// Call once after [Firebase.initializeApp].
   Future<void> install() async {
-    if (!_supported) return;
-
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
-      !kDebugMode,
-    );
-
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    FlutterError.onError = (details) {
+      FlutterError.presentError(details);
+      if (kDebugMode) {
+        debugPrint('CrashReporting: ${details.exceptionAsString()}');
+      }
+    };
 
     PlatformDispatcher.instance.onError = (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      if (kDebugMode) {
+        debugPrint('CrashReporting: $error\n$stack');
+      }
       return true;
     };
   }
 
   Future<void> setUserId(String? uid) async {
-    if (!_supported) return;
-    final trimmed = uid?.trim();
-    await FirebaseCrashlytics.instance.setUserIdentifier(
-      (trimmed == null || trimmed.isEmpty) ? '' : trimmed,
-    );
+    if (kDebugMode) {
+      debugPrint('CrashReporting user: ${uid ?? '(signed out)'}');
+    }
   }
 
   Future<void> log(String message) async {
-    if (!_supported) return;
-    await FirebaseCrashlytics.instance.log(message);
+    if (kDebugMode) debugPrint('CrashReporting: $message');
   }
 
   Future<void> setCustomKey(String key, Object value) async {
-    if (!_supported) return;
-    await FirebaseCrashlytics.instance.setCustomKey(key, value);
+    if (kDebugMode) debugPrint('CrashReporting key $key=$value');
   }
 
-  /// Non-fatal by default — use for caught failures the UI already handles.
   Future<void> recordError(
     Object error,
     StackTrace? stack, {
@@ -54,19 +43,9 @@ class AppCrashReporting {
     bool fatal = false,
     bool printDetails = true,
   }) async {
-    if (!_supported) {
-      if (printDetails && kDebugMode) {
-        debugPrint('CrashReporting(web noop): $reason $error');
-      }
-      return;
+    if (printDetails && kDebugMode) {
+      debugPrint('CrashReporting($reason): $error');
+      if (stack != null) debugPrint('$stack');
     }
-
-    await FirebaseCrashlytics.instance.recordError(
-      error,
-      stack ?? StackTrace.current,
-      reason: reason,
-      fatal: fatal,
-      printDetails: printDetails,
-    );
   }
 }

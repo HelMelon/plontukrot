@@ -1,4 +1,4 @@
-import 'firestore_helpers.dart';
+import 'model_helpers.dart';
 import 'plant.dart';
 
 enum GiftStatus {
@@ -9,11 +9,8 @@ enum GiftStatus {
 
   String get code => name;
 
-  static GiftStatus fromCode(String? code) {
-    return GiftStatus.values.firstWhere(
-      (value) => value.name == code,
-      orElse: () => GiftStatus.pending,
-    );
+  static GiftStatus fromCode(dynamic code) {
+    return readEnum(code, GiftStatus.values, GiftStatus.pending);
   }
 }
 
@@ -42,18 +39,18 @@ class IncomingGift {
   Plant get previewPlant => Plant.fromMap(fromPlantId, plantSnapshot);
 
   factory IncomingGift.fromMap(String id, Map<String, dynamic> data) {
-    final raw = data['plantSnapshot'];
+    final raw = readField(data, 'plantSnapshot');
     final snapshot = raw is Map
         ? Map<String, dynamic>.from(raw)
         : <String, dynamic>{};
     return IncomingGift(
       id: id,
-      fromUid: (data['fromUid'] as String?)?.trim() ?? '',
-      fromPlantId: (data['fromPlantId'] as String?)?.trim() ?? '',
-      fromDisplayName: (data['fromDisplayName'] as String?)?.trim(),
-      message: (data['message'] as String?)?.trim(),
-      createdAt: readTimestamp(data['createdAt']),
-      status: GiftStatus.fromCode(data['status'] as String?),
+      fromUid: readString(data, 'fromUid')?.trim() ?? '',
+      fromPlantId: readString(data, 'fromPlantId')?.trim() ?? '',
+      fromDisplayName: readString(data, 'fromDisplayName')?.trim(),
+      message: readString(data, 'message')?.trim(),
+      createdAt: readDate(data, 'createdAt'),
+      status: GiftStatus.fromCode(readField(data, 'status')),
       plantSnapshot: snapshot,
     );
   }
@@ -78,10 +75,16 @@ class OutgoingGift {
   factory OutgoingGift.fromMap(String id, Map<String, dynamic> data) {
     return OutgoingGift(
       id: id,
-      recipientUid: (data['recipientUid'] as String?)?.trim() ?? '',
-      plantId: (data['plantId'] as String?)?.trim() ?? '',
-      status: GiftStatus.fromCode(data['status'] as String?),
-      createdAt: readTimestamp(data['createdAt']),
+      recipientUid: (readString(data, 'recipientUid') ??
+                  readString(data, 'toUid'))
+              ?.trim() ??
+          '',
+      plantId: (readString(data, 'plantId') ??
+                  readString(data, 'fromPlantId'))
+              ?.trim() ??
+          '',
+      status: GiftStatus.fromCode(readField(data, 'status')),
+      createdAt: readDate(data, 'createdAt'),
     );
   }
 }

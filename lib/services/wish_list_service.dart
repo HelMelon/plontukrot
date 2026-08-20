@@ -1,26 +1,32 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
+import '../models/model_helpers.dart';
 import '../models/wish_list_item.dart';
+import 'api_client.dart';
+import 'api_exception.dart';
+import 'auth_service.dart';
+import 'rest_stream.dart';
 
 class WishListService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final ApiClient _api = ApiClient.instance;
 
-  String get _uid => FirebaseAuth.instance.currentUser!.uid;
+  String get _uid => AuthService().requireUid;
 
-  CollectionReference<Map<String, dynamic>> _wishListRefFor(String ownerUid) =>
-      _firestore.collection('users').doc(ownerUid).collection('wishList');
-
-  CollectionReference<Map<String, dynamic>> get _wishListRef =>
-      _wishListRefFor(_uid);
+  Future<List<WishListItem>> _fetchAll() async {
+    final list = jsonMapList(await _api.get('/wish-list'));
+    return list
+        .map((m) => WishListItem.fromMap(readString(m, 'id') ?? '', m))
+        .toList()
+      ..sort((a, b) {
+        final aAt = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final bAt = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return bAt.compareTo(aAt);
+      });
+  }
 
   Stream<List<WishListItem>> watchItemsForUser(String ownerUid) {
-    return _wishListRefFor(ownerUid)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs.map(WishListItem.fromFirestore).toList(),
-        );
+    if (ownerUid != _uid) {
+      return restPollStream(() async => <WishListItem>[]);
+    }
+    return restPollStream(_fetchAll);
   }
 
   Stream<List<WishListItem>> watchItems() => watchItemsForUser(_uid);
@@ -29,11 +35,9 @@ class WishListService {
     required String nameEn,
     required String nameAlt,
   }) async {
-    await _wishListRef.add({
-      'nameEn': nameEn,
-      'nameAlt': nameAlt,
-      'createdAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
+    await _api.post('/wish-list', body: {
+      'name_en': nameEn,
+      'name_alt': nameAlt,
     });
   }
 
@@ -42,15 +46,17 @@ class WishListService {
     required String nameEn,
     required String nameAlt,
   }) async {
-    await _wishListRef.doc(id).update({
-      'nameEn': nameEn,
-      'nameAlt': nameAlt,
-      'updatedAt': FieldValue.serverTimestamp(),
-      'nameRu': FieldValue.delete(),
-    });
+    try {
+      await _api.patch('/wish-list/$id', body: {
+        'name_en': nameEn,
+        'name_alt': nameAlt,
+      });
+    } on ApiException catch (error) {
+      if (!error.isNotFound) rethrow;
+    }
   }
 
   Future<void> deleteItem(String id) async {
-    await _wishListRef.doc(id).delete();
+    await _api.delete('/wish-list/$id');
   }
 }
