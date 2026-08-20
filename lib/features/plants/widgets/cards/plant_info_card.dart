@@ -16,6 +16,7 @@ import '../notes/plant_notes_section.dart';
 import '../propagations/plant_propagations_section.dart';
 import '../sheets/add_note_sheet.dart';
 import '../sheets/fertilizing_history_sheet.dart';
+import '../sheets/manipulations_history_sheet.dart';
 import '../sheets/repotting_history_sheet.dart';
 import '../sheets/watering_history_sheet.dart';
 import 'info_card.dart';
@@ -207,14 +208,46 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
       );
     }
 
+    void openManipulationsHistory() {
+      showAppModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        enableDrag: true,
+        builder: (_) => ManipulationsHistorySheet(
+          plantId: plantId,
+          plantStage: plant.stage,
+        ),
+      );
+    }
+
     final mainInfo = _section(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (plant.nickname.trim().isNotEmpty)
-            Text(
-              plant.nickname,
-              style: details.nicknameStyle,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: Text(
+                    plant.nickname,
+                    style: details.nicknameStyle,
+                  ),
+                ),
+                if (variegation.showIconNearSpecies) ...[
+                  spacing.hXs,
+                  Tooltip(
+                    message: variegationLabel,
+                    child: Icon(
+                      variegation.icon,
+                      color: variegation.iconColor,
+                      size: spacing.xl,
+                    ),
+                  ),
+                ],
+              ],
             ),
           if (plant.nickname.trim().isNotEmpty) spacing.vXs,
           if (plant.isArchived) ...[
@@ -243,7 +276,10 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
             _infoRow(
               label: l10n.plantSpecies,
               value: speciesTrimmed,
-              valueTrailing: variegation.showIconNearSpecies
+              // Variegation icon moved to the nickname row; keep it on the
+              // species row only when there is no nickname to show it on.
+              valueTrailing: plant.nickname.trim().isEmpty &&
+                      variegation.showIconNearSpecies
                   ? Tooltip(
                       message: variegationLabel,
                       child: Icon(
@@ -338,6 +374,17 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
             title: l10n.repotting,
             value: careDateLabel(plant.lastRepottedAt),
             onTap: openRepottingHistory,
+          ),
+          spacing.vXs,
+          InfoCard(
+            icon: Icon(
+              Icons.healing_outlined,
+              size: context.dimensions.avatar - 8,
+              color: context.colors.icon,
+            ),
+            title: l10n.manipulations,
+            value: careDateLabel(plant.lastManipulationAt),
+            onTap: openManipulationsHistory,
           ),
         ],
       ),
