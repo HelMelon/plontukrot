@@ -456,6 +456,47 @@
   "soilCustomMix": "Свой микс",
   "soilParts": "{parts} ч.",
 
+  "manipulations": "Манипуляции",
+  "manipulationsHistory": "История манипуляций",
+  "manipulationAdd": "Добавить манипуляцию",
+  "manipulationEdit": "Редактировать манипуляцию",
+  "manipulationDeleteTitle": "Удалить манипуляцию",
+  "manipulationDeleteConfirm": "Удалить эту запись?",
+  "manipulationEmpty": "Манипуляций пока нет",
+  "manipulationTypeField": "Тип",
+  "manipulationTypePinching": "Прищипка",
+  "manipulationTypeRerooting": "Реанимация",
+  "manipulationTypeStimulator": "Стимулятор",
+  "manipulationNote": "Заметка",
+  "manipulationNoteHint": "Что сделали и зачем",
+  "manipulationRerootingStageOptional": "Новая стадия (необязательно)",
+  "manipulationRerootingStageBefore": "Было: {stage}",
+  "@manipulationRerootingStageBefore": {
+    "placeholders": {
+      "stage": {"type": "String"}
+    }
+  },
+  "manipulationRerootingStageChange": "{before} → {after}",
+  "@manipulationRerootingStageChange": {
+    "placeholders": {
+      "before": {"type": "String"},
+      "after": {"type": "String"}
+    }
+  },
+  "manipulationStimulatorModeSaved": "Из каталога",
+  "manipulationStimulatorModeCustom": "Вручную",
+  "manipulationStimulatorSelect": "Выберите стимулятор",
+  "manipulationStimulatorName": "Название препарата",
+  "manipulationStimulatorNameHint": "напр. Корnevin",
+  "manipulationStimulatorDosage": "Дозировка",
+  "manipulationStimulatorDosageHint": "напр. 1 мл / л",
+  "manipulationStimulatorNameRequired": "Укажите название препарата",
+  "manageStimulatorsTitle": "Стимуляторы",
+  "stimulatorAddTitle": "Добавить стимулятор",
+  "stimulatorEditTitle": "Редактировать стимулятор",
+  "stimulatorDefaultDosage": "Дозировка по умолчанию",
+  "emptyStimulators": "Стимуляторов пока нет",
+
   "notesEmpty": "Заметок пока нет",
   "notesAdd": "Добавить заметку",
   "notesAddHint": "Добавьте новую запись в журнал для этого растения.",

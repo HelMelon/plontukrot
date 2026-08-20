@@ -568,6 +568,47 @@
     }
   },
 
+  "manipulations": "Manipulations",
+  "manipulationsHistory": "Manipulation history",
+  "manipulationAdd": "Add manipulation",
+  "manipulationEdit": "Edit manipulation",
+  "manipulationDeleteTitle": "Delete manipulation",
+  "manipulationDeleteConfirm": "Delete this entry?",
+  "manipulationEmpty": "No manipulations yet",
+  "manipulationTypeField": "Type",
+  "manipulationTypePinching": "Pinching",
+  "manipulationTypeRerooting": "Reanimation",
+  "manipulationTypeStimulator": "Stimulator",
+  "manipulationNote": "Note",
+  "manipulationNoteHint": "What you did and why",
+  "manipulationRerootingStageOptional": "New stage (optional)",
+  "manipulationRerootingStageBefore": "Was: {stage}",
+  "@manipulationRerootingStageBefore": {
+    "placeholders": {
+      "stage": {"type": "String"}
+    }
+  },
+  "manipulationRerootingStageChange": "{before} → {after}",
+  "@manipulationRerootingStageChange": {
+    "placeholders": {
+      "before": {"type": "String"},
+      "after": {"type": "String"}
+    }
+  },
+  "manipulationStimulatorModeSaved": "From catalog",
+  "manipulationStimulatorModeCustom": "Manual",
+  "manipulationStimulatorSelect": "Select stimulator",
+  "manipulationStimulatorName": "Product name",
+  "manipulationStimulatorNameHint": "e.g. Rooting hormone",
+  "manipulationStimulatorDosage": "Dosage",
+  "manipulationStimulatorDosageHint": "e.g. 1 ml / L",
+  "manipulationStimulatorNameRequired": "Enter product name",
+  "manageStimulatorsTitle": "Stimulators",
+  "stimulatorAddTitle": "Add stimulator",
+  "stimulatorEditTitle": "Edit stimulator",
+  "stimulatorDefaultDosage": "Default dosage",
+  "emptyStimulators": "No stimulators yet",
+
   "notesEmpty": "No notes yet",
   "notesAdd": "Add note",
   "notesAddHint": "Add a new journal entry for this plant.",

@@ -3,6 +3,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../models/fertilizer.dart';
 import '../../models/fertilizer_application_method.dart';
 import '../../models/fertilizer_dose.dart';
+import '../../models/manipulation_type.dart';
 import '../../models/propagation_method.dart';
 import '../../models/propagation_outcome.dart';
 import '../../models/propagation_status.dart';
@@ -167,5 +168,13 @@ extension AppLocalizationsStage on AppLocalizations {
     final trimmed = soilName?.trim();
     if (trimmed != null && trimmed.isNotEmpty) return trimmed;
     return soilCustomMix;
+  }
+
+  String manipulationTypeLabel(ManipulationType type) {
+    return switch (type) {
+      ManipulationType.pinching => manipulationTypePinching,
+      ManipulationType.rerooting => manipulationTypeRerooting,
+      ManipulationType.stimulator => manipulationTypeStimulator,
+    };
   }
 }

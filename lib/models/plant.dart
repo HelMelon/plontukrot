@@ -29,6 +29,7 @@ class Plant {
   final DateTime? lastFertilizedAt;
   final String? lastFertilizerName;
   final DateTime? lastRepottedAt;
+  final DateTime? lastManipulationAt;
   final int initialLeafCount;
   final List<PlantMember> members;
   final DateTime? archivedAt;
@@ -59,6 +60,7 @@ class Plant {
     this.lastFertilizedAt,
     this.lastFertilizerName,
     this.lastRepottedAt,
+    this.lastManipulationAt,
     this.initialLeafCount = 0,
     this.members = const [],
     this.archivedAt,
@@ -178,6 +180,7 @@ class Plant {
       lastFertilizedAt: readTimestamp(data['lastFertilizedAt']),
       lastFertilizerName: _nullableTrimmed(data['lastFertilizerName'] as String?),
       lastRepottedAt: readTimestamp(data['lastRepottedAt']),
+      lastManipulationAt: readTimestamp(data['lastManipulationAt']),
       initialLeafCount: data['initialLeafCount'] as int? ?? 0,
       members: _readMembers(data['members']),
       archivedAt: readTimestamp(data['archivedAt']),
@@ -227,6 +230,8 @@ class Plant {
         'lastFertilizerName': lastFertilizerName,
       if (lastRepottedAt != null)
         'lastRepottedAt': Timestamp.fromDate(lastRepottedAt!),
+      if (lastManipulationAt != null)
+        'lastManipulationAt': Timestamp.fromDate(lastManipulationAt!),
       'initialLeafCount': initialLeafCount,
       if (members.isNotEmpty) 'members': members.map((m) => m.toMap()).toList(),
       if (archivedAt != null) 'archivedAt': Timestamp.fromDate(archivedAt!),

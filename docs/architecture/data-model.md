@@ -68,6 +68,9 @@ Stages: `stage_info.dart` (`stageInfos`, stages 0–4).
 | `WateringEntry` | `fromMap` / `fromFirestore`; **no** `toMap` |
 | `FertilizingEntry` | `fromMap` / `fromFirestoreData`; nested dose maps |
 | `RepottingEntry` | `fromMap` / `fromFirestore` / `toMap` |
+| `ManipulationEntry` | `fromMap` / `fromFirestore` / `toMap`; types `pinching`, `rerooting`, `stimulator`; rerooting may include `stageBefore` / `stageAfter` |
+| `ManipulationType` | Enum; persist `.code`; UI via l10n |
+| `Stimulator` | User catalog; `fromMap` / `fromFirestore` / `toMap` |
 | `Propagation` | `fromMap` / `fromFirestore` / `toMap` |
 | `PropagationStageEntry` | `fromMap` / `fromFirestore` / `toMap` |
 | `Soil` | `fromMap` / `fromFirestore` / `toMap` |

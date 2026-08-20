@@ -1246,6 +1246,98 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get manipulations => 'Manipulations';
+
+  @override
+  String get manipulationsHistory => 'Historique des manipulations';
+
+  @override
+  String get manipulationAdd => 'Ajouter une manipulation';
+
+  @override
+  String get manipulationEdit => 'Modifier la manipulation';
+
+  @override
+  String get manipulationDeleteTitle => 'Supprimer la manipulation';
+
+  @override
+  String get manipulationDeleteConfirm => 'Supprimer cette entrée ?';
+
+  @override
+  String get manipulationEmpty => 'Aucune manipulation pour le moment';
+
+  @override
+  String get manipulationTypeField => 'Type';
+
+  @override
+  String get manipulationTypePinching => 'Pincement';
+
+  @override
+  String get manipulationTypeRerooting => 'Réanimation';
+
+  @override
+  String get manipulationTypeStimulator => 'Stimulateur';
+
+  @override
+  String get manipulationNote => 'Note';
+
+  @override
+  String get manipulationNoteHint => 'Ce qui a été fait et pourquoi';
+
+  @override
+  String get manipulationRerootingStageOptional =>
+      'Nouvelle étape (facultatif)';
+
+  @override
+  String manipulationRerootingStageBefore(String stage) {
+    return 'Était : $stage';
+  }
+
+  @override
+  String manipulationRerootingStageChange(String before, String after) {
+    return '$before → $after';
+  }
+
+  @override
+  String get manipulationStimulatorModeSaved => 'Du catalogue';
+
+  @override
+  String get manipulationStimulatorModeCustom => 'Manuel';
+
+  @override
+  String get manipulationStimulatorSelect => 'Choisir un stimulateur';
+
+  @override
+  String get manipulationStimulatorName => 'Nom du produit';
+
+  @override
+  String get manipulationStimulatorNameHint => 'ex. Hormone de racinage';
+
+  @override
+  String get manipulationStimulatorDosage => 'Dosage';
+
+  @override
+  String get manipulationStimulatorDosageHint => 'ex. 1 ml / L';
+
+  @override
+  String get manipulationStimulatorNameRequired => 'Indiquez le nom du produit';
+
+  @override
+  String get manageStimulatorsTitle => 'Stimulateurs';
+
+  @override
+  String get stimulatorAddTitle => 'Ajouter un stimulateur';
+
+  @override
+  String get stimulatorEditTitle => 'Modifier le stimulateur';
+
+  @override
+  String get stimulatorDefaultDosage => 'Dosage par défaut';
+
+  @override
+  String get emptyStimulators => 'Aucun stimulateur pour le moment';
+
+  @override
   String get notesEmpty => 'Aucune note pour le moment';
 
   @override

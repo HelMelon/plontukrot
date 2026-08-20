@@ -9,6 +9,7 @@ import '../models/plant_member.dart';
 import '../models/plant_photo.dart';
 import '../models/variegation.dart';
 import 'fertilizing_notification_service.dart';
+import 'app_crash_reporting.dart';
 import 'plant_species_service.dart';
 import 'storage_service.dart';
 
@@ -40,9 +41,24 @@ class PlantService {
   }
 
   Future<void> _rescheduleNotifications(String plantId) async {
-    final plant = await getPlant(plantId);
-    if (plant != null) {
-      await FertilizingNotificationService.instance.rescheduleForPlant(plant);
+    try {
+      final plant = await getPlant(plantId);
+      if (plant != null) {
+        await FertilizingNotificationService.instance.rescheduleForPlant(plant);
+      }
+    } catch (error, stack) {
+      // Notification scheduling must never break the plant operation that
+      // triggered it (e.g. exact-alarm permission denied on Android 14+).
+      // The plant is already persisted; a reminder failure is non-fatal.
+      try {
+        await AppCrashReporting.instance.recordError(
+          error,
+          stack,
+          reason: 'plant_notification_reschedule_failed',
+        );
+      } catch (_) {
+        // Crash reporting must not rethrow and break the caller either.
+      }
     }
   }
 
@@ -519,6 +535,7 @@ class PlantService {
     await _deleteQueryInBatches(plantRef.collection('watering'));
     await _deleteQueryInBatches(plantRef.collection('fertilizing'));
     await _deleteQueryInBatches(plantRef.collection('repotting'));
+    await _deleteQueryInBatches(plantRef.collection('manipulations'));
     await _deleteQueryInBatches(plantRef.collection('notes'));
     await _deleteQueryInBatches(plantRef.collection('growthEvents'));
 

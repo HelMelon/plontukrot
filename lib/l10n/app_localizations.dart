@@ -2376,6 +2376,180 @@ abstract class AppLocalizations {
   /// **'{parts} parts'**
   String soilParts(String parts);
 
+  /// No description provided for @manipulations.
+  ///
+  /// In en, this message translates to:
+  /// **'Manipulations'**
+  String get manipulations;
+
+  /// No description provided for @manipulationsHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Manipulation history'**
+  String get manipulationsHistory;
+
+  /// No description provided for @manipulationAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add manipulation'**
+  String get manipulationAdd;
+
+  /// No description provided for @manipulationEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit manipulation'**
+  String get manipulationEdit;
+
+  /// No description provided for @manipulationDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete manipulation'**
+  String get manipulationDeleteTitle;
+
+  /// No description provided for @manipulationDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this entry?'**
+  String get manipulationDeleteConfirm;
+
+  /// No description provided for @manipulationEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No manipulations yet'**
+  String get manipulationEmpty;
+
+  /// No description provided for @manipulationTypeField.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get manipulationTypeField;
+
+  /// No description provided for @manipulationTypePinching.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinching'**
+  String get manipulationTypePinching;
+
+  /// No description provided for @manipulationTypeRerooting.
+  ///
+  /// In en, this message translates to:
+  /// **'Reanimation'**
+  String get manipulationTypeRerooting;
+
+  /// No description provided for @manipulationTypeStimulator.
+  ///
+  /// In en, this message translates to:
+  /// **'Stimulator'**
+  String get manipulationTypeStimulator;
+
+  /// No description provided for @manipulationNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get manipulationNote;
+
+  /// No description provided for @manipulationNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What you did and why'**
+  String get manipulationNoteHint;
+
+  /// No description provided for @manipulationRerootingStageOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'New stage (optional)'**
+  String get manipulationRerootingStageOptional;
+
+  /// No description provided for @manipulationRerootingStageBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'Was: {stage}'**
+  String manipulationRerootingStageBefore(String stage);
+
+  /// No description provided for @manipulationRerootingStageChange.
+  ///
+  /// In en, this message translates to:
+  /// **'{before} → {after}'**
+  String manipulationRerootingStageChange(String before, String after);
+
+  /// No description provided for @manipulationStimulatorModeSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'From catalog'**
+  String get manipulationStimulatorModeSaved;
+
+  /// No description provided for @manipulationStimulatorModeCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual'**
+  String get manipulationStimulatorModeCustom;
+
+  /// No description provided for @manipulationStimulatorSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select stimulator'**
+  String get manipulationStimulatorSelect;
+
+  /// No description provided for @manipulationStimulatorName.
+  ///
+  /// In en, this message translates to:
+  /// **'Product name'**
+  String get manipulationStimulatorName;
+
+  /// No description provided for @manipulationStimulatorNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Rooting hormone'**
+  String get manipulationStimulatorNameHint;
+
+  /// No description provided for @manipulationStimulatorDosage.
+  ///
+  /// In en, this message translates to:
+  /// **'Dosage'**
+  String get manipulationStimulatorDosage;
+
+  /// No description provided for @manipulationStimulatorDosageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 1 ml / L'**
+  String get manipulationStimulatorDosageHint;
+
+  /// No description provided for @manipulationStimulatorNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter product name'**
+  String get manipulationStimulatorNameRequired;
+
+  /// No description provided for @manageStimulatorsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stimulators'**
+  String get manageStimulatorsTitle;
+
+  /// No description provided for @stimulatorAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add stimulator'**
+  String get stimulatorAddTitle;
+
+  /// No description provided for @stimulatorEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit stimulator'**
+  String get stimulatorEditTitle;
+
+  /// No description provided for @stimulatorDefaultDosage.
+  ///
+  /// In en, this message translates to:
+  /// **'Default dosage'**
+  String get stimulatorDefaultDosage;
+
+  /// No description provided for @emptyStimulators.
+  ///
+  /// In en, this message translates to:
+  /// **'No stimulators yet'**
+  String get emptyStimulators;
+
   /// No description provided for @notesEmpty.
   ///
   /// In en, this message translates to:

@@ -1238,6 +1238,98 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get manipulations => 'Манипуляции';
+
+  @override
+  String get manipulationsHistory => 'История манипуляций';
+
+  @override
+  String get manipulationAdd => 'Добавить манипуляцию';
+
+  @override
+  String get manipulationEdit => 'Редактировать манипуляцию';
+
+  @override
+  String get manipulationDeleteTitle => 'Удалить манипуляцию';
+
+  @override
+  String get manipulationDeleteConfirm => 'Удалить эту запись?';
+
+  @override
+  String get manipulationEmpty => 'Манипуляций пока нет';
+
+  @override
+  String get manipulationTypeField => 'Тип';
+
+  @override
+  String get manipulationTypePinching => 'Прищипка';
+
+  @override
+  String get manipulationTypeRerooting => 'Реанимация';
+
+  @override
+  String get manipulationTypeStimulator => 'Стимулятор';
+
+  @override
+  String get manipulationNote => 'Заметка';
+
+  @override
+  String get manipulationNoteHint => 'Что сделали и зачем';
+
+  @override
+  String get manipulationRerootingStageOptional =>
+      'Новая стадия (необязательно)';
+
+  @override
+  String manipulationRerootingStageBefore(String stage) {
+    return 'Было: $stage';
+  }
+
+  @override
+  String manipulationRerootingStageChange(String before, String after) {
+    return '$before → $after';
+  }
+
+  @override
+  String get manipulationStimulatorModeSaved => 'Из каталога';
+
+  @override
+  String get manipulationStimulatorModeCustom => 'Вручную';
+
+  @override
+  String get manipulationStimulatorSelect => 'Выберите стимулятор';
+
+  @override
+  String get manipulationStimulatorName => 'Название препарата';
+
+  @override
+  String get manipulationStimulatorNameHint => 'напр. Корnevin';
+
+  @override
+  String get manipulationStimulatorDosage => 'Дозировка';
+
+  @override
+  String get manipulationStimulatorDosageHint => 'напр. 1 мл / л';
+
+  @override
+  String get manipulationStimulatorNameRequired => 'Укажите название препарата';
+
+  @override
+  String get manageStimulatorsTitle => 'Стимуляторы';
+
+  @override
+  String get stimulatorAddTitle => 'Добавить стимулятор';
+
+  @override
+  String get stimulatorEditTitle => 'Редактировать стимулятор';
+
+  @override
+  String get stimulatorDefaultDosage => 'Дозировка по умолчанию';
+
+  @override
+  String get emptyStimulators => 'Стимуляторов пока нет';
+
+  @override
   String get notesEmpty => 'Заметок пока нет';
 
   @override

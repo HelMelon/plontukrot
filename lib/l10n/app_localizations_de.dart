@@ -1243,6 +1243,97 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get manipulations => 'Manipulationen';
+
+  @override
+  String get manipulationsHistory => 'Manipulationsverlauf';
+
+  @override
+  String get manipulationAdd => 'Manipulation hinzufügen';
+
+  @override
+  String get manipulationEdit => 'Manipulation bearbeiten';
+
+  @override
+  String get manipulationDeleteTitle => 'Manipulation löschen';
+
+  @override
+  String get manipulationDeleteConfirm => 'Diesen Eintrag löschen?';
+
+  @override
+  String get manipulationEmpty => 'Noch keine Manipulationen';
+
+  @override
+  String get manipulationTypeField => 'Typ';
+
+  @override
+  String get manipulationTypePinching => 'Auspinzen';
+
+  @override
+  String get manipulationTypeRerooting => 'Reanimation';
+
+  @override
+  String get manipulationTypeStimulator => 'Stimulator';
+
+  @override
+  String get manipulationNote => 'Notiz';
+
+  @override
+  String get manipulationNoteHint => 'Was gemacht wurde und warum';
+
+  @override
+  String get manipulationRerootingStageOptional => 'Neue Stufe (optional)';
+
+  @override
+  String manipulationRerootingStageBefore(String stage) {
+    return 'War: $stage';
+  }
+
+  @override
+  String manipulationRerootingStageChange(String before, String after) {
+    return '$before → $after';
+  }
+
+  @override
+  String get manipulationStimulatorModeSaved => 'Aus Katalog';
+
+  @override
+  String get manipulationStimulatorModeCustom => 'Manuell';
+
+  @override
+  String get manipulationStimulatorSelect => 'Stimulator wählen';
+
+  @override
+  String get manipulationStimulatorName => 'Produktname';
+
+  @override
+  String get manipulationStimulatorNameHint => 'z. B. Wurzelhormon';
+
+  @override
+  String get manipulationStimulatorDosage => 'Dosierung';
+
+  @override
+  String get manipulationStimulatorDosageHint => 'z. B. 1 ml / l';
+
+  @override
+  String get manipulationStimulatorNameRequired => 'Produktname eingeben';
+
+  @override
+  String get manageStimulatorsTitle => 'Stimulatoren';
+
+  @override
+  String get stimulatorAddTitle => 'Stimulator hinzufügen';
+
+  @override
+  String get stimulatorEditTitle => 'Stimulator bearbeiten';
+
+  @override
+  String get stimulatorDefaultDosage => 'Standarddosierung';
+
+  @override
+  String get emptyStimulators => 'Noch keine Stimulatoren';
+
+  @override
   String get notesEmpty => 'Noch keine Notizen';
 
   @override
