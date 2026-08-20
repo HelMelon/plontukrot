@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../config/api_config.dart';
@@ -60,6 +61,54 @@ class ApiClient {
     bool ping = true,
   }) {
     return request('POST', path, body: body, query: query, pingOnSuccess: ping);
+  }
+
+  /// Upload a binary file as multipart/form-data and return parsed JSON.
+  ///
+  /// The body is expected to be a map of string fields (values must be
+  /// strings). The `fileField` names the file part. Attaches the bearer token.
+  Future<dynamic> postMultipart(
+    String path, {
+    required String fileField,
+    required String filename,
+    required List<int> fileBytes,
+    Map<String, String> fields = const {},
+  }) async {
+    final uri = _uri(path);
+    final request = http.MultipartRequest('POST', uri);
+    request.headers.addAll(_headers());
+    for (final entry in fields.entries) {
+      request.fields[entry.key] = entry.value;
+    }
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        fileField,
+        fileBytes,
+        filename: filename,
+      ),
+    );
+    final streamed = await _http.send(request);
+    final response = await http.Response.fromStream(streamed);
+    if (kDebugMode) {
+      debugPrint('[ApiClient] POST Multipart $path -> status ${response.statusCode}, body: ${response.body}');
+    }
+    if (response.statusCode == 401) {
+      await TokenStore.instance.clear();
+      final callback = onUnauthorized;
+      if (callback != null) {
+        await callback();
+      }
+      throw ApiException(401, _extractMessage(response), body: response.body);
+    }
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiException(
+        response.statusCode,
+        _extractMessage(response),
+        body: response.body,
+      );
+    }
+    if (response.body.isEmpty) return null;
+    return jsonDecode(response.body);
   }
 
   Future<dynamic> patch(

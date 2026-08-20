@@ -1,5 +1,6 @@
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 
+import '../models/model_helpers.dart';
 import '../models/plant_photo.dart';
 import 'api_client.dart';
 import 'app_crash_reporting.dart';
@@ -31,12 +32,55 @@ class StorageService {
     required String plantId,
     String? photoId,
   }) async {
-    await AppCrashReporting.instance.log(
-      'storage_upload_skipped_no_object_storage',
-    );
-    throw UnsupportedError(
-      'Photo upload is unavailable until object storage is enabled',
-    );
+    try {
+      if (kDebugMode) {
+        debugPrint(
+          '[StorageService] Starting photo upload for plantId: $plantId (${imageBytes.length} bytes)',
+        );
+      }
+      final rawResponse = await _api.postMultipart(
+        '/plants/$plantId/photos/upload',
+        fileField: 'file',
+        filename: 'photo_${DateTime.now().millisecondsSinceEpoch}.jpg',
+        fileBytes: imageBytes,
+      );
+      if (kDebugMode) {
+        debugPrint('[StorageService] Raw upload response: $rawResponse');
+      }
+      final json = jsonMap(rawResponse);
+      final id = readString(json, 'id') ?? '';
+      final imageUrl = readString(json, 'imageUrl')?.trim() ??
+          readString(json, 'image_url')?.trim() ??
+          '';
+      final thumb = readString(json, 'imageThumbUrl')?.trim() ??
+          readString(json, 'image_thumb_url')?.trim() ??
+          imageUrl;
+      if (imageUrl.isEmpty) {
+        if (kDebugMode) {
+          debugPrint(
+            '[StorageService] Empty imageUrl! Raw response: $rawResponse, parsed json: $json',
+          );
+        }
+        throw StateError(
+          'Upload succeeded but no imageUrl returned (response: $rawResponse)',
+        );
+      }
+      return PlantImageUploadResult(
+        photoId: id.isEmpty ? photoId ?? '' : id,
+        imageUrl: imageUrl,
+        imageThumbUrl: thumb.isEmpty ? imageUrl : thumb,
+      );
+    } catch (error, stack) {
+      if (kDebugMode) {
+        debugPrint('[StorageService] uploadPlantPhoto failed: $error\n$stack');
+      }
+      await AppCrashReporting.instance.recordError(
+        error,
+        stack,
+        reason: 'storage_upload_plant_photo_failed',
+      );
+      rethrow;
+    }
   }
 
   Future<PlantImageUploadResult> uploadPlantImages({
