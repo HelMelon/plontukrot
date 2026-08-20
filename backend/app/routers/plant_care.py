@@ -1,8 +1,11 @@
 """Nested plant resources: photos, notes, growth, care, manipulations."""
+import os
 import uuid
+from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
+from ..config import settings
 from ..db import get_pool, jsonb
 from ..routers.auth import get_current_user_id
 from ..schemas import (
@@ -50,12 +53,55 @@ def list_photos(plant_id: str, user_id: str = Depends(get_current_user_id)):
     return [PlantPhotoOut(**r) for r in rows]
 
 
+@router.post("/photos/upload", response_model=PlantPhotoOut, status_code=201)
+def upload_photo(plant_id: str, file: UploadFile = File(...),
+                 user_id: str = Depends(get_current_user_id)):
+    """Save an uploaded photo file to disk and return its URLs.
+
+    This endpoint only stores the file and returns a stable URL. The caller
+    (frontend) then creates the `plant_photos` row via POST /photos, so one
+    upload maps to exactly one gallery entry and the gallery cap is respected.
+    """
+    _ensure_owned(plant_id, user_id)
+    photo_id = uuid.uuid4().hex
+    ext = os.path.splitext(file.filename or "")[1] or ".jpg"
+    if ext.lower() not in {".jpg", ".jpeg", ".png", ".webp", ".gif"}:
+        raise HTTPException(status_code=400, detail="Unsupported image type")
+    # Per-plant folder to avoid one huge directory.
+    plant_dir = os.path.join(settings.photos_dir, plant_id)
+    os.makedirs(plant_dir, exist_ok=True)
+    filename = f"{photo_id}{ext}"
+    dest = os.path.join(plant_dir, filename)
+    with open(dest, "wb") as out:
+        while True:
+            chunk = file.file.read(1024 * 1024)
+            if not chunk:
+                break
+            out.write(chunk)
+    image_url = f"{settings.public_base_url}/photos/{plant_id}/{filename}"
+    return PlantPhotoOut(
+        id=photo_id,
+        plant_id=plant_id,
+        image_url=image_url,
+        image_thumb_url=image_url,
+        added_at=datetime.now(timezone.utc),
+        is_legacy=False,
+    )
+
+
 @router.post("/photos", response_model=PlantPhotoOut, status_code=201)
 def add_photo(plant_id: str, payload: PlantPhotoCreate,
               user_id: str = Depends(get_current_user_id)):
     _ensure_owned(plant_id, user_id)
     photo_id = uuid.uuid4().hex
     with get_pool().connection() as conn:
+        if not payload.is_legacy:
+            # A real gallery photo supersedes any legacy cover (dead Firebase
+            # URL placeholder) — drop it so it doesn't show as a 2nd photo.
+            conn.execute(
+                "DELETE FROM plant_photos WHERE plant_id = %s AND is_legacy",
+                (plant_id,),
+            )
         conn.execute(
             "INSERT INTO plant_photos (id, plant_id, image_url, "
             "image_thumb_url, is_legacy) VALUES (%s, %s, %s, %s, %s)",

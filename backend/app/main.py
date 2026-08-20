@@ -1,8 +1,11 @@
 """FastAPI application entry point."""
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
+from .config import settings
 from .db import get_pool
 from .routers import auth, catalogs, plant_care, plants, propagations, social, species
 
@@ -10,6 +13,7 @@ from .routers import auth, catalogs, plant_care, plants, propagations, social, s
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Open the DB pool on startup, close it on shutdown."""
+    os.makedirs(settings.photos_dir, exist_ok=True)
     get_pool().open()
     yield
     get_pool().close()
@@ -24,6 +28,10 @@ app.include_router(propagations.router)
 app.include_router(catalogs.router)
 app.include_router(social.router)
 app.include_router(species.router)
+
+# Serve uploaded photos from disk.
+os.makedirs(settings.photos_dir, exist_ok=True)
+app.mount("/photos", StaticFiles(directory=settings.photos_dir), name="photos")
 
 
 @app.get("/health", tags=["meta"])
