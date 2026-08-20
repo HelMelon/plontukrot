@@ -346,8 +346,7 @@ class _HomePageState extends State<HomePage> {
               Semantics(
                 button: true,
                 expanded: !isCollapsed,
-                label:
-                    '${titleForKey(entry.key)}, ${entry.value.length}',
+                label: '${titleForKey(entry.key)}, ${entry.value.length}',
                 child: InkWell(
                   borderRadius: radii.smAll,
                   onTap: () => _toggleGroup(entry.key),
@@ -404,8 +403,20 @@ class _HomePageState extends State<HomePage> {
   }) {
     final preferSpeciesAsTitle = _sortField == _PlantSortField.species ||
         _sortField == _PlantSortField.plantFamily;
-    final childAspectRatio =
-        crossAxisCount <= 2 ? 0.45 : 0.625;
+    final isMobile = crossAxisCount <= 2;
+    final childAspectRatio = isMobile ? 0.45 : 0.625;
+    // Mobile cards: square photo + footer. Give the footer 10px more than
+    // the 0.45 ratio would, so the three stat chips never overflow.
+    final double? mainAxisExtent;
+    if (isMobile) {
+      final screenWidth = MediaQuery.sizeOf(context).width;
+      final cellWidth =
+          (screenWidth - 2 * _spacing.lg - _spacing.sm * (crossAxisCount - 1)) /
+              crossAxisCount;
+      mainAxisExtent = cellWidth / 0.45 + 15;
+    } else {
+      mainAxisExtent = null;
+    }
 
     return GridView.builder(
       shrinkWrap: true,
@@ -416,6 +427,7 @@ class _HomePageState extends State<HomePage> {
         crossAxisSpacing: _spacing.sm,
         mainAxisSpacing: _spacing.md,
         childAspectRatio: childAspectRatio,
+        mainAxisExtent: mainAxisExtent,
       ),
       itemBuilder: (context, index) {
         final plant = plants[index];
@@ -506,9 +518,7 @@ class _HomePageState extends State<HomePage> {
     final chips = context.components.chips;
     final spacing = _spacing;
     final labelStyle = chips.labelStyle.copyWith(
-      color: selected
-          ? chips.selectedForeground
-          : chips.unselectedForeground,
+      color: selected ? chips.selectedForeground : chips.unselectedForeground,
       height: 1.15,
     );
 
@@ -798,8 +808,7 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    final genera =
-        selected.map((p) => p.genus.trim().toLowerCase()).toSet();
+    final genera = selected.map((p) => p.genus.trim().toLowerCase()).toSet();
     if (genera.length != 1) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.homeMergeNeedSameGenus)),
@@ -884,8 +893,7 @@ class _HomePageState extends State<HomePage> {
       bottom: isWide
           ? null
           : PreferredSize(
-              preferredSize:
-                  Size.fromHeight(_spacing.xxxl + _spacing.md),
+              preferredSize: Size.fromHeight(_spacing.xxxl + _spacing.md),
               child: Row(
                 children: [
                   for (final button in actionButtons) Expanded(child: button),
@@ -1333,8 +1341,8 @@ class _HomePageState extends State<HomePage> {
                                     child: Text(
                                       l10n.homeNoPropagatingPlants,
                                       textAlign: TextAlign.center,
-                                      style: typography.bodyMedium
-                                          .copyWith(color: colors.textSecondary),
+                                      style: typography.bodyMedium.copyWith(
+                                          color: colors.textSecondary),
                                     ),
                                   )
                                 else if (_filterGroupsOnly &&
@@ -1352,8 +1360,8 @@ class _HomePageState extends State<HomePage> {
                                     child: Text(
                                       l10n.homeNoGroupPlants,
                                       textAlign: TextAlign.center,
-                                      style: typography.bodyMedium
-                                          .copyWith(color: colors.textSecondary),
+                                      style: typography.bodyMedium.copyWith(
+                                          color: colors.textSecondary),
                                     ),
                                   )
                                 else if (sortedPlants.isEmpty &&
@@ -1373,8 +1381,8 @@ class _HomePageState extends State<HomePage> {
                                     child: Text(
                                       l10n.homeNoPlantsForFilter,
                                       textAlign: TextAlign.center,
-                                      style: typography.bodyMedium
-                                          .copyWith(color: colors.textSecondary),
+                                      style: typography.bodyMedium.copyWith(
+                                          color: colors.textSecondary),
                                     ),
                                   )
                                 else if (_sortField == _PlantSortField.species)
