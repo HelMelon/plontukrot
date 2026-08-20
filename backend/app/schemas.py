@@ -1,4 +1,6 @@
 """Pydantic schemas for auth."""
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Optional
 
@@ -66,6 +68,7 @@ class PlantOut(BaseModel):
     last_fertilized_at: Optional[datetime] = None
     last_repotted_at: Optional[datetime] = None
     created_at: datetime
+    photos: list[PlantPhotoOut] = []
 
 
 class PlantPhotoCreate(BaseModel):

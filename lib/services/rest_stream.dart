@@ -5,14 +5,14 @@ import 'api_refresh.dart';
 /// Turns a one-shot REST fetch into a broadcast stream that many widgets can
 /// listen to at once without "already been listened to" errors.
 ///
-/// Emits immediately, again after each [ApiRefresh.ping], and on a short poll
-/// interval (ADR-033 v1). Because it is a broadcast stream, a listener that
-/// attaches later receives the most recently emitted value via a replay cache
-/// (so it does not sit on an infinite spinner), and multiple `StreamBuilder`s
-/// can subscribe to the same stream safely.
+/// Emits immediately, again after each [ApiRefresh.ping], and on a background
+/// poll interval (default 30s; ADR-033 v1). Because it is a broadcast stream,
+/// a listener that attaches later receives the most recently emitted value via
+/// a replay cache (so it does not sit on an infinite spinner), and multiple
+/// `StreamBuilder`s can subscribe to the same stream safely.
 Stream<T> restPollStream<T>(
   Future<T> Function() fetch, {
-  Duration interval = const Duration(seconds: 8),
+  Duration interval = const Duration(seconds: 30),
 }) {
   late StreamController<T> controller;
   Timer? timer;

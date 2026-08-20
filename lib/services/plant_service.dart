@@ -78,16 +78,24 @@ class PlantService {
     return Plant.fromMap(id, merged);
   }
 
+  /// Parse a plant map, using the photos already embedded in the response
+  /// (backend includes them in GET /plants). Keeps home grid to one request.
+  Plant _plantFromMap(Map<String, dynamic> map) {
+    final rawPhotos = readField(map, 'photos');
+    final photos = (rawPhotos is List)
+        ? rawPhotos
+            .whereType<Map>()
+            .map((e) => PlantPhoto.fromMap(Map<String, dynamic>.from(e)))
+            .where((p) => p.imageUrl.isNotEmpty)
+            .toList()
+        : const <PlantPhoto>[];
+    photos.sort((a, b) => b.addedAt.compareTo(a.addedAt));
+    return _plantFrom(map, photos);
+  }
+
   Future<List<Plant>> _fetchAllPlants() async {
     final list = jsonMapList(await _api.get('/plants'));
-    return Future.wait([
-      for (final map in list)
-        () async {
-          final id = readString(map, 'id') ?? '';
-          final photos = id.isEmpty ? const <PlantPhoto>[] : await _fetchPhotos(id);
-          return _plantFrom(map, photos);
-        }(),
-    ]);
+    return [for (final map in list) _plantFromMap(map)];
   }
 
   Future<void> markFertilizedToday(String plantId) async {

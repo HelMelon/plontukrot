@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..db import get_pool
 from ..routers.auth import get_current_user_id
-from ..schemas import PlantCreate, PlantOut
+from ..schemas import PlantCreate, PlantOut, PlantPhotoOut
 
 router = APIRouter(prefix="/plants", tags=["plants"])
 
@@ -27,7 +27,11 @@ _FIELDS = {
 
 @router.get("", response_model=list[PlantOut])
 def list_plants(user_id: str = Depends(get_current_user_id)):
-    """Return all plants belonging to the current user."""
+    """Return all plants belonging to the current user, with their photos.
+
+    Photos are fetched in a single JOIN (no N+1) so the home grid loads in one
+    request instead of one request per plant.
+    """
     with get_pool().connection() as conn:
         rows = conn.execute(
             "SELECT id, genus, species, cultivar, trading_name, plant_family, "
@@ -37,7 +41,23 @@ def list_plants(user_id: str = Depends(get_current_user_id)):
             "FROM plants WHERE user_id = %s ORDER BY created_at",
             (user_id,),
         ).fetchall()
-    return [_row_to_plant(r) for r in rows]
+        photos = conn.execute(
+            "SELECT id, plant_id, image_url, image_thumb_url, added_at, "
+            "is_legacy FROM plant_photos "
+            "WHERE plant_id = ANY(%s) ORDER BY added_at DESC",
+            ([r["id"] for r in rows],),
+        ).fetchall()
+    by_plant: dict[str, list[dict]] = {}
+    for p in photos:
+        by_plant.setdefault(p["plant_id"], []).append(dict(p))
+    result = []
+    for r in rows:
+        plant = _row_to_plant(r)
+        plant.photos = [
+            PlantPhotoOut(**p) for p in by_plant.get(r["id"], [])
+        ]
+        result.append(plant)
+    return result
 
 
 @router.post("", response_model=PlantOut, status_code=201)
