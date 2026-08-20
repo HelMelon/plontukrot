@@ -15,14 +15,8 @@ dependencies:
 
   cupertino_icons: ^1.0.8
 
-  firebase_core: ^4.11.0
-  firebase_auth: ^6.5.4
-  cloud_firestore: ^6.6.0
-  firebase_storage: ^13.4.3
-
   flutter_slidable: ^4.0.3
   cached_network_image: ^3.4.1
-  google_sign_in: ^7.2.0
 
   image_picker: ^1.1.2
   auto_size_text: ^3.0.0
@@ -35,7 +29,6 @@ dependencies:
   share_plus: ^11.0.0
   crop_your_image: ^2.0.0
   url_launcher: ^6.3.1
-  firebase_crashlytics: ^5.2.7
   http: ^1.6.0
 
   flutter_local_notifications: ^19.0.0

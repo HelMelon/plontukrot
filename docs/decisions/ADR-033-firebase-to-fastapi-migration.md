@@ -2,7 +2,22 @@
 
 ## Status
 
-Proposed — planning only, no code changes yet.
+Accepted — Flutter service layer talks to FastAPI over REST + JWT.
+Backend (`backend/`) was already in place; this records the client rewrite.
+
+## Flutter implementation (Phase 5)
+
+- HTTP client: `lib/services/api_client.dart` (`http` package, Bearer JWT).
+- Base URL: `lib/config/api_config.dart` via `--dart-define=API_BASE_URL=…`.
+- Auth: email/password only; Google sign-in and email-verification gate removed.
+- Firestore/Storage services rewritten onto REST; `Stream` APIs kept via 8s polling + refresh-after-write (`ApiRefresh`).
+- Models parse camelCase and snake_case; dates are ISO-8601 (no `Timestamp`).
+- Crashlytics replaced with local debug logging.
+- Photo **display** uses stored URLs; binary upload waits on Object Storage.
+
+See `lib/FRONTEND_MIGRATION.md` for endpoint coverage and backend gaps.
+
+---
 
 ## Context
 
