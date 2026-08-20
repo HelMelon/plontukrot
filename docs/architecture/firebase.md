@@ -1,5 +1,21 @@
 # Firebase Boundary Rules
 
+> ## ⚠️ SUPERSEDED — Firebase removed
+>
+> **This document is historical.** As of 2026-08 the app no longer uses Firebase
+> (Auth, Firestore, Storage, Crashlytics, Hosting). It was replaced by a
+> self-hosted backend: **FastAPI + PostgreSQL**, with email/password JWT auth and
+> photos stored on server disk. See:
+>
+> - **[ADR-033](../decisions/ADR-033-firebase-to-fastapi-migration.md)** — migration decision
+> - **`backend/README.md`** — the new self-hosted server
+> - **[Architecture overview](overview.md)** — current app flow
+>
+> Data was migrated one-shot from a Firebase export to Postgres
+> (`backend/migrator.py`). Google sign-in is gone; only email/password remains.
+>
+> ---
+
 Living document. Source of truth for paths also: `.cursor/rules/firebase.mdc`, `firestore.rules`, `storage.rules`.
 
 See also: [Architecture overview](overview.md), [Data model](data-model.md), [ADR-002](../decisions/ADR-002-firebase.md).

@@ -1,5 +1,15 @@
 # Architecture Overview
 
+> ## ⚠️ BACKEND CHANGED — see `backend/README.md`
+>
+> As of 2026-08 the app's backend is **self-hosted FastAPI + PostgreSQL**
+> (email/password JWT auth, photos on server disk), replacing Firebase
+> Auth / Firestore / Storage / Crashlytics / Hosting. The Firebase-related
+> sections below are historical. New server docs: **`backend/README.md`**;
+> migration: **[ADR-033](../decisions/ADR-033-firebase-to-fastapi-migration.md)**.
+> In the Flutter layer, services now talk to the REST API via `ApiClient`
+> (`lib/services/api_client.dart`) instead of Firebase SDKs.
+
 Living document. Reflects the codebase as of 2026-08. If code and this doc disagree, **fix wins** — update this file.
 
 Related:

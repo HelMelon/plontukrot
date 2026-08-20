@@ -1,5 +1,15 @@
 # Architecture Audit
 
+> ## ⚠️ Snapshot predates the backend migration
+>
+> This audit (2026-08-03) reflects the **Firebase-era** codebase. As of
+> 2026-08 the backend is **self-hosted FastAPI + PostgreSQL** and the Flutter
+> layer talks to it over REST (`lib/services/api_client.dart`) — no Firebase
+> SDKs. Statements below about "Firebase services", `FirestoreService`, model
+> `fromFirestore`, or `cloud_firestore` imports are **historical**. See
+> `backend/README.md` and ADR-033 for the current backend; `overview.md` and
+> `data-model.md` have been updated for the new stack.
+
 **Date:** 2026-08-03  
 **Scope:** `lib/`, `docs/architecture/`, `docs/decisions/`, `.cursor/rules/`  
 **Method:** Compare real code ↔ living docs ↔ Cursor rules. No code was changed.
