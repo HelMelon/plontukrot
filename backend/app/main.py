@@ -3,6 +3,7 @@ import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .config import settings
@@ -20,6 +21,19 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="plontukrot", version="0.1.0", lifespan=lifespan)
+
+# Allow the Flutter web build (any origin) to call the REST API. Web requests
+# from a browser are blocked by CORS unless the server explicitly allows the
+# origin. We allow all origins so `flutter run -d chrome` works out of the box;
+# tighten this to a fixed domain list if the web build is ever deployed to a
+# public hostname.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(auth.router)
 app.include_router(plants.router)
