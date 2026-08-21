@@ -421,7 +421,7 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
                       IconButton(
                         tooltip: l10n.commonManage,
                         onPressed: _openManageStimulators,
-                        icon: const Icon(Icons.edit_outlined),
+                        icon: Icon(context.icons.editOutlined),
                       ),
                     ],
                   ),
@@ -514,8 +514,8 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
                   ),
                   child: ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: const ExcludeSemantics(
-                      child: Icon(Icons.calendar_today),
+                    leading: ExcludeSemantics(
+                      child: Icon(context.icons.calendar),
                     ),
                     title: Text(DateFormat.yMMMMd().format(_selectedDate)),
                     onTap: _pickDate,

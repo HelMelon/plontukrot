@@ -25,7 +25,9 @@ class PlantPendingPhotoControl extends StatelessWidget {
       contentPadding: EdgeInsets.zero,
       leading: ExcludeSemantics(
         child: Icon(
-          hasPhoto ? Icons.check_circle_outline : Icons.add_a_photo_outlined,
+          hasPhoto
+              ? context.icons.checkCircleOutlined
+              : context.icons.addPhotoOutlined,
           color: colors.icon,
         ),
       ),

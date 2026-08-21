@@ -328,7 +328,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             decoration: _fieldDecoration(
                               labelText: l10n.plantGenus,
                               errorText: genusError,
-                              prefixIcon: _materialPrefixIcon(Icons.park_outlined),
+                              prefixIcon: _materialPrefixIcon(context.icons.genus),
                             ),
                           ),
                           spacing.vMd,
@@ -343,7 +343,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             decoration: _fieldDecoration(
                               labelText: l10n.plantSpecies,
                               errorText: speciesError,
-                              prefixIcon: _materialPrefixIcon(Icons.eco),
+                              prefixIcon: _materialPrefixIcon(context.icons.species),
                             ),
                           ),
                           spacing.vMd,
@@ -352,7 +352,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantCultivar,
-                              prefixIcon: _materialPrefixIcon(Icons.spa_outlined),
+                              prefixIcon: _materialPrefixIcon(context.icons.cultivar),
                             ),
                           ),
                           spacing.vMd,
@@ -369,7 +369,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             decoration: _fieldDecoration(
                               labelText: l10n.plantTradingName,
                               prefixIcon:
-                                  _materialPrefixIcon(Icons.storefront_outlined),
+                                  _materialPrefixIcon(context.icons.tradingName),
                             ),
                           ),
                           spacing.vMd,
@@ -379,7 +379,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             decoration: _fieldDecoration(
                               labelText: l10n.plantFamily,
                               prefixIcon:
-                                  _materialPrefixIcon(Icons.family_restroom),
+                                  _materialPrefixIcon(context.icons.family),
                             ),
                           ),
                           spacing.vMd,
@@ -389,7 +389,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             decoration: _fieldDecoration(
                               labelText: l10n.plantNickname,
                               prefixIcon: _hugePrefixIcon(
-                                HugeIcons.strokeRoundedHouseHeart,
+                                context.icons.nickname,
                               ),
                             ),
                           ),
@@ -446,7 +446,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantWateringFrequency,
-                              prefixIcon: _materialPrefixIcon(Icons.water_drop),
+                              prefixIcon: _materialPrefixIcon(context.icons.wateringFilled),
                             ),
                           ),
                           spacing.vMd,
@@ -460,7 +460,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             decoration: _fieldDecoration(
                               labelText: l10n.plantInitialLeafCount,
                               prefixIcon: _hugePrefixIcon(
-                                HugeIcons.strokeRoundedLeaf01,
+                                context.icons.leaf,
                               ),
                             ),
                           ),

@@ -309,7 +309,7 @@ class _MarkPropagationOutcomeSheetState
                           children: [
                             ExcludeSemantics(
                               child: Icon(
-                                Icons.calendar_today_outlined,
+                                context.icons.calendarOutlined,
                                 color: colors.icon,
                                 size: dimensions.iconLg,
                               ),

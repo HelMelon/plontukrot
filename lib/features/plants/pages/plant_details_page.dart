@@ -387,7 +387,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      Icons.error_outline,
+                      context.icons.error,
                       size: context.dimensions.iconXl,
                       color: colors.error,
                     ),
@@ -433,7 +433,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      Icons.help_outline,
+                      context.icons.help,
                       size: context.dimensions.iconXl,
                       color: colors.icon,
                     ),
@@ -461,17 +461,18 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
         final titleStyle = typography.titleSmall;
         final actionsBarHeight = spacing.xxxl + spacing.md;
 
+        final icons = context.icons;
         final actionButtons = <Widget>[
           IconButton(
             tooltip: l10n.watering,
             onPressed: _openWateringHistory,
-            icon: Icon(Icons.water_drop_outlined, color: actionIconColor),
+            icon: Icon(icons.watering, color: actionIconColor),
           ),
           IconButton(
             tooltip: l10n.fertilizing,
             onPressed: _openFertilizing,
             icon: Icon(
-              Icons.science_outlined,
+              icons.fertilizing,
               color: actionIconColor,
             ),
           ),
@@ -479,7 +480,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
             tooltip: l10n.repotting,
             onPressed: _openRepotting,
             icon: HugeIcon(
-              icon: HugeIcons.strokeRoundedShovel,
+              icon: icons.repotting,
               color: actionIconColor,
             ),
           ),
@@ -487,20 +488,20 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
             tooltip: l10n.plantPropagation,
             onPressed: () => _openPropagation(plant),
             icon: HugeIcon(
-              icon: HugeIcons.strokeRoundedEcoLab01,
+              icon: icons.propagations,
               color: actionIconColor,
             ),
           ),
           IconButton(
             tooltip: l10n.commonEdit,
             onPressed: () => _openUpdatePlant(plant),
-            icon: Icon(Icons.edit, color: actionIconColor),
+            icon: Icon(icons.edit, color: actionIconColor),
           ),
           IconButton(
             tooltip: l10n.plantNote,
             onPressed: _openAddNote,
             icon: HugeIcon(
-              icon: HugeIcons.strokeRoundedNoteEdit,
+              icon: icons.note,
               color: actionIconColor,
             ),
           ),
@@ -508,12 +509,12 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
             IconButton(
               tooltip: l10n.plantGift,
               onPressed: () => showGiftPlantSheet(context: context, plant: plant),
-              icon: Icon(Icons.card_giftcard_outlined, color: actionIconColor),
+              icon: Icon(icons.gift, color: actionIconColor),
             ),
             IconButton(
               tooltip: l10n.plantDispose,
               onPressed: () => _openDispose(plant),
-              icon: Icon(Icons.archive_outlined, color: actionIconColor),
+              icon: Icon(icons.archiveAction, color: actionIconColor),
             ),
           ],
         ];

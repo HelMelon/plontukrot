@@ -81,8 +81,8 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                         DateFormat.yMMMMd().format(selectedDate),
                       ),
                       child: ListTile(
-                        leading: const ExcludeSemantics(
-                          child: Icon(Icons.calendar_today),
+                        leading: ExcludeSemantics(
+                          child: Icon(context.icons.calendar),
                         ),
                         title: Text(DateFormat.yMMMMd().format(selectedDate)),
                         onTap: () async {
@@ -246,7 +246,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                             ),
                           ),
                           child: Icon(
-                            Icons.add,
+                            context.icons.add,
                             size: context.dimensions.iconXl,
                           ),
                         ),
@@ -311,7 +311,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                             child: Row(
                               children: [
                                 Icon(
-                                  Icons.water_drop_rounded,
+                                  context.icons.wateringHistory,
                                   color: colors.icon,
                                 ),
                                 spacing.hSm,
@@ -327,7 +327,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                                 ),
                                 IconButton(
                                   tooltip: l10n.commonEdit,
-                                  icon: const Icon(Icons.edit_outlined),
+                                  icon: Icon(context.icons.editOutlined),
                                   onPressed: () => _showWateringEditor(
                                     wateringId: wateringId,
                                     initialDate: wateredAt,
@@ -335,7 +335,7 @@ class _WateringHistorySheetState extends State<WateringHistorySheet> {
                                 ),
                                 IconButton(
                                   tooltip: l10n.commonDelete,
-                                  icon: const Icon(Icons.delete_outline),
+                                  icon: Icon(context.icons.delete),
                                   onPressed: () => _confirmDelete(wateringId),
                                 ),
                               ],

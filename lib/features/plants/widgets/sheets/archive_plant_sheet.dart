@@ -221,12 +221,12 @@ class _ArchivePlantSheetState extends State<ArchivePlantSheet> {
                               ButtonSegment(
                                 value: PlantArchiveReason.died,
                                 label: Text(l10n.plantDisposeReasonDied),
-                                icon: const Icon(Icons.heart_broken_outlined),
+                                icon: Icon(context.icons.lossDied),
                               ),
                               ButtonSegment(
                                 value: PlantArchiveReason.sold,
                                 label: Text(l10n.plantDisposeReasonSold),
-                                icon: const Icon(Icons.sell_outlined),
+                                icon: Icon(context.icons.lossSold),
                               ),
                             ],
                             selected: {_reason},
@@ -249,7 +249,7 @@ class _ArchivePlantSheetState extends State<ArchivePlantSheet> {
                               title: Text(DateFormat('d MMM y').format(_at)),
                               trailing: ExcludeSemantics(
                                 child: Icon(
-                                  Icons.calendar_today_outlined,
+                                  context.icons.calendarOutlined,
                                   color: colors.icon,
                                 ),
                               ),
@@ -270,7 +270,7 @@ class _ArchivePlantSheetState extends State<ArchivePlantSheet> {
                               decoration: _fieldDecoration(
                                 labelText: l10n.plantDisposeDeathNote,
                                 errorText: _deathNoteError,
-                                icon: Icons.notes_outlined,
+                                icon: context.icons.notesOutlined,
                               ),
                             )
                           else ...[
@@ -296,7 +296,7 @@ class _ArchivePlantSheetState extends State<ArchivePlantSheet> {
                                   currency.symbol,
                                 ),
                                 errorText: _amountError,
-                                icon: Icons.payments_outlined,
+                                icon: context.icons.paymentsOutlined,
                               ),
                             ),
                             spacing.vMd,
@@ -306,7 +306,7 @@ class _ArchivePlantSheetState extends State<ArchivePlantSheet> {
                               style: inputs.textStyle,
                               decoration: _fieldDecoration(
                                 labelText: l10n.notesOptional,
-                                icon: Icons.notes_outlined,
+                                icon: context.icons.notesOutlined,
                               ),
                             ),
                           ],

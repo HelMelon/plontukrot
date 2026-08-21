@@ -111,7 +111,7 @@ class _FertilizingFrequencyFieldState extends State<FertilizingFrequencyField> {
           style: inputs.textStyle,
           decoration: inputs.decoration(
             labelText: l10n.plantFertilizingFrequency,
-            prefixIcon: Icon(Icons.eco_outlined, color: colors.icon),
+            prefixIcon: Icon(context.icons.fertilizingEco, color: colors.icon),
           ),
           onChanged: _onDaysChanged,
         ),

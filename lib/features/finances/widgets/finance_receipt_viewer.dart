@@ -93,7 +93,7 @@ class _FinanceReceiptsViewerDialogState
                   IconButton(
                     tooltip: l10n.commonClose,
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close),
+                    icon: Icon(context.icons.close),
                   ),
                 ],
               ),
@@ -114,7 +114,7 @@ class _FinanceReceiptsViewerDialogState
                     );
                     final error = Center(
                       child: Icon(
-                        Icons.broken_image_outlined,
+                        context.icons.brokenImage,
                         color: colors.icon,
                         size: dimensions.iconXl,
                       ),

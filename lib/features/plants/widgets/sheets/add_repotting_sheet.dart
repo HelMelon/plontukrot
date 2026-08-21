@@ -356,8 +356,8 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                             ),
                             child: ListTile(
                               contentPadding: EdgeInsets.zero,
-                              leading: const ExcludeSemantics(
-                                child: Icon(Icons.calendar_today),
+                              leading: ExcludeSemantics(
+                                child: Icon(context.icons.calendar),
                               ),
                               title: Text(
                                   DateFormat('d MMM y').format(_selectedDate)),
@@ -471,7 +471,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                                           ? null
                                           : () =>
                                               _showSelectedComposition(soils),
-                                      icon: const Icon(Icons.info_outline),
+                                      icon: Icon(context.icons.info),
                                     ),
                                   ],
                                 );
@@ -490,7 +490,7 @@ class _AddRepottingSheetState extends State<AddRepottingSheet> {
                                 TextButton.icon(
                                   onPressed: _openManageComponents,
                                   icon: Icon(
-                                    Icons.edit_outlined,
+                                    context.icons.editOutlined,
                                     size: dimensions.iconMd,
                                   ),
                                   label: Text(l10n.commonManage),

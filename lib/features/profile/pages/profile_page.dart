@@ -348,7 +348,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       widget.user.photoUrl!,
                                       fit: BoxFit.cover,
                                       errorBuilder: (_, __, ___) => Icon(
-                                        Icons.person,
+                                        context.icons.profile,
                                         color: colors.icon,
                                         size: dimensions.iconXl,
                                       ),
@@ -357,7 +357,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 )
                               : ExcludeSemantics(
                                   child: Icon(
-                                    Icons.person,
+                                    context.icons.profile,
                                     color: colors.icon,
                                     size: dimensions.iconXl,
                                   ),
@@ -468,14 +468,14 @@ class _ProfilePageState extends State<ProfilePage> {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: ExcludeSemantics(
-                  child: Icon(Icons.people_outline, color: colors.icon),
+                  child: Icon(context.icons.friends, color: colors.icon),
                 ),
                 title: Text(
                   l10n.profileFriends,
                   style: typography.bodyEmphasis,
                 ),
                 trailing: ExcludeSemantics(
-                  child: Icon(Icons.chevron_right, color: colors.icon),
+                  child: Icon(context.icons.chevronRight, color: colors.icon),
                 ),
                 onTap: _busy
                     ? null
@@ -491,7 +491,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: ExcludeSemantics(
-                  child: Icon(Icons.upload_file_outlined, color: colors.icon),
+                  child: Icon(context.icons.uploadFile, color: colors.icon),
                 ),
                 title: Text(
                   l10n.profileExportPlants,
@@ -661,7 +661,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         leading: ExcludeSemantics(
-                          child: Icon(Icons.notifications_outlined,
+                          child: Icon(context.icons.notifications,
                               color: colors.icon),
                         ),
                         title: Text(

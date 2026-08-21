@@ -49,7 +49,7 @@ class PlantLeafCounter extends StatelessWidget {
               children: [
                 _RoundControl(
                   tooltip: l10n.plantLeafRemove,
-                  icon: Icons.remove,
+                  icon: context.icons.remove,
                   onPressed: canDecrement ? onDecrement : null,
                 ),
                 Padding(
@@ -65,7 +65,7 @@ class PlantLeafCounter extends StatelessWidget {
                 ),
                 _RoundControl(
                   tooltip: l10n.plantLeafAdd,
-                  icon: Icons.add,
+                  icon: context.icons.add,
                   onPressed: canIncrement ? onIncrement : null,
                 ),
               ],
@@ -97,7 +97,7 @@ class PlantLeafCounter extends StatelessWidget {
                         spacing.hXxs,
                         ExcludeSemantics(
                           child: Icon(
-                            Icons.arrow_downward,
+                            context.icons.arrowDownward,
                             size: dimensions.iconSm,
                             color: colors.icon,
                           ),

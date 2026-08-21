@@ -198,7 +198,7 @@ class _PlantImageCardState extends State<PlantImageCard> {
                       tooltip: l10n.plantPhotoAdd,
                       background: gallery.galleryActionBackground,
                       iconColor: colors.onPrimary,
-                      icon: HugeIcons.strokeRoundedAdd01,
+                      icon: context.icons.photoAdd,
                       onTap: widget.onAdd,
                     ),
                     if (widget.onDelete != null && current != null) ...[
@@ -207,7 +207,7 @@ class _PlantImageCardState extends State<PlantImageCard> {
                         tooltip: l10n.plantPhotoDeleteTitle,
                         background: gallery.galleryActionBackground,
                         iconColor: colors.onPrimary,
-                        icon: HugeIcons.strokeRoundedDelete02,
+                        icon: context.icons.photoDelete,
                         onTap: () => widget.onDelete!(current),
                       ),
                     ],
@@ -304,7 +304,7 @@ class _PlantImageUploadSpinnerState extends State<_PlantImageUploadSpinner>
     return RotationTransition(
       turns: _controller,
       child: HugeIcon(
-        icon: HugeIcons.strokeRoundedLaurelWreath01,
+        icon: context.icons.laurelWreath,
         color: colors.icon,
         size: size,
       ),

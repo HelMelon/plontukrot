@@ -153,7 +153,7 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
                           labelText: l10n.authEmailLabel,
                           prefixIcon: ExcludeSemantics(
                             child: Icon(
-                              Icons.email_outlined,
+                              context.icons.email,
                               color: colors.icon,
                               size: dimensions.iconLg,
                             ),
@@ -180,7 +180,7 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
                           labelText: l10n.authPasswordLabel,
                           prefixIcon: ExcludeSemantics(
                             child: Icon(
-                              Icons.lock_outline,
+                              context.icons.lock,
                               color: colors.icon,
                               size: dimensions.iconLg,
                             ),
@@ -197,8 +197,8 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
                                     ),
                             icon: Icon(
                               _obscurePassword
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
+                                  ? context.icons.visibility
+                                  : context.icons.visibilityOff,
                               color: colors.icon,
                             ),
                           ),

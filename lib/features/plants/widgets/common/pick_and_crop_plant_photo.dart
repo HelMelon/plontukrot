@@ -23,12 +23,12 @@ Future<ImageSource?> showPlantImageSourceSheet(BuildContext context) {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.photo_library),
+              leading: Icon(context.icons.gallery),
               title: Text(l10n.plantGallery),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt),
+              leading: Icon(context.icons.camera),
               title: Text(l10n.plantCamera),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),

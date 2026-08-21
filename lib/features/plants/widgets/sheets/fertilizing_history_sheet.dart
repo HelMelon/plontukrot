@@ -150,7 +150,7 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                             ),
                           ),
                           child: Icon(
-                            Icons.add,
+                            context.icons.add,
                             size: context.dimensions.iconXl,
                           ),
                         ),
@@ -233,7 +233,7 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                                   children: [
                                     ExcludeSemantics(
                                       child: Icon(
-                                        Icons.science,
+                                        context.icons.fertilizingFilled,
                                         color: colors.icon,
                                       ),
                                     ),
@@ -265,13 +265,13 @@ class _FertilizingHistorySheetState extends State<FertilizingHistorySheet> {
                                     IconButton(
                                       tooltip: l10n.commonEdit,
                                       visualDensity: VisualDensity.compact,
-                                      icon: const Icon(Icons.edit_outlined),
+                                      icon: Icon(context.icons.editOutlined),
                                       onPressed: () => _showEditSheet(item),
                                     ),
                                     IconButton(
                                       tooltip: l10n.commonDelete,
                                       visualDensity: VisualDensity.compact,
-                                      icon: const Icon(Icons.delete_outline),
+                                      icon: Icon(context.icons.delete),
                                       onPressed: () => _confirmDelete(item),
                                     ),
                                   ],

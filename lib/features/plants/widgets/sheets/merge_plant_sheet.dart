@@ -243,7 +243,7 @@ class _MergePlantSheetState extends State<MergePlantSheet> {
                             decoration: _fieldDecoration(
                               labelText: l10n.plantGenus,
                               errorText: genusError,
-                              icon: Icons.park_outlined,
+                              icon: context.icons.genus,
                             ),
                           ),
                           spacing.vMd,
@@ -258,7 +258,7 @@ class _MergePlantSheetState extends State<MergePlantSheet> {
                             decoration: _fieldDecoration(
                               labelText: l10n.plantSpecies,
                               errorText: speciesError,
-                              icon: Icons.eco,
+                              icon: context.icons.species,
                             ),
                           ),
                           spacing.vMd,
@@ -267,7 +267,7 @@ class _MergePlantSheetState extends State<MergePlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantFamily,
-                              icon: Icons.family_restroom,
+                              icon: context.icons.family,
                             ),
                           ),
                           spacing.vMd,
@@ -289,7 +289,7 @@ class _MergePlantSheetState extends State<MergePlantSheet> {
                               style: inputs.textStyle,
                               decoration: _fieldDecoration(
                                 labelText: l10n.plantCultivar,
-                                icon: Icons.spa_outlined,
+                                icon: context.icons.cultivar,
                               ),
                             ),
                             spacing.vSm,
@@ -309,7 +309,7 @@ class _MergePlantSheetState extends State<MergePlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantTradingName,
-                              icon: Icons.storefront_outlined,
+                              icon: context.icons.tradingName,
                             ),
                           ),
                           spacing.vMd,
@@ -318,7 +318,7 @@ class _MergePlantSheetState extends State<MergePlantSheet> {
                             style: inputs.textStyle,
                             decoration: _fieldDecoration(
                               labelText: l10n.plantNickname,
-                              icon: Icons.local_florist,
+                              icon: context.icons.plantSearchIcon,
                             ),
                           ),
                           spacing.vMd,

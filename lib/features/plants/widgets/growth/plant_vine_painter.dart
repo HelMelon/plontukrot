@@ -138,6 +138,7 @@ class _VineRow extends StatelessWidget {
                 rowHeight: growth.rowHeight,
                 freshColor: colors.primary,
                 staleColor: colors.icon,
+                leafIcon: context.icons.leaf,
               ),
           ],
         );
@@ -153,6 +154,7 @@ class _VineRow extends StatelessWidget {
     required double rowHeight,
     required Color freshColor,
     required Color staleColor,
+    required List<List<dynamic>> leafIcon,
   }) {
     final column = _rtl
         ? (PlantVineStrip.maxLeavesPerRow - 1 - positionInRow)
@@ -166,7 +168,7 @@ class _VineRow extends StatelessWidget {
       child: Transform.flip(
         flipY: !above,
         child: HugeIcon(
-          icon: HugeIcons.strokeRoundedLeaf01,
+          icon: leafIcon,
           size: leafSize,
           color: isFresh ? freshColor : staleColor,
           strokeWidth: 1.8,

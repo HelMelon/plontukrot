@@ -89,8 +89,8 @@ class _ExpandableSideScrollListState extends State<ExpandableSideScrollList> {
               onPressed: () => setState(() => _expanded = !_expanded),
               icon: Icon(
                 showExpanded
-                    ? Icons.keyboard_arrow_up
-                    : Icons.keyboard_arrow_down,
+                    ? context.icons.chevronUp
+                    : context.icons.chevronDown,
                 color: context.colors.primary,
                 size: spacing.xxl,
               ),

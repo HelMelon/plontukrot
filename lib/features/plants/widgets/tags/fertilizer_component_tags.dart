@@ -249,7 +249,7 @@ class FertilizerComponentTags extends StatelessWidget {
             children: [
               ExcludeSemantics(
                 child: Icon(
-                  Icons.add,
+                  context.icons.add,
                   size: dimensions.iconSm,
                   color: colors.icon,
                 ),

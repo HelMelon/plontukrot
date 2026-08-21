@@ -144,7 +144,7 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
                 spacing.hXs,
                 FilledButton.icon(
                   onPressed: _addPurchased,
-                  icon: const Icon(Icons.add),
+                  icon: Icon(context.icons.add),
                   label: Text(l10n.fertilizerKindPurchased),
                 ),
               ],
@@ -210,13 +210,13 @@ class _ManageFertilizersSheetState extends State<ManageFertilizersSheet> {
                             IconButton(
                               tooltip: l10n.commonEdit,
                               visualDensity: VisualDensity.compact,
-                              icon: const Icon(Icons.edit_outlined),
+                              icon: Icon(context.icons.editOutlined),
                               onPressed: () => _edit(item),
                             ),
                             IconButton(
                               tooltip: l10n.commonDelete,
                               visualDensity: VisualDensity.compact,
-                              icon: const Icon(Icons.delete_outline),
+                              icon: Icon(context.icons.delete),
                               onPressed: () => _delete(item),
                             ),
                           ],

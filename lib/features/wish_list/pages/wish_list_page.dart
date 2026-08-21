@@ -143,7 +143,7 @@ class _WishListPageState extends State<WishListPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             HugeIcon(
-              icon: HugeIcons.strokeRoundedBookHeart,
+              icon: context.icons.wishlist,
               color: colors.icon,
               size: dimensions.iconXl,
             ),
@@ -224,13 +224,13 @@ class _WishListPageState extends State<WishListPage> {
           IconButton(
             tooltip: l10n.commonEdit,
             visualDensity: VisualDensity.compact,
-            icon: const Icon(Icons.edit_outlined),
+            icon: Icon(context.icons.editOutlined),
             onPressed: () => _openAddSheet(item: item),
           ),
           IconButton(
             tooltip: l10n.commonDelete,
             visualDensity: VisualDensity.compact,
-            icon: const Icon(Icons.delete_outline),
+            icon: Icon(context.icons.delete),
             onPressed: () => _confirmDelete(item),
           ),
         ],
@@ -260,7 +260,7 @@ class _WishListPageState extends State<WishListPage> {
                     height: dimensions.iconSm,
                     child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.icon),
                   )
-                : Icon(Icons.ios_share_outlined, color: colors.icon),
+                : Icon(context.icons.share, color: colors.icon),
           ),
           ...buildAppBarChromeActions(context),
         ],
@@ -268,7 +268,7 @@ class _WishListPageState extends State<WishListPage> {
       floatingActionButton: FloatingActionButton(
         tooltip: l10n.wishListAdd,
         onPressed: () => _openAddSheet(),
-        child: const Icon(Icons.add),
+        child: Icon(context.icons.add),
       ),
       body: StreamBuilder<List<WishListItem>>(
         stream: _itemsStream,

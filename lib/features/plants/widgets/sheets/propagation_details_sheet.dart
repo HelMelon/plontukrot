@@ -344,7 +344,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                                               historyLength: history.length,
                                             ),
                                             icon: Icon(
-                                              Icons.delete_outline,
+                                              context.icons.delete,
                                               color: colors.textSecondary,
                                             ),
                                           ),
@@ -417,7 +417,7 @@ class PropagationDetailsSheet extends StatelessWidget {
                                 );
                               },
                               icon: Icon(
-                                Icons.add,
+                                context.icons.add,
                                 size: dimensions.iconMd,
                               ),
                               label: Text(l10n.commonAdd),

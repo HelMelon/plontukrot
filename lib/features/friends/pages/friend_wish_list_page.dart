@@ -135,7 +135,7 @@ class _FriendWishListPageState extends State<FriendWishListPage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         HugeIcon(
-                          icon: HugeIcons.strokeRoundedBookHeart,
+                          icon: context.icons.wishlist,
                           color: colors.icon,
                           size: dimensions.iconXl,
                         ),

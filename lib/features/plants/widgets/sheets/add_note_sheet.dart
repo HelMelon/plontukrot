@@ -154,8 +154,8 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                   label: l10n.a11ySelectDate(dateLabel),
                   child: ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: const ExcludeSemantics(
-                      child: Icon(Icons.calendar_today),
+                    leading: ExcludeSemantics(
+                      child: Icon(context.icons.calendar),
                     ),
                     title: Text(dateLabel),
                     onTap: _pickDate,

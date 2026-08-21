@@ -169,7 +169,7 @@ class _AddWishListItemSheetState extends State<AddWishListItemSheet> {
                                 .decoration(
                                   labelText: l10n.wishListNameEn,
                                   prefixIcon: Icon(
-                                    Icons.language,
+                                    context.icons.link,
                                     color: colors.icon,
                                   ),
                                 )
@@ -189,7 +189,7 @@ class _AddWishListItemSheetState extends State<AddWishListItemSheet> {
                                 .decoration(
                                   labelText: l10n.wishListNameAlt,
                                   prefixIcon: Icon(
-                                    Icons.translate,
+                                    context.icons.translate,
                                     color: colors.icon,
                                   ),
                                 )

@@ -5,10 +5,19 @@ import 'components/app_component_themes.dart';
 import 'screens/app_screen_themes.dart';
 import 'tokens/app_color_tokens.dart';
 import 'tokens/app_dimension_tokens.dart';
+import 'tokens/app_icon_tokens.dart';
 import 'tokens/app_radii_tokens.dart';
 import 'tokens/app_shadow_tokens.dart';
 import 'tokens/app_spacing_tokens.dart';
 import 'tokens/app_typography_tokens.dart';
+
+export 'tokens/app_color_tokens.dart';
+export 'tokens/app_dimension_tokens.dart';
+export 'tokens/app_icon_tokens.dart';
+export 'tokens/app_radii_tokens.dart';
+export 'tokens/app_shadow_tokens.dart';
+export 'tokens/app_spacing_tokens.dart';
+export 'tokens/app_typography_tokens.dart';
 
 /// BuildContext accessors for [AppThemeTokens].
 extension AppThemeContext on BuildContext {
@@ -27,6 +36,7 @@ extension AppThemeContext on BuildContext {
   AppDimensionTokens get dimensions => appTheme.dimensions;
   AppTypographyTokens get typography => appTheme.typography;
   AppShadowTokens get shadows => appTheme.shadows;
+  AppIconTokens get icons => appTheme.icons;
   AppComponentThemes get components => appTheme.components;
   AppScreenThemes get screens => appTheme.screens;
 }

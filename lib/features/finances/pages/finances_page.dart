@@ -234,7 +234,7 @@ class _FinancesPageState extends State<FinancesPage> {
               minimumSize: Size(dimensions.buttonHeight, dimensions.buttonHeight),
               maximumSize: Size(dimensions.buttonHeight, dimensions.buttonHeight),
             ),
-            child: Icon(Icons.add, size: dimensions.iconXl),
+            child: Icon(context.icons.add, size: dimensions.iconXl),
           ),
         ),
       ],
@@ -298,7 +298,7 @@ class _FinancesPageState extends State<FinancesPage> {
             IconButton(
               tooltip: l10n.financesViewReceipts,
               visualDensity: VisualDensity.compact,
-              icon: const Icon(Icons.image_outlined),
+              icon: Icon(context.icons.image),
               onPressed: () => showFinanceReceiptsViewer(
                 context,
                 receipts: entry.receipts,
@@ -307,13 +307,13 @@ class _FinancesPageState extends State<FinancesPage> {
           IconButton(
             tooltip: l10n.commonEdit,
             visualDensity: VisualDensity.compact,
-            icon: const Icon(Icons.edit_outlined),
+            icon: Icon(context.icons.editOutlined),
             onPressed: () => _openSheet(entry: entry),
           ),
           IconButton(
             tooltip: l10n.commonDelete,
             visualDensity: VisualDensity.compact,
-            icon: const Icon(Icons.delete_outline),
+            icon: Icon(context.icons.delete),
             onPressed: () => _confirmDelete(entry),
           ),
         ],
@@ -335,7 +335,7 @@ class _FinancesPageState extends State<FinancesPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             HugeIcon(
-              icon: HugeIcons.strokeRoundedCoins01,
+              icon: context.icons.finances,
               color: colors.icon,
               size: dimensions.iconXl,
             ),
@@ -375,7 +375,7 @@ class _FinancesPageState extends State<FinancesPage> {
           floatingActionButton: FloatingActionButton(
             tooltip: l10n.financesAdd,
             onPressed: () => _openSheet(),
-            child: const Icon(Icons.add),
+            child: Icon(context.icons.add),
           ),
           body: StreamBuilder<List<FinanceEntry>>(
             stream: _entriesStream,

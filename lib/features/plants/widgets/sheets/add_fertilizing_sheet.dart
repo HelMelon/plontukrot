@@ -416,8 +416,8 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                 ),
                 child: ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: const ExcludeSemantics(
-                    child: Icon(Icons.calendar_today),
+                  leading: ExcludeSemantics(
+                    child: Icon(context.icons.calendar),
                   ),
                   title: Text(DateFormat('d MMM y').format(_selectedDate)),
                   onTap: _pickDate,
@@ -521,7 +521,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                             TextButton.icon(
                               onPressed: _openManageFertilizers,
                               icon: Icon(
-                                Icons.edit_outlined,
+                                context.icons.editOutlined,
                                 size: dimensions.iconMd,
                               ),
                               label: Text(l10n.commonManage),
@@ -598,7 +598,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                                     ? null
                                     : () =>
                                         _showSelectedComposition(fertilizers),
-                                icon: const Icon(Icons.info_outline),
+                                icon: Icon(context.icons.info),
                               ),
                             ],
                           ),
@@ -633,7 +633,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                     TextButton.icon(
                       onPressed: _openManageIngredients,
                       icon: Icon(
-                        Icons.edit_outlined,
+                        context.icons.editOutlined,
                         size: dimensions.iconMd,
                       ),
                       label: Text(l10n.commonManage),

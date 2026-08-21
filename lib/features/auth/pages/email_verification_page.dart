@@ -137,7 +137,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.mark_email_unread_outlined,
+                  context.icons.emailUnread,
                   size: dimensions.iconXl * 2,
                   color: colors.primary,
                 ),

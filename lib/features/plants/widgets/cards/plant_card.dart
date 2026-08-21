@@ -175,18 +175,18 @@ class PlantCard extends StatelessWidget {
                                               CrossAxisAlignment.start,
                                           children: [
                                             _StatChip(
-                                              icon: Icons.science_outlined,
+                                              icon: context.icons.fertilizing,
                                               label: fertilizedLabel,
                                             ),
                                             spacing.vXxs,
                                             _StatChip(
-                                              icon: Icons.water_drop_outlined,
+                                              icon: context.icons.watering,
                                               label: wateredLabel,
                                             ),
                                             spacing.vXxs,
                                             _StatChip(
-                                              hugeIcon: HugeIcons
-                                                  .strokeRoundedEcoLab01,
+                                              hugeIcon: context
+                                                  .icons.propagations,
                                               label: batchesLabel,
                                             ),
                                           ],
@@ -195,23 +195,22 @@ class PlantCard extends StatelessWidget {
                                           children: [
                                             Expanded(
                                               child: _StatChip(
-                                                icon: Icons.science_outlined,
+                                                icon: context.icons.fertilizing,
                                                 label: fertilizedLabel,
                                               ),
                                             ),
                                             spacing.hXxs,
                                             Expanded(
                                               child: _StatChip(
-                                                icon:
-                                                    Icons.water_drop_outlined,
+                                                icon: context.icons.watering,
                                                 label: wateredLabel,
                                               ),
                                             ),
                                             spacing.hXxs,
                                             Expanded(
                                               child: _StatChip(
-                                                hugeIcon: HugeIcons
-                                                    .strokeRoundedEcoLab01,
+                                                hugeIcon: context
+                                                    .icons.propagations,
                                                 label: batchesLabel,
                                               ),
                                             ),
@@ -236,7 +235,7 @@ class PlantCard extends StatelessWidget {
                       radius: 14,
                       backgroundColor: colors.primary,
                       child: Icon(
-                        Icons.check,
+                        context.icons.check,
                         color: colors.onPrimary,
                         size: dimensions.iconMd,
                       ),
@@ -316,7 +315,7 @@ class _PlantAssetPlaceholder extends StatelessWidget {
           errorBuilder: (context, error, stackTrace) {
             return Center(
               child: Icon(
-                Icons.eco_rounded,
+                context.icons.stage,
                 color: colors.icon,
                 size: dimensions.photoPlaceholder,
               ),

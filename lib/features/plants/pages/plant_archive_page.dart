@@ -150,7 +150,7 @@ class _PlantArchivePageState extends State<PlantArchivePage>
         final archiveThumbError = ColoredBox(
           color: colors.outline.withValues(alpha: 0.2),
           child: Icon(
-            Icons.local_florist_outlined,
+            context.icons.plantPlaceholder,
             color: colors.icon,
           ),
         );
@@ -208,7 +208,7 @@ class _PlantArchivePageState extends State<PlantArchivePage>
                                   color: colors.outline
                                       .withValues(alpha: 0.2),
                                   child: Icon(
-                                    Icons.local_florist_outlined,
+                                    context.icons.plantPlaceholder,
                                     color: colors.icon,
                                   ),
                                 ),
@@ -436,7 +436,7 @@ class _PlantArchivePageState extends State<PlantArchivePage>
                         ),
                         ExcludeSemantics(
                           child: Icon(
-                            Icons.chevron_right,
+                            context.icons.chevronRight,
                             color: colors.textSecondary,
                           ),
                         ),

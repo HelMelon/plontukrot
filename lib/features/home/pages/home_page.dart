@@ -7,11 +7,6 @@ import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import 'package:plontukrot/core/theme/theme_context.dart';
-import 'package:plontukrot/core/theme/tokens/app_color_tokens.dart';
-import 'package:plontukrot/core/theme/tokens/app_dimension_tokens.dart';
-import 'package:plontukrot/core/theme/tokens/app_radii_tokens.dart';
-import 'package:plontukrot/core/theme/tokens/app_spacing_tokens.dart';
-import 'package:plontukrot/core/theme/tokens/app_typography_tokens.dart';
 import 'package:plontukrot/core/theme/screens/app_screen_themes.dart';
 import '../../../core/widgets/app_bar_chrome_actions.dart';
 import '../../../core/widgets/prompt_text_dialog.dart';
@@ -91,6 +86,7 @@ class _HomePageState extends State<HomePage> {
   AppRadiiTokens get _radii => context.radii;
   AppTypographyTokens get _typography => context.typography;
   AppDimensionTokens get _dimensions => context.dimensions;
+  AppIconTokens get _icons => context.icons;
   HomeScreenTheme get _homeTheme => context.screens.home;
 
   @override
@@ -373,8 +369,8 @@ class _HomePageState extends State<HomePage> {
                         ExcludeSemantics(
                           child: Icon(
                             isCollapsed
-                                ? Icons.keyboard_arrow_down
-                                : Icons.keyboard_arrow_up,
+                                ? _icons.chevronDown
+                                : _icons.chevronUp,
                             color: colors.icon,
                           ),
                         ),
@@ -837,43 +833,43 @@ class _HomePageState extends State<HomePage> {
             allVisibleSelected ? l10n.homeClearSelection : l10n.homeSelectAll,
         onPressed: _selectAll,
         icon: Icon(
-          allVisibleSelected ? Icons.deselect : Icons.select_all,
+          allVisibleSelected ? _icons.deselectAll : _icons.selectAll,
         ),
       ),
       IconButton(
         tooltip: l10n.homeWatering,
         onPressed: _addWatering,
-        icon: const Icon(Icons.water_drop_outlined),
+        icon: Icon(_icons.watering),
       ),
       IconButton(
         tooltip: l10n.homeFertilizing,
         onPressed: _showFertilizingSheet,
-        icon: const Icon(Icons.science_outlined),
+        icon: Icon(_icons.fertilizing),
       ),
       IconButton(
         tooltip: l10n.homeRepotting,
         onPressed: _showRepottingSheet,
-        icon: const Icon(Icons.flaky),
+        icon: Icon(_icons.repottingAction),
       ),
       IconButton(
         tooltip: l10n.homeNotes,
         onPressed: _showNotesSheet,
-        icon: const Icon(Icons.sticky_note_2_outlined),
+        icon: Icon(_icons.noteAction),
       ),
       IconButton(
         tooltip: l10n.homeUpdateFamily,
         onPressed: _updateFamily,
-        icon: const Icon(Icons.park_outlined),
+        icon: Icon(_icons.genus),
       ),
       IconButton(
         tooltip: l10n.homeMerge,
         onPressed: _mergePlants,
-        icon: const Icon(Icons.merge_type),
+        icon: Icon(_icons.merge),
       ),
       IconButton(
         tooltip: l10n.commonDelete,
         onPressed: _deletePlants,
-        icon: const Icon(Icons.delete_outline),
+        icon: Icon(_icons.delete),
       ),
     ];
 
@@ -882,7 +878,7 @@ class _HomePageState extends State<HomePage> {
       leading: IconButton(
         tooltip: l10n.a11yExitSelection,
         onPressed: _exitSelectionMode,
-        icon: const Icon(Icons.close),
+        icon: Icon(_icons.close),
       ),
       title: Text(
         l10n.homeSelectedCount(_selectedPlantIds.length),
@@ -917,7 +913,7 @@ class _HomePageState extends State<HomePage> {
           );
         },
         icon: HugeIcon(
-          icon: HugeIcons.strokeRoundedEcoLab01,
+          icon: _icons.propagations,
           color: colors.icon,
         ),
       ),
@@ -930,7 +926,7 @@ class _HomePageState extends State<HomePage> {
             ),
           );
         },
-        icon: Icon(Icons.inventory_2_outlined, color: colors.icon),
+        icon: Icon(_icons.archive, color: colors.icon),
       ),
       IconButton(
         tooltip: l10n.homeWishList,
@@ -942,7 +938,7 @@ class _HomePageState extends State<HomePage> {
           );
         },
         icon: HugeIcon(
-          icon: HugeIcons.strokeRoundedBookHeart,
+          icon: _icons.wishlist,
           color: colors.icon,
         ),
       ),
@@ -956,7 +952,7 @@ class _HomePageState extends State<HomePage> {
           );
         },
         icon: HugeIcon(
-          icon: HugeIcons.strokeRoundedCoins01,
+          icon: _icons.finances,
           color: colors.icon,
         ),
       ),
@@ -1037,7 +1033,7 @@ class _HomePageState extends State<HomePage> {
                   },
                 );
               },
-              child: const Icon(Icons.add),
+              child: Icon(_icons.add),
             ),
       body: StreamBuilder<bool>(
         stream: _userDocumentExistsStream,
@@ -1096,7 +1092,7 @@ class _HomePageState extends State<HomePage> {
                         child: Column(
                           children: [
                             Icon(
-                              Icons.eco_rounded,
+                              _icons.stage,
                               size: dimensions.avatar + spacing.xs,
                               color: colors.icon,
                             ),
@@ -1177,8 +1173,7 @@ class _HomePageState extends State<HomePage> {
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                               avatar: HugeIcon(
-                                                icon: HugeIcons
-                                                    .strokeRoundedEcoLab01,
+                                                icon: _icons.propagations,
                                                 size: dimensions.iconSm,
                                                 color: _filterPropagatingOnly
                                                     ? chips.selectedForeground
@@ -1225,7 +1220,7 @@ class _HomePageState extends State<HomePage> {
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                               avatar: Icon(
-                                                Icons.hub_outlined,
+                                                _icons.familyHub,
                                                 size: dimensions.iconSm,
                                                 color: _filterGroupsOnly
                                                     ? chips.selectedForeground
@@ -1278,10 +1273,10 @@ class _HomePageState extends State<HomePage> {
                                                         if (_sortField == field)
                                                           Icon(
                                                             _sortAscending
-                                                                ? Icons
-                                                                    .arrow_upward
-                                                                : Icons
-                                                                    .arrow_downward,
+                                                                ? _icons
+                                                                    .arrowUpward
+                                                                : _icons
+                                                                    .arrowDownward,
                                                             size: dimensions
                                                                 .iconLg,
                                                           )
@@ -1306,8 +1301,8 @@ class _HomePageState extends State<HomePage> {
                                               MaterialTapTargetSize.shrinkWrap,
                                           avatar: Icon(
                                             _sortAscending
-                                                ? Icons.arrow_upward
-                                                : Icons.arrow_downward,
+                                                ? _icons.arrowUpward
+                                                : _icons.arrowDownward,
                                             size: dimensions.iconSm,
                                           ),
                                           label: Text(

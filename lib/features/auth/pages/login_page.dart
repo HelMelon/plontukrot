@@ -133,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                               color: colors.onPrimary,
                             ),
                           )
-                        : const Icon(Icons.email_outlined),
+                        : Icon(context.icons.email),
                     label: Text(
                       isLoading ? l10n.authSigningIn : l10n.authSignInEmail,
                     ),

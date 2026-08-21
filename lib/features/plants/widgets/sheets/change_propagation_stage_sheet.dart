@@ -166,8 +166,8 @@ class _ChangePropagationStageSheetState
                       contentPadding: EdgeInsets.zero,
                       leading: Icon(
                         selected
-                            ? Icons.radio_button_checked
-                            : Icons.radio_button_off,
+                            ? context.icons.radioChecked
+                            : context.icons.radioUnchecked,
                         color: selected ? colors.primary : colors.textSecondary,
                       ),
                       title: Text(
@@ -216,7 +216,7 @@ class _ChangePropagationStageSheetState
                           children: [
                             ExcludeSemantics(
                               child: Icon(
-                                Icons.calendar_today_outlined,
+                                context.icons.calendarOutlined,
                                 color: colors.icon,
                                 size: dimensions.iconLg,
                               ),

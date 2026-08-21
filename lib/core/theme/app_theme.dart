@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'app_theme_tokens.dart';
 import 'tokens/app_color_tokens.dart';
 import 'tokens/app_dimension_tokens.dart';
+import 'tokens/app_icon_tokens.dart';
 import 'tokens/app_radii_tokens.dart';
 import 'tokens/app_shadow_tokens.dart';
 import 'tokens/app_spacing_tokens.dart';
@@ -33,6 +34,7 @@ class AppTheme {
   static AppDimensionTokens get dimensions => tokens.dimensions;
   static AppTypographyTokens get typography => tokens.typography;
   static AppShadowTokens get shadows => tokens.shadows;
+  static AppIconTokens get icons => tokens.icons;
 
   /// Fixed height for primary actions (also in [dimensions.buttonHeight]).
   static double get buttonHeight => dimensions.buttonHeight;

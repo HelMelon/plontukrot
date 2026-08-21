@@ -279,7 +279,7 @@ class _PropagationsPageState extends State<PropagationsPage> {
               ),
               ExcludeSemantics(
                 child: Icon(
-                  Icons.chevron_right,
+                  context.icons.chevronRight,
                   color: colors.textSecondary,
                 ),
               ),
@@ -323,7 +323,7 @@ class _PropagationsPageState extends State<PropagationsPage> {
       final iconSize = context.dimensions.avatar + context.spacing.xs;
       return _emptyState(
         icon: HugeIcon(
-          icon: HugeIcons.strokeRoundedEcoLab01,
+          icon: context.icons.propagations,
           size: iconSize,
           color: colors.icon,
         ),

@@ -117,7 +117,7 @@ class PlantSearchDelegate extends SearchDelegate {
       if (query.isNotEmpty)
         IconButton(
           tooltip: l10n.commonClear,
-          icon: Icon(Icons.clear, color: context.colors.icon),
+          icon: Icon(context.icons.clear, color: context.colors.icon),
           onPressed: () => query = '',
         ),
     ];
@@ -128,7 +128,7 @@ class PlantSearchDelegate extends SearchDelegate {
     final l10n = AppLocalizations.of(context);
     return IconButton(
       tooltip: l10n.commonBack,
-      icon: Icon(Icons.arrow_back, color: context.colors.icon),
+      icon: Icon(context.icons.back, color: context.colors.icon),
       onPressed: () => close(context, null),
     );
   }
@@ -280,7 +280,7 @@ class PlantSearchDelegate extends SearchDelegate {
                           final String? imageUrl = plant.listImageUrl;
                           final fullUrl = plant.imageUrl?.trim();
                           final florist = Icon(
-                            Icons.local_florist,
+                            context.icons.plantSearchIcon,
                             color: colors.icon,
                             size: dimensions.iconXl,
                           );
@@ -306,7 +306,7 @@ class PlantSearchDelegate extends SearchDelegate {
                           }
 
                           return Icon(
-                            Icons.local_florist,
+                            context.icons.plantSearchIcon,
                             color: colors.primary,
                             size: dimensions.iconXl,
                           );
@@ -338,7 +338,7 @@ class PlantSearchDelegate extends SearchDelegate {
                         : null,
                     trailing: ExcludeSemantics(
                       child: Icon(
-                        Icons.chevron_right,
+                        context.icons.chevronRight,
                         color: colors.textSecondary,
                         size: dimensions.iconLg,
                       ),

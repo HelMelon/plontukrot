@@ -113,8 +113,8 @@ class _GiftPlantSheetState extends State<_GiftPlantSheet> {
                                 : () => setState(() => _selected = friend),
                             leading: Icon(
                               _selected?.friendUid == friend.friendUid
-                                  ? Icons.radio_button_checked
-                                  : Icons.radio_button_off,
+                                  ? context.icons.radioChecked
+                                  : context.icons.radioUnchecked,
                               color: colors.icon,
                             ),
                             title: Text(

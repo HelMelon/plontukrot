@@ -33,7 +33,7 @@ List<Widget> buildAppBarChromeActions(
           ),
         );
       },
-      icon: Icon(Icons.search, color: colors.icon),
+      icon: Icon(context.icons.search, color: colors.icon),
     ),
     if (showProfile)
       Padding(
@@ -64,11 +64,11 @@ List<Widget> buildAppBarChromeActions(
                               resolvedUser.photoUrl!,
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) => Icon(
-                                Icons.person,
+                                context.icons.profile,
                                 color: colors.icon,
                               ),
                             )
-                          : Icon(Icons.person, color: colors.icon),
+                          : Icon(context.icons.profile, color: colors.icon),
                     ),
                   ),
                 ),

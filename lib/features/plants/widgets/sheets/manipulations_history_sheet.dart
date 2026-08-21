@@ -110,11 +110,12 @@ class _ManipulationsHistorySheetState extends State<ManipulationsHistorySheet> {
     );
   }
 
-  IconData _iconForType(ManipulationType type) {
+  IconData _iconForType(ManipulationType type, BuildContext context) {
+    final icons = context.icons;
     return switch (type) {
-      ManipulationType.pinching => Icons.content_cut_outlined,
-      ManipulationType.rerooting => Icons.healing_outlined,
-      ManipulationType.stimulator => Icons.biotech_outlined,
+      ManipulationType.pinching => icons.pinching,
+      ManipulationType.rerooting => icons.rerooting,
+      ManipulationType.stimulator => icons.stimulator,
     };
   }
 
@@ -209,7 +210,7 @@ class _ManipulationsHistorySheetState extends State<ManipulationsHistorySheet> {
                             ),
                           ),
                           child: Icon(
-                            Icons.add,
+                            context.icons.add,
                             size: context.dimensions.iconXl,
                           ),
                         ),
@@ -276,7 +277,7 @@ class _ManipulationsHistorySheetState extends State<ManipulationsHistorySheet> {
                                 children: [
                                   ExcludeSemantics(
                                     child: Icon(
-                                      _iconForType(item.type),
+                                      _iconForType(item.type, context),
                                       color: colors.icon,
                                     ),
                                   ),
@@ -308,13 +309,13 @@ class _ManipulationsHistorySheetState extends State<ManipulationsHistorySheet> {
                                   IconButton(
                                     tooltip: l10n.commonEdit,
                                     visualDensity: VisualDensity.compact,
-                                    icon: const Icon(Icons.edit_outlined),
+                                    icon: Icon(context.icons.editOutlined),
                                     onPressed: () => _showEditSheet(item),
                                   ),
                                   IconButton(
                                     tooltip: l10n.commonDelete,
                                     visualDensity: VisualDensity.compact,
-                                    icon: const Icon(Icons.delete_outline),
+                                    icon: Icon(context.icons.delete),
                                     onPressed: () => _confirmDelete(item),
                                   ),
                                 ],

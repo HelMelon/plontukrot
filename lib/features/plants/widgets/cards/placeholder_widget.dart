@@ -22,7 +22,7 @@ class PlaceholderWithIcon extends StatelessWidget {
           ),
           Center(
             child: Icon(
-              Icons.add_a_photo,
+              context.icons.addPhotoPlaceholder,
               color: context.colors.onPrimary,
               size: context.dimensions.photoPlaceholder,
             ),

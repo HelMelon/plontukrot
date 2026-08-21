@@ -174,8 +174,8 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(
                       _divisionStage == stage
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_off,
+                          ? context.icons.radioChecked
+                          : context.icons.radioUnchecked,
                       color: _divisionStage == stage
                           ? colors.primary
                           : colors.textSecondary,
@@ -227,7 +227,7 @@ class _AddPropagationSheetState extends State<AddPropagationSheet> {
                       children: [
                         ExcludeSemantics(
                           child: Icon(
-                            Icons.calendar_today_outlined,
+                            context.icons.calendarOutlined,
                             color: colors.icon,
                             size: dimensions.iconLg,
                           ),

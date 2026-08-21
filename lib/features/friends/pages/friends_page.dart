@@ -198,7 +198,7 @@ class _FriendsPageState extends State<FriendsPage> {
               IconButton(
                 tooltip: l10n.profileCopyUid,
                 onPressed: _copyMyUid,
-                icon: Icon(Icons.copy, color: colors.heading),
+                icon: Icon(context.icons.copy, color: colors.heading),
               ),
             ],
           ),
@@ -423,7 +423,7 @@ class _FriendsPageState extends State<FriendsPage> {
                                 ? NetworkImage(friend.photoUrlSnap!)
                                 : null,
                             child: friend.photoUrlSnap == null
-                                ? Icon(Icons.person, color: colors.icon)
+                                ? Icon(context.icons.profile, color: colors.icon)
                                 : null,
                           ),
                           SizedBox(width: spacing.sm),
@@ -460,7 +460,7 @@ class _FriendsPageState extends State<FriendsPage> {
                                   );
                                 },
                                 child: HugeIcon(
-                                  icon: HugeIcons.strokeRoundedBookHeart,
+                                  icon: context.icons.wishlist,
                                   color: colors.icon,
                                   // Stroke HugeIcons read smaller than Material
                                   // icons at the same nominal size.
@@ -480,7 +480,7 @@ class _FriendsPageState extends State<FriendsPage> {
                                   );
                                 },
                                 child: Icon(
-                                  Icons.grid_view,
+                                  context.icons.collection,
                                   color: colors.icon,
                                   size: dimensions.iconLg,
                                 ),
@@ -491,7 +491,7 @@ class _FriendsPageState extends State<FriendsPage> {
                                     ? null
                                     : () => _removeFriend(friend),
                                 child: Icon(
-                                  Icons.person_remove_outlined,
+                                  context.icons.friendRemove,
                                   color: colors.icon,
                                   size: dimensions.iconLg,
                                 ),
@@ -566,7 +566,7 @@ class _FriendPlantCount extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.local_florist_outlined,
+              context.icons.plantPlaceholder,
               size: dimensions.iconSm,
               color: colors.icon,
             ),

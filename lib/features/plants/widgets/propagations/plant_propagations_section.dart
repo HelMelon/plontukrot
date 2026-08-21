@@ -120,7 +120,7 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
                 ),
                 ExcludeSemantics(
                   child: Icon(
-                    Icons.chevron_right,
+                    context.icons.chevronRight,
                     color: colors.textSecondary,
                   ),
                 ),
@@ -157,7 +157,7 @@ class _PlantPropagationsSectionState extends State<PlantPropagationsSection> {
             ),
             TextButton.icon(
               onPressed: () => _openAdd(context),
-              icon: Icon(Icons.add, size: dimensions.iconMd),
+              icon: Icon(context.icons.add, size: dimensions.iconMd),
               label: Text(l10n.commonAdd),
               style: TextButton.styleFrom(
                 foregroundColor: colors.primary,

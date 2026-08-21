@@ -147,7 +147,7 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                           labelText: l10n.authDisplayNameLabel,
                           prefixIcon: ExcludeSemantics(
                             child: Icon(
-                              Icons.person_outline,
+                              context.icons.personOutline,
                               color: colors.icon,
                               size: dimensions.iconLg,
                             ),
@@ -171,7 +171,7 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                           labelText: l10n.authEmailLabel,
                           prefixIcon: ExcludeSemantics(
                             child: Icon(
-                              Icons.email_outlined,
+                              context.icons.email,
                               color: colors.icon,
                               size: dimensions.iconLg,
                             ),
@@ -198,7 +198,7 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                           labelText: l10n.authPasswordLabel,
                           prefixIcon: ExcludeSemantics(
                             child: Icon(
-                              Icons.lock_outline,
+                              context.icons.lock,
                               color: colors.icon,
                               size: dimensions.iconLg,
                             ),
@@ -215,8 +215,8 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                                     ),
                             icon: Icon(
                               _obscurePassword
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
+                                  ? context.icons.visibility
+                                  : context.icons.visibilityOff,
                               color: colors.icon,
                             ),
                           ),

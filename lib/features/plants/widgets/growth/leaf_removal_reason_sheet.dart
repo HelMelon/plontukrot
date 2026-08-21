@@ -36,7 +36,7 @@ Future<LeafRemovalReason?> showLeafRemovalReasonSheet(BuildContext context) {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: ExcludeSemantics(
-                  child: Icon(Icons.content_cut, color: colors.icon),
+                  child: Icon(context.icons.leafCut, color: colors.icon),
                 ),
                 title: Text(l10n.plantLeafRemoveCut),
                 onTap: () =>
@@ -45,7 +45,7 @@ Future<LeafRemovalReason?> showLeafRemovalReasonSheet(BuildContext context) {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: ExcludeSemantics(
-                  child: Icon(Icons.restaurant, color: colors.icon),
+                  child: Icon(context.icons.leafEaten, color: colors.icon),
                 ),
                 title: Text(l10n.plantLeafRemoveEaten),
                 onTap: () => Navigator.pop(context, LeafRemovalReason.eaten),
@@ -53,7 +53,7 @@ Future<LeafRemovalReason?> showLeafRemovalReasonSheet(BuildContext context) {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: ExcludeSemantics(
-                  child: Icon(Icons.water_drop_outlined, color: colors.icon),
+                  child: Icon(context.icons.watering, color: colors.icon),
                 ),
                 title: Text(l10n.plantLeafRemoveDried),
                 onTap: () => Navigator.pop(context, LeafRemovalReason.dried),

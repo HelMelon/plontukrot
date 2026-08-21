@@ -153,7 +153,7 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                             ),
                           ),
                           child: Icon(
-                            Icons.add,
+                            context.icons.add,
                             size: context.dimensions.iconXl,
                           ),
                         ),
@@ -234,7 +234,7 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                                   children: [
                                     ExcludeSemantics(
                                       child: Icon(
-                                        Icons.flaky,
+                                        context.icons.repottingAction,
                                         color: colors.icon,
                                       ),
                                     ),
@@ -278,13 +278,13 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                                     IconButton(
                                       tooltip: l10n.commonEdit,
                                       visualDensity: VisualDensity.compact,
-                                      icon: const Icon(Icons.edit_outlined),
+                                      icon: Icon(context.icons.editOutlined),
                                       onPressed: () => _showEditSheet(item),
                                     ),
                                     IconButton(
                                       tooltip: l10n.commonDelete,
                                       visualDensity: VisualDensity.compact,
-                                      icon: const Icon(Icons.delete_outline),
+                                      icon: Icon(context.icons.delete),
                                       onPressed: () =>
                                           _confirmDelete(repottingId),
                                     ),

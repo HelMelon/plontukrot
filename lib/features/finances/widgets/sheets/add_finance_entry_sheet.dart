@@ -126,12 +126,12 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.photo_library_outlined),
+                leading: Icon(context.icons.galleryOutlined),
                 title: Text(l10n.plantGallery),
                 onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
               ),
               ListTile(
-                leading: const Icon(Icons.camera_alt_outlined),
+                leading: Icon(context.icons.cameraOutlined),
                 title: Text(l10n.plantCamera),
                 onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
               ),
@@ -286,7 +286,7 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
             for (final receipt in _keptReceipts)
               InputChip(
                 avatar: Icon(
-                  Icons.image_outlined,
+                  context.icons.image,
                   size: dimensions.iconMd,
                   color: colors.icon,
                 ),
@@ -298,7 +298,7 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
             for (var i = 0; i < _pendingReceiptBytes.length; i++)
               InputChip(
                 avatar: Icon(
-                  Icons.image_outlined,
+                  context.icons.image,
                   size: dimensions.iconMd,
                   color: colors.icon,
                 ),
@@ -309,7 +309,7 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
             if (_canAddReceipt)
               ActionChip(
                 avatar: Icon(
-                  Icons.add_photo_alternate_outlined,
+                  context.icons.addImage,
                   size: dimensions.iconMd,
                   color: colors.icon,
                 ),
@@ -369,12 +369,12 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
                       ButtonSegment(
                         value: FinanceEntryType.expense,
                         label: Text(l10n.financesExpense),
-                        icon: const Icon(Icons.remove_circle_outline),
+                        icon: Icon(context.icons.removeCircle),
                       ),
                       ButtonSegment(
                         value: FinanceEntryType.income,
                         label: Text(l10n.financesIncome),
-                        icon: const Icon(Icons.add_circle_outline),
+                        icon: Icon(context.icons.addCircle),
                       ),
                     ],
                     selected: {_type},
@@ -442,7 +442,7 @@ class _AddFinanceEntrySheetState extends State<AddFinanceEntrySheet> {
                           children: [
                             ExcludeSemantics(
                               child: Icon(
-                                Icons.calendar_today_outlined,
+                                context.icons.calendarOutlined,
                                 color: colors.icon,
                                 size: dimensions.iconLg,
                               ),
