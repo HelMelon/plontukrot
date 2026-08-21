@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..db import get_pool
 from ..routers.auth import get_current_user_id
-from ..schemas import PlantCreate, PlantOut, PlantPhotoOut
+from ..schemas import PlantCreate, PlantOut, PlantPhotoOut, PlantUpdate
 
 router = APIRouter(prefix="/plants", tags=["plants"])
 
@@ -92,6 +92,106 @@ def create_plant(payload: PlantCreate, user_id: str = Depends(get_current_user_i
             (plant_id,),
         ).fetchone()
     return _row_to_plant(row)
+
+
+@router.get("/{plant_id}", response_model=PlantOut)
+def get_plant(plant_id: str, user_id: str = Depends(get_current_user_id)):
+    with get_pool().connection() as conn:
+        row = conn.execute(
+            "SELECT id, genus, species, cultivar, trading_name, plant_family, "
+            "nickname, stage, variegation, watering_frequency, "
+            "fertilizing_frequency_days, initial_leaf_count, last_watered_at, "
+            "last_fertilized_at, last_repotted_at, created_at "
+            "FROM plants WHERE id = %s AND user_id = %s",
+            (plant_id, user_id),
+        ).fetchone()
+        if not row:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Plant not found",
+            )
+        photos = conn.execute(
+            "SELECT id, plant_id, image_url, image_thumb_url, added_at, "
+            "is_legacy FROM plant_photos "
+            "WHERE plant_id = %s ORDER BY added_at DESC",
+            (plant_id,),
+        ).fetchall()
+    plant = _row_to_plant(row)
+    plant.photos = [
+        PlantPhotoOut(**p) for p in photos
+    ]
+    return plant
+
+
+@router.patch("/{plant_id}", response_model=PlantOut)
+def update_plant(
+    plant_id: str,
+    payload: PlantUpdate,
+    user_id: str = Depends(get_current_user_id),
+):
+    data = payload.model_dump(exclude_unset=True)
+    fields = []
+    values = []
+    for key, val in data.items():
+        if key in _FIELDS:
+            fields.append(f"{_FIELDS[key]} = %s")
+            values.append(val)
+        elif key in ("last_watered_at", "last_fertilized_at", "last_repotted_at"):
+            fields.append(f"{key} = %s")
+            values.append(val)
+
+    with get_pool().connection() as conn:
+        existing = conn.execute(
+            "SELECT id FROM plants WHERE id = %s AND user_id = %s",
+            (plant_id, user_id),
+        ).fetchone()
+        if not existing:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Plant not found",
+            )
+
+        if fields:
+            values.extend([plant_id, user_id])
+            conn.execute(
+                f"UPDATE plants SET {', '.join(fields)} WHERE id = %s AND user_id = %s",
+                tuple(values),
+            )
+
+        row = conn.execute(
+            "SELECT id, genus, species, cultivar, trading_name, plant_family, "
+            "nickname, stage, variegation, watering_frequency, "
+            "fertilizing_frequency_days, initial_leaf_count, last_watered_at, "
+            "last_fertilized_at, last_repotted_at, created_at "
+            "FROM plants WHERE id = %s",
+            (plant_id,),
+        ).fetchone()
+        photos = conn.execute(
+            "SELECT id, plant_id, image_url, image_thumb_url, added_at, "
+            "is_legacy FROM plant_photos "
+            "WHERE plant_id = %s ORDER BY added_at DESC",
+            (plant_id,),
+        ).fetchall()
+
+    plant = _row_to_plant(row)
+    plant.photos = [
+        PlantPhotoOut(**p) for p in photos
+    ]
+    return plant
+
+
+@router.delete("/{plant_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_plant(plant_id: str, user_id: str = Depends(get_current_user_id)):
+    with get_pool().connection() as conn:
+        res = conn.execute(
+            "DELETE FROM plants WHERE id = %s AND user_id = %s",
+            (plant_id, user_id),
+        )
+        if res.rowcount == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Plant not found",
+            )
 
 
 def _row_to_plant(row) -> PlantOut:

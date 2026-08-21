@@ -49,17 +49,38 @@ class UserUpdate(BaseModel):
 
 
 class PlantCreate(BaseModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
     genus: Optional[str] = None
     species: Optional[str] = None
     cultivar: Optional[str] = None
-    trading_name: Optional[str] = None
-    plant_family: Optional[str] = None
+    trading_name: Optional[str] = Field(default=None, alias="tradingName")
+    plant_family: Optional[str] = Field(default=None, alias="plantFamily")
     nickname: Optional[str] = None
     stage: Optional[int] = None
     variegation: Optional[int] = None
-    watering_frequency: Optional[int] = None
-    fertilizing_frequency_days: Optional[int] = None
-    initial_leaf_count: Optional[int] = None
+    watering_frequency: Optional[int] = Field(default=None, alias="wateringFrequency")
+    fertilizing_frequency_days: Optional[int] = Field(default=None, alias="fertilizingFrequencyDays")
+    initial_leaf_count: Optional[int] = Field(default=None, alias="initialLeafCount")
+
+
+class PlantUpdate(BaseModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    genus: Optional[str] = None
+    species: Optional[str] = None
+    cultivar: Optional[str] = None
+    trading_name: Optional[str] = Field(default=None, alias="tradingName")
+    plant_family: Optional[str] = Field(default=None, alias="plantFamily")
+    nickname: Optional[str] = None
+    stage: Optional[int] = None
+    variegation: Optional[int] = None
+    watering_frequency: Optional[int] = Field(default=None, alias="wateringFrequency")
+    fertilizing_frequency_days: Optional[int] = Field(default=None, alias="fertilizingFrequencyDays")
+    initial_leaf_count: Optional[int] = Field(default=None, alias="initialLeafCount")
+    last_watered_at: Optional[datetime] = Field(default=None, alias="lastWateredAt")
+    last_fertilized_at: Optional[datetime] = Field(default=None, alias="lastFertilizedAt")
+    last_repotted_at: Optional[datetime] = Field(default=None, alias="lastRepottedAt")
 
 
 class PlantOut(BaseModel):

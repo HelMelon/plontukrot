@@ -15,7 +15,7 @@ Widget _wrap(Widget child) {
     home: Scaffold(
       body: SizedBox(
         width: 200,
-        height: 280,
+        height: 350,
         child: child,
       ),
     ),
