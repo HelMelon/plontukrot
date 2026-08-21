@@ -203,13 +203,30 @@ class RepottingOut(BaseModel):
 
 
 class ManipulationCreate(BaseModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
     type: int
-    applied_at: datetime
+    applied_at: datetime = Field(alias="appliedAt")
+    ended_at: Optional[datetime] = Field(default=None, alias="endedAt")
     note: Optional[str] = None
-    stage_before: Optional[int] = None
-    stage_after: Optional[int] = None
-    stimulator_id: Optional[str] = None
-    stimulator_name: Optional[str] = None
+    stage_before: Optional[int] = Field(default=None, alias="stageBefore")
+    stage_after: Optional[int] = Field(default=None, alias="stageAfter")
+    stimulator_id: Optional[str] = Field(default=None, alias="stimulatorId")
+    stimulator_name: Optional[str] = Field(default=None, alias="stimulatorName")
+    dosage: Optional[str] = None
+
+
+class ManipulationUpdate(BaseModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    type: Optional[int] = None
+    applied_at: Optional[datetime] = Field(default=None, alias="appliedAt")
+    ended_at: Optional[datetime] = Field(default=None, alias="endedAt")
+    note: Optional[str] = None
+    stage_before: Optional[int] = Field(default=None, alias="stageBefore")
+    stage_after: Optional[int] = Field(default=None, alias="stageAfter")
+    stimulator_id: Optional[str] = Field(default=None, alias="stimulatorId")
+    stimulator_name: Optional[str] = Field(default=None, alias="stimulatorName")
     dosage: Optional[str] = None
 
 
@@ -218,6 +235,7 @@ class ManipulationOut(BaseModel):
     plant_id: str
     type: int
     applied_at: datetime
+    ended_at: Optional[datetime] = None
     note: Optional[str] = None
     stage_before: Optional[int] = None
     stage_after: Optional[int] = None

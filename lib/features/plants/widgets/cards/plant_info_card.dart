@@ -204,13 +204,17 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
         }
         return l10n.commonNoData;
       }
+      final latestDate = entry.endedAt ?? entry.appliedAt;
       final dateStr =
-          DateFormat('d MMM y', dateLocale).format(entry.appliedAt);
+          DateFormat('d MMM y', dateLocale).format(latestDate);
       final name = switch (entry.type) {
         ManipulationType.stimulator =>
           entry.stimulatorName?.trim().isNotEmpty == true
               ? entry.stimulatorName!.trim()
               : l10n.manipulationTypeStimulator,
+        ManipulationType.rerooting => entry.endedAt == null
+            ? '${l10n.manipulationTypeRerooting} (${l10n.manipulationRerootingInProgress.toLowerCase()})'
+            : l10n.manipulationTypeRerooting,
         _ => l10n.manipulationTypeLabel(entry.type),
       };
       return '$dateStr · $name';

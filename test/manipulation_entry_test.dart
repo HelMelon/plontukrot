@@ -38,19 +38,56 @@ void main() {
       expect(entry.note, 'верхушку');
     });
 
-    test('fromMap parses rerooting with stages', () {
+    test('fromMap parses rerooting with stages and endedAt', () {
       final entry = ManipulationEntry.fromMap('id2', {
         'type': 'rerooting',
         'appliedAt': DateTime(2026, 3, 11),
+        'endedAt': DateTime(2026, 3, 20),
         'stageBefore': 3,
         'stageAfter': 1,
         'note': 'гнилые корни',
       });
 
       expect(entry.type, ManipulationType.rerooting);
+      expect(entry.appliedAt, DateTime(2026, 3, 11));
+      expect(entry.endedAt, DateTime(2026, 3, 20));
       expect(entry.stageBefore, 3);
       expect(entry.stageAfter, 1);
       expect(entry.note, 'гнилые корни');
+    });
+
+    test('fromMap parses snake_case ended_at', () {
+      final entry = ManipulationEntry.fromMap('id2_snake', {
+        'type': 1,
+        'applied_at': '2026-03-11T00:00:00.000Z',
+        'ended_at': '2026-03-20T00:00:00.000Z',
+        'stage_before': 3,
+        'stage_after': 1,
+      });
+
+      expect(entry.type, ManipulationType.rerooting);
+      expect(entry.endedAt, isNotNull);
+      expect(entry.stageBefore, 3);
+      expect(entry.stageAfter, 1);
+    });
+
+    test('toMap round-trips rerooting endedAt', () {
+      final appliedAt = DateTime(2026, 3, 11);
+      final endedAt = DateTime(2026, 3, 20);
+      final entry = ManipulationEntry(
+        id: 'id2',
+        type: ManipulationType.rerooting,
+        appliedAt: appliedAt,
+        endedAt: endedAt,
+        stageBefore: 3,
+        stageAfter: 1,
+      );
+
+      final map = entry.toMap();
+      expect(map['type'], ManipulationType.rerooting.index);
+      expect(map['endedAt'], isNotNull);
+      expect(map['ended_at'], isNotNull);
+      expect(DateTime.parse(map['endedAt'] as String).toUtc(), endedAt.toUtc());
     });
 
     test('fromMap parses stimulator entry', () {

@@ -120,6 +120,7 @@ CREATE TABLE IF NOT EXISTS plant_manipulations (
     plant_id      TEXT NOT NULL REFERENCES plants(id) ON DELETE CASCADE,
     type          INT NOT NULL,
     applied_at    TIMESTAMPTZ NOT NULL,
+    ended_at      TIMESTAMPTZ,
     note          TEXT,
     stage_before  INT,
     stage_after   INT,

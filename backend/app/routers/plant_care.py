@@ -15,6 +15,7 @@ from ..schemas import (
     GrowthEventOut,
     ManipulationCreate,
     ManipulationOut,
+    ManipulationUpdate,
     PlantNoteCreate,
     PlantNoteOut,
     PlantPhotoCreate,
@@ -305,9 +306,9 @@ def list_manipulations(plant_id: str,
     _ensure_owned(plant_id, user_id)
     with get_pool().connection() as conn:
         rows = conn.execute(
-            "SELECT id, plant_id, type, applied_at, note, stage_before, "
+            "SELECT id, plant_id, type, applied_at, ended_at, note, stage_before, "
             "stage_after, stimulator_id, stimulator_name, dosage, created_at "
-            "FROM plant_manipulations WHERE plant_id = %s ORDER BY applied_at",
+            "FROM plant_manipulations WHERE plant_id = %s ORDER BY applied_at DESC",
             (plant_id,),
         ).fetchall()
     return [ManipulationOut(**r) for r in rows]
@@ -321,17 +322,76 @@ def add_manipulation(plant_id: str, payload: ManipulationCreate,
     with get_pool().connection() as conn:
         conn.execute(
             "INSERT INTO plant_manipulations (id, plant_id, type, applied_at, "
-            "note, stage_before, stage_after, stimulator_id, "
-            "stimulator_name, dosage) VALUES (%s, %s, %s, %s, %s, %s, %s, "
+            "ended_at, note, stage_before, stage_after, stimulator_id, "
+            "stimulator_name, dosage) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, "
             "%s, %s, %s)",
-            (m_id, plant_id, payload.type, payload.applied_at, payload.note,
+            (m_id, plant_id, payload.type, payload.applied_at, payload.ended_at, payload.note,
              payload.stage_before, payload.stage_after, payload.stimulator_id,
              payload.stimulator_name, payload.dosage),
         )
         row = conn.execute(
-            "SELECT id, plant_id, type, applied_at, note, stage_before, "
+            "SELECT id, plant_id, type, applied_at, ended_at, note, stage_before, "
             "stage_after, stimulator_id, stimulator_name, dosage, created_at "
             "FROM plant_manipulations WHERE id = %s",
             (m_id,),
         ).fetchone()
     return ManipulationOut(**row)
+
+
+@router.patch("/manipulations/{manipulation_id}", response_model=ManipulationOut)
+def update_manipulation(
+    plant_id: str,
+    manipulation_id: str,
+    payload: ManipulationUpdate,
+    user_id: str = Depends(get_current_user_id),
+):
+    _ensure_owned(plant_id, user_id)
+    data = payload.model_dump(exclude_unset=True)
+    fields = []
+    values = []
+    for key, val in data.items():
+        fields.append(f"{key} = %s")
+        values.append(val)
+
+    with get_pool().connection() as conn:
+        existing = conn.execute(
+            "SELECT id FROM plant_manipulations WHERE id = %s AND plant_id = %s",
+            (manipulation_id, plant_id),
+        ).fetchone()
+        if not existing:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Manipulation not found",
+            )
+        if fields:
+            values.extend([manipulation_id, plant_id])
+            conn.execute(
+                f"UPDATE plant_manipulations SET {', '.join(fields)} WHERE id = %s AND plant_id = %s",
+                tuple(values),
+            )
+        row = conn.execute(
+            "SELECT id, plant_id, type, applied_at, ended_at, note, stage_before, "
+            "stage_after, stimulator_id, stimulator_name, dosage, created_at "
+            "FROM plant_manipulations WHERE id = %s",
+            (manipulation_id,),
+        ).fetchone()
+    return ManipulationOut(**row)
+
+
+@router.delete("/manipulations/{manipulation_id}", status_code=204)
+def delete_manipulation(
+    plant_id: str,
+    manipulation_id: str,
+    user_id: str = Depends(get_current_user_id),
+):
+    _ensure_owned(plant_id, user_id)
+    with get_pool().connection() as conn:
+        res = conn.execute(
+            "DELETE FROM plant_manipulations WHERE id = %s AND plant_id = %s",
+            (manipulation_id, plant_id),
+        )
+        if res.rowcount == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Manipulation not found",
+            )
