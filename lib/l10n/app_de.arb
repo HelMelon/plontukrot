@@ -242,6 +242,8 @@
   "homeFertilizeSelectedTitle": "Ausgewählte Pflanzen düngen",
   "homeRepotSelectedTitle": "Ausgewählte Pflanzen umtopfen",
   "homeNotesSelectedTitle": "Notiz zu ausgewählten Pflanzen hinzufügen",
+  "homeManipulations": "Manipulationen",
+  "homeManipulateSelectedTitle": "Manipulation zu ausgewählten Pflanzen hinzufügen",
   "homeDeleteSelectedTitle": "Ausgewählte Pflanzen löschen?",
   "homeDeleteSelectedBody": "Dadurch werden {count} Pflanze(n) dauerhaft gelöscht.",
   "homeDeleteSelectedBodyPlural": "{count, plural, =1{Dadurch wird 1 Pflanze dauerhaft gelöscht.} other{Dadurch werden {count} Pflanzen dauerhaft gelöscht.}}",
@@ -470,6 +472,20 @@
   "manipulationNote": "Notiz",
   "manipulationNoteHint": "Was gemacht wurde und warum",
   "manipulationRerootingStageOptional": "Neue Stufe (optional)",
+  "manipulationRerootingStartDate": "Startdatum: {date}",
+  "@manipulationRerootingStartDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "manipulationRerootingEndDate": "Enddatum: {date}",
+  "@manipulationRerootingEndDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "manipulationRerootingEndedCheckbox": "Reanimation abgeschlossen",
+  "manipulationRerootingInProgress": "In Bearbeitung",
   "manipulationRerootingStageBefore": "War: {stage}",
   "manipulationRerootingStageChange": "{before} → {after}",
   "manipulationStimulatorModeSaved": "Aus Katalog",

@@ -6,6 +6,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/manipulation_entry.dart';
 import '../../../../models/manipulation_type.dart';
+import '../../../../models/plant.dart';
 import '../../../../models/stimulator.dart';
 import '../../../../services/manipulation_service.dart';
 import '../../../../services/stimulator_service.dart';
@@ -18,13 +19,17 @@ import 'package:plontukrot/core/widgets/app_modal.dart';
 enum _StimulatorMode { saved, custom }
 
 class AddManipulationSheet extends StatefulWidget {
-  final String plantId;
+  final List<String> plantIds;
+  final List<Plant> plants;
+  final String? title;
   final int plantStage;
   final ManipulationEntry? entry;
 
   const AddManipulationSheet({
     super.key,
-    required this.plantId,
+    required this.plantIds,
+    this.plants = const [],
+    this.title,
     this.plantStage = 0,
     this.entry,
   });
@@ -32,11 +37,13 @@ class AddManipulationSheet extends StatefulWidget {
   factory AddManipulationSheet.forPlant({
     Key? key,
     required String plantId,
+    Plant? plant,
     int plantStage = 0,
   }) {
     return AddManipulationSheet(
       key: key,
-      plantId: plantId,
+      plantIds: [plantId],
+      plants: plant == null ? const [] : [plant],
       plantStage: plantStage,
     );
   }
@@ -45,17 +52,20 @@ class AddManipulationSheet extends StatefulWidget {
     Key? key,
     required String plantId,
     required ManipulationEntry entry,
+    Plant? plant,
     int plantStage = 0,
   }) {
     return AddManipulationSheet(
       key: key,
-      plantId: plantId,
+      plantIds: [plantId],
+      plants: plant == null ? const [] : [plant],
       plantStage: plantStage,
       entry: entry,
     );
   }
 
   bool get isEditing => entry != null;
+  bool get isBulk => plantIds.length > 1;
 
   @override
   State<AddManipulationSheet> createState() => _AddManipulationSheetState();
@@ -70,6 +80,8 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
 
   late ManipulationType _type;
   late DateTime _selectedDate;
+  DateTime? _endedDate;
+  bool _hasEnded = false;
   late _StimulatorMode _stimulatorMode;
   String? _selectedStimulatorId;
   bool _setStageAfter = false;
@@ -84,6 +96,8 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
     if (entry != null) {
       _type = entry.type;
       _selectedDate = entry.appliedAt;
+      _endedDate = entry.endedAt;
+      _hasEnded = entry.endedAt != null;
       _noteController.text = entry.note ?? '';
       _stageAfter = entry.stageAfter;
       _setStageAfter = entry.stageAfter != null;
@@ -102,6 +116,8 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
     } else {
       _type = ManipulationType.pinching;
       _selectedDate = DateTime.now();
+      _endedDate = null;
+      _hasEnded = false;
       _stimulatorMode = _StimulatorMode.saved;
     }
   }
@@ -122,7 +138,25 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
       lastDate: DateTime.now(),
     );
     if (picked != null) {
-      setState(() => _selectedDate = picked);
+      setState(() {
+        _selectedDate = picked;
+        if (_endedDate != null && _endedDate!.isBefore(_selectedDate)) {
+          _endedDate = _selectedDate;
+        }
+      });
+    }
+  }
+
+  Future<void> _pickEndDate() async {
+    final initial = _endedDate ?? _selectedDate;
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial.isBefore(_selectedDate) ? _selectedDate : initial,
+      firstDate: _selectedDate,
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() => _endedDate = picked);
     }
   }
 
@@ -201,13 +235,17 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
           _type == ManipulationType.rerooting && _setStageAfter
               ? _stageAfter
               : null;
+      final endedAt = _type == ManipulationType.rerooting && _hasEnded
+          ? (_endedDate ?? _selectedDate)
+          : null;
 
       if (widget.isEditing) {
         await _manipulationService.updateManipulation(
-          plantId: widget.plantId,
+          plantId: widget.plantIds.first,
           manipulationId: widget.entry!.id,
           type: _type,
           appliedAt: _selectedDate,
+          endedAt: endedAt,
           note: note.isEmpty ? null : note,
           stageBefore: widget.entry!.stageBefore,
           stageAfter: stageAfter,
@@ -215,11 +253,24 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
           stimulatorName: stimulatorName,
           dosage: dosage.isEmpty ? null : dosage,
         );
-      } else {
-        await _manipulationService.addManipulation(
-          plantId: widget.plantId,
+      } else if (widget.isBulk) {
+        await _manipulationService.addManipulations(
+          plantIds: widget.plantIds,
           type: _type,
           appliedAt: _selectedDate,
+          endedAt: endedAt,
+          note: note.isEmpty ? null : note,
+          stageAfter: stageAfter,
+          stimulatorId: stimulatorId,
+          stimulatorName: stimulatorName,
+          dosage: dosage.isEmpty ? null : dosage,
+        );
+      } else {
+        await _manipulationService.addManipulation(
+          plantId: widget.plantIds.first,
+          type: _type,
+          appliedAt: _selectedDate,
+          endedAt: endedAt,
           note: note.isEmpty ? null : note,
           stageAfter: stageAfter,
           stimulatorId: stimulatorId,
@@ -228,7 +279,7 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
         );
       }
 
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
       setState(() => _saving = false);
@@ -296,6 +347,7 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
   Widget _buildRerootingFields(AppLocalizations l10n) {
     final spacing = context.spacing;
     final typography = context.typography;
+    final isBulk = widget.isBulk;
     final stageBefore = widget.isEditing
         ? widget.entry!.stageBefore ?? widget.plantStage
         : widget.plantStage;
@@ -303,10 +355,56 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.manipulationRerootingStageBefore(l10n.stageTitle(stageBefore)),
-          style: typography.bodySmall,
+        if (!isBulk) ...[
+          Text(
+            l10n.manipulationRerootingStageBefore(l10n.stageTitle(stageBefore)),
+            style: typography.bodySmall,
+          ),
+          spacing.vSm,
+        ],
+        CheckboxListTile(
+          contentPadding: EdgeInsets.zero,
+          value: _hasEnded,
+          onChanged: (value) {
+            setState(() {
+              _hasEnded = value ?? false;
+              if (_hasEnded && _endedDate == null) {
+                _endedDate = DateTime.now().isBefore(_selectedDate)
+                    ? _selectedDate
+                    : DateTime.now();
+              }
+            });
+          },
+          title: Text(l10n.manipulationRerootingEndedCheckbox),
+          controlAffinity: ListTileControlAffinity.leading,
         ),
+        if (_hasEnded) ...[
+          spacing.vXs,
+          Semantics(
+            button: true,
+            label: l10n.a11ySelectDate(
+              DateFormat.yMMMMd().format(_endedDate ?? _selectedDate),
+            ),
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: ExcludeSemantics(
+                child: Icon(context.icons.calendar),
+              ),
+              title: Text(l10n.manipulationRerootingEndDate(
+                DateFormat.yMMMMd().format(_endedDate ?? _selectedDate),
+              )),
+              trailing: IconButton(
+                tooltip: l10n.commonClear,
+                icon: Icon(context.icons.clear),
+                onPressed: () => setState(() {
+                  _hasEnded = false;
+                  _endedDate = null;
+                }),
+              ),
+              onTap: _pickEndDate,
+            ),
+          ),
+        ],
         spacing.vSm,
         CheckboxListTile(
           contentPadding: EdgeInsets.zero,
@@ -492,9 +590,10 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
                 const SheetDragHandle(),
                 spacing.vMd,
                 Text(
-                  widget.isEditing
-                      ? l10n.manipulationEdit
-                      : l10n.manipulationAdd,
+                  widget.title ??
+                      (widget.isEditing
+                          ? l10n.manipulationEdit
+                          : l10n.manipulationAdd),
                   style: typography.titleMedium,
                 ),
                 spacing.vLg,
@@ -517,7 +616,13 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
                     leading: ExcludeSemantics(
                       child: Icon(context.icons.calendar),
                     ),
-                    title: Text(DateFormat.yMMMMd().format(_selectedDate)),
+                    title: Text(
+                      _type == ManipulationType.rerooting
+                          ? l10n.manipulationRerootingStartDate(
+                              DateFormat.yMMMMd().format(_selectedDate),
+                            )
+                          : DateFormat.yMMMMd().format(_selectedDate),
+                    ),
                     onTap: _pickDate,
                   ),
                 ),

@@ -242,6 +242,8 @@
   "homeFertilizeSelectedTitle": "Подкормить выбранные растения",
   "homeRepotSelectedTitle": "Пересадить выбранные растения",
   "homeNotesSelectedTitle": "Заметка для выбранных растений",
+  "homeManipulations": "Манипуляции",
+  "homeManipulateSelectedTitle": "Манипуляции для выбранных растений",
   "homeDeleteSelectedTitle": "Удалить выбранные растения?",
   "homeDeleteSelectedBody": "Это навсегда удалит {count} растение(й).",
   "homeDeleteSelectedBodyPlural": "{count, plural, =1{Это навсегда удалит 1 растение.} few{Это навсегда удалит {count} растения.} many{Это навсегда удалит {count} растений.} other{Это навсегда удалит {count} растений.}}",
@@ -470,6 +472,20 @@
   "manipulationNote": "Заметка",
   "manipulationNoteHint": "Что сделали и зачем",
   "manipulationRerootingStageOptional": "Новая стадия (необязательно)",
+  "manipulationRerootingStartDate": "Дата начала: {date}",
+  "@manipulationRerootingStartDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "manipulationRerootingEndDate": "Дата окончания: {date}",
+  "@manipulationRerootingEndDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "manipulationRerootingEndedCheckbox": "Реанимация завершена",
+  "manipulationRerootingInProgress": "В процессе",
   "manipulationRerootingStageBefore": "Было: {stage}",
   "@manipulationRerootingStageBefore": {
     "placeholders": {

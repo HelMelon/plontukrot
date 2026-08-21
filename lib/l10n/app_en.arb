@@ -292,6 +292,8 @@
   "homeFertilizeSelectedTitle": "Fertilize selected plants",
   "homeRepotSelectedTitle": "Repot selected plants",
   "homeNotesSelectedTitle": "Add a note to selected plants",
+  "homeManipulations": "Manipulations",
+  "homeManipulateSelectedTitle": "Add manipulation to selected plants",
   "homeDeleteSelectedTitle": "Delete selected plants?",
   "homeDeleteSelectedBody": "This will permanently delete {count} plant(s).",
   "@homeDeleteSelectedBody": {
@@ -582,6 +584,20 @@
   "manipulationNote": "Note",
   "manipulationNoteHint": "What you did and why",
   "manipulationRerootingStageOptional": "New stage (optional)",
+  "manipulationRerootingStartDate": "Start date: {date}",
+  "@manipulationRerootingStartDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "manipulationRerootingEndDate": "End date: {date}",
+  "@manipulationRerootingEndDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "manipulationRerootingEndedCheckbox": "Reanimation completed",
+  "manipulationRerootingInProgress": "In progress",
   "manipulationRerootingStageBefore": "Was: {stage}",
   "@manipulationRerootingStageBefore": {
     "placeholders": {

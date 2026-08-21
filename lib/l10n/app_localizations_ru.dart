@@ -653,6 +653,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeNotesSelectedTitle => 'Заметка для выбранных растений';
 
   @override
+  String get homeManipulations => 'Манипуляции';
+
+  @override
+  String get homeManipulateSelectedTitle =>
+      'Манипуляции для выбранных растений';
+
+  @override
   String get homeDeleteSelectedTitle => 'Удалить выбранные растения?';
 
   @override
@@ -1279,6 +1286,22 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get manipulationRerootingStageOptional =>
       'Новая стадия (необязательно)';
+
+  @override
+  String manipulationRerootingStartDate(String date) {
+    return 'Дата начала: $date';
+  }
+
+  @override
+  String manipulationRerootingEndDate(String date) {
+    return 'Дата окончания: $date';
+  }
+
+  @override
+  String get manipulationRerootingEndedCheckbox => 'Реанимация завершена';
+
+  @override
+  String get manipulationRerootingInProgress => 'В процессе';
 
   @override
   String manipulationRerootingStageBefore(String stage) {

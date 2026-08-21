@@ -242,6 +242,8 @@
   "homeFertilizeSelectedTitle": "Fertiliser les plantes sélectionnées",
   "homeRepotSelectedTitle": "Rempoter les plantes sélectionnées",
   "homeNotesSelectedTitle": "Ajouter une note aux plantes sélectionnées",
+  "homeManipulations": "Manipulations",
+  "homeManipulateSelectedTitle": "Ajouter une manipulation aux plantes sélectionnées",
   "homeDeleteSelectedTitle": "Supprimer les plantes sélectionnées ?",
   "homeDeleteSelectedBody": "Cela supprimera définitivement {count} plante(s).",
   "homeDeleteSelectedBodyPlural": "{count, plural, =1{Cela supprimera définitivement 1 plante.} other{Cela supprimera définitivement {count} plantes.}}",
@@ -470,6 +472,20 @@
   "manipulationNote": "Note",
   "manipulationNoteHint": "Ce qui a été fait et pourquoi",
   "manipulationRerootingStageOptional": "Nouvelle étape (facultatif)",
+  "manipulationRerootingStartDate": "Date de début : {date}",
+  "@manipulationRerootingStartDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "manipulationRerootingEndDate": "Date de fin : {date}",
+  "@manipulationRerootingEndDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "manipulationRerootingEndedCheckbox": "Réanimation terminée",
+  "manipulationRerootingInProgress": "En cours",
   "manipulationRerootingStageBefore": "Était : {stage}",
   "manipulationRerootingStageChange": "{before} → {after}",
   "manipulationStimulatorModeSaved": "Du catalogue",

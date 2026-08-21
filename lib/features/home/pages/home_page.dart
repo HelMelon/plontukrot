@@ -15,6 +15,7 @@ import '../../../models/plant.dart';
 import '../../../models/stage_info.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
 import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
+import '../../plants/widgets/sheets/add_manipulation_sheet.dart';
 import '../../plants/widgets/sheets/add_note_sheet.dart';
 import '../../plants/widgets/sheets/add_repotting_sheet.dart';
 import '../../plants/widgets/sheets/merge_plant_sheet.dart';
@@ -368,9 +369,7 @@ class _HomePageState extends State<HomePage> {
                         spacing.hXs,
                         ExcludeSemantics(
                           child: Icon(
-                            isCollapsed
-                                ? _icons.chevronDown
-                                : _icons.chevronUp,
+                            isCollapsed ? _icons.chevronDown : _icons.chevronUp,
                             color: colors.icon,
                           ),
                         ),
@@ -751,6 +750,25 @@ class _HomePageState extends State<HomePage> {
     if (applied == true && mounted) _exitSelectionMode();
   }
 
+  Future<void> _showManipulationsSheet() async {
+    final l10n = AppLocalizations.of(context);
+    final selectedPlants = _latestPlants
+        .where((plant) => _selectedPlantIds.contains(plant.id))
+        .toList();
+    final applied = await showAppModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      enableDrag: true,
+      builder: (_) => AddManipulationSheet(
+        plantIds: _selectedPlantIds.toList(),
+        plants: selectedPlants,
+        title: l10n.homeManipulateSelectedTitle,
+      ),
+    );
+    if (applied == true && mounted) _exitSelectionMode();
+  }
+
   Future<void> _showNotesSheet() async {
     final l10n = AppLocalizations.of(context);
     final added = await showAppModalBottomSheet<bool>(
@@ -849,7 +867,12 @@ class _HomePageState extends State<HomePage> {
       IconButton(
         tooltip: l10n.homeRepotting,
         onPressed: _showRepottingSheet,
-        icon: Icon(_icons.repottingAction),
+        icon: HugeIcon(icon: _icons.repottingAction),
+      ),
+      IconButton(
+        tooltip: l10n.homeManipulations,
+        onPressed: _showManipulationsSheet,
+        icon: HugeIcon(icon: _icons.rerooting),
       ),
       IconButton(
         tooltip: l10n.homeNotes,

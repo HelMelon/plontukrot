@@ -659,6 +659,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Notiz zu ausgewählten Pflanzen hinzufügen';
 
   @override
+  String get homeManipulations => 'Manipulationen';
+
+  @override
+  String get homeManipulateSelectedTitle =>
+      'Manipulation zu ausgewählten Pflanzen hinzufügen';
+
+  @override
   String get homeDeleteSelectedTitle => 'Ausgewählte Pflanzen löschen?';
 
   @override
@@ -1283,6 +1290,22 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get manipulationRerootingStageOptional => 'Neue Stufe (optional)';
+
+  @override
+  String manipulationRerootingStartDate(String date) {
+    return 'Startdatum: $date';
+  }
+
+  @override
+  String manipulationRerootingEndDate(String date) {
+    return 'Enddatum: $date';
+  }
+
+  @override
+  String get manipulationRerootingEndedCheckbox => 'Reanimation abgeschlossen';
+
+  @override
+  String get manipulationRerootingInProgress => 'In Bearbeitung';
 
   @override
   String manipulationRerootingStageBefore(String stage) {

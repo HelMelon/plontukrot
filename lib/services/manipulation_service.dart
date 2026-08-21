@@ -28,13 +28,18 @@ class ManipulationService {
     return list
         .map((m) => ManipulationEntry.fromMap(readString(m, 'id') ?? '', m))
         .toList()
-      ..sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
+      ..sort((a, b) {
+        final aDate = a.endedAt ?? a.appliedAt;
+        final bDate = b.endedAt ?? b.appliedAt;
+        return bDate.compareTo(aDate);
+      });
   }
 
   Future<void> addManipulation({
     required String plantId,
     required ManipulationType type,
     required DateTime appliedAt,
+    DateTime? endedAt,
     String? note,
     int? stageAfter,
     String? stimulatorId,
@@ -54,6 +59,7 @@ class ManipulationService {
     await _api.post('/plants/$plantId/manipulations', body: {
       'type': type.index,
       'applied_at': isoDate(appliedAt),
+      if (endedAt != null) 'ended_at': isoDate(endedAt),
       'note': _trimOrNull(note),
       'stage_before': stageBefore,
       'stage_after': stageAfter,
@@ -71,11 +77,38 @@ class ManipulationService {
     }
   }
 
+  Future<void> addManipulations({
+    required Iterable<String> plantIds,
+    required ManipulationType type,
+    required DateTime appliedAt,
+    DateTime? endedAt,
+    String? note,
+    int? stageAfter,
+    String? stimulatorId,
+    String? stimulatorName,
+    String? dosage,
+  }) async {
+    for (final plantId in plantIds) {
+      await addManipulation(
+        plantId: plantId,
+        type: type,
+        appliedAt: appliedAt,
+        endedAt: endedAt,
+        note: note,
+        stageAfter: stageAfter,
+        stimulatorId: stimulatorId,
+        stimulatorName: stimulatorName,
+        dosage: dosage,
+      );
+    }
+  }
+
   Future<void> updateManipulation({
     required String plantId,
     required String manipulationId,
     required ManipulationType type,
     required DateTime appliedAt,
+    DateTime? endedAt,
     String? note,
     int? stageBefore,
     int? stageAfter,
@@ -90,6 +123,7 @@ class ManipulationService {
       await _api.patch('/plants/$plantId/manipulations/$manipulationId', body: {
         'type': type.index,
         'applied_at': isoDate(appliedAt),
+        'ended_at': isoOrNull(endedAt),
         'note': _trimOrNull(note),
         'stage_before': stageBefore,
         'stage_after': stageAfter,

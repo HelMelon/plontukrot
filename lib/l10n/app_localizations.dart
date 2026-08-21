@@ -1302,6 +1302,18 @@ abstract class AppLocalizations {
   /// **'Add a note to selected plants'**
   String get homeNotesSelectedTitle;
 
+  /// No description provided for @homeManipulations.
+  ///
+  /// In en, this message translates to:
+  /// **'Manipulations'**
+  String get homeManipulations;
+
+  /// No description provided for @homeManipulateSelectedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add manipulation to selected plants'**
+  String get homeManipulateSelectedTitle;
+
   /// No description provided for @homeDeleteSelectedTitle.
   ///
   /// In en, this message translates to:
@@ -2459,6 +2471,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New stage (optional)'**
   String get manipulationRerootingStageOptional;
+
+  /// No description provided for @manipulationRerootingStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date: {date}'**
+  String manipulationRerootingStartDate(String date);
+
+  /// No description provided for @manipulationRerootingEndDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End date: {date}'**
+  String manipulationRerootingEndDate(String date);
+
+  /// No description provided for @manipulationRerootingEndedCheckbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Reanimation completed'**
+  String get manipulationRerootingEndedCheckbox;
+
+  /// No description provided for @manipulationRerootingInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get manipulationRerootingInProgress;
 
   /// No description provided for @manipulationRerootingStageBefore.
   ///
