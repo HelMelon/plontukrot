@@ -35,6 +35,16 @@ class UserOut(BaseModel):
     created_at: datetime
 
 
+class UserUpdate(BaseModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    name: Optional[str] = None
+    locale_code: Optional[str] = Field(default=None, alias="localeCode")
+    currency_code: Optional[str] = Field(default=None, alias="currencyCode")
+    collection_visibility: Optional[str] = Field(default=None, alias="collectionVisibility")
+    personal_data_consent_at: Optional[datetime] = Field(default=None, alias="personalDataConsentAt")
+
+
 class PlantCreate(BaseModel):
     genus: Optional[str] = None
     species: Optional[str] = None

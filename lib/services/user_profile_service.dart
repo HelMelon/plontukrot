@@ -30,10 +30,12 @@ class UserProfileDoc {
     return UserProfileDoc(
       name: readString(data, 'name')?.trim(),
       email: readString(data, 'email')?.trim(),
-      personalDataConsentAt: readDate(data, kPersonalDataConsentAtField) ??
+      personalDataConsentAt: readDate(data, 'personal_data_consent_at') ??
+          readDate(data, kPersonalDataConsentAtField) ??
           readDate(data, 'personalDataConsentAt'),
       collectionVisibility: CollectionVisibility.fromCode(
-        readString(data, 'collectionVisibility'),
+        readString(data, 'collection_visibility') ??
+            readString(data, 'collectionVisibility'),
       ),
     );
   }
@@ -53,9 +55,16 @@ class UserProfileService {
     bool recordConsent = false,
     String? displayName,
   }) async {
-    final json = await fetchMe();
-    if (recordConsent && readDate(json, kPersonalDataConsentAtField) == null) {
-      await recordPersonalDataConsent();
+    try {
+      final json = await fetchMe();
+      final consent = readDate(json, 'personal_data_consent_at') ??
+          readDate(json, kPersonalDataConsentAtField) ??
+          readDate(json, 'personalDataConsentAt');
+      if (recordConsent && consent == null) {
+        await recordPersonalDataConsent();
+      }
+    } catch (_) {
+      // Non-fatal: do not abort auth if profile extras fail.
     }
   }
 
@@ -65,7 +74,9 @@ class UserProfileService {
         'personal_data_consent_at': isoDate(DateTime.now()),
       });
     } on ApiException catch (error) {
-      if (!error.isNotFound) rethrow;
+      if (!error.isNotFound && error.statusCode != 405) rethrow;
+    } catch (_) {
+      // Non-fatal fallback.
     }
   }
 
@@ -73,8 +84,8 @@ class UserProfileService {
     try {
       await _api.patch('/auth/me', body: body);
     } on ApiException catch (error) {
-      if (!error.isNotFound) rethrow;
-    }
+      if (!error.isNotFound && error.statusCode != 405) rethrow;
+    } catch (_) {}
   }
 
   Stream<UserProfileDoc> watchUserProfile() {

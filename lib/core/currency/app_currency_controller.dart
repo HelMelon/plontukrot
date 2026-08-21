@@ -42,7 +42,8 @@ class AppCurrencyController extends ChangeNotifier {
 
     try {
       final json = await UserProfileService().fetchMe();
-      final remote = readString(json, firestoreField);
+      final remote = readString(json, 'currency_code') ??
+          readString(json, firestoreField);
 
       if (remote != null && remote.trim().isNotEmpty) {
         final next = AppCurrency.fromCode(remote);

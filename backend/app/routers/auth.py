@@ -5,7 +5,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from ..db import get_pool
-from ..schemas import LoginRequest, RegisterRequest, TokenResponse, UserOut
+from ..schemas import (
+    LoginRequest,
+    RegisterRequest,
+    TokenResponse,
+    UserOut,
+    UserUpdate,
+)
 from ..security import (
     create_access_token,
     decode_access_token,
@@ -116,3 +122,56 @@ def me(user_id: str = Depends(get_current_user_id)):
             detail="User not found",
         )
     return _row_to_user_out(row)
+
+
+@router.patch("/me", response_model=UserOut)
+def patch_me(
+    payload: UserUpdate,
+    user_id: str = Depends(get_current_user_id),
+):
+    """Update profile fields (name, locale, currency, visibility, consent)."""
+    fields = []
+    values = []
+    if payload.name is not None:
+        fields.append("name = %s")
+        values.append(payload.name)
+    if payload.locale_code is not None:
+        fields.append("locale_code = %s")
+        values.append(payload.locale_code)
+    if payload.currency_code is not None:
+        fields.append("currency_code = %s")
+        values.append(payload.currency_code)
+    if payload.collection_visibility is not None:
+        fields.append("collection_visibility = %s")
+        values.append(payload.collection_visibility)
+    if payload.personal_data_consent_at is not None:
+        fields.append("personal_data_consent_at = %s")
+        values.append(payload.personal_data_consent_at)
+
+    if fields:
+        values.append(user_id)
+        with get_pool().connection() as conn:
+            conn.execute(
+                f"UPDATE users SET {', '.join(fields)} WHERE id = %s",
+                tuple(values),
+            )
+
+    with get_pool().connection() as conn:
+        row = conn.execute(
+            f"{_SELECT_USER} WHERE id = %s",
+            (user_id,),
+        ).fetchone()
+    if row is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    return _row_to_user_out(row)
+
+
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+def delete_me(user_id: str = Depends(get_current_user_id)):
+    """Delete the authenticated user and all cascaded data."""
+    with get_pool().connection() as conn:
+        conn.execute("DELETE FROM users WHERE id = %s", (user_id,))
+    return None

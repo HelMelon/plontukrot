@@ -51,7 +51,8 @@ class AppLocaleController extends ChangeNotifier {
 
     try {
       final json = await UserProfileService().fetchMe();
-      final remote = readString(json, firestoreField);
+      final remote = readString(json, 'locale_code') ??
+          readString(json, firestoreField);
 
       if (remote != null && _isValidCode(remote)) {
         if (remote == _preference) return;

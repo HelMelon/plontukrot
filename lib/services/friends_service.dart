@@ -18,8 +18,10 @@ class FriendsService {
     final me = uid;
     final friends = <Friendship>[];
     for (final map in list) {
-      final userA = readString(map, 'userA') ?? '';
-      final userB = readString(map, 'userB') ?? '';
+      final userA =
+          readString(map, 'user_a') ?? readString(map, 'userA') ?? '';
+      final userB =
+          readString(map, 'user_b') ?? readString(map, 'userB') ?? '';
       final friendUid = userA == me ? userB : userA;
       if (friendUid.isEmpty) continue;
       friends.add(Friendship.fromMap(friendUid, map));

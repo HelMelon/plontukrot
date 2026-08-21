@@ -79,12 +79,14 @@ class _PersonalDataConsentGatePageState
     try {
       await UserProfileService().recordPersonalDataConsent();
       await DeviceConsentStore.instance.rememberAccepted();
+      if (mounted) {
+        setState(() => _consentRememberedOnDevice = true);
+      }
     } catch (e) {
-      if (!mounted) return;
-      final l10n = AppLocalizations.of(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.commonError(e.toString()))),
-      );
+      await DeviceConsentStore.instance.rememberAccepted();
+      if (mounted) {
+        setState(() => _consentRememberedOnDevice = true);
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -93,7 +95,7 @@ class _PersonalDataConsentGatePageState
   void _autoSyncDeviceConsent() {
     if (_autoSyncStarted || _saving) return;
     _autoSyncStarted = true;
-    unawaited(_submit());
+    unawaited(UserProfileService().recordPersonalDataConsent());
   }
 
   Widget _waitingPlaceholder(BuildContext context) {
@@ -116,25 +118,21 @@ class _PersonalDataConsentGatePageState
       stream: UserProfileService().watchHasPersonalDataConsent(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting &&
-            !snapshot.hasData) {
+            !snapshot.hasData &&
+            !_deviceConsentLoaded) {
           return _waitingPlaceholder(context);
         }
 
-        if (snapshot.data == true) {
+        if (snapshot.data == true || _consentRememberedOnDevice) {
+          if (_consentRememberedOnDevice && snapshot.data != true) {
+            _autoSyncDeviceConsent();
+          }
           unawaited(DeviceConsentStore.instance.rememberAccepted());
           return widget.child;
         }
 
         // Wait until we know the device flag before choosing UI vs auto-sync.
         if (!_deviceConsentLoaded) {
-          return _waitingPlaceholder(context);
-        }
-
-        // Already accepted on this device (e.g. login checkbox) — sync to
-        // Firestore without asking again. Covers the race where AuthGate
-        // opens before createUserDocument(recordConsent: true) completes.
-        if (_consentRememberedOnDevice) {
-          _autoSyncDeviceConsent();
           return _waitingPlaceholder(context);
         }
 

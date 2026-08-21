@@ -159,6 +159,9 @@ class AuthService {
         lowercased.contains('connection refused') ||
         lowercased.contains('timed out') ||
         lowercased.contains('timeout') ||
+        lowercased.contains('clientexception') ||
+        lowercased.contains('httpexception') ||
+        lowercased.contains('failed to connect') ||
         lowercased.contains('offline');
   }
 
