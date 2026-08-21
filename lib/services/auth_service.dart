@@ -206,10 +206,15 @@ class AuthService {
             'email': trimmedEmail,
             'password': password,
             if (trimmedName.isNotEmpty) 'name': trimmedName,
+            if (recordConsent)
+              'personal_data_consent_at': isoDate(DateTime.now()),
           },
           ping: false,
         ),
       );
+      if (recordConsent) {
+        await DeviceConsentStore.instance.rememberAccepted();
+      }
       await _loadMe();
       await UserProfileService().createUserDocument(
         recordConsent: recordConsent,
@@ -237,6 +242,9 @@ class AuthService {
           ping: false,
         ),
       );
+      if (recordConsent) {
+        await DeviceConsentStore.instance.rememberAccepted();
+      }
       await _loadMe();
       await UserProfileService().createUserDocument(recordConsent: recordConsent);
     } catch (error, stack) {

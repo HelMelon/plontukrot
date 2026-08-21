@@ -1,3 +1,4 @@
+import '../core/privacy/device_consent_store.dart';
 import '../core/privacy/privacy_constants.dart';
 import '../models/collection_visibility.dart';
 import '../models/model_helpers.dart';
@@ -69,6 +70,7 @@ class UserProfileService {
   }
 
   Future<void> recordPersonalDataConsent() async {
+    await DeviceConsentStore.instance.rememberAccepted();
     try {
       await _api.patch('/auth/me', body: {
         'personal_data_consent_at': isoDate(DateTime.now()),

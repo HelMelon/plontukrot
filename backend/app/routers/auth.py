@@ -1,4 +1,5 @@
 """Auth endpoints: register, login, current user."""
+from datetime import datetime, timezone
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -57,10 +58,11 @@ def register(payload: RegisterRequest):
                 detail="Email already registered",
             )
         user_id = uuid.uuid4()
+        consent_at = payload.personal_data_consent_at or datetime.now(timezone.utc)
         conn.execute(
             "INSERT INTO users (id, email, password_hash, name, locale_code, "
-            "currency_code, collection_visibility) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            "currency_code, collection_visibility, personal_data_consent_at) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
             (
                 user_id,
                 email,
@@ -69,6 +71,7 @@ def register(payload: RegisterRequest):
                 "ru",
                 "BYN",
                 "friends",
+                consent_at,
             ),
         )
         token = create_access_token(str(user_id))

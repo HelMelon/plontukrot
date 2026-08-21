@@ -31,6 +31,7 @@ class PersonalDataConsentGatePage extends StatefulWidget {
 
 class _PersonalDataConsentGatePageState
     extends State<PersonalDataConsentGatePage> {
+  late final Stream<bool> _consentStream;
   bool _accepted = false;
   bool _deviceConsentLoaded = false;
   bool _saving = false;
@@ -46,6 +47,7 @@ class _PersonalDataConsentGatePageState
   @override
   void initState() {
     super.initState();
+    _consentStream = UserProfileService().watchHasPersonalDataConsent();
     _loadDeviceConsent();
   }
 
@@ -115,11 +117,11 @@ class _PersonalDataConsentGatePageState
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<bool>(
-      stream: UserProfileService().watchHasPersonalDataConsent(),
+      stream: _consentStream,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting &&
-            !snapshot.hasData &&
-            !_deviceConsentLoaded) {
+        if (!_deviceConsentLoaded &&
+            snapshot.connectionState == ConnectionState.waiting &&
+            !snapshot.hasData) {
           return _waitingPlaceholder(context);
         }
 

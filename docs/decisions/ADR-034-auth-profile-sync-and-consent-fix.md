@@ -28,13 +28,13 @@ Following the migration to the self-hosted FastAPI backend (ADR-033), users were
 
 ## Implementation
 
-- `backend/app/schemas.py`: Added `UserUpdate` model with field aliases and `extra="ignore"`.
-- `backend/app/routers/auth.py`: Added `PATCH /auth/me` and `DELETE /auth/me` handlers.
-- `lib/services/user_profile_service.dart`: Added snake_case and camelCase field parsing and non-fatal error handling for profile updates.
-- `lib/features/auth/pages/personal_data_consent_gate_page.dart`: Resolved infinite waiting placeholder loop; admitted users with remembered device consent and updated consent state on submit.
+- `backend/app/schemas.py`: Added `UserUpdate` model with field aliases and `extra="ignore"`, and added `personal_data_consent_at` to `RegisterRequest`.
+- `backend/app/routers/auth.py`: Added `PATCH /auth/me` and `DELETE /auth/me` handlers, and stored `personal_data_consent_at` on `POST /auth/register`.
+- `lib/services/user_profile_service.dart`: Added snake_case and camelCase field parsing, `DeviceConsentStore` integration, and non-fatal error handling for profile updates.
+- `lib/features/auth/pages/personal_data_consent_gate_page.dart`: Resolved infinite waiting placeholder loop and stream recreation; admitted users with remembered device consent and updated consent state on submit.
 - `lib/core/currency/app_currency_controller.dart`: Updated `syncWithCloud` to read `currency_code`.
 - `lib/core/locale/app_locale_controller.dart`: Updated `syncWithCloud` to read `locale_code`.
-- `lib/services/auth_service.dart`: Enhanced network failure classification for HTTP client exceptions.
+- `lib/services/auth_service.dart`: Enhanced network failure classification and ensured device and backend consent recording on sign-in and registration.
 - `lib/services/friends_service.dart`: Added dual snake_case / camelCase reading for user IDs in friendships.
 
 ## Behavior

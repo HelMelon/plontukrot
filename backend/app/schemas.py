@@ -8,9 +8,12 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class RegisterRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     email: EmailStr
     password: str = Field(min_length=6)
     name: Optional[str] = None
+    personal_data_consent_at: Optional[datetime] = Field(default=None, alias="personalDataConsentAt")
 
 class LoginRequest(BaseModel):
     email: EmailStr
