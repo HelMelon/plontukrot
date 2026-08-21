@@ -7,15 +7,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .config import settings
-from .db import get_pool
+from .db import auto_migrate, get_pool
 from .routers import auth, catalogs, plant_care, plants, propagations, social, species
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Open the DB pool on startup, close it on shutdown."""
+    """Open the DB pool on startup, run migrations, close it on shutdown."""
     os.makedirs(settings.photos_dir, exist_ok=True)
     get_pool().open()
+    auto_migrate()
     yield
     get_pool().close()
 

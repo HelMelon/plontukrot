@@ -62,6 +62,17 @@ class PlantCreate(BaseModel):
     watering_frequency: Optional[int] = Field(default=None, alias="wateringFrequency")
     fertilizing_frequency_days: Optional[int] = Field(default=None, alias="fertilizingFrequencyDays")
     initial_leaf_count: Optional[int] = Field(default=None, alias="initialLeafCount")
+    last_watered_at: Optional[datetime] = Field(default=None, alias="lastWateredAt")
+    last_fertilized_at: Optional[datetime] = Field(default=None, alias="lastFertilizedAt")
+    last_repotted_at: Optional[datetime] = Field(default=None, alias="lastRepottedAt")
+    last_manipulation_at: Optional[datetime] = Field(default=None, alias="lastManipulationAt")
+    members: Optional[list[Any]] = None
+    archived_at: Optional[datetime] = Field(default=None, alias="archivedAt")
+    expires_at: Optional[datetime] = Field(default=None, alias="expiresAt")
+    archive_reason: Optional[str] = Field(default=None, alias="archiveReason")
+    archive_note: Optional[str] = Field(default=None, alias="archiveNote")
+    merged_into_plant_id: Optional[str] = Field(default=None, alias="mergedIntoPlantId")
+    gifted_to_uid: Optional[str] = Field(default=None, alias="giftedToUid")
 
 
 class PlantUpdate(BaseModel):
@@ -81,6 +92,14 @@ class PlantUpdate(BaseModel):
     last_watered_at: Optional[datetime] = Field(default=None, alias="lastWateredAt")
     last_fertilized_at: Optional[datetime] = Field(default=None, alias="lastFertilizedAt")
     last_repotted_at: Optional[datetime] = Field(default=None, alias="lastRepottedAt")
+    last_manipulation_at: Optional[datetime] = Field(default=None, alias="lastManipulationAt")
+    members: Optional[list[Any]] = None
+    archived_at: Optional[datetime] = Field(default=None, alias="archivedAt")
+    expires_at: Optional[datetime] = Field(default=None, alias="expiresAt")
+    archive_reason: Optional[str] = Field(default=None, alias="archiveReason")
+    archive_note: Optional[str] = Field(default=None, alias="archiveNote")
+    merged_into_plant_id: Optional[str] = Field(default=None, alias="mergedIntoPlantId")
+    gifted_to_uid: Optional[str] = Field(default=None, alias="giftedToUid")
 
 
 class PlantOut(BaseModel):
@@ -101,6 +120,14 @@ class PlantOut(BaseModel):
     last_watered_at: Optional[datetime] = None
     last_fertilized_at: Optional[datetime] = None
     last_repotted_at: Optional[datetime] = None
+    last_manipulation_at: Optional[datetime] = None
+    members: Optional[list[Any]] = None
+    archived_at: Optional[datetime] = None
+    expires_at: Optional[datetime] = None
+    archive_reason: Optional[str] = None
+    archive_note: Optional[str] = None
+    merged_into_plant_id: Optional[str] = None
+    gifted_to_uid: Optional[str] = None
     created_at: datetime
     photos: list[PlantPhotoOut] = []
 
@@ -208,6 +235,8 @@ class ManipulationCreate(BaseModel):
     type: int
     applied_at: datetime = Field(alias="appliedAt")
     ended_at: Optional[datetime] = Field(default=None, alias="endedAt")
+    reanimation_tags: Optional[list[str]] = Field(default=None, alias="reanimationTags")
+    is_greenhouse: bool = Field(default=False, alias="isGreenhouse")
     note: Optional[str] = None
     stage_before: Optional[int] = Field(default=None, alias="stageBefore")
     stage_after: Optional[int] = Field(default=None, alias="stageAfter")
@@ -222,6 +251,8 @@ class ManipulationUpdate(BaseModel):
     type: Optional[int] = None
     applied_at: Optional[datetime] = Field(default=None, alias="appliedAt")
     ended_at: Optional[datetime] = Field(default=None, alias="endedAt")
+    reanimation_tags: Optional[list[str]] = Field(default=None, alias="reanimationTags")
+    is_greenhouse: Optional[bool] = Field(default=None, alias="isGreenhouse")
     note: Optional[str] = None
     stage_before: Optional[int] = Field(default=None, alias="stageBefore")
     stage_after: Optional[int] = Field(default=None, alias="stageAfter")
@@ -236,6 +267,8 @@ class ManipulationOut(BaseModel):
     type: int
     applied_at: datetime
     ended_at: Optional[datetime] = None
+    reanimation_tags: Optional[list[str]] = None
+    is_greenhouse: bool = False
     note: Optional[str] = None
     stage_before: Optional[int] = None
     stage_after: Optional[int] = None

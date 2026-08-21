@@ -3,7 +3,7 @@ import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from ..db import get_pool
+from ..db import get_pool, jsonb
 from ..routers.auth import get_current_user_id
 from ..schemas import PlantCreate, PlantOut, PlantPhotoOut, PlantUpdate
 
@@ -22,6 +22,14 @@ _FIELDS = {
     "watering_frequency": "watering_frequency",
     "fertilizing_frequency_days": "fertilizing_frequency_days",
     "initial_leaf_count": "initial_leaf_count",
+    "last_manipulation_at": "last_manipulation_at",
+    "members": "members",
+    "archived_at": "archived_at",
+    "expires_at": "expires_at",
+    "archive_reason": "archive_reason",
+    "archive_note": "archive_note",
+    "merged_into_plant_id": "merged_into_plant_id",
+    "gifted_to_uid": "gifted_to_uid",
 }
 
 
@@ -37,7 +45,9 @@ def list_plants(user_id: str = Depends(get_current_user_id)):
             "SELECT id, genus, species, cultivar, trading_name, plant_family, "
             "nickname, stage, variegation, watering_frequency, "
             "fertilizing_frequency_days, initial_leaf_count, last_watered_at, "
-            "last_fertilized_at, last_repotted_at, created_at "
+            "last_fertilized_at, last_repotted_at, last_manipulation_at, "
+            "members, archived_at, expires_at, archive_reason, archive_note, "
+            "merged_into_plant_id, gifted_to_uid, created_at "
             "FROM plants WHERE user_id = %s ORDER BY created_at",
             (user_id,),
         ).fetchall()
@@ -70,7 +80,10 @@ def create_plant(payload: PlantCreate, user_id: str = Depends(get_current_user_i
     for schema_field, column in _FIELDS.items():
         val = getattr(payload, schema_field, None)
         if val is not None:
-            values[column] = val
+            if column == "members":
+                values[column] = jsonb(val)
+            else:
+                values[column] = val
     if payload.stage is None:
         values["stage"] = 0
     if payload.initial_leaf_count is None:
@@ -87,7 +100,9 @@ def create_plant(payload: PlantCreate, user_id: str = Depends(get_current_user_i
             "SELECT id, genus, species, cultivar, trading_name, plant_family, "
             "nickname, stage, variegation, watering_frequency, "
             "fertilizing_frequency_days, initial_leaf_count, last_watered_at, "
-            "last_fertilized_at, last_repotted_at, created_at "
+            "last_fertilized_at, last_repotted_at, last_manipulation_at, "
+            "members, archived_at, expires_at, archive_reason, archive_note, "
+            "merged_into_plant_id, gifted_to_uid, created_at "
             "FROM plants WHERE id = %s",
             (plant_id,),
         ).fetchone()
@@ -101,7 +116,9 @@ def get_plant(plant_id: str, user_id: str = Depends(get_current_user_id)):
             "SELECT id, genus, species, cultivar, trading_name, plant_family, "
             "nickname, stage, variegation, watering_frequency, "
             "fertilizing_frequency_days, initial_leaf_count, last_watered_at, "
-            "last_fertilized_at, last_repotted_at, created_at "
+            "last_fertilized_at, last_repotted_at, last_manipulation_at, "
+            "members, archived_at, expires_at, archive_reason, archive_note, "
+            "merged_into_plant_id, gifted_to_uid, created_at "
             "FROM plants WHERE id = %s AND user_id = %s",
             (plant_id, user_id),
         ).fetchone()
@@ -135,8 +152,22 @@ def update_plant(
     for key, val in data.items():
         if key in _FIELDS:
             fields.append(f"{_FIELDS[key]} = %s")
-            values.append(val)
-        elif key in ("last_watered_at", "last_fertilized_at", "last_repotted_at"):
+            if _FIELDS[key] == "members":
+                values.append(jsonb(val))
+            else:
+                values.append(val)
+        elif key in (
+            "last_watered_at",
+            "last_fertilized_at",
+            "last_repotted_at",
+            "last_manipulation_at",
+            "archived_at",
+            "expires_at",
+            "archive_reason",
+            "archive_note",
+            "merged_into_plant_id",
+            "gifted_to_uid",
+        ):
             fields.append(f"{key} = %s")
             values.append(val)
 
@@ -162,7 +193,9 @@ def update_plant(
             "SELECT id, genus, species, cultivar, trading_name, plant_family, "
             "nickname, stage, variegation, watering_frequency, "
             "fertilizing_frequency_days, initial_leaf_count, last_watered_at, "
-            "last_fertilized_at, last_repotted_at, created_at "
+            "last_fertilized_at, last_repotted_at, last_manipulation_at, "
+            "members, archived_at, expires_at, archive_reason, archive_note, "
+            "merged_into_plant_id, gifted_to_uid, created_at "
             "FROM plants WHERE id = %s",
             (plant_id,),
         ).fetchone()
@@ -211,5 +244,13 @@ def _row_to_plant(row) -> PlantOut:
         last_watered_at=row["last_watered_at"],
         last_fertilized_at=row["last_fertilized_at"],
         last_repotted_at=row["last_repotted_at"],
+        last_manipulation_at=row.get("last_manipulation_at"),
+        members=row.get("members"),
+        archived_at=row.get("archived_at"),
+        expires_at=row.get("expires_at"),
+        archive_reason=row.get("archive_reason"),
+        archive_note=row.get("archive_note"),
+        merged_into_plant_id=row.get("merged_into_plant_id"),
+        gifted_to_uid=row.get("gifted_to_uid"),
         created_at=row["created_at"],
     )

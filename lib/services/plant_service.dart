@@ -176,6 +176,8 @@ class PlantService {
         'watering_frequency': wateringFrequency,
         'fertilizing_frequency_days': resolvedFrequency,
         'initial_leaf_count': safeInitialLeafCount,
+        if (members.isNotEmpty)
+          'members': members.map((m) => m.toMap()).toList(),
       }),
     );
     final id = readString(created, 'id') ?? '';
@@ -215,6 +217,15 @@ class PlantService {
   Stream<Plant?> watchPlant(String plantId) => watchPlantForUser(uid, plantId);
 
   Future<Plant?> getPlant(String plantId) async {
+    try {
+      final res = await _api.get('/plants/$plantId');
+      if (res is Map) {
+        return _plantFromMap(jsonMap(res));
+      }
+    } on ApiException catch (e) {
+      if (!e.isNotFound) rethrow;
+      return null;
+    }
     final plants = await _fetchAllPlants();
     for (final plant in plants) {
       if (plant.id == plantId) return plant;
@@ -421,6 +432,8 @@ class PlantService {
       'fertilizing_frequency_days': resolvedFrequency,
       'initial_leaf_count': safeInitialLeafCount,
       'stage': stage,
+      if (members != null)
+        'members': members.map((m) => m.toMap()).toList(),
     });
 
     await _plantSpeciesService.ensureSpecies(

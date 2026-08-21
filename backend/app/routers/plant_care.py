@@ -227,6 +227,10 @@ def add_watering(plant_id: str, payload: WateringCreate,
             "next_watering) VALUES (%s, %s, %s, %s)",
             (w_id, plant_id, payload.watered_at, payload.next_watering),
         )
+        conn.execute(
+            "UPDATE plants SET last_watered_at = %s WHERE id = %s",
+            (payload.watered_at, plant_id),
+        )
         row = conn.execute(
             "SELECT id, plant_id, watered_at, next_watering, created_at "
             "FROM plant_waterings WHERE id = %s",
@@ -266,6 +270,10 @@ def add_fertilizing(plant_id: str, payload: FertilizingCreate,
              jsonb(payload.components),
              payload.water_ml, payload.applied_at, payload.next_fertilizing),
         )
+        conn.execute(
+            "UPDATE plants SET last_fertilized_at = %s WHERE id = %s",
+            (payload.applied_at, plant_id),
+        )
         row = conn.execute(
             "SELECT id, plant_id, fertilizer_id, fertilizer_name, "
             "application_method, components, water_ml, applied_at, "
@@ -290,6 +298,10 @@ def add_repotting(plant_id: str, payload: RepottingCreate,
              jsonb(payload.components),
              payload.slow_release_fertilizer, payload.repotted_at),
         )
+        conn.execute(
+            "UPDATE plants SET last_repotted_at = %s WHERE id = %s",
+            (payload.repotted_at, plant_id),
+        )
         row = conn.execute(
             "SELECT id, plant_id, soil_id, soil_name, components, "
             "slow_release_fertilizer, repotted_at, created_at "
@@ -306,8 +318,9 @@ def list_manipulations(plant_id: str,
     _ensure_owned(plant_id, user_id)
     with get_pool().connection() as conn:
         rows = conn.execute(
-            "SELECT id, plant_id, type, applied_at, ended_at, note, stage_before, "
-            "stage_after, stimulator_id, stimulator_name, dosage, created_at "
+            "SELECT id, plant_id, type, applied_at, ended_at, reanimation_tags, "
+            "is_greenhouse, note, stage_before, stage_after, stimulator_id, "
+            "stimulator_name, dosage, created_at "
             "FROM plant_manipulations WHERE plant_id = %s ORDER BY applied_at DESC",
             (plant_id,),
         ).fetchall()
@@ -322,16 +335,22 @@ def add_manipulation(plant_id: str, payload: ManipulationCreate,
     with get_pool().connection() as conn:
         conn.execute(
             "INSERT INTO plant_manipulations (id, plant_id, type, applied_at, "
-            "ended_at, note, stage_before, stage_after, stimulator_id, "
-            "stimulator_name, dosage) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, "
-            "%s, %s, %s)",
-            (m_id, plant_id, payload.type, payload.applied_at, payload.ended_at, payload.note,
+            "ended_at, reanimation_tags, is_greenhouse, note, stage_before, "
+            "stage_after, stimulator_id, stimulator_name, dosage) VALUES (%s, %s, %s, %s, %s, %s, "
+            "%s, %s, %s, %s, %s, %s, %s)",
+            (m_id, plant_id, payload.type, payload.applied_at, payload.ended_at,
+             jsonb(payload.reanimation_tags), payload.is_greenhouse, payload.note,
              payload.stage_before, payload.stage_after, payload.stimulator_id,
              payload.stimulator_name, payload.dosage),
         )
+        conn.execute(
+            "UPDATE plants SET last_manipulation_at = %s WHERE id = %s",
+            (payload.applied_at, plant_id),
+        )
         row = conn.execute(
-            "SELECT id, plant_id, type, applied_at, ended_at, note, stage_before, "
-            "stage_after, stimulator_id, stimulator_name, dosage, created_at "
+            "SELECT id, plant_id, type, applied_at, ended_at, reanimation_tags, "
+            "is_greenhouse, note, stage_before, stage_after, stimulator_id, "
+            "stimulator_name, dosage, created_at "
             "FROM plant_manipulations WHERE id = %s",
             (m_id,),
         ).fetchone()
@@ -351,7 +370,10 @@ def update_manipulation(
     values = []
     for key, val in data.items():
         fields.append(f"{key} = %s")
-        values.append(val)
+        if key == "reanimation_tags":
+            values.append(jsonb(val))
+        else:
+            values.append(val)
 
     with get_pool().connection() as conn:
         existing = conn.execute(
@@ -369,9 +391,14 @@ def update_manipulation(
                 f"UPDATE plant_manipulations SET {', '.join(fields)} WHERE id = %s AND plant_id = %s",
                 tuple(values),
             )
+            conn.execute(
+                "UPDATE plants SET last_manipulation_at = (SELECT MAX(applied_at) FROM plant_manipulations WHERE plant_id = %s) WHERE id = %s",
+                (plant_id, plant_id),
+            )
         row = conn.execute(
-            "SELECT id, plant_id, type, applied_at, ended_at, note, stage_before, "
-            "stage_after, stimulator_id, stimulator_name, dosage, created_at "
+            "SELECT id, plant_id, type, applied_at, ended_at, reanimation_tags, "
+            "is_greenhouse, note, stage_before, stage_after, stimulator_id, "
+            "stimulator_name, dosage, created_at "
             "FROM plant_manipulations WHERE id = %s",
             (manipulation_id,),
         ).fetchone()
@@ -395,3 +422,7 @@ def delete_manipulation(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Manipulation not found",
             )
+        conn.execute(
+            "UPDATE plants SET last_manipulation_at = (SELECT MAX(applied_at) FROM plant_manipulations WHERE plant_id = %s) WHERE id = %s",
+            (plant_id, plant_id),
+        )

@@ -47,6 +47,14 @@ CREATE TABLE IF NOT EXISTS plants (
     last_watered_at          TIMESTAMPTZ,
     last_fertilized_at       TIMESTAMPTZ,
     last_repotted_at         TIMESTAMPTZ,
+    last_manipulation_at     TIMESTAMPTZ,
+    members                  JSONB,
+    archived_at              TIMESTAMPTZ,
+    expires_at               TIMESTAMPTZ,
+    archive_reason           TEXT,
+    archive_note             TEXT,
+    merged_into_plant_id     TEXT,
+    gifted_to_uid            TEXT,
     created_at               TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -116,18 +124,20 @@ CREATE TABLE IF NOT EXISTS plant_repottings (
 
 -- Manipulations (plants/{id}/manipulations).
 CREATE TABLE IF NOT EXISTS plant_manipulations (
-    id            TEXT PRIMARY KEY,
-    plant_id      TEXT NOT NULL REFERENCES plants(id) ON DELETE CASCADE,
-    type          INT NOT NULL,
-    applied_at    TIMESTAMPTZ NOT NULL,
-    ended_at      TIMESTAMPTZ,
-    note          TEXT,
-    stage_before  INT,
-    stage_after   INT,
-    stimulator_id TEXT,
-    stimulator_name TEXT,
-    dosage        TEXT,
-    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+    id               TEXT PRIMARY KEY,
+    plant_id         TEXT NOT NULL REFERENCES plants(id) ON DELETE CASCADE,
+    type             INT NOT NULL,
+    applied_at       TIMESTAMPTZ NOT NULL,
+    ended_at         TIMESTAMPTZ,
+    reanimation_tags JSONB,
+    is_greenhouse    BOOLEAN NOT NULL DEFAULT false,
+    note             TEXT,
+    stage_before     INT,
+    stage_after      INT,
+    stimulator_id    TEXT,
+    stimulator_name  TEXT,
+    dosage           TEXT,
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- ============================= PROPAGATIONS =============================

@@ -1,8 +1,59 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plontukrot/models/plant.dart';
+import 'package:plontukrot/models/plant_archive_reason.dart';
 import 'package:plontukrot/models/plant_photo.dart';
 
 void main() {
+  group('Plant archive and group members', () {
+    test('parses archive fields from snake_case JSON', () {
+      final plant = Plant.fromMap('plant-1', {
+        'genus': 'Hoya',
+        'species': 'carnosa',
+        'nickname': 'Carnosa',
+        'stage': 2,
+        'archived_at': '2026-08-21T10:00:00.000Z',
+        'expires_at': '2028-08-20T10:00:00.000Z',
+        'archive_reason': 'merged',
+        'archive_note': 'Merged into group',
+        'merged_into_plant_id': 'group-1',
+      });
+
+      expect(plant.isArchived, isTrue);
+      expect(plant.archivedAt, DateTime.utc(2026, 8, 21, 10, 0, 0));
+      expect(plant.expiresAt, DateTime.utc(2028, 8, 20, 10, 0, 0));
+      expect(plant.archiveReason, PlantArchiveReason.merged);
+      expect(plant.archiveNote, 'Merged into group');
+      expect(plant.mergedIntoPlantId, 'group-1');
+    });
+
+    test('parses group members from snake_case and camelCase JSON', () {
+      final plant = Plant.fromMap('group-1', {
+        'genus': 'Hoya',
+        'species': 'carnosa',
+        'nickname': 'Tricolor + Krimson Queen',
+        'stage': 2,
+        'members': [
+          {
+            'cultivar': 'Krimson Queen',
+            'variegation': 1,
+            'source_plant_id': 'src-1',
+          },
+          {
+            'cultivar': 'Tricolor',
+            'variegation': 2,
+            'sourcePlantId': 'src-2',
+          },
+        ],
+      });
+
+      expect(plant.isGroup, isTrue);
+      expect(plant.members.length, 2);
+      expect(plant.members[0].cultivar, 'Krimson Queen');
+      expect(plant.members[0].sourcePlantId, 'src-1');
+      expect(plant.members[1].cultivar, 'Tricolor');
+      expect(plant.members[1].sourcePlantId, 'src-2');
+    });
+  });
   group('Plant.listImageUrl', () {
     test('prefers non-empty thumb over full', () {
       const plant = Plant(

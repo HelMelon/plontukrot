@@ -179,18 +179,30 @@ class Plant {
       lastFertilizedAt: readDate(data, 'lastFertilizedAt'),
       lastFertilizerName:
           _nullableTrimmed(readString(data, 'lastFertilizerName')),
-      lastRepottedAt: readDate(data, 'lastRepottedAt'),
-      lastManipulationAt: readDate(data, 'lastManipulationAt'),
-      initialLeafCount: readInt(data, 'initialLeafCount') ?? 0,
+      lastRepottedAt: readDate(data, 'lastRepottedAt') ??
+          readDate(data, 'last_repotted_at'),
+      lastManipulationAt: readDate(data, 'lastManipulationAt') ??
+          readDate(data, 'last_manipulation_at'),
+      initialLeafCount: readInt(data, 'initialLeafCount') ??
+          readInt(data, 'initial_leaf_count') ??
+          0,
       members: _readMembers(readField(data, 'members')),
-      archivedAt: readDate(data, 'archivedAt'),
-      expiresAt: readDate(data, 'expiresAt'),
+      archivedAt: readDate(data, 'archivedAt') ??
+          readDate(data, 'archived_at'),
+      expiresAt: readDate(data, 'expiresAt') ??
+          readDate(data, 'expires_at'),
       archiveReason: PlantArchiveReason.fromCode(
-        readString(data, 'archiveReason'),
+        readString(data, 'archiveReason') ??
+            readString(data, 'archive_reason'),
       ),
-      archiveNote: _nullableTrimmed(readString(data, 'archiveNote')),
-      mergedIntoPlantId: readString(data, 'mergedIntoPlantId'),
-      giftedToUid: readString(data, 'giftedToUid'),
+      archiveNote: _nullableTrimmed(
+        readString(data, 'archiveNote') ??
+            readString(data, 'archive_note'),
+      ),
+      mergedIntoPlantId: readString(data, 'mergedIntoPlantId') ??
+          readString(data, 'merged_into_plant_id'),
+      giftedToUid: readString(data, 'giftedToUid') ??
+          readString(data, 'gifted_to_uid'),
     );
   }
 
