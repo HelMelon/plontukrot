@@ -284,6 +284,19 @@ def add_fertilizing(plant_id: str, payload: FertilizingCreate,
 
 
 # ---- Repotting ----
+@router.get("/repottings", response_model=list[RepottingOut])
+def list_repottings(plant_id: str, user_id: str = Depends(get_current_user_id)):
+    _ensure_owned(plant_id, user_id)
+    with get_pool().connection() as conn:
+        rows = conn.execute(
+            "SELECT id, plant_id, soil_id, soil_name, components, "
+            "slow_release_fertilizer, repotted_at, created_at "
+            "FROM plant_repottings WHERE plant_id = %s ORDER BY repotted_at",
+            (plant_id,),
+        ).fetchall()
+    return [RepottingOut(**r) for r in rows]
+
+
 @router.post("/repottings", response_model=RepottingOut, status_code=201)
 def add_repotting(plant_id: str, payload: RepottingCreate,
                   user_id: str = Depends(get_current_user_id)):
