@@ -204,20 +204,65 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
         }
         return l10n.commonNoData;
       }
-      final latestDate = entry.endedAt ?? entry.appliedAt;
-      final dateStr =
-          DateFormat('d MMM y', dateLocale).format(latestDate);
-      final name = switch (entry.type) {
-        ManipulationType.stimulator =>
-          entry.stimulatorName?.trim().isNotEmpty == true
-              ? entry.stimulatorName!.trim()
-              : l10n.manipulationTypeStimulator,
-        ManipulationType.rerooting => entry.endedAt == null
-            ? '${l10n.manipulationTypeRerooting} (${l10n.manipulationRerootingInProgress.toLowerCase()})'
-            : l10n.manipulationTypeRerooting,
-        _ => l10n.manipulationTypeLabel(entry.type),
-      };
-      return '$dateStr · $name';
+
+      final parts = <String>[];
+
+      if (entry.type == ManipulationType.rerooting) {
+        if (entry.endedAt != null) {
+          final startFormatted =
+              DateFormat('d MMM y', dateLocale).format(entry.appliedAt);
+          final endFormatted =
+              DateFormat('d MMM y', dateLocale).format(entry.endedAt!);
+          if (startFormatted == endFormatted) {
+            parts.add(startFormatted);
+          } else {
+            parts.add('$startFormatted – $endFormatted');
+          }
+        } else {
+          parts.add(
+            '${DateFormat('d MMM y', dateLocale).format(entry.appliedAt)} · ${l10n.manipulationRerootingInProgress}',
+          );
+        }
+
+        final variety = entry.reanimationTags.isNotEmpty
+            ? entry.reanimationTags
+                .map((tag) => l10n.reanimationTagLabel(tag))
+                .join(', ')
+            : l10n.manipulationTypeRerooting;
+        parts.add(variety);
+
+        if (entry.isGreenhouse) {
+          parts.add(l10n.reanimationGreenhouse);
+        }
+
+        if (entry.stageBefore != null && entry.stageAfter != null) {
+          parts.add(
+            l10n.manipulationRerootingStageChange(
+              l10n.stageTitle(entry.stageBefore!),
+              l10n.stageTitle(entry.stageAfter!),
+            ),
+          );
+        }
+      } else if (entry.type == ManipulationType.stimulator) {
+        parts.add(DateFormat('d MMM y', dateLocale).format(entry.appliedAt));
+        final stimulatorName = entry.stimulatorName?.trim().isNotEmpty == true
+            ? entry.stimulatorName!.trim()
+            : l10n.manipulationTypeStimulator;
+        parts.add(stimulatorName);
+        if (entry.dosage != null && entry.dosage!.trim().isNotEmpty) {
+          parts.add(entry.dosage!.trim());
+        }
+      } else {
+        parts.add(DateFormat('d MMM y', dateLocale).format(entry.appliedAt));
+        parts.add(l10n.manipulationTypeLabel(entry.type));
+      }
+
+      final note = entry.note?.trim();
+      if (note != null && note.isNotEmpty) {
+        parts.add(note);
+      }
+
+      return parts.join(' · ');
     }
 
     void openWateringHistory() {

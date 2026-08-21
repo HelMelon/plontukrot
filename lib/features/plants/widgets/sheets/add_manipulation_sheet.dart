@@ -7,6 +7,7 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../models/manipulation_entry.dart';
 import '../../../../models/manipulation_type.dart';
 import '../../../../models/plant.dart';
+import '../../../../models/reanimation_tag.dart';
 import '../../../../models/stimulator.dart';
 import '../../../../services/manipulation_service.dart';
 import '../../../../services/stimulator_service.dart';
@@ -82,6 +83,8 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
   late DateTime _selectedDate;
   DateTime? _endedDate;
   bool _hasEnded = false;
+  final Set<ReanimationTag> _selectedReanimationTags = {};
+  bool _isGreenhouse = false;
   late _StimulatorMode _stimulatorMode;
   String? _selectedStimulatorId;
   bool _setStageAfter = false;
@@ -98,6 +101,8 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
       _selectedDate = entry.appliedAt;
       _endedDate = entry.endedAt;
       _hasEnded = entry.endedAt != null;
+      _selectedReanimationTags.addAll(entry.reanimationTags);
+      _isGreenhouse = entry.isGreenhouse;
       _noteController.text = entry.note ?? '';
       _stageAfter = entry.stageAfter;
       _setStageAfter = entry.stageAfter != null;
@@ -118,6 +123,8 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
       _selectedDate = DateTime.now();
       _endedDate = null;
       _hasEnded = false;
+      _selectedReanimationTags.clear();
+      _isGreenhouse = false;
       _stimulatorMode = _StimulatorMode.saved;
     }
   }
@@ -238,6 +245,11 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
       final endedAt = _type == ManipulationType.rerooting && _hasEnded
           ? (_endedDate ?? _selectedDate)
           : null;
+      final reanimationTags = _type == ManipulationType.rerooting
+          ? _selectedReanimationTags.toList()
+          : const <ReanimationTag>[];
+      final isGreenhouse =
+          _type == ManipulationType.rerooting && _isGreenhouse;
 
       if (widget.isEditing) {
         await _manipulationService.updateManipulation(
@@ -246,6 +258,8 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
           type: _type,
           appliedAt: _selectedDate,
           endedAt: endedAt,
+          reanimationTags: reanimationTags,
+          isGreenhouse: isGreenhouse,
           note: note.isEmpty ? null : note,
           stageBefore: widget.entry!.stageBefore,
           stageAfter: stageAfter,
@@ -259,6 +273,8 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
           type: _type,
           appliedAt: _selectedDate,
           endedAt: endedAt,
+          reanimationTags: reanimationTags,
+          isGreenhouse: isGreenhouse,
           note: note.isEmpty ? null : note,
           stageAfter: stageAfter,
           stimulatorId: stimulatorId,
@@ -271,6 +287,8 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
           type: _type,
           appliedAt: _selectedDate,
           endedAt: endedAt,
+          reanimationTags: reanimationTags,
+          isGreenhouse: isGreenhouse,
           note: note.isEmpty ? null : note,
           stageAfter: stageAfter,
           stimulatorId: stimulatorId,
@@ -362,6 +380,43 @@ class _AddManipulationSheetState extends State<AddManipulationSheet> {
           ),
           spacing.vSm,
         ],
+        Text(
+          l10n.manipulationReanimationTagsTitle,
+          style: typography.bodySmall,
+        ),
+        spacing.vXs,
+        Wrap(
+          spacing: spacing.xs,
+          runSpacing: spacing.xs,
+          children: ReanimationTag.values.map((tag) {
+            final selected = _selectedReanimationTags.contains(tag);
+            return FilterChip(
+              label: Text(l10n.reanimationTagLabel(tag)),
+              selected: selected,
+              onSelected: (isSelected) {
+                setState(() {
+                  if (isSelected) {
+                    _selectedReanimationTags.add(tag);
+                  } else {
+                    _selectedReanimationTags.remove(tag);
+                  }
+                });
+              },
+            );
+          }).toList(),
+        ),
+        spacing.vSm,
+        CheckboxListTile(
+          contentPadding: EdgeInsets.zero,
+          value: _isGreenhouse,
+          onChanged: (value) {
+            setState(() {
+              _isGreenhouse = value ?? false;
+            });
+          },
+          title: Text(l10n.reanimationGreenhouse),
+          controlAffinity: ListTileControlAffinity.leading,
+        ),
         CheckboxListTile(
           contentPadding: EdgeInsets.zero,
           value: _hasEnded,

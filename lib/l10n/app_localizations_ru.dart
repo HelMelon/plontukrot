@@ -1304,6 +1304,21 @@ class AppLocalizationsRu extends AppLocalizations {
   String get manipulationRerootingInProgress => 'В процессе';
 
   @override
+  String get manipulationReanimationTagsTitle => 'Разновидности реанимации';
+
+  @override
+  String get reanimationTagRerooting => 'Переукоренение';
+
+  @override
+  String get reanimationTagSoilFlush => 'Промывка грунта';
+
+  @override
+  String get reanimationTagRotTrimming => 'Обрезка гнили';
+
+  @override
+  String get reanimationGreenhouse => 'Тепличка';
+
+  @override
   String manipulationRerootingStageBefore(String stage) {
     return 'Было: $stage';
   }

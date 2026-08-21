@@ -1,6 +1,7 @@
 import '../models/model_helpers.dart';
 import '../models/manipulation_entry.dart';
 import '../models/manipulation_type.dart';
+import '../models/reanimation_tag.dart';
 import 'api_client.dart';
 import 'api_exception.dart';
 import 'plant_service.dart';
@@ -40,6 +41,8 @@ class ManipulationService {
     required ManipulationType type,
     required DateTime appliedAt,
     DateTime? endedAt,
+    List<ReanimationTag> reanimationTags = const [],
+    bool isGreenhouse = false,
     String? note,
     int? stageAfter,
     String? stimulatorId,
@@ -60,6 +63,9 @@ class ManipulationService {
       'type': type.index,
       'applied_at': isoDate(appliedAt),
       if (endedAt != null) 'ended_at': isoDate(endedAt),
+      if (reanimationTags.isNotEmpty)
+        'reanimation_tags': reanimationTags.map((e) => e.code).toList(),
+      if (isGreenhouse) 'is_greenhouse': true,
       'note': _trimOrNull(note),
       'stage_before': stageBefore,
       'stage_after': stageAfter,
@@ -82,6 +88,8 @@ class ManipulationService {
     required ManipulationType type,
     required DateTime appliedAt,
     DateTime? endedAt,
+    List<ReanimationTag> reanimationTags = const [],
+    bool isGreenhouse = false,
     String? note,
     int? stageAfter,
     String? stimulatorId,
@@ -94,6 +102,8 @@ class ManipulationService {
         type: type,
         appliedAt: appliedAt,
         endedAt: endedAt,
+        reanimationTags: reanimationTags,
+        isGreenhouse: isGreenhouse,
         note: note,
         stageAfter: stageAfter,
         stimulatorId: stimulatorId,
@@ -109,6 +119,8 @@ class ManipulationService {
     required ManipulationType type,
     required DateTime appliedAt,
     DateTime? endedAt,
+    List<ReanimationTag> reanimationTags = const [],
+    bool isGreenhouse = false,
     String? note,
     int? stageBefore,
     int? stageAfter,
@@ -124,6 +136,8 @@ class ManipulationService {
         'type': type.index,
         'applied_at': isoDate(appliedAt),
         'ended_at': isoOrNull(endedAt),
+        'reanimation_tags': reanimationTags.map((e) => e.code).toList(),
+        'is_greenhouse': isGreenhouse,
         'note': _trimOrNull(note),
         'stage_before': stageBefore,
         'stage_after': stageAfter,

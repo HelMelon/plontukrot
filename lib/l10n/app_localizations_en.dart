@@ -1299,6 +1299,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get manipulationRerootingInProgress => 'In progress';
 
   @override
+  String get manipulationReanimationTagsTitle => 'Reanimation varieties';
+
+  @override
+  String get reanimationTagRerooting => 'Re-rooting';
+
+  @override
+  String get reanimationTagSoilFlush => 'Soil flush';
+
+  @override
+  String get reanimationTagRotTrimming => 'Rot trimming';
+
+  @override
+  String get reanimationGreenhouse => 'Greenhouse';
+
+  @override
   String manipulationRerootingStageBefore(String stage) {
     return 'Was: $stage';
   }

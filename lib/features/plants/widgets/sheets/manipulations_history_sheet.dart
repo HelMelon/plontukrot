@@ -130,6 +130,12 @@ class _ManipulationsHistorySheetState extends State<ManipulationsHistorySheet> {
         entry.stimulatorName?.trim().isNotEmpty == true
             ? entry.stimulatorName!.trim()
             : l10n.manipulationTypeStimulator,
+      ManipulationType.rerooting =>
+        entry.reanimationTags.isNotEmpty
+            ? entry.reanimationTags
+                .map((tag) => l10n.reanimationTagLabel(tag))
+                .join(', ')
+            : l10n.manipulationTypeRerooting,
       _ => l10n.manipulationTypeLabel(entry.type),
     };
   }
@@ -150,6 +156,9 @@ class _ManipulationsHistorySheetState extends State<ManipulationsHistorySheet> {
         parts.add(
           '${DateFormat.yMMMMd().format(entry.appliedAt)} · ${l10n.manipulationRerootingInProgress}',
         );
+      }
+      if (entry.isGreenhouse) {
+        parts.add(l10n.reanimationGreenhouse);
       }
     } else {
       parts.add(DateFormat.yMMMMd().format(entry.appliedAt));

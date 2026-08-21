@@ -7,6 +7,7 @@ import '../../models/manipulation_type.dart';
 import '../../models/propagation_method.dart';
 import '../../models/propagation_outcome.dart';
 import '../../models/propagation_status.dart';
+import '../../models/reanimation_tag.dart';
 import '../../models/stage_info.dart';
 import '../../models/variegation.dart';
 
@@ -175,6 +176,14 @@ extension AppLocalizationsStage on AppLocalizations {
       ManipulationType.pinching => manipulationTypePinching,
       ManipulationType.rerooting => manipulationTypeRerooting,
       ManipulationType.stimulator => manipulationTypeStimulator,
+    };
+  }
+
+  String reanimationTagLabel(ReanimationTag tag) {
+    return switch (tag) {
+      ReanimationTag.rerooting => reanimationTagRerooting,
+      ReanimationTag.soilFlush => reanimationTagSoilFlush,
+      ReanimationTag.rotTrimming => reanimationTagRotTrimming,
     };
   }
 }

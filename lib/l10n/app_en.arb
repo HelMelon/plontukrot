@@ -598,6 +598,11 @@
   },
   "manipulationRerootingEndedCheckbox": "Reanimation completed",
   "manipulationRerootingInProgress": "In progress",
+  "manipulationReanimationTagsTitle": "Reanimation varieties",
+  "reanimationTagRerooting": "Re-rooting",
+  "reanimationTagSoilFlush": "Soil flush",
+  "reanimationTagRotTrimming": "Rot trimming",
+  "reanimationGreenhouse": "Greenhouse",
   "manipulationRerootingStageBefore": "Was: {stage}",
   "@manipulationRerootingStageBefore": {
     "placeholders": {

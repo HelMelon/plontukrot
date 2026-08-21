@@ -2496,6 +2496,36 @@ abstract class AppLocalizations {
   /// **'In progress'**
   String get manipulationRerootingInProgress;
 
+  /// No description provided for @manipulationReanimationTagsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reanimation varieties'**
+  String get manipulationReanimationTagsTitle;
+
+  /// No description provided for @reanimationTagRerooting.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-rooting'**
+  String get reanimationTagRerooting;
+
+  /// No description provided for @reanimationTagSoilFlush.
+  ///
+  /// In en, this message translates to:
+  /// **'Soil flush'**
+  String get reanimationTagSoilFlush;
+
+  /// No description provided for @reanimationTagRotTrimming.
+  ///
+  /// In en, this message translates to:
+  /// **'Rot trimming'**
+  String get reanimationTagRotTrimming;
+
+  /// No description provided for @reanimationGreenhouse.
+  ///
+  /// In en, this message translates to:
+  /// **'Greenhouse'**
+  String get reanimationGreenhouse;
+
   /// No description provided for @manipulationRerootingStageBefore.
   ///
   /// In en, this message translates to:

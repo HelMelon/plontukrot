@@ -1308,6 +1308,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get manipulationRerootingInProgress => 'In Bearbeitung';
 
   @override
+  String get manipulationReanimationTagsTitle => 'Reanimationsarten';
+
+  @override
+  String get reanimationTagRerooting => 'Neu bewurzeln';
+
+  @override
+  String get reanimationTagSoilFlush => 'Bodenspülung';
+
+  @override
+  String get reanimationTagRotTrimming => 'Faulstellen entfernen';
+
+  @override
+  String get reanimationGreenhouse => 'Gewächshaus';
+
+  @override
   String manipulationRerootingStageBefore(String stage) {
     return 'War: $stage';
   }

@@ -486,6 +486,11 @@
   },
   "manipulationRerootingEndedCheckbox": "Реанимация завершена",
   "manipulationRerootingInProgress": "В процессе",
+  "manipulationReanimationTagsTitle": "Разновидности реанимации",
+  "reanimationTagRerooting": "Переукоренение",
+  "reanimationTagSoilFlush": "Промывка грунта",
+  "reanimationTagRotTrimming": "Обрезка гнили",
+  "reanimationGreenhouse": "Тепличка",
   "manipulationRerootingStageBefore": "Было: {stage}",
   "@manipulationRerootingStageBefore": {
     "placeholders": {
