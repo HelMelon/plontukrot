@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import 'api_exception.dart';
 import 'api_refresh.dart';
+import 'app_crash_reporting.dart';
 import 'token_store.dart';
 
 /// Thin REST client for the FastAPI backend.
@@ -101,11 +102,19 @@ class ApiClient {
       throw ApiException(401, _extractMessage(response), body: response.body);
     }
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(
+      final exception = ApiException(
         response.statusCode,
         _extractMessage(response),
         body: response.body,
       );
+      unawaited(
+        AppCrashReporting.instance.recordError(
+          exception,
+          StackTrace.current,
+          reason: 'api_multipart_http_${response.statusCode}: $path',
+        ),
+      );
+      throw exception;
     }
     if (response.body.isEmpty) return null;
     return jsonDecode(response.body);
@@ -155,9 +164,23 @@ class ApiClient {
         default:
           throw ArgumentError('Unsupported HTTP method: $method');
       }
-    } on SocketException {
+    } on SocketException catch (error, stack) {
+      unawaited(
+        AppCrashReporting.instance.recordError(
+          error,
+          stack,
+          reason: 'network_socket_error: $method $path',
+        ),
+      );
       rethrow;
-    } on TimeoutException {
+    } on TimeoutException catch (error, stack) {
+      unawaited(
+        AppCrashReporting.instance.recordError(
+          error,
+          stack,
+          reason: 'network_timeout_error: $method $path',
+        ),
+      );
       rethrow;
     }
 
@@ -175,11 +198,23 @@ class ApiClient {
     }
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(
+      final exception = ApiException(
         response.statusCode,
         _extractMessage(response),
         body: response.body,
       );
+      if (response.statusCode >= 500 ||
+          response.statusCode == 400 ||
+          response.statusCode == 422) {
+        unawaited(
+          AppCrashReporting.instance.recordError(
+            exception,
+            StackTrace.current,
+            reason: 'api_http_${response.statusCode}: $method $path',
+          ),
+        );
+      }
+      throw exception;
     }
 
     if (pingOnSuccess) {

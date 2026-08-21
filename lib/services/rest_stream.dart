@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'api_refresh.dart';
+import 'app_crash_reporting.dart';
 
 /// Turns a one-shot REST fetch into a broadcast stream that many widgets can
 /// listen to at once without "already been listened to" errors.
@@ -31,7 +32,20 @@ Stream<T> restPollStream<T>(
       hasValue = true;
       controller.add(value);
     } catch (error, stack) {
-      if (!controller.isClosed) controller.addError(error, stack);
+      unawaited(
+        AppCrashReporting.instance.recordError(
+          error,
+          stack,
+          reason: 'rest_poll_stream_failed',
+        ),
+      );
+      if (!controller.isClosed) {
+        // If there is no cached value yet, notify listeners of initial failure.
+        // If we already have a value, retain the current UI rather than clearing data.
+        if (!hasValue) {
+          controller.addError(error, stack);
+        }
+      }
     } finally {
       inFlight = false;
     }

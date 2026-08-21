@@ -370,11 +370,87 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
     return StreamBuilder<Plant?>(
       stream: _plantStream,
       builder: (context, plantSnapshot) {
-        if (!plantSnapshot.hasData || plantSnapshot.data == null) {
+        if (plantSnapshot.hasError) {
+          final error = plantSnapshot.error;
           return Scaffold(
             backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              surfaceTintColor: Colors.transparent,
+              actions: buildAppBarChromeActions(context),
+            ),
             body: Center(
-              child: AccessibleProgressIndicator(color: colors.primary),
+              child: Padding(
+                padding: EdgeInsets.all(spacing.lg),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: context.dimensions.iconXl,
+                      color: colors.error,
+                    ),
+                    spacing.vMd,
+                    Text(
+                      l10n.commonError(error.toString()),
+                      textAlign: TextAlign.center,
+                      style: typography.bodyMedium,
+                    ),
+                    spacing.vLg,
+                    OutlinedButton(
+                      onPressed: () => Navigator.of(context).maybePop(),
+                      child: Text(l10n.commonBack),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
+        if (!plantSnapshot.hasData || plantSnapshot.data == null) {
+          if (plantSnapshot.connectionState == ConnectionState.waiting) {
+            return Scaffold(
+              backgroundColor: Colors.transparent,
+              body: Center(
+                child: AccessibleProgressIndicator(color: colors.primary),
+              ),
+            );
+          }
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              surfaceTintColor: Colors.transparent,
+              actions: buildAppBarChromeActions(context),
+            ),
+            body: Center(
+              child: Padding(
+                padding: EdgeInsets.all(spacing.lg),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.help_outline,
+                      size: context.dimensions.iconXl,
+                      color: colors.icon,
+                    ),
+                    spacing.vMd,
+                    Text(
+                      l10n.commonNoData,
+                      textAlign: TextAlign.center,
+                      style: typography.bodyMedium,
+                    ),
+                    spacing.vLg,
+                    OutlinedButton(
+                      onPressed: () => Navigator.of(context).maybePop(),
+                      child: Text(l10n.commonBack),
+                    ),
+                  ],
+                ),
+              ),
             ),
           );
         }

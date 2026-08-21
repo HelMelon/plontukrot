@@ -35,21 +35,26 @@ Future<LeafRemovalReason?> showLeafRemovalReasonSheet(BuildContext context) {
               spacing.vSm,
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: Icon(Icons.content_cut, color: colors.icon),
+                leading: ExcludeSemantics(
+                  child: Icon(Icons.content_cut, color: colors.icon),
+                ),
                 title: Text(l10n.plantLeafRemoveCut),
                 onTap: () =>
                     Navigator.pop(context, LeafRemovalReason.cutForRooting),
               ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: Icon(Icons.restaurant, color: colors.icon),
+                leading: ExcludeSemantics(
+                  child: Icon(Icons.restaurant, color: colors.icon),
+                ),
                 title: Text(l10n.plantLeafRemoveEaten),
                 onTap: () => Navigator.pop(context, LeafRemovalReason.eaten),
               ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading:
-                    Icon(Icons.water_drop_outlined, color: colors.icon),
+                leading: ExcludeSemantics(
+                  child: Icon(Icons.water_drop_outlined, color: colors.icon),
+                ),
                 title: Text(l10n.plantLeafRemoveDried),
                 onTap: () => Navigator.pop(context, LeafRemovalReason.dried),
               ),

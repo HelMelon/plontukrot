@@ -7,10 +7,17 @@ import 'package:flutter/widgets.dart';
 import '../models/plant.dart';
 
 /// Precaches Home list thumbs so [CachedNetworkImage] can paint from cache.
+///
+/// Runs while the splash/startup screens are visible (via `onFirstContentReady`)
+/// so the Home grid appears fully painted rather than images fading in through
+/// placeholders. `concurrency` caps how many images download in parallel;
+/// `timeout` bounds the whole warmup so the splash cannot hang forever on a
+/// slow connection — but it is generous (45s) because the point is to finish
+/// the download *before* revealing Home.
 class StartupWarmupService {
   StartupWarmupService({
-    this.timeout = const Duration(seconds: 12),
-    this.concurrency = 6,
+    this.timeout = const Duration(seconds: 45),
+    this.concurrency = 12,
   });
 
   final Duration timeout;
