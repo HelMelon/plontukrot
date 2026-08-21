@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
@@ -110,12 +111,16 @@ class _ManipulationsHistorySheetState extends State<ManipulationsHistorySheet> {
     );
   }
 
-  IconData _iconForType(ManipulationType type, BuildContext context) {
+  Widget _buildLeadingIcon(ManipulationType type, BuildContext context) {
     final icons = context.icons;
+    final colors = context.colors;
     return switch (type) {
-      ManipulationType.pinching => icons.pinching,
-      ManipulationType.rerooting => icons.rerooting,
-      ManipulationType.stimulator => icons.stimulator,
+      ManipulationType.pinching =>
+        HugeIcon(icon: icons.pinching, color: colors.icon),
+      ManipulationType.rerooting =>
+        HugeIcon(icon: icons.rerooting, color: colors.icon),
+      ManipulationType.stimulator =>
+        HugeIcon(icon: icons.stimulator, color: colors.icon),
     };
   }
 
@@ -130,9 +135,25 @@ class _ManipulationsHistorySheetState extends State<ManipulationsHistorySheet> {
   }
 
   String _subtitleForEntry(ManipulationEntry entry, AppLocalizations l10n) {
-    final parts = <String>[
-      DateFormat.yMMMMd().format(entry.appliedAt),
-    ];
+    final parts = <String>[];
+
+    if (entry.type == ManipulationType.rerooting) {
+      if (entry.endedAt != null) {
+        final startFormatted = DateFormat.yMMMMd().format(entry.appliedAt);
+        final endFormatted = DateFormat.yMMMMd().format(entry.endedAt!);
+        if (startFormatted == endFormatted) {
+          parts.add(startFormatted);
+        } else {
+          parts.add('$startFormatted – $endFormatted');
+        }
+      } else {
+        parts.add(
+          '${DateFormat.yMMMMd().format(entry.appliedAt)} · ${l10n.manipulationRerootingInProgress}',
+        );
+      }
+    } else {
+      parts.add(DateFormat.yMMMMd().format(entry.appliedAt));
+    }
 
     if (entry.type == ManipulationType.rerooting &&
         entry.stageBefore != null &&
@@ -276,9 +297,9 @@ class _ManipulationsHistorySheetState extends State<ManipulationsHistorySheet> {
                               child: Row(
                                 children: [
                                   ExcludeSemantics(
-                                    child: Icon(
-                                      _iconForType(item.type, context),
-                                      color: colors.icon,
+                                    child: _buildLeadingIcon(
+                                      item.type,
+                                      context,
                                     ),
                                   ),
                                   spacing.hSm,
@@ -291,8 +312,7 @@ class _ManipulationsHistorySheetState extends State<ManipulationsHistorySheet> {
                                           title,
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
-                                          style:
-                                              typography.bodyLarge.copyWith(
+                                          style: typography.bodyLarge.copyWith(
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),

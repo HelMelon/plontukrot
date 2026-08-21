@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
@@ -171,7 +172,8 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                       }
 
                       if (!snapshot.hasData) {
-                        return const Center(child: AccessibleProgressIndicator());
+                        return const Center(
+                            child: AccessibleProgressIndicator());
                       }
 
                       final items = snapshot.data!;
@@ -226,15 +228,15 @@ class _RepottingHistorySheetState extends State<RepottingHistorySheet> {
                               child: Container(
                                 padding: spacing.allMd,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(
-                                      context.radii.md),
+                                  borderRadius:
+                                      BorderRadius.circular(context.radii.md),
                                   color: colors.card,
                                 ),
                                 child: Row(
                                   children: [
                                     ExcludeSemantics(
-                                      child: Icon(
-                                        context.icons.repottingAction,
+                                      child: HugeIcon(
+                                        icon: context.icons.repottingAction,
                                         color: colors.icon,
                                       ),
                                     ),

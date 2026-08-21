@@ -188,21 +188,21 @@ class AppIconTokens {
 
     // Care & Manipulations
     watering: Icons.water_drop_outlined,
-    wateringFilled: Icons.water_drop,
-    wateringHistory: Icons.water_drop_rounded,
+    wateringFilled: Icons.water_drop_outlined,
+    wateringHistory: Icons.water_drop_outlined,
     fertilizing: Icons.science_outlined,
     fertilizingFilled: Icons.science,
     fertilizingEco: Icons.eco_outlined,
     repotting: HugeIcons.strokeRoundedShovel,
-    repottingAction: Icons.flaky,
+    repottingAction: HugeIcons.strokeRoundedShovel,
     note: HugeIcons.strokeRoundedNoteEdit,
     noteAction: Icons.sticky_note_2_outlined,
     notesOutlined: Icons.notes_outlined,
     paymentsOutlined: Icons.payments_outlined,
     merge: Icons.merge_type,
-    pinching: Icons.content_cut_outlined,
-    rerooting: Icons.healing_outlined,
-    stimulator: Icons.biotech_outlined,
+    pinching: HugeIcons.strokeRoundedMinimize03,
+    rerooting: HugeIcons.strokeRoundedBioEnergy,
+    stimulator: HugeIcons.strokeRoundedAiChemistry03,
     leafCut: Icons.content_cut,
     leafEaten: Icons.restaurant,
     lossDied: Icons.heart_broken_outlined,
@@ -300,15 +300,15 @@ class AppIconTokens {
   final IconData fertilizingFilled;
   final IconData fertilizingEco;
   final List<List<dynamic>> repotting;
-  final IconData repottingAction;
+  final List<List<dynamic>> repottingAction;
   final List<List<dynamic>> note;
   final IconData noteAction;
   final IconData notesOutlined;
   final IconData paymentsOutlined;
   final IconData merge;
-  final IconData pinching;
-  final IconData rerooting;
-  final IconData stimulator;
+  final List<List<dynamic>> pinching;
+  final List<List<dynamic>> rerooting;
+  final List<List<dynamic>> stimulator;
   final IconData leafCut;
   final IconData leafEaten;
   final IconData lossDied;
@@ -397,15 +397,15 @@ class AppIconTokens {
     IconData? fertilizingFilled,
     IconData? fertilizingEco,
     List<List<dynamic>>? repotting,
-    IconData? repottingAction,
+    List<List<dynamic>>? repottingAction,
     List<List<dynamic>>? note,
     IconData? noteAction,
     IconData? notesOutlined,
     IconData? paymentsOutlined,
     IconData? merge,
-    IconData? pinching,
-    IconData? rerooting,
-    IconData? stimulator,
+    List<List<dynamic>>? pinching,
+    List<List<dynamic>>? rerooting,
+    List<List<dynamic>>? stimulator,
     IconData? leafCut,
     IconData? leafEaten,
     IconData? lossDied,

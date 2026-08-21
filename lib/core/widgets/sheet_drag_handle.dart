@@ -10,12 +10,14 @@ class SheetDragHandle extends StatelessWidget {
   Widget build(BuildContext context) {
     final sheets = context.components.sheets;
     return ExcludeSemantics(
-      child: Container(
-        width: sheets.handleWidth,
-        height: sheets.handleHeight,
-        decoration: BoxDecoration(
-          color: sheets.handleColor,
-          borderRadius: BorderRadius.circular(sheets.handleRadius),
+      child: Center(
+        child: Container(
+          width: sheets.handleWidth,
+          height: sheets.handleHeight,
+          decoration: BoxDecoration(
+            color: sheets.handleColor,
+            borderRadius: BorderRadius.circular(sheets.handleRadius),
+          ),
         ),
       ),
     );
