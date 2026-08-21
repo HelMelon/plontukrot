@@ -229,6 +229,8 @@ class Plant {
       if (lastRepottedAt != null) 'last_repotted_at': isoOrNull(lastRepottedAt),
       if (lastManipulationAt != null)
         'lastManipulationAt': isoOrNull(lastManipulationAt),
+      if (lastManipulationAt != null)
+        'last_manipulation_at': isoOrNull(lastManipulationAt),
       'initialLeafCount': initialLeafCount,
       'initial_leaf_count': initialLeafCount,
       if (members.isNotEmpty) 'members': members.map((m) => m.toMap()).toList(),

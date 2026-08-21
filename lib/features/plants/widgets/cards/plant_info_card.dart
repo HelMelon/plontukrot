@@ -5,10 +5,13 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/growth_event.dart';
+import '../../../../models/manipulation_entry.dart';
+import '../../../../models/manipulation_type.dart';
 import '../../../../models/plant.dart';
 import '../../../../models/plant_archive_reason.dart';
 import '../../../../models/stage_info.dart';
 import '../../../../models/variegation.dart';
+import '../../../../services/manipulation_service.dart';
 import '../../pages/plant_genus_details_page.dart';
 import '../growth/plant_growth_stats_section.dart';
 import '../../../../services/note_service.dart';
@@ -42,11 +45,28 @@ class PlantInfoCard extends StatefulWidget {
 
 class _PlantInfoCardState extends State<PlantInfoCard> {
   final GlobalKey _botanicalDetailsKey = GlobalKey();
+  late Stream<ManipulationEntry?> _lastManipulationStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _lastManipulationStream =
+        ManipulationService().watchLastManipulation(widget.plantId);
+  }
+
+  @override
+  void didUpdateWidget(PlantInfoCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.plantId != widget.plantId) {
+      _lastManipulationStream =
+          ManipulationService().watchLastManipulation(widget.plantId);
+    }
+  }
 
   double get _sectionGap => context.spacing.md;
 
   static Widget _icon(BuildContext context, String asset) {
-    final size = context.dimensions.avatar - 8;
+    final size = context.dimensions.avatar + 20;
     return ExcludeSemantics(
       child: Image.asset(
         asset,
@@ -157,9 +177,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
         _infoRowIfPresent(l10n.plantFamilyLabel, plant.plantFamily);
     final tradingNameRow =
         _infoRowIfPresent(l10n.plantTradingNameLabel, tradingNameTrimmed);
-    final variegation = plant.isGroup
-        ? Variegation.none
-        : plant.variegation;
+    final variegation = plant.isGroup ? Variegation.none : plant.variegation;
     final variegationLabel = l10n.variegationLabelOf(variegation);
     final dateLocale = Localizations.localeOf(context).toString();
     final createdAtLabel = plant.createdAt == null
@@ -175,7 +193,27 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
 
     String careDateLabel(DateTime? date) {
       if (date == null) return l10n.commonNoData;
-      return DateFormat('d MMM y').format(date);
+      return DateFormat('d MMM y', dateLocale).format(date);
+    }
+
+    String manipulationLabel(ManipulationEntry? entry) {
+      if (entry == null) {
+        if (plant.lastManipulationAt != null) {
+          return DateFormat('d MMM y', dateLocale)
+              .format(plant.lastManipulationAt!);
+        }
+        return l10n.commonNoData;
+      }
+      final dateStr =
+          DateFormat('d MMM y', dateLocale).format(entry.appliedAt);
+      final name = switch (entry.type) {
+        ManipulationType.stimulator =>
+          entry.stimulatorName?.trim().isNotEmpty == true
+              ? entry.stimulatorName!.trim()
+              : l10n.manipulationTypeStimulator,
+        _ => l10n.manipulationTypeLabel(entry.type),
+      };
+      return '$dateStr · $name';
     }
 
     void openWateringHistory() {
@@ -337,7 +375,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                       spacing.hXxs,
                       ExcludeSemantics(
                         child: Icon(
-                          Icons.arrow_downward,
+                          context.icons.arrowDownward,
                           size: context.dimensions.iconSm,
                           color: colors.icon,
                         ),
@@ -376,15 +414,16 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
             onTap: openRepottingHistory,
           ),
           spacing.vXs,
-          InfoCard(
-            icon: Icon(
-              Icons.healing_outlined,
-              size: context.dimensions.avatar - 8,
-              color: context.colors.icon,
-            ),
-            title: l10n.manipulations,
-            value: careDateLabel(plant.lastManipulationAt),
-            onTap: openManipulationsHistory,
+          StreamBuilder<ManipulationEntry?>(
+            stream: _lastManipulationStream,
+            builder: (context, snapshot) {
+              return InfoCard(
+                icon: _icon(context, 'assets/icons/trimming.webp'),
+                title: l10n.manipulations,
+                value: manipulationLabel(snapshot.data),
+                onTap: openManipulationsHistory,
+              );
+            },
           ),
         ],
       ),
@@ -425,7 +464,7 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                     ),
                   );
                 },
-                icon: Icon(Icons.add, size: context.dimensions.iconMd),
+                icon: Icon(context.icons.add, size: context.dimensions.iconMd),
                 label: Text(l10n.commonAdd),
                 style: TextButton.styleFrom(
                   foregroundColor: colors.primary,

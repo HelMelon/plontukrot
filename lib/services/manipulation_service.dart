@@ -130,4 +130,12 @@ class ManipulationService {
       return entries.take(limit).toList();
     });
   }
+
+  Stream<ManipulationEntry?> watchLastManipulation(String plantId) {
+    return restPollStream(() async {
+      final entries = await _fetchHistory(plantId);
+      if (entries.isEmpty) return null;
+      return entries.first;
+    });
+  }
 }
