@@ -37,6 +37,9 @@ class ApiClient {
   Map<String, String> _headers({bool jsonBody = false}) {
     final headers = <String, String>{
       'Accept': 'application/json',
+      // Tell the backend the client's UTC offset (minutes) so any server-side
+      // date math can stay in the user's local day. E.g. UTC+3 → "+180".
+      'X-Timezone-Offset': deviceUtcOffsetMinutes().toString(),
     };
     if (jsonBody) {
       headers['Content-Type'] = 'application/json';
@@ -259,7 +262,32 @@ Map<String, dynamic> jsonMap(dynamic json) {
   return <String, dynamic>{};
 }
 
-String isoDate(DateTime value) => value.toUtc().toIso8601String();
+String isoDate(DateTime value) {
+  // Date-only values (midnight local) must keep their calendar day. Converting
+  // to UTC shifts them back a day for positive offsets (e.g. UTC+3 → 23rd),
+  // which corrupts repotting/watering/fertilizing dates. Real timestamps with
+  // a time component still serialize as UTC.
+  if (value.hour == 0 &&
+      value.minute == 0 &&
+      value.second == 0 &&
+      value.millisecond == 0) {
+    final y = value.year.toString().padLeft(4, '0');
+    final m = value.month.toString().padLeft(2, '0');
+    final d = value.day.toString().padLeft(2, '0');
+    return '$y-$m-${d}T00:00:00';
+  }
+  return value.toUtc().toIso8601String();
+}
 
 String? isoDateOrNull(DateTime? value) =>
     value == null ? null : isoDate(value);
+
+/// The device's current UTC offset in minutes (e.g. UTC+3 → 180, UTC-5 → -300).
+///
+/// Sent to the backend as `X-Timezone-Offset` so any server-side date math
+/// stays in the user's local day. Uses the local [DateTime]'s offset, which
+/// already reflects DST.
+int deviceUtcOffsetMinutes() {
+  final now = DateTime.now();
+  return now.timeZoneOffset.inMinutes;
+}
