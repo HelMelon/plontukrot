@@ -218,6 +218,14 @@ class RepottingCreate(BaseModel):
     repotted_at: datetime
 
 
+class RepottingUpdate(BaseModel):
+    soil_id: Optional[str] = None
+    soil_name: Optional[str] = None
+    components: Optional[list] = None
+    slow_release_fertilizer: Optional[bool] = None
+    repotted_at: Optional[datetime] = None
+
+
 class RepottingOut(BaseModel):
     id: str
     plant_id: str

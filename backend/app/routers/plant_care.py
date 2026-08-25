@@ -22,6 +22,7 @@ from ..schemas import (
     PlantPhotoOut,
     RepottingCreate,
     RepottingOut,
+    RepottingUpdate,
     WateringCreate,
     WateringOut,
 )
@@ -322,6 +323,77 @@ def add_repotting(plant_id: str, payload: RepottingCreate,
             (r_id,),
         ).fetchone()
     return RepottingOut(**row)
+
+
+@router.patch("/repottings/{repotting_id}", response_model=RepottingOut)
+def update_repotting(
+    plant_id: str,
+    repotting_id: str,
+    payload: RepottingUpdate,
+    user_id: str = Depends(get_current_user_id),
+):
+    _ensure_owned(plant_id, user_id)
+    data = payload.model_dump(exclude_unset=True)
+    fields = []
+    values = []
+    for key, val in data.items():
+        fields.append(f"{key} = %s")
+        if key == "components":
+            values.append(jsonb(val))
+        else:
+            values.append(val)
+
+    with get_pool().connection() as conn:
+        existing = conn.execute(
+            "SELECT id FROM plant_repottings WHERE id = %s AND plant_id = %s",
+            (repotting_id, plant_id),
+        ).fetchone()
+        if not existing:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Repotting not found",
+            )
+        if fields:
+            values.extend([repotting_id, plant_id])
+            conn.execute(
+                f"UPDATE plant_repottings SET {', '.join(fields)} "
+                "WHERE id = %s AND plant_id = %s",
+                tuple(values),
+            )
+            conn.execute(
+                "UPDATE plants SET last_repotted_at = "
+                "(SELECT MAX(repotted_at) FROM plant_repottings "
+                "WHERE plant_id = %s) WHERE id = %s",
+                (plant_id, plant_id),
+            )
+        row = conn.execute(
+            "SELECT id, plant_id, soil_id, soil_name, components, "
+            "slow_release_fertilizer, repotted_at, created_at "
+            "FROM plant_repottings WHERE id = %s",
+            (repotting_id,),
+        ).fetchone()
+    return RepottingOut(**row)
+
+
+@router.delete("/repottings/{repotting_id}", status_code=204)
+def delete_repotting(
+    plant_id: str,
+    repotting_id: str,
+    user_id: str = Depends(get_current_user_id),
+):
+    _ensure_owned(plant_id, user_id)
+    with get_pool().connection() as conn:
+        conn.execute(
+            "DELETE FROM plant_repottings WHERE id = %s AND plant_id = %s",
+            (repotting_id, plant_id),
+        )
+        conn.execute(
+            "UPDATE plants SET last_repotted_at = "
+            "(SELECT MAX(repotted_at) FROM plant_repottings "
+            "WHERE plant_id = %s) WHERE id = %s",
+            (plant_id, plant_id),
+        )
+    return None
 
 
 # ---- Manipulations ----
