@@ -73,6 +73,22 @@ def auto_migrate() -> None:
                 ALTER TABLE plant_manipulations ADD COLUMN IF NOT EXISTS stimulator_id TEXT;
                 ALTER TABLE plant_manipulations ADD COLUMN IF NOT EXISTS stimulator_name TEXT;
                 ALTER TABLE plant_manipulations ADD COLUMN IF NOT EXISTS dosage TEXT;
+
+                CREATE TABLE IF NOT EXISTS sensor_readings (
+                    id BIGSERIAL PRIMARY KEY,
+                    pot INT NOT NULL,
+                    moisture DOUBLE PRECISION NOT NULL,
+                    raw INT,
+                    read_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                );
+                CREATE INDEX IF NOT EXISTS idx_sensor_readings_pot
+                    ON sensor_readings (pot, read_at DESC);
+
+                CREATE TABLE IF NOT EXISTS sensor_names (
+                    pot INT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                );
             """)
     except Exception:
         pass

@@ -8,7 +8,18 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import settings
 from .db import auto_migrate, get_pool
-from .routers import auth, catalogs, plant_care, plants, propagations, social, species
+from .routers import (
+    auth,
+    catalogs,
+    manipulations,
+    plant_care,
+    plants,
+    propagations,
+    sensor,
+    smart_home,
+    social,
+    species,
+)
 
 
 @asynccontextmanager
@@ -43,6 +54,9 @@ app.include_router(propagations.router)
 app.include_router(catalogs.router)
 app.include_router(social.router)
 app.include_router(species.router)
+app.include_router(manipulations.router)
+app.include_router(sensor.router)
+app.include_router(smart_home.router)
 
 # Serve uploaded photos from disk.
 os.makedirs(settings.photos_dir, exist_ok=True)

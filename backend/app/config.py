@@ -27,6 +27,17 @@ class Settings:
         self.photos_dir: str = os.environ.get(
             "PHOTOS_DIR", "/opt/plontukrot/photos"
         )
+        # Shared token used by ESP8266 soil-moisture sensors to post readings.
+        self.sensor_token: str = os.environ.get("SENSOR_TOKEN", "")
+        # Yandex Smart Home skill credentials (filled after registering).
+        self.yandex_client_id: str = os.environ.get("YANDEX_CLIENT_ID", "")
+        self.yandex_client_secret: str = os.environ.get(
+            "YANDEX_CLIENT_SECRET", ""
+        )
+        # Fixed access token the skill always hands out; survives restarts.
+        self.yandex_access_token: str = os.environ.get(
+            "YANDEX_ACCESS_TOKEN", ""
+        )
 
 
 settings = Settings()
