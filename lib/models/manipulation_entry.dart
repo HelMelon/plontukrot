@@ -4,6 +4,7 @@ import 'reanimation_tag.dart';
 
 class ManipulationEntry {
   final String id;
+  final String plantId;
   final ManipulationType type;
   final DateTime appliedAt;
   final DateTime? endedAt;
@@ -18,6 +19,7 @@ class ManipulationEntry {
 
   const ManipulationEntry({
     required this.id,
+    this.plantId = '',
     required this.type,
     required this.appliedAt,
     this.endedAt,
@@ -48,6 +50,7 @@ class ManipulationEntry {
 
     return ManipulationEntry(
       id: id,
+      plantId: readString(data, 'plant_id') ?? readString(data, 'plantId') ?? '',
       type: ManipulationType.fromCode(readField(data, 'type')),
       appliedAt: readDate(data, 'appliedAt') ??
           readDate(data, 'applied_at') ??

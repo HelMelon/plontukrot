@@ -186,4 +186,28 @@ class ManipulationService {
       return entries.first;
     });
   }
+
+  /// Все манипуляции текущего пользователя (глобальный эндпоинт).
+  Future<List<ManipulationEntry>> fetchAllManipulations() async {
+    final list = jsonMapList(await _api.get('/manipulations'));
+    return list
+        .map((m) => ManipulationEntry.fromMap(readString(m, 'id') ?? '', m))
+        .toList();
+  }
+
+  /// Идентификаторы растений, которые сейчас на переукоренении
+  /// (есть активная манипуляция rerooting без даты завершения).
+  Stream<Set<String>> watchActiveRerootingPlantIds() {
+    return restPollStream(() async {
+      final all = await fetchAllManipulations();
+      return all
+          .where(
+            (m) =>
+                m.type == ManipulationType.rerooting &&
+                m.endedAt == null,
+          )
+          .map((m) => m.plantId)
+          .toSet();
+    });
+  }
 }

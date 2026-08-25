@@ -19,6 +19,7 @@ import '../../plants/widgets/sheets/add_manipulation_sheet.dart';
 import '../../plants/widgets/sheets/add_note_sheet.dart';
 import '../../plants/widgets/sheets/add_repotting_sheet.dart';
 import '../../plants/widgets/sheets/merge_plant_sheet.dart';
+import '../../../services/manipulation_service.dart';
 import '../../../services/note_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
@@ -70,11 +71,13 @@ class _HomePageState extends State<HomePage> {
   late final Stream<bool> _userDocumentExistsStream;
   late final Stream<List<Plant>> _plantsStream;
   late final Stream<Map<String, int>> _activeBatchCountsStream;
+  late final Stream<Set<String>> _rerootingPlantIdsStream;
   List<Plant> _latestPlants = const [];
   _PlantSortField _sortField = _PlantSortField.createdAt;
   bool _sortAscending = false;
   bool _filterPropagatingOnly = false;
   bool _filterGroupsOnly = false;
+  bool _filterRerootingOnly = false;
   String? _filterPlantFamily;
   String? _filterGenus;
   int? _filterStage;
@@ -100,6 +103,8 @@ class _HomePageState extends State<HomePage> {
     _plantsStream = PlantService().getPlants();
     _activeBatchCountsStream =
         PropagationService().watchActiveBatchCountsByPlantId();
+    _rerootingPlantIdsStream =
+        ManipulationService().watchActiveRerootingPlantIds();
   }
 
   Future<void> _signalFirstContentReady(List<Plant> plants) async {
@@ -1153,13 +1158,26 @@ class _HomePageState extends State<HomePage> {
                               .toList();
                         }
                         workingPlants = _applyBotanicalFilters(workingPlants);
-                        final sortedPlants = _sortPlants(workingPlants);
-                        _visiblePlantIds
-                          ..clear()
-                          ..addAll(sortedPlants.map((plant) => plant.id));
+                        return StreamBuilder<Set<String>>(
+                          stream: _rerootingPlantIdsStream,
+                          builder: (context, rerootingSnapshot) {
+                            final rerootingIds =
+                                rerootingSnapshot.data ?? const <String>{};
+                            var filteredPlants = workingPlants;
+                            if (_filterRerootingOnly) {
+                              filteredPlants = filteredPlants
+                                  .where(
+                                    (plant) => rerootingIds.contains(plant.id),
+                                  )
+                                  .toList();
+                            }
+                            final sortedPlants = _sortPlants(filteredPlants);
+                            _visiblePlantIds
+                              ..clear()
+                              ..addAll(sortedPlants.map((plant) => plant.id));
 
-                        return LayoutBuilder(
-                          builder: (context, constraints) {
+                            return LayoutBuilder(
+                              builder: (context, constraints) {
                             final double screenWidth =
                                 MediaQuery.of(context).size.width;
 
@@ -1276,6 +1294,53 @@ class _HomePageState extends State<HomePage> {
                                               onSelected: (selected) {
                                                 setState(() {
                                                   _filterGroupsOnly = selected;
+                                                });
+                                              },
+                                            ),
+                                            FilterChip(
+                                              selected: _filterRerootingOnly,
+                                              materialTapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                              label: Text(
+                                                l10n.homeReanimation,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              avatar: HugeIcon(
+                                                icon: _icons.rerooting,
+                                                size: dimensions.iconSm,
+                                                color: _filterRerootingOnly
+                                                    ? chips.selectedForeground
+                                                    : colors.icon,
+                                              ),
+                                              selectedColor:
+                                                  chips.selectedBackground,
+                                              checkmarkColor: chips.checkmark,
+                                              labelStyle:
+                                                  chips.labelStyle.copyWith(
+                                                color: _filterRerootingOnly
+                                                    ? chips.selectedForeground
+                                                    : chips
+                                                        .unselectedForeground,
+                                                height: 1.1,
+                                              ),
+                                              backgroundColor:
+                                                  chips.unselectedBackground,
+                                              side: BorderSide(
+                                                color: _filterRerootingOnly
+                                                    ? chips.selectedBorder
+                                                    : chips.unselectedBorder,
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  chips.radius,
+                                                ),
+                                              ),
+                                              onSelected: (selected) {
+                                                setState(() {
+                                                  _filterRerootingOnly =
+                                                      selected;
                                                 });
                                               },
                                             ),
@@ -1450,6 +1515,8 @@ class _HomePageState extends State<HomePage> {
                                   ),
                               ],
                             );
+                          },
+                        );
                           },
                         );
                       },
