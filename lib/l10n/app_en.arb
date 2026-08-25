@@ -325,6 +325,8 @@
   "plantTradingName": "Trading name",
   "plantFamily": "Family",
   "plantNickname": "Nickname",
+  "plantNicknameRequired": "Enter the plant name",
+  "plantRegularWatering": "Regular watering",
   "plantWateringFrequency": "Watering frequency",
   "plantGrowthStage": "Growth stage",
   "plantGenusRequired": "Enter the plant genus",

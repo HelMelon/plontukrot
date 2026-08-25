@@ -735,7 +735,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get plantNickname => 'Surnom';
 
   @override
-  String get plantWateringFrequency => 'Fréquence d’arrosage';
+  String get plantNicknameRequired => 'Saisissez le nom de la plante';
+
+  @override
+  String get plantRegularWatering => 'Arrosage régulier';
+
+  @override
+  String get plantWateringFrequency => 'Fréquence d\'arrosage';
 
   @override
   String get plantGrowthStage => 'Stade de croissance';

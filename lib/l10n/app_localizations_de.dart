@@ -733,6 +733,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get plantNickname => 'Spitzname';
 
   @override
+  String get plantNicknameRequired => 'Pflanzennamen eingeben';
+
+  @override
+  String get plantRegularWatering => 'Regelmäßiges Gießen';
+
+  @override
   String get plantWateringFrequency => 'Gießhäufigkeit';
 
   @override

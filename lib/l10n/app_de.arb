@@ -265,6 +265,8 @@
   "plantTradingName": "Handelsname",
   "plantFamily": "Familie",
   "plantNickname": "Spitzname",
+  "plantNicknameRequired": "Pflanzennamen eingeben",
+  "plantRegularWatering": "Regelmäßiges Gießen",
   "plantWateringFrequency": "Gießhäufigkeit",
   "plantGrowthStage": "Wachstumsstadium",
   "plantGenusRequired": "Gattung der Pflanze eingeben",

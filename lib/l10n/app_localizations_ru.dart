@@ -729,6 +729,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get plantNickname => 'Прозвище';
 
   @override
+  String get plantNicknameRequired => 'Укажите название растения';
+
+  @override
+  String get plantRegularWatering => 'Регулярный полив';
+
+  @override
   String get plantWateringFrequency => 'Частота полива';
 
   @override

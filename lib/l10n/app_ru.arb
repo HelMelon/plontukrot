@@ -265,6 +265,8 @@
   "plantTradingName": "Торговое название",
   "plantFamily": "Семейство",
   "plantNickname": "Прозвище",
+  "plantNicknameRequired": "Укажите название растения",
+  "plantRegularWatering": "Регулярный полив",
   "plantWateringFrequency": "Частота полива",
   "plantGrowthStage": "Стадия роста",
   "plantGenusRequired": "Укажите род растения",

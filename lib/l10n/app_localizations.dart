@@ -1428,6 +1428,18 @@ abstract class AppLocalizations {
   /// **'Nickname'**
   String get plantNickname;
 
+  /// No description provided for @plantNicknameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the plant name'**
+  String get plantNicknameRequired;
+
+  /// No description provided for @plantRegularWatering.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular watering'**
+  String get plantRegularWatering;
+
   /// No description provided for @plantWateringFrequency.
   ///
   /// In en, this message translates to:
