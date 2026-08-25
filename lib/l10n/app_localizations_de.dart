@@ -568,6 +568,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get homeGroups => 'Gruppen';
 
   @override
+  String get homeReanimation => 'Rettung';
+
+  @override
   String get homeArchive => 'Archiv';
 
   @override
@@ -704,6 +707,18 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get plantSpecies => 'Art';
+
+  @override
+  String get plantHybrid => 'Hybride';
+
+  @override
+  String get plantHybridParent1 => 'Elternart 1';
+
+  @override
+  String get plantHybridParent2 => 'Elternart 2';
+
+  @override
+  String get plantHybridParentsRequired => 'Beide Elternarten angeben';
 
   @override
   String get plantCultivar => 'Sorte';

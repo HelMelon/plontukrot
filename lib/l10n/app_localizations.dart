@@ -1128,6 +1128,12 @@ abstract class AppLocalizations {
   /// **'Groups'**
   String get homeGroups;
 
+  /// No description provided for @homeReanimation.
+  ///
+  /// In en, this message translates to:
+  /// **'Rescue'**
+  String get homeReanimation;
+
   /// No description provided for @homeArchive.
   ///
   /// In en, this message translates to:
@@ -1373,6 +1379,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Species'**
   String get plantSpecies;
+
+  /// No description provided for @plantHybrid.
+  ///
+  /// In en, this message translates to:
+  /// **'Hybrid'**
+  String get plantHybrid;
+
+  /// No description provided for @plantHybridParent1.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent species 1'**
+  String get plantHybridParent1;
+
+  /// No description provided for @plantHybridParent2.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent species 2'**
+  String get plantHybridParent2;
+
+  /// No description provided for @plantHybridParentsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter both parent species'**
+  String get plantHybridParentsRequired;
 
   /// No description provided for @plantCultivar.
   ///
