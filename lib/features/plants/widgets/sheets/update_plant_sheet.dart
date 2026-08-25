@@ -65,9 +65,9 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   Variegation selectedVariegation = Variegation.none;
   int? fertilizingFrequencyDays;
   bool isFertilizingFrequencyCustom = false;
-  String? genusError;
-  String? speciesError;
+  String? nicknameError;
   bool isHybrid = false;
+  bool isRegularWatering = false;
   Uint8List? _pendingPhotoBytes;
 
   bool get _isGroup => widget.plant.isGroup;
@@ -101,6 +101,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
         wateringFrequencyController.text == 'null') {
       wateringFrequencyController.text = '';
     }
+    isRegularWatering = wateringFrequencyController.text.isNotEmpty;
     initialLeafCountController.text = widget.plant.initialLeafCount.toString();
     selectedStage = widget.plant.stage;
     isFertilizingFrequencyCustom = widget.plant.isFertilizingFrequencyCustom;
@@ -212,9 +213,6 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     final plantFamily = plantFamilyController.text.trim();
     final tradingName = tradingNameController.text.trim();
     final nickname = nickNameController.text.trim();
-    final wateringRaw = wateringFrequencyController.text.trim();
-    final wateringFrequency =
-        wateringRaw.isEmpty ? null : int.tryParse(wateringRaw);
     final initialLeafRaw = initialLeafCountController.text.trim();
     final initialLeafCount =
         initialLeafRaw.isEmpty ? 0 : int.tryParse(initialLeafRaw);
@@ -234,27 +232,29 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
       species = speciesController.text.trim();
     }
 
-    String? nextGenusError;
-    String? nextSpeciesError;
-    if (genus.isEmpty) {
-      nextGenusError = l10n.plantGenusRequired;
+    String? nextNicknameError;
+    if (nickname.isEmpty) {
+      nextNicknameError = l10n.plantNicknameRequired;
     }
-    if (species.isEmpty) {
-      nextSpeciesError = l10n.plantSpeciesRequired;
-    }
-    if (nextGenusError != null || nextSpeciesError != null) {
+    if (nextNicknameError != null) {
       setState(() {
-        genusError = nextGenusError;
-        speciesError = nextSpeciesError;
+        nicknameError = nextNicknameError;
       });
       return;
     }
 
-    if (wateringRaw.isNotEmpty && wateringFrequency == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.plantInvalidWateringFrequency)),
-      );
-      return;
+    final int? wateringFrequency;
+    if (isRegularWatering) {
+      final wateringRaw = wateringFrequencyController.text.trim();
+      if (wateringRaw.isEmpty || int.tryParse(wateringRaw) == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.plantInvalidWateringFrequency)),
+        );
+        return;
+      }
+      wateringFrequency = int.tryParse(wateringRaw);
+    } else {
+      wateringFrequency = null;
     }
 
     if (initialLeafCount == null || initialLeafCount < 0) {
@@ -297,8 +297,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
 
     setState(() {
       isLoading = true;
-      genusError = null;
-      speciesError = null;
+      nicknameError = null;
     });
 
     try {
@@ -410,14 +409,8 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                           TextField(
                             controller: genusController,
                             style: inputs.textStyle,
-                            onChanged: (_) {
-                              if (genusError != null) {
-                                setState(() => genusError = null);
-                              }
-                            },
                             decoration: _fieldDecoration(
                               labelText: l10n.plantGenus,
-                              errorText: genusError,
                               prefixIcon: _materialPrefixIcon(context.icons.genus),
                             ),
                           ),
@@ -426,14 +419,8 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             TextField(
                               controller: speciesController,
                               style: inputs.textStyle,
-                              onChanged: (_) {
-                                if (speciesError != null) {
-                                  setState(() => speciesError = null);
-                                }
-                              },
                               decoration: _fieldDecoration(
                                 labelText: l10n.plantSpecies,
-                                errorText: speciesError,
                                 prefixIcon: _materialPrefixIcon(context.icons.species),
                               ),
                             ),
@@ -445,7 +432,6 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             onChanged: (value) {
                               setState(() {
                                 isHybrid = value ?? false;
-                                speciesError = null;
                               });
                             },
                             title: Text(
@@ -546,8 +532,14 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                           TextField(
                             controller: nickNameController,
                             style: inputs.textStyle,
+                            onChanged: (_) {
+                              if (nicknameError != null) {
+                                setState(() => nicknameError = null);
+                              }
+                            },
                             decoration: _fieldDecoration(
                               labelText: l10n.plantNickname,
+                              errorText: nicknameError,
                               prefixIcon: _hugePrefixIcon(context.icons.nickname),
                             ),
                           ),
@@ -592,18 +584,33 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             },
                           ),
                           spacing.vMd,
-                          TextField(
-                            controller: wateringFrequencyController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            style: inputs.textStyle,
-                            decoration: _fieldDecoration(
-                              labelText: l10n.plantWateringFrequency,
-                              prefixIcon: _materialPrefixIcon(context.icons.wateringFilled),
+                          CheckboxListTile(
+                            contentPadding: EdgeInsets.zero,
+                            value: isRegularWatering,
+                            onChanged: (value) {
+                              setState(() => isRegularWatering = value ?? false);
+                            },
+                            title: Text(
+                              l10n.plantRegularWatering,
+                              style: typography.bodyMedium,
                             ),
                           ),
+                          if (isRegularWatering) ...[
+                            spacing.vSm,
+                            TextField(
+                              controller: wateringFrequencyController,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              style: inputs.textStyle,
+                              decoration: _fieldDecoration(
+                                labelText: l10n.plantWateringFrequency,
+                                prefixIcon:
+                                    _materialPrefixIcon(context.icons.wateringFilled),
+                              ),
+                            ),
+                          ],
                           spacing.vMd,
                           TextField(
                             controller: initialLeafCountController,
