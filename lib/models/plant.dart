@@ -71,6 +71,8 @@ class Plant {
 
   bool get isGroup => members.length >= 2;
 
+  bool get isHybrid => species.contains('×');
+
   bool get isArchived => archivedAt != null;
 
   bool get isArchiveVisible {

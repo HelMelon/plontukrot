@@ -41,6 +41,8 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
   final nickNameController = TextEditingController();
   late final TextEditingController wateringFrequencyController;
   late final TextEditingController initialLeafCountController;
+  late final TextEditingController hybridParent1Controller;
+  late final TextEditingController hybridParent2Controller;
 
   bool isLoading = false;
   int selectedStage = 0;
@@ -49,6 +51,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
   bool isFertilizingFrequencyCustom = false;
   String? genusError;
   String? speciesError;
+  bool isHybrid = false;
   Uint8List? _pendingPhotoBytes;
 
   @override
@@ -65,6 +68,8 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
       text: selectedStage == 0 ? '0' : '',
     );
     initialLeafCountController = TextEditingController(text: '0');
+    hybridParent1Controller = TextEditingController();
+    hybridParent2Controller = TextEditingController();
     fertilizingFrequencyDays = resolveFertilizingFrequencyDays(
       stage: selectedStage,
       seasonSettings: FertilizingSeasonController.instance.settings,
@@ -83,6 +88,8 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
     nickNameController.dispose();
     wateringFrequencyController.dispose();
     initialLeafCountController.dispose();
+    hybridParent1Controller.dispose();
+    hybridParent2Controller.dispose();
     super.dispose();
   }
 
@@ -150,7 +157,6 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
   Future<void> addPlant() async {
     final l10n = AppLocalizations.of(context);
     final genus = genusController.text.trim();
-    final species = speciesController.text.trim();
     final cultivar = cultivarController.text.trim();
     final plantFamily = plantFamilyController.text.trim();
     final tradingName = tradingNameController.text.trim();
@@ -161,6 +167,21 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
     final initialLeafRaw = initialLeafCountController.text.trim();
     final initialLeafCount =
         initialLeafRaw.isEmpty ? 0 : int.tryParse(initialLeafRaw);
+
+    final String species;
+    if (isHybrid) {
+      final parent1 = hybridParent1Controller.text.trim();
+      final parent2 = hybridParent2Controller.text.trim();
+      if (parent1.isEmpty || parent2.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.plantHybridParentsRequired)),
+        );
+        return;
+      }
+      species = '$parent1 × $parent2';
+    } else {
+      species = speciesController.text.trim();
+    }
 
     String? nextGenusError;
     String? nextSpeciesError;
@@ -332,20 +353,57 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             ),
                           ),
                           spacing.vMd,
-                          TextField(
-                            controller: speciesController,
-                            style: inputs.textStyle,
-                            onChanged: (_) {
-                              if (speciesError != null) {
-                                setState(() => speciesError = null);
-                              }
+                          if (!isHybrid) ...[
+                            TextField(
+                              controller: speciesController,
+                              style: inputs.textStyle,
+                              onChanged: (_) {
+                                if (speciesError != null) {
+                                  setState(() => speciesError = null);
+                                }
+                              },
+                              decoration: _fieldDecoration(
+                                labelText: l10n.plantSpecies,
+                                errorText: speciesError,
+                                prefixIcon: _materialPrefixIcon(context.icons.species),
+                              ),
+                            ),
+                            spacing.vSm,
+                          ],
+                          CheckboxListTile(
+                            contentPadding: EdgeInsets.zero,
+                            value: isHybrid,
+                            onChanged: (value) {
+                              setState(() {
+                                isHybrid = value ?? false;
+                                speciesError = null;
+                              });
                             },
-                            decoration: _fieldDecoration(
-                              labelText: l10n.plantSpecies,
-                              errorText: speciesError,
-                              prefixIcon: _materialPrefixIcon(context.icons.species),
+                            title: Text(
+                              l10n.plantHybrid,
+                              style: typography.bodyMedium,
                             ),
                           ),
+                          if (isHybrid) ...[
+                            spacing.vSm,
+                            TextField(
+                              controller: hybridParent1Controller,
+                              style: inputs.textStyle,
+                              decoration: _fieldDecoration(
+                                labelText: l10n.plantHybridParent1,
+                                prefixIcon: _materialPrefixIcon(context.icons.species),
+                              ),
+                            ),
+                            spacing.vMd,
+                            TextField(
+                              controller: hybridParent2Controller,
+                              style: inputs.textStyle,
+                              decoration: _fieldDecoration(
+                                labelText: l10n.plantHybridParent2,
+                                prefixIcon: _materialPrefixIcon(context.icons.species),
+                              ),
+                            ),
+                          ],
                           spacing.vMd,
                           TextField(
                             controller: cultivarController,

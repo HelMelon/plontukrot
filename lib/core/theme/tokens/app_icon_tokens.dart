@@ -57,6 +57,7 @@ class AppIconTokens {
     // Plants, Botany & Photos
     required this.genus,
     required this.species,
+    required this.hybrid,
     required this.cultivar,
     required this.tradingName,
     required this.family,
@@ -164,6 +165,7 @@ class AppIconTokens {
     // Plants, Botany & Photos
     genus: Icons.park_outlined,
     species: Icons.eco,
+    hybrid: HugeIcons.strokeRoundedGitPullRequest,
     cultivar: Icons.spa_outlined,
     tradingName: Icons.storefront_outlined,
     family: Icons.family_restroom,
@@ -270,6 +272,7 @@ class AppIconTokens {
   // Plants, Botany & Photos
   final IconData genus;
   final IconData species;
+  final List<List<dynamic>> hybrid;
   final IconData cultivar;
   final IconData tradingName;
   final IconData family;
@@ -369,6 +372,7 @@ class AppIconTokens {
     IconData? friendRemove,
     IconData? genus,
     IconData? species,
+    List<List<dynamic>>? hybrid,
     IconData? cultivar,
     IconData? tradingName,
     IconData? family,
@@ -464,6 +468,7 @@ class AppIconTokens {
       friendRemove: friendRemove ?? this.friendRemove,
       genus: genus ?? this.genus,
       species: species ?? this.species,
+      hybrid: hybrid ?? this.hybrid,
       cultivar: cultivar ?? this.cultivar,
       tradingName: tradingName ?? this.tradingName,
       family: family ?? this.family,

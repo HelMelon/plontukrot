@@ -24,6 +24,7 @@ import '../sheets/repotting_history_sheet.dart';
 import '../sheets/watering_history_sheet.dart';
 import 'info_card.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 class PlantInfoCard extends StatefulWidget {
   final Plant plant;
@@ -334,6 +335,17 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                     ),
                   ),
                 ],
+                if (plant.isHybrid) ...[
+                  spacing.hXs,
+                  Tooltip(
+                    message: l10n.plantHybrid,
+                    child: HugeIcon(
+                      icon: context.icons.hybrid,
+                      color: context.colors.textSecondary,
+                      size: spacing.xl,
+                    ),
+                  ),
+                ],
               ],
             ),
           if (plant.nickname.trim().isNotEmpty) spacing.vXs,
@@ -363,17 +375,32 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
             _infoRow(
               label: l10n.plantSpecies,
               value: speciesTrimmed,
-              // Variegation icon moved to the nickname row; keep it on the
-              // species row only when there is no nickname to show it on.
+              // Variegation/hybrid icons moved to the nickname row; keep them
+              // on the species row only when there is no nickname to show on.
               valueTrailing: plant.nickname.trim().isEmpty &&
-                      variegation.showIconNearSpecies
-                  ? Tooltip(
-                      message: variegationLabel,
-                      child: Icon(
-                        variegation.icon,
-                        color: variegation.iconColor,
-                        size: spacing.xl,
-                      ),
+                      (variegation.showIconNearSpecies || plant.isHybrid)
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (variegation.showIconNearSpecies)
+                          Tooltip(
+                            message: variegationLabel,
+                            child: Icon(
+                              variegation.icon,
+                              color: variegation.iconColor,
+                              size: spacing.xl,
+                            ),
+                          ),
+                        if (plant.isHybrid) ...[
+                          spacing.hXs,
+                          Tooltip(
+                            message: l10n.plantHybrid,
+                            child: HugeIcon(
+                              icon: context.icons.hybrid,
+                            ),
+                          ),
+                        ],
+                      ],
                     )
                   : null,
             ),

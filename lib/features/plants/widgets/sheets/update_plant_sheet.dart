@@ -56,6 +56,8 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   final nickNameController = TextEditingController();
   final wateringFrequencyController = TextEditingController();
   final initialLeafCountController = TextEditingController();
+  final hybridParent1Controller = TextEditingController();
+  final hybridParent2Controller = TextEditingController();
   late final List<_MemberEditors> _members;
 
   bool isLoading = false;
@@ -65,6 +67,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   bool isFertilizingFrequencyCustom = false;
   String? genusError;
   String? speciesError;
+  bool isHybrid = false;
   Uint8List? _pendingPhotoBytes;
 
   bool get _isGroup => widget.plant.isGroup;
@@ -77,6 +80,17 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
 
     genusController.text = widget.plant.genus;
     speciesController.text = widget.plant.species;
+    // Если сохранённый вид содержит × — это гибрид: разбиваем на два родителя.
+    final hybridIdx = widget.plant.species.indexOf('×');
+    if (hybridIdx > 0) {
+      isHybrid = true;
+      hybridParent1Controller.text =
+          widget.plant.species.substring(0, hybridIdx).trim();
+      hybridParent2Controller.text =
+          widget.plant.species
+              .substring(hybridIdx + 1)
+              .trim();
+    }
     cultivarController.text = widget.plant.cultivar ?? '';
     plantFamilyController.text = widget.plant.plantFamily ?? '';
     tradingNameController.text = widget.plant.tradingName;
@@ -122,6 +136,8 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     nickNameController.dispose();
     wateringFrequencyController.dispose();
     initialLeafCountController.dispose();
+    hybridParent1Controller.dispose();
+    hybridParent2Controller.dispose();
     for (final member in _members) {
       member.dispose();
     }
@@ -192,7 +208,6 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   Future<void> updatePlant() async {
     final l10n = AppLocalizations.of(context);
     final genus = genusController.text.trim();
-    final species = speciesController.text.trim();
     final cultivar = cultivarController.text.trim();
     final plantFamily = plantFamilyController.text.trim();
     final tradingName = tradingNameController.text.trim();
@@ -203,6 +218,21 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     final initialLeafRaw = initialLeafCountController.text.trim();
     final initialLeafCount =
         initialLeafRaw.isEmpty ? 0 : int.tryParse(initialLeafRaw);
+
+    final String species;
+    if (isHybrid) {
+      final parent1 = hybridParent1Controller.text.trim();
+      final parent2 = hybridParent2Controller.text.trim();
+      if (parent1.isEmpty || parent2.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.plantHybridParentsRequired)),
+        );
+        return;
+      }
+      species = '$parent1 × $parent2';
+    } else {
+      species = speciesController.text.trim();
+    }
 
     String? nextGenusError;
     String? nextSpeciesError;
@@ -392,20 +422,57 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             ),
                           ),
                           spacing.vMd,
-                          TextField(
-                            controller: speciesController,
-                            style: inputs.textStyle,
-                            onChanged: (_) {
-                              if (speciesError != null) {
-                                setState(() => speciesError = null);
-                              }
+                          if (!isHybrid) ...[
+                            TextField(
+                              controller: speciesController,
+                              style: inputs.textStyle,
+                              onChanged: (_) {
+                                if (speciesError != null) {
+                                  setState(() => speciesError = null);
+                                }
+                              },
+                              decoration: _fieldDecoration(
+                                labelText: l10n.plantSpecies,
+                                errorText: speciesError,
+                                prefixIcon: _materialPrefixIcon(context.icons.species),
+                              ),
+                            ),
+                            spacing.vSm,
+                          ],
+                          CheckboxListTile(
+                            contentPadding: EdgeInsets.zero,
+                            value: isHybrid,
+                            onChanged: (value) {
+                              setState(() {
+                                isHybrid = value ?? false;
+                                speciesError = null;
+                              });
                             },
-                            decoration: _fieldDecoration(
-                              labelText: l10n.plantSpecies,
-                              errorText: speciesError,
-                              prefixIcon: _materialPrefixIcon(context.icons.species),
+                            title: Text(
+                              l10n.plantHybrid,
+                              style: typography.bodyMedium,
                             ),
                           ),
+                          if (isHybrid) ...[
+                            spacing.vSm,
+                            TextField(
+                              controller: hybridParent1Controller,
+                              style: inputs.textStyle,
+                              decoration: _fieldDecoration(
+                                labelText: l10n.plantHybridParent1,
+                                prefixIcon: _materialPrefixIcon(context.icons.species),
+                              ),
+                            ),
+                            spacing.vMd,
+                            TextField(
+                              controller: hybridParent2Controller,
+                              style: inputs.textStyle,
+                              decoration: _fieldDecoration(
+                                labelText: l10n.plantHybridParent2,
+                                prefixIcon: _materialPrefixIcon(context.icons.species),
+                              ),
+                            ),
+                          ],
                           spacing.vMd,
                           if (_isGroup) ...[
                             Text(
