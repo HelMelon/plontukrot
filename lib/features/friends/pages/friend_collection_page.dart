@@ -94,14 +94,29 @@ class _FriendCollectionPageState extends State<FriendCollectionPage> {
                 );
               }
 
+              final screenWidth = MediaQuery.sizeOf(context).width;
+              final crossAxisCount = screenWidth >= 700 ? 3 : 2;
+              final isMobile = crossAxisCount <= 2;
+              final childAspectRatio = isMobile ? 0.45 : 0.625;
+              final double? mainAxisExtent;
+              if (isMobile) {
+                final cellWidth = (screenWidth -
+                        spacing.md * 2 -
+                        spacing.md * (crossAxisCount - 1)) /
+                    crossAxisCount;
+                mainAxisExtent = cellWidth / 0.45 + 22;
+              } else {
+                mainAxisExtent = null;
+              }
+
               return GridView.builder(
                 padding: EdgeInsets.all(spacing.md),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount:
-                      MediaQuery.sizeOf(context).width >= 700 ? 3 : 2,
+                  crossAxisCount: crossAxisCount,
                   crossAxisSpacing: spacing.md,
                   mainAxisSpacing: spacing.md,
-                  childAspectRatio: 0.72,
+                  childAspectRatio: childAspectRatio,
+                  mainAxisExtent: mainAxisExtent,
                 ),
                 itemCount: plants.length,
                 itemBuilder: (context, index) {

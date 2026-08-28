@@ -400,15 +400,15 @@ class _HomePageState extends State<HomePage> {
         _sortField == _PlantSortField.plantFamily;
     final isMobile = crossAxisCount <= 2;
     final childAspectRatio = isMobile ? 0.45 : 0.625;
-    // Mobile cards: square photo + footer. Give the footer 10px more than
-    // the 0.45 ratio would, so the three stat chips never overflow.
+    // Mobile cards: square photo + footer. Give the footer extra height so
+    // title/subtitle and stat chips never overflow.
     final double? mainAxisExtent;
     if (isMobile) {
       final screenWidth = MediaQuery.sizeOf(context).width;
       final cellWidth =
           (screenWidth - 2 * _spacing.lg - _spacing.sm * (crossAxisCount - 1)) /
               crossAxisCount;
-      mainAxisExtent = cellWidth / 0.45 + 15;
+      mainAxisExtent = cellWidth / 0.45 + 22;
     } else {
       mainAxisExtent = null;
     }

@@ -136,33 +136,36 @@ class PlantCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  title,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: typography.bodyEmphasis.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: -0.3,
-                                    color: colors.primary,
-                                    height: 1.2,
-                                  ),
-                                ),
-                                if (subtitle != null) ...[
-                                  spacing.vXxs,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
                                   Text(
-                                    subtitle,
-                                    maxLines: 2,
+                                    title,
+                                    maxLines: isMobile && subtitle != null ? 1 : 2,
                                     overflow: TextOverflow.ellipsis,
-                                    style: typography.bodySmall.copyWith(
-                                      color: colors.textSecondary,
+                                    style: typography.bodyEmphasis.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -0.3,
+                                      color: colors.primary,
                                       height: 1.2,
                                     ),
                                   ),
+                                  if (subtitle != null) ...[
+                                    spacing.vXxs,
+                                    Text(
+                                      subtitle,
+                                      maxLines: isMobile ? 1 : 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: typography.bodySmall.copyWith(
+                                        color: colors.textSecondary,
+                                        height: 1.2,
+                                      ),
+                                    ),
+                                  ],
                                 ],
-                              ],
+                              ),
                             ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,

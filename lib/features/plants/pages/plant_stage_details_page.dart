@@ -90,6 +90,19 @@ class _PlantStageDetailsPageState extends State<PlantStageDetailsPage> {
           return LayoutBuilder(
             builder: (context, constraints) {
               final crossAxisCount = _crossAxisCount(constraints.maxWidth);
+              final isMobile = crossAxisCount <= 2;
+              final childAspectRatio = isMobile ? 0.45 : 0.625;
+              final double? mainAxisExtent;
+              if (isMobile) {
+                final cellWidth = (constraints.maxWidth -
+                        spacing.md * 2 -
+                        spacing.sm * (crossAxisCount - 1)) /
+                    crossAxisCount;
+                mainAxisExtent = cellWidth / 0.45 + 22;
+              } else {
+                mainAxisExtent = null;
+              }
+
               return GridView.builder(
                 padding: EdgeInsets.fromLTRB(
                   spacing.md,
@@ -102,7 +115,8 @@ class _PlantStageDetailsPageState extends State<PlantStageDetailsPage> {
                   crossAxisCount: crossAxisCount,
                   crossAxisSpacing: spacing.sm,
                   mainAxisSpacing: spacing.md,
-                  childAspectRatio: 0.55,
+                  childAspectRatio: childAspectRatio,
+                  mainAxisExtent: mainAxisExtent,
                 ),
                 itemBuilder: (context, index) {
                   return PlantCard(plant: plants[index]);
