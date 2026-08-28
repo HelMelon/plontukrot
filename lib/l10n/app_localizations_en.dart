@@ -544,6 +544,74 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeNoPlantsForFilter => 'No plants match the selected filter';
 
   @override
+  String get homeFilters => 'Filters';
+
+  @override
+  String get homeFilterReset => 'Reset';
+
+  @override
+  String get homeFilterResetAll => 'Reset all';
+
+  @override
+  String homeFilterApply(int count) {
+    return 'Show ($count)';
+  }
+
+  @override
+  String get homeFilterBotanical => 'Botanical properties';
+
+  @override
+  String get homeFilterFamily => 'Family';
+
+  @override
+  String get homeFilterGenus => 'Genus';
+
+  @override
+  String get homeFilterCultivar => 'Cultivar';
+
+  @override
+  String get homeFilterStage => 'Stage';
+
+  @override
+  String get homeFilterStatuses => 'Statuses';
+
+  @override
+  String get homeFilterCustomPresets => 'Custom filters (presets)';
+
+  @override
+  String get homeFilterSaveAsPreset => 'Save as preset';
+
+  @override
+  String get homeFilterPresetNameTitle => 'Filter name';
+
+  @override
+  String get homeFilterPresetNameHint => 'E.g.: My cuttings';
+
+  @override
+  String get homeFilterDeletePresetTitle => 'Delete filter';
+
+  @override
+  String homeFilterDeletePresetConfirm(String name) {
+    return 'Delete saved filter \"$name\"?';
+  }
+
+  @override
+  String get homeFilterAllGenera => 'All genera';
+
+  @override
+  String get homeFilterAllCultivars => 'All cultivars';
+
+  @override
+  String homeFilterActiveBadge(int count) {
+    return 'Filters ($count)';
+  }
+
+  @override
+  String homeFilterPresetTag(String name) {
+    return 'Preset: $name';
+  }
+
+  @override
   String get homeAllFamilies => 'All families';
 
   @override

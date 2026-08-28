@@ -111,6 +111,9 @@ class AppIconTokens {
     required this.visibilityOff,
     required this.link,
     required this.translate,
+    required this.filter,
+    required this.bookmark,
+    required this.bookmarkAdd,
   });
 
   static const standard = AppIconTokens(
@@ -219,6 +222,9 @@ class AppIconTokens {
     visibilityOff: Icons.visibility_off_outlined,
     link: Icons.language,
     translate: Icons.translate,
+    filter: Icons.tune_outlined,
+    bookmark: Icons.bookmark_border,
+    bookmarkAdd: Icons.bookmark_add_outlined,
   );
 
   // Generic actions & controls
@@ -326,6 +332,9 @@ class AppIconTokens {
   final IconData visibilityOff;
   final IconData link;
   final IconData translate;
+  final IconData filter;
+  final IconData bookmark;
+  final IconData bookmarkAdd;
 
   AppIconTokens copyWith({
     IconData? add,
@@ -422,6 +431,9 @@ class AppIconTokens {
     IconData? visibilityOff,
     IconData? link,
     IconData? translate,
+    IconData? filter,
+    IconData? bookmark,
+    IconData? bookmarkAdd,
   }) {
     return AppIconTokens(
       add: add ?? this.add,
@@ -518,6 +530,9 @@ class AppIconTokens {
       visibilityOff: visibilityOff ?? this.visibilityOff,
       link: link ?? this.link,
       translate: translate ?? this.translate,
+      filter: filter ?? this.filter,
+      bookmark: bookmark ?? this.bookmark,
+      bookmarkAdd: bookmarkAdd ?? this.bookmarkAdd,
     );
   }
 }

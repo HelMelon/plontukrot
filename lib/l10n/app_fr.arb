@@ -207,6 +207,46 @@
   "homeNoPropagatingPlants": "Aucune plante en multiplication active",
   "homeNoGroupPlants": "Aucun groupe de plantes",
   "homeNoPlantsForFilter": "Aucune plante ne correspond au filtre sélectionné",
+  "homeFilters": "Filtres",
+  "homeFilterReset": "Réinitialiser",
+  "homeFilterResetAll": "Tout réinitialiser",
+  "homeFilterApply": "Afficher ({count})",
+  "@homeFilterApply": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "homeFilterBotanical": "Propriétés botaniques",
+  "homeFilterFamily": "Famille",
+  "homeFilterGenus": "Genre",
+  "homeFilterCultivar": "Cultivar",
+  "homeFilterStage": "Stade",
+  "homeFilterStatuses": "Statuts",
+  "homeFilterCustomPresets": "Filtres personnalisés (modèles)",
+  "homeFilterSaveAsPreset": "Enregistrer comme modèle",
+  "homeFilterPresetNameTitle": "Nom du filtre",
+  "homeFilterPresetNameHint": "Ex. : Mes boutures",
+  "homeFilterDeletePresetTitle": "Supprimer le filtre",
+  "homeFilterDeletePresetConfirm": "Supprimer le filtre enregistré « {name} » ?",
+  "@homeFilterDeletePresetConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "homeFilterAllGenera": "Tous les genres",
+  "homeFilterAllCultivars": "Tous les cultivars",
+  "homeFilterActiveBadge": "Filtres ({count})",
+  "@homeFilterActiveBadge": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "homeFilterPresetTag": "Modèle : {name}",
+  "@homeFilterPresetTag": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "homeAllFamilies": "Toutes les familles",
   "homeAllGenera": "Tous les genres",
   "homeAllStages": "Tous les stades",

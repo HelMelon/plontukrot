@@ -207,6 +207,46 @@
   "homeNoPropagatingPlants": "Нет растений с активным размножением",
   "homeNoGroupPlants": "Нет объединённых групп",
   "homeNoPlantsForFilter": "Нет растений по выбранному фильтру",
+  "homeFilters": "Фильтры",
+  "homeFilterReset": "Сбросить",
+  "homeFilterResetAll": "Сбросить всё",
+  "homeFilterApply": "Показать ({count})",
+  "@homeFilterApply": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "homeFilterBotanical": "Ботанические параметры",
+  "homeFilterFamily": "Семейство",
+  "homeFilterGenus": "Род",
+  "homeFilterCultivar": "Сорт",
+  "homeFilterStage": "Стадия",
+  "homeFilterStatuses": "Статусы",
+  "homeFilterCustomPresets": "Свои фильтры (пресеты)",
+  "homeFilterSaveAsPreset": "Сохранить как пресет",
+  "homeFilterPresetNameTitle": "Название фильтра",
+  "homeFilterPresetNameHint": "Например: Мои черенки",
+  "homeFilterDeletePresetTitle": "Удалить фильтр",
+  "homeFilterDeletePresetConfirm": "Удалить сохранённый фильтр «{name}»?",
+  "@homeFilterDeletePresetConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "homeFilterAllGenera": "Все роды",
+  "homeFilterAllCultivars": "Все сорта",
+  "homeFilterActiveBadge": "Фильтры ({count})",
+  "@homeFilterActiveBadge": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "homeFilterPresetTag": "Пресет: {name}",
+  "@homeFilterPresetTag": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "homeGroups": "Группы",
   "homeReanimation": "Реанимация",
   "homeArchive": "Архив",

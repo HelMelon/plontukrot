@@ -546,6 +546,74 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeNoPlantsForFilter => 'Нет растений по выбранному фильтру';
 
   @override
+  String get homeFilters => 'Фильтры';
+
+  @override
+  String get homeFilterReset => 'Сбросить';
+
+  @override
+  String get homeFilterResetAll => 'Сбросить всё';
+
+  @override
+  String homeFilterApply(int count) {
+    return 'Показать ($count)';
+  }
+
+  @override
+  String get homeFilterBotanical => 'Ботанические параметры';
+
+  @override
+  String get homeFilterFamily => 'Семейство';
+
+  @override
+  String get homeFilterGenus => 'Род';
+
+  @override
+  String get homeFilterCultivar => 'Сорт';
+
+  @override
+  String get homeFilterStage => 'Стадия';
+
+  @override
+  String get homeFilterStatuses => 'Статусы';
+
+  @override
+  String get homeFilterCustomPresets => 'Свои фильтры (пресеты)';
+
+  @override
+  String get homeFilterSaveAsPreset => 'Сохранить как пресет';
+
+  @override
+  String get homeFilterPresetNameTitle => 'Название фильтра';
+
+  @override
+  String get homeFilterPresetNameHint => 'Например: Мои черенки';
+
+  @override
+  String get homeFilterDeletePresetTitle => 'Удалить фильтр';
+
+  @override
+  String homeFilterDeletePresetConfirm(String name) {
+    return 'Удалить сохранённый фильтр «$name»?';
+  }
+
+  @override
+  String get homeFilterAllGenera => 'Все роды';
+
+  @override
+  String get homeFilterAllCultivars => 'Все сорта';
+
+  @override
+  String homeFilterActiveBadge(int count) {
+    return 'Фильтры ($count)';
+  }
+
+  @override
+  String homeFilterPresetTag(String name) {
+    return 'Пресет: $name';
+  }
+
+  @override
   String get homeAllFamilies => 'Все семейства';
 
   @override

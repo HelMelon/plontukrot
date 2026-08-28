@@ -550,6 +550,74 @@ class AppLocalizationsDe extends AppLocalizations {
       'Keine Pflanzen passen zum gewählten Filter';
 
   @override
+  String get homeFilters => 'Filter';
+
+  @override
+  String get homeFilterReset => 'Zurücksetzen';
+
+  @override
+  String get homeFilterResetAll => 'Alles zurücksetzen';
+
+  @override
+  String homeFilterApply(int count) {
+    return 'Anzeigen ($count)';
+  }
+
+  @override
+  String get homeFilterBotanical => 'Botanische Eigenschaften';
+
+  @override
+  String get homeFilterFamily => 'Familie';
+
+  @override
+  String get homeFilterGenus => 'Gattung';
+
+  @override
+  String get homeFilterCultivar => 'Sorte';
+
+  @override
+  String get homeFilterStage => 'Stufe';
+
+  @override
+  String get homeFilterStatuses => 'Status';
+
+  @override
+  String get homeFilterCustomPresets => 'Eigene Filter (Vorlagen)';
+
+  @override
+  String get homeFilterSaveAsPreset => 'Als Vorlage speichern';
+
+  @override
+  String get homeFilterPresetNameTitle => 'Filtername';
+
+  @override
+  String get homeFilterPresetNameHint => 'Z.B.: Meine Stecklinge';
+
+  @override
+  String get homeFilterDeletePresetTitle => 'Filter löschen';
+
+  @override
+  String homeFilterDeletePresetConfirm(String name) {
+    return 'Gespeicherten Filter «$name» löschen?';
+  }
+
+  @override
+  String get homeFilterAllGenera => 'Alle Gattungen';
+
+  @override
+  String get homeFilterAllCultivars => 'Alle Sorten';
+
+  @override
+  String homeFilterActiveBadge(int count) {
+    return 'Filter ($count)';
+  }
+
+  @override
+  String homeFilterPresetTag(String name) {
+    return 'Vorlage: $name';
+  }
+
+  @override
   String get homeAllFamilies => 'Alle Familien';
 
   @override

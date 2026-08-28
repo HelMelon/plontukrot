@@ -1092,6 +1092,126 @@ abstract class AppLocalizations {
   /// **'No plants match the selected filter'**
   String get homeNoPlantsForFilter;
 
+  /// No description provided for @homeFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get homeFilters;
+
+  /// No description provided for @homeFilterReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get homeFilterReset;
+
+  /// No description provided for @homeFilterResetAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset all'**
+  String get homeFilterResetAll;
+
+  /// No description provided for @homeFilterApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Show ({count})'**
+  String homeFilterApply(int count);
+
+  /// No description provided for @homeFilterBotanical.
+  ///
+  /// In en, this message translates to:
+  /// **'Botanical properties'**
+  String get homeFilterBotanical;
+
+  /// No description provided for @homeFilterFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get homeFilterFamily;
+
+  /// No description provided for @homeFilterGenus.
+  ///
+  /// In en, this message translates to:
+  /// **'Genus'**
+  String get homeFilterGenus;
+
+  /// No description provided for @homeFilterCultivar.
+  ///
+  /// In en, this message translates to:
+  /// **'Cultivar'**
+  String get homeFilterCultivar;
+
+  /// No description provided for @homeFilterStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage'**
+  String get homeFilterStage;
+
+  /// No description provided for @homeFilterStatuses.
+  ///
+  /// In en, this message translates to:
+  /// **'Statuses'**
+  String get homeFilterStatuses;
+
+  /// No description provided for @homeFilterCustomPresets.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom filters (presets)'**
+  String get homeFilterCustomPresets;
+
+  /// No description provided for @homeFilterSaveAsPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as preset'**
+  String get homeFilterSaveAsPreset;
+
+  /// No description provided for @homeFilterPresetNameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter name'**
+  String get homeFilterPresetNameTitle;
+
+  /// No description provided for @homeFilterPresetNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'E.g.: My cuttings'**
+  String get homeFilterPresetNameHint;
+
+  /// No description provided for @homeFilterDeletePresetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete filter'**
+  String get homeFilterDeletePresetTitle;
+
+  /// No description provided for @homeFilterDeletePresetConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete saved filter \"{name}\"?'**
+  String homeFilterDeletePresetConfirm(String name);
+
+  /// No description provided for @homeFilterAllGenera.
+  ///
+  /// In en, this message translates to:
+  /// **'All genera'**
+  String get homeFilterAllGenera;
+
+  /// No description provided for @homeFilterAllCultivars.
+  ///
+  /// In en, this message translates to:
+  /// **'All cultivars'**
+  String get homeFilterAllCultivars;
+
+  /// No description provided for @homeFilterActiveBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters ({count})'**
+  String homeFilterActiveBadge(int count);
+
+  /// No description provided for @homeFilterPresetTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset: {name}'**
+  String homeFilterPresetTag(String name);
+
   /// No description provided for @homeAllFamilies.
   ///
   /// In en, this message translates to:

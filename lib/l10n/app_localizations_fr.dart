@@ -550,6 +550,74 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucune plante ne correspond au filtre sélectionné';
 
   @override
+  String get homeFilters => 'Filtres';
+
+  @override
+  String get homeFilterReset => 'Réinitialiser';
+
+  @override
+  String get homeFilterResetAll => 'Tout réinitialiser';
+
+  @override
+  String homeFilterApply(int count) {
+    return 'Afficher ($count)';
+  }
+
+  @override
+  String get homeFilterBotanical => 'Propriétés botaniques';
+
+  @override
+  String get homeFilterFamily => 'Famille';
+
+  @override
+  String get homeFilterGenus => 'Genre';
+
+  @override
+  String get homeFilterCultivar => 'Cultivar';
+
+  @override
+  String get homeFilterStage => 'Stade';
+
+  @override
+  String get homeFilterStatuses => 'Statuts';
+
+  @override
+  String get homeFilterCustomPresets => 'Filtres personnalisés (modèles)';
+
+  @override
+  String get homeFilterSaveAsPreset => 'Enregistrer comme modèle';
+
+  @override
+  String get homeFilterPresetNameTitle => 'Nom du filtre';
+
+  @override
+  String get homeFilterPresetNameHint => 'Ex. : Mes boutures';
+
+  @override
+  String get homeFilterDeletePresetTitle => 'Supprimer le filtre';
+
+  @override
+  String homeFilterDeletePresetConfirm(String name) {
+    return 'Supprimer le filtre enregistré « $name » ?';
+  }
+
+  @override
+  String get homeFilterAllGenera => 'Tous les genres';
+
+  @override
+  String get homeFilterAllCultivars => 'Tous les cultivars';
+
+  @override
+  String homeFilterActiveBadge(int count) {
+    return 'Filtres ($count)';
+  }
+
+  @override
+  String homeFilterPresetTag(String name) {
+    return 'Modèle : $name';
+  }
+
+  @override
   String get homeAllFamilies => 'Toutes les familles';
 
   @override

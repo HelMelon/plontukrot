@@ -207,6 +207,46 @@
   "homeNoPropagatingPlants": "Keine Pflanzen mit aktiver Vermehrung",
   "homeNoGroupPlants": "Keine Pflanzengruppen",
   "homeNoPlantsForFilter": "Keine Pflanzen passen zum gewählten Filter",
+  "homeFilters": "Filter",
+  "homeFilterReset": "Zurücksetzen",
+  "homeFilterResetAll": "Alles zurücksetzen",
+  "homeFilterApply": "Anzeigen ({count})",
+  "@homeFilterApply": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "homeFilterBotanical": "Botanische Eigenschaften",
+  "homeFilterFamily": "Familie",
+  "homeFilterGenus": "Gattung",
+  "homeFilterCultivar": "Sorte",
+  "homeFilterStage": "Stufe",
+  "homeFilterStatuses": "Status",
+  "homeFilterCustomPresets": "Eigene Filter (Vorlagen)",
+  "homeFilterSaveAsPreset": "Als Vorlage speichern",
+  "homeFilterPresetNameTitle": "Filtername",
+  "homeFilterPresetNameHint": "Z.B.: Meine Stecklinge",
+  "homeFilterDeletePresetTitle": "Filter löschen",
+  "homeFilterDeletePresetConfirm": "Gespeicherten Filter «{name}» löschen?",
+  "@homeFilterDeletePresetConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "homeFilterAllGenera": "Alle Gattungen",
+  "homeFilterAllCultivars": "Alle Sorten",
+  "homeFilterActiveBadge": "Filter ({count})",
+  "@homeFilterActiveBadge": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "homeFilterPresetTag": "Vorlage: {name}",
+  "@homeFilterPresetTag": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "homeAllFamilies": "Alle Familien",
   "homeAllGenera": "Alle Gattungen",
   "homeAllStages": "Alle Stadien",

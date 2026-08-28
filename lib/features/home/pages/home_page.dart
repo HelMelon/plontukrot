@@ -12,7 +12,9 @@ import '../../../core/widgets/app_bar_chrome_actions.dart';
 import '../../../core/widgets/prompt_text_dialog.dart';
 import '../../../models/app_user.dart';
 import '../../../models/plant.dart';
+import '../../../models/plant_filter_criteria.dart';
 import '../../../models/stage_info.dart';
+import '../widgets/sheets/plant_filter_sheet.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
 import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
 import '../../plants/widgets/sheets/add_manipulation_sheet.dart';
@@ -26,8 +28,6 @@ import '../../../services/propagation_service.dart';
 import '../../../services/startup_warmup_service.dart';
 import '../../../services/watering_service.dart';
 import '../../plants/pages/plant_archive_page.dart';
-import '../../plants/pages/plant_genus_details_page.dart';
-import '../../plants/pages/plant_stage_details_page.dart';
 import '../../plants/widgets/cards/plant_card.dart';
 import '../../finances/pages/finances_page.dart';
 import '../../propagations/pages/propagations_page.dart';
@@ -75,12 +75,7 @@ class _HomePageState extends State<HomePage> {
   List<Plant> _latestPlants = const [];
   _PlantSortField _sortField = _PlantSortField.createdAt;
   bool _sortAscending = false;
-  bool _filterPropagatingOnly = false;
-  bool _filterGroupsOnly = false;
-  bool _filterRerootingOnly = false;
-  String? _filterPlantFamily;
-  String? _filterGenus;
-  int? _filterStage;
+  PlantFilterCriteria _filter = PlantFilterCriteria.empty;
   bool _firstContentReadySignaled = false;
 
   bool get _coverLoadingUi => widget.onFirstContentReady != null;
@@ -444,232 +439,80 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  List<String> _uniquePlantFamilies(Iterable<Plant> plants) {
-    final families = plants
-        .map((plant) => (plant.plantFamily ?? '').trim())
-        .where((family) => family.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
-    return families;
-  }
-
-  List<String> _uniqueGeneraForFamily(
-    Iterable<Plant> plants,
-    String plantFamily,
-  ) {
-    final genera = plants
-        .where((plant) => (plant.plantFamily ?? '').trim() == plantFamily)
-        .map((plant) => plant.genus.trim())
-        .where((value) => value.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
-    return genera;
-  }
-
-  List<Plant> _applyBotanicalFilters(Iterable<Plant> plants) {
-    return plants.where((plant) {
-      if (_filterPlantFamily != null &&
-          (plant.plantFamily ?? '').trim() != _filterPlantFamily) {
-        return false;
-      }
-      if (_filterGenus != null && plant.genus.trim() != _filterGenus) {
-        return false;
-      }
-      if (_filterStage != null && plant.stage != _filterStage) {
-        return false;
-      }
-      return true;
-    }).toList();
-  }
-
-  void _openGenusPage(String genus) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => PlantGenusDetailsPage(genus: genus),
-      ),
+  Future<void> _openFilterSheet(
+    List<Plant> plants,
+    Map<String, int> batchCounts,
+    Set<String> rerootingIds,
+  ) async {
+    final newFilter = await showPlantFilterSheet(
+      context: context,
+      initial: _filter,
+      plants: plants,
+      batchCounts: batchCounts,
+      rerootingIds: rerootingIds,
     );
+    if (newFilter != null && mounted) {
+      setState(() => _filter = newFilter);
+    }
   }
 
-  void _openStagePage(int stage) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => PlantStageDetailsPage(stage: stage),
-      ),
-    );
-  }
-
-  List<StageInfo> _stagesPresentIn(Iterable<Plant> plants) {
-    final presentValues = plants.map((plant) => plant.stage).toSet();
-    return stageInfos
-        .where((stage) => presentValues.contains(stage.value))
-        .toList();
-  }
-
-  Widget _buildFilterChip({
+  Widget _buildActiveFilterChip({
     required String label,
-    required bool selected,
-    required ValueChanged<bool> onSelected,
-    VoidCallback? onLongPress,
+    required VoidCallback onDeleted,
+    Widget? avatar,
   }) {
     final chips = context.components.chips;
     final spacing = _spacing;
-    final labelStyle = chips.labelStyle.copyWith(
-      color: selected ? chips.selectedForeground : chips.unselectedForeground,
-      height: 1.15,
-    );
+    final dimensions = _dimensions;
 
-    // Custom chip: FilterChip's Flexible label truncates text in nested
-    // horizontal scroll on web. Size to intrinsic label width instead.
     return Padding(
       padding: EdgeInsets.only(right: spacing.xs),
-      child: Semantics(
-        button: true,
-        selected: selected,
-        label: label,
-        child: Material(
-          color:
-              selected ? chips.selectedBackground : chips.unselectedBackground,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(chips.radius),
-            side: BorderSide(
-              color: selected ? chips.selectedBorder : chips.unselectedBorder,
-            ),
+      child: Material(
+        color: chips.selectedBackground,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(chips.radius),
+          side: BorderSide(color: chips.selectedBorder),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: spacing.sm,
+            vertical: spacing.xxs,
           ),
-          child: InkWell(
-            onTap: () => onSelected(!selected),
-            onLongPress: onLongPress,
-            borderRadius: BorderRadius.circular(chips.radius),
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: spacing.sm,
-                vertical: spacing.xs,
-              ),
-              child: Text(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (avatar != null) ...[
+                avatar,
+                SizedBox(width: spacing.xs),
+              ],
+              Text(
                 label,
-                softWrap: false,
-                maxLines: 1,
-                style: labelStyle,
+                style: chips.labelStyle.copyWith(
+                  color: chips.selectedForeground,
+                  height: 1.15,
+                ),
               ),
-            ),
+              SizedBox(width: spacing.xs),
+              Semantics(
+                button: true,
+                label: label,
+                child: InkWell(
+                  onTap: onDeleted,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: EdgeInsets.all(spacing.xxs),
+                    child: Icon(
+                      _icons.close,
+                      size: dimensions.iconSm * 0.8,
+                      color: chips.selectedForeground,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildHorizontalChipRow(List<Widget> children) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: children,
-      ),
-    );
-  }
-
-  Widget _buildBotanicalFilters(List<Plant> plants, AppLocalizations l10n) {
-    final families = _uniquePlantFamilies(plants);
-    final genusOptions = _filterPlantFamily == null
-        ? const <String>[]
-        : _uniqueGeneraForFamily(plants, _filterPlantFamily!);
-    final stageOptions = _stagesPresentIn(plants);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (families.isNotEmpty)
-          _buildHorizontalChipRow([
-            _buildFilterChip(
-              label: l10n.homeAllFamilies,
-              selected: _filterPlantFamily == null,
-              onSelected: (_) {
-                setState(() {
-                  _filterPlantFamily = null;
-                  _filterGenus = null;
-                });
-              },
-            ),
-            ...families.map(
-              (family) => _buildFilterChip(
-                label: family,
-                selected: _filterPlantFamily == family,
-                onSelected: (_) {
-                  setState(() {
-                    if (_filterPlantFamily == family) {
-                      _filterPlantFamily = null;
-                      _filterGenus = null;
-                    } else {
-                      _filterPlantFamily = family;
-                      _filterGenus = null;
-                    }
-                  });
-                },
-              ),
-            ),
-          ]),
-        if (_filterPlantFamily != null && genusOptions.isNotEmpty) ...[
-          _spacing.vXs,
-          _buildHorizontalChipRow([
-            _buildFilterChip(
-              label: l10n.homeAllGenera,
-              selected: _filterGenus == null,
-              onSelected: (_) {
-                setState(() => _filterGenus = null);
-              },
-            ),
-            ...genusOptions.map(
-              (genus) => _buildFilterChip(
-                label: genus,
-                selected: _filterGenus == genus,
-                onSelected: (selected) {
-                  if (_filterGenus == genus) {
-                    _openGenusPage(genus);
-                    return;
-                  }
-                  setState(() {
-                    _filterGenus = selected ? genus : null;
-                  });
-                },
-                onLongPress: () => _openGenusPage(genus),
-              ),
-            ),
-          ]),
-        ],
-        if (stageOptions.isNotEmpty) ...[
-          if (families.isNotEmpty ||
-              (_filterPlantFamily != null && genusOptions.isNotEmpty))
-            _spacing.vXs,
-          _buildHorizontalChipRow([
-            _buildFilterChip(
-              label: l10n.homeAllStages,
-              selected: _filterStage == null,
-              onSelected: (_) {
-                setState(() => _filterStage = null);
-              },
-            ),
-            ...stageOptions.map(
-              (stage) => _buildFilterChip(
-                label: l10n.stageInfoTitle(stage),
-                selected: _filterStage == stage.value,
-                onSelected: (selected) {
-                  if (_filterStage == stage.value) {
-                    _openStagePage(stage.value);
-                    return;
-                  }
-                  setState(() {
-                    _filterStage = selected ? stage.value : null;
-                  });
-                },
-                onLongPress: () => _openStagePage(stage.value),
-              ),
-            ),
-          ]),
-        ],
-      ],
     );
   }
 
@@ -1144,33 +987,18 @@ class _HomePageState extends State<HomePage> {
                       builder: (context, propagatingSnapshot) {
                         final batchCounts =
                             propagatingSnapshot.data ?? const <String, int>{};
-                        var workingPlants = plants;
-                        if (_filterPropagatingOnly) {
-                          workingPlants = workingPlants
-                              .where(
-                                (plant) => batchCounts.containsKey(plant.id),
-                              )
-                              .toList();
-                        }
-                        if (_filterGroupsOnly) {
-                          workingPlants = workingPlants
-                              .where((plant) => plant.isGroup)
-                              .toList();
-                        }
-                        workingPlants = _applyBotanicalFilters(workingPlants);
                         return StreamBuilder<Set<String>>(
                           stream: _rerootingPlantIdsStream,
                           builder: (context, rerootingSnapshot) {
                             final rerootingIds =
                                 rerootingSnapshot.data ?? const <String>{};
-                            var filteredPlants = workingPlants;
-                            if (_filterRerootingOnly) {
-                              filteredPlants = filteredPlants
-                                  .where(
-                                    (plant) => rerootingIds.contains(plant.id),
-                                  )
-                                  .toList();
-                            }
+                            final filteredPlants = plants.where((plant) {
+                              return _filter.matches(
+                                plant,
+                                isPropagating: batchCounts.containsKey(plant.id),
+                                isRerooting: rerootingIds.contains(plant.id),
+                              );
+                            }).toList();
                             final sortedPlants = _sortPlants(filteredPlants);
                             _visiblePlantIds
                               ..clear()
@@ -1194,160 +1022,72 @@ class _HomePageState extends State<HomePage> {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (!_isSelectionMode)
+                                if (!_isSelectionMode) ...[
                                   Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
                                     children: [
-                                      Expanded(
-                                        child: Wrap(
-                                          spacing: spacing.xs,
-                                          runSpacing: spacing.xs,
-                                          children: [
-                                            FilterChip(
-                                              selected: _filterPropagatingOnly,
-                                              materialTapTargetSize:
-                                                  MaterialTapTargetSize
-                                                      .shrinkWrap,
-                                              label: Text(
-                                                l10n.homePropagation,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              avatar: HugeIcon(
-                                                icon: _icons.propagations,
-                                                size: dimensions.iconSm,
-                                                color: _filterPropagatingOnly
-                                                    ? chips.selectedForeground
-                                                    : colors.icon,
-                                              ),
-                                              selectedColor:
-                                                  chips.selectedBackground,
-                                              checkmarkColor: chips.checkmark,
-                                              labelStyle:
-                                                  chips.labelStyle.copyWith(
-                                                color: _filterPropagatingOnly
-                                                    ? chips.selectedForeground
-                                                    : chips
-                                                        .unselectedForeground,
-                                                height: 1.1,
-                                              ),
-                                              backgroundColor:
-                                                  chips.unselectedBackground,
-                                              side: BorderSide(
-                                                color: _filterPropagatingOnly
-                                                    ? chips.selectedBorder
-                                                    : chips.unselectedBorder,
-                                              ),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                  chips.radius,
-                                                ),
-                                              ),
-                                              onSelected: (selected) {
-                                                setState(() {
-                                                  _filterPropagatingOnly =
-                                                      selected;
-                                                });
-                                              },
+                                      Semantics(
+                                        button: true,
+                                        label: _filter.isActive
+                                            ? l10n.homeFilterActiveBadge(_filter.activeCount)
+                                            : l10n.homeFilters,
+                                        child: Material(
+                                          color: _filter.isActive
+                                              ? chips.selectedBackground
+                                              : chips.unselectedBackground,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(chips.radius),
+                                            side: BorderSide(
+                                              color: _filter.isActive
+                                                  ? chips.selectedBorder
+                                                  : chips.unselectedBorder,
                                             ),
-                                            FilterChip(
-                                              selected: _filterGroupsOnly,
-                                              materialTapTargetSize:
-                                                  MaterialTapTargetSize
-                                                      .shrinkWrap,
-                                              label: Text(
-                                                l10n.homeGroups,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              avatar: Icon(
-                                                _icons.familyHub,
-                                                size: dimensions.iconSm,
-                                                color: _filterGroupsOnly
-                                                    ? chips.selectedForeground
-                                                    : colors.icon,
-                                              ),
-                                              selectedColor:
-                                                  chips.selectedBackground,
-                                              checkmarkColor: chips.checkmark,
-                                              labelStyle:
-                                                  chips.labelStyle.copyWith(
-                                                color: _filterGroupsOnly
-                                                    ? chips.selectedForeground
-                                                    : chips
-                                                        .unselectedForeground,
-                                                height: 1.1,
-                                              ),
-                                              backgroundColor:
-                                                  chips.unselectedBackground,
-                                              side: BorderSide(
-                                                color: _filterGroupsOnly
-                                                    ? chips.selectedBorder
-                                                    : chips.unselectedBorder,
-                                              ),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                  chips.radius,
-                                                ),
-                                              ),
-                                              onSelected: (selected) {
-                                                setState(() {
-                                                  _filterGroupsOnly = selected;
-                                                });
-                                              },
+                                          ),
+                                          child: InkWell(
+                                            onTap: () => _openFilterSheet(
+                                              plants,
+                                              batchCounts,
+                                              rerootingIds,
                                             ),
-                                            FilterChip(
-                                              selected: _filterRerootingOnly,
-                                              materialTapTargetSize:
-                                                  MaterialTapTargetSize
-                                                      .shrinkWrap,
-                                              label: Text(
-                                                l10n.homeReanimation,
-                                                overflow: TextOverflow.ellipsis,
+                                            borderRadius:
+                                                BorderRadius.circular(chips.radius),
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: spacing.sm,
+                                                vertical: spacing.xs,
                                               ),
-                                              avatar: HugeIcon(
-                                                icon: _icons.rerooting,
-                                                size: dimensions.iconSm,
-                                                color: _filterRerootingOnly
-                                                    ? chips.selectedForeground
-                                                    : colors.icon,
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    _icons.filter,
+                                                    size: dimensions.iconSm,
+                                                    color: _filter.isActive
+                                                        ? chips.selectedForeground
+                                                        : colors.icon,
+                                                  ),
+                                                  SizedBox(width: spacing.xs),
+                                                  Text(
+                                                    _filter.isActive
+                                                        ? l10n.homeFilterActiveBadge(
+                                                            _filter.activeCount,
+                                                          )
+                                                        : l10n.homeFilters,
+                                                    style: chips.labelStyle.copyWith(
+                                                      color: _filter.isActive
+                                                          ? chips.selectedForeground
+                                                          : chips
+                                                              .unselectedForeground,
+                                                      height: 1.1,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                              selectedColor:
-                                                  chips.selectedBackground,
-                                              checkmarkColor: chips.checkmark,
-                                              labelStyle:
-                                                  chips.labelStyle.copyWith(
-                                                color: _filterRerootingOnly
-                                                    ? chips.selectedForeground
-                                                    : chips
-                                                        .unselectedForeground,
-                                                height: 1.1,
-                                              ),
-                                              backgroundColor:
-                                                  chips.unselectedBackground,
-                                              side: BorderSide(
-                                                color: _filterRerootingOnly
-                                                    ? chips.selectedBorder
-                                                    : chips.unselectedBorder,
-                                              ),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                  chips.radius,
-                                                ),
-                                              ),
-                                              onSelected: (selected) {
-                                                setState(() {
-                                                  _filterRerootingOnly =
-                                                      selected;
-                                                });
-                                              },
                                             ),
-                                          ],
+                                          ),
                                         ),
                                       ),
-                                      spacing.hXs,
+                                      const Spacer(),
                                       PopupMenuButton<_PlantSortField>(
                                         tooltip: l10n.homeSort,
                                         onSelected: _setSortField,
@@ -1403,13 +1143,154 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ],
                                   ),
-                                if (!_isSelectionMode) ...[
-                                  spacing.vXs,
-                                  _buildBotanicalFilters(plants, l10n),
+                                  if (_filter.isActive) ...[
+                                    spacing.vXs,
+                                    SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          if (_filter.presetName != null &&
+                                              _filter.presetName!.isNotEmpty)
+                                            _buildActiveFilterChip(
+                                              label: l10n.homeFilterPresetTag(
+                                                _filter.presetName!,
+                                              ),
+                                              avatar: Icon(
+                                                _icons.bookmark,
+                                                size: dimensions.iconSm,
+                                                color: chips.selectedForeground,
+                                              ),
+                                              onDeleted: () => setState(() =>
+                                                  _filter = _filter.copyWith(
+                                                    clearPresetId: true,
+                                                    clearPresetName: true,
+                                                  )),
+                                            ),
+                                          if (_filter.propagatingOnly)
+                                            _buildActiveFilterChip(
+                                              label: l10n.homePropagation,
+                                              avatar: HugeIcon(
+                                                icon: _icons.propagations,
+                                                size: dimensions.iconSm,
+                                                color: chips.selectedForeground,
+                                              ),
+                                              onDeleted: () => setState(() =>
+                                                  _filter = _filter.copyWith(
+                                                    propagatingOnly: false,
+                                                    clearPresetId: true,
+                                                    clearPresetName: true,
+                                                  )),
+                                            ),
+                                          if (_filter.groupsOnly)
+                                            _buildActiveFilterChip(
+                                              label: l10n.homeGroups,
+                                              avatar: Icon(
+                                                _icons.familyHub,
+                                                size: dimensions.iconSm,
+                                                color: chips.selectedForeground,
+                                              ),
+                                              onDeleted: () => setState(() =>
+                                                  _filter = _filter.copyWith(
+                                                    groupsOnly: false,
+                                                    clearPresetId: true,
+                                                    clearPresetName: true,
+                                                  )),
+                                            ),
+                                          if (_filter.rerootingOnly)
+                                            _buildActiveFilterChip(
+                                              label: l10n.homeReanimation,
+                                              avatar: HugeIcon(
+                                                icon: _icons.rerooting,
+                                                size: dimensions.iconSm,
+                                                color: chips.selectedForeground,
+                                              ),
+                                              onDeleted: () => setState(() =>
+                                                  _filter = _filter.copyWith(
+                                                    rerootingOnly: false,
+                                                    clearPresetId: true,
+                                                    clearPresetName: true,
+                                                  )),
+                                            ),
+                                          if (_filter.plantFamily != null &&
+                                              _filter.plantFamily!.isNotEmpty)
+                                            _buildActiveFilterChip(
+                                              label:
+                                                  '${l10n.homeFilterFamily}: ${_filter.plantFamily}',
+                                              onDeleted: () => setState(() =>
+                                                  _filter = _filter.copyWith(
+                                                    clearPlantFamily: true,
+                                                    clearGenus: true,
+                                                    clearCultivar: true,
+                                                    clearPresetId: true,
+                                                    clearPresetName: true,
+                                                  )),
+                                            ),
+                                          if (_filter.genus != null &&
+                                              _filter.genus!.isNotEmpty)
+                                            _buildActiveFilterChip(
+                                              label:
+                                                  '${l10n.homeFilterGenus}: ${_filter.genus}',
+                                              onDeleted: () => setState(() =>
+                                                  _filter = _filter.copyWith(
+                                                    clearGenus: true,
+                                                    clearCultivar: true,
+                                                    clearPresetId: true,
+                                                    clearPresetName: true,
+                                                  )),
+                                            ),
+                                          if (_filter.cultivar != null &&
+                                              _filter.cultivar!.isNotEmpty)
+                                            _buildActiveFilterChip(
+                                              label:
+                                                  '${l10n.homeFilterCultivar}: ${_filter.cultivar}',
+                                              onDeleted: () => setState(() =>
+                                                  _filter = _filter.copyWith(
+                                                    clearCultivar: true,
+                                                    clearPresetId: true,
+                                                    clearPresetName: true,
+                                                  )),
+                                            ),
+                                          if (_filter.stage != null)
+                                            _buildActiveFilterChip(
+                                              label:
+                                                  '${l10n.homeFilterStage}: ${l10n.stageInfoTitle(stageInfos.firstWhere((s) => s.value == _filter.stage, orElse: () => StageInfo(value: _filter.stage!)))}',
+                                              onDeleted: () => setState(() =>
+                                                  _filter = _filter.copyWith(
+                                                    clearStage: true,
+                                                    clearPresetId: true,
+                                                    clearPresetName: true,
+                                                  )),
+                                            ),
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                left: spacing.xs),
+                                            child: TextButton(
+                                              style: TextButton.styleFrom(
+                                                visualDensity:
+                                                    VisualDensity.compact,
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: spacing.sm),
+                                              ),
+                                              onPressed: () => setState(() =>
+                                                  _filter = PlantFilterCriteria
+                                                      .empty),
+                                              child: Text(
+                                                l10n.homeFilterResetAll,
+                                                style: typography.bodySmall
+                                                    .copyWith(
+                                                        color: colors.primary),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                   spacing.vXs,
                                 ],
-                                if (_filterPropagatingOnly &&
-                                    !_filterGroupsOnly &&
+                                if (_filter.propagatingOnly &&
+                                    !_filter.groupsOnly &&
                                     sortedPlants.isEmpty)
                                   Container(
                                     width: double.infinity,
@@ -1428,7 +1309,7 @@ class _HomePageState extends State<HomePage> {
                                           color: colors.textSecondary),
                                     ),
                                   )
-                                else if (_filterGroupsOnly &&
+                                else if (_filter.groupsOnly &&
                                     sortedPlants.isEmpty)
                                   Container(
                                     width: double.infinity,
@@ -1448,9 +1329,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   )
                                 else if (sortedPlants.isEmpty &&
-                                    (_filterPlantFamily != null ||
-                                        _filterGenus != null ||
-                                        _filterStage != null))
+                                    _filter.isActive)
                                   Container(
                                     width: double.infinity,
                                     padding: EdgeInsets.all(spacing.xl),
