@@ -75,7 +75,7 @@ Set in `/etc/systemd/system/plontukrot.service` (never in code/commit):
 |-----|---------|
 | `DATABASE_URL` | `postgresql://user:pass@127.0.0.1:5432/plontukrot` |
 | `SECRET_KEY` | JWT signing secret — **change from the provisional value** |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | token lifetime (default 60) |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | token lifetime (default 525600 = 1 year) |
 | `PUBLIC_BASE_URL` | base used to build absolute photo URLs (e.g. `http://91.149.167.7:8000`) |
 | `PHOTOS_DIR` | disk dir for uploaded photos (default `/opt/plontukrot/photos`) |
 

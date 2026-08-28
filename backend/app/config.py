@@ -16,7 +16,7 @@ class Settings:
             "SECRET_KEY", "change-me-in-production"
         )
         self.access_token_expire_minutes: int = int(
-            os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "60")
+            os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "525600")
         )
         self.algorithm: str = "HS256"
         # Public base URL used to build absolute photo links.

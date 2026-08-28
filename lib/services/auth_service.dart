@@ -90,6 +90,11 @@ class AuthService {
       _emit(null);
       return;
     }
+    final cachedUser = TokenStore.instance.cachedUser;
+    if (cachedUser != null) {
+      _email = cachedUser.email;
+      _emit(cachedUser);
+    }
     try {
       await _loadMe();
     } on ApiException catch (error) {
@@ -99,8 +104,10 @@ class AuthService {
       }
       rethrow;
     } catch (_) {
-      // Keep the JWT if the backend is unreachable.
-      _emit(null);
+      // Keep the JWT and cached session if the backend is temporarily unreachable.
+      if (_user == null) {
+        _emit(null);
+      }
     }
   }
 
@@ -108,14 +115,14 @@ class AuthService {
     final json = jsonMap(await _api.get('/auth/me'));
     final id = readString(json, 'id') ?? '';
     _email = readString(json, 'email');
-    _emit(
-      AppUser(
-        uid: id,
-        email: _email,
-        name: readString(json, 'name'),
-        photoUrl: readString(json, 'photoUrl'),
-      ),
+    final user = AppUser(
+      uid: id,
+      email: _email,
+      name: readString(json, 'name'),
+      photoUrl: readString(json, 'photoUrl'),
     );
+    await TokenStore.instance.saveUser(user);
+    _emit(user);
   }
 
   void _emit(AppUser? user) {
