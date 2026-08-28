@@ -903,6 +903,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsNotificationsEnable => 'Düngungserinnerungen erlauben';
 
   @override
+  String get profileNotificationsAccepted =>
+      'Berechtigung für Düngungserinnerungen erteilt';
+
+  @override
+  String get profileNotificationsEnabledSnackBar =>
+      'Düngungserinnerungen aktiviert';
+
+  @override
+  String get profileNotificationsPermissionDenied =>
+      'Bitte erlauben Sie Benachrichtigungen in den Geräteeinstellungen';
+
+  @override
   String get plantUntitled => 'Ohne Titel';
 
   @override

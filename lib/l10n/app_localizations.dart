@@ -1734,6 +1734,24 @@ abstract class AppLocalizations {
   /// **'Allow fertilizing reminders'**
   String get settingsNotificationsEnable;
 
+  /// No description provided for @profileNotificationsAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilizing reminders permission granted'**
+  String get profileNotificationsAccepted;
+
+  /// No description provided for @profileNotificationsEnabledSnackBar.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilizing reminders enabled'**
+  String get profileNotificationsEnabledSnackBar;
+
+  /// No description provided for @profileNotificationsPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Please allow notifications in device settings'**
+  String get profileNotificationsPermissionDenied;
+
   /// No description provided for @plantUntitled.
   ///
   /// In en, this message translates to:

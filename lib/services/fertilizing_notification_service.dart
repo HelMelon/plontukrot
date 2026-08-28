@@ -80,6 +80,29 @@ class FertilizingNotificationService {
     );
   }
 
+  Future<bool> isPermissionGranted() async {
+    await initialize();
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      final enabled = await android?.areNotificationsEnabled();
+      return enabled ?? true;
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
+      final ios = _plugin.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
+      final settings = await ios?.checkPermissions();
+      return (settings?.isAlertEnabled ?? false) ||
+          (settings?.isBadgeEnabled ?? false) ||
+          (settings?.isSoundEnabled ?? false);
+    }
+
+    return true;
+  }
+
   Future<bool> requestPermission() async {
     await initialize();
 

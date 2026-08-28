@@ -896,6 +896,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsNotificationsEnable => 'Allow fertilizing reminders';
 
   @override
+  String get profileNotificationsAccepted =>
+      'Fertilizing reminders permission granted';
+
+  @override
+  String get profileNotificationsEnabledSnackBar =>
+      'Fertilizing reminders enabled';
+
+  @override
+  String get profileNotificationsPermissionDenied =>
+      'Please allow notifications in device settings';
+
+  @override
   String get plantUntitled => 'Untitled';
 
   @override

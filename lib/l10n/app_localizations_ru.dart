@@ -899,6 +899,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsNotificationsEnable => 'Разрешить напоминания о подкормке';
 
   @override
+  String get profileNotificationsAccepted =>
+      'Разрешение на напоминания о подкормке получено';
+
+  @override
+  String get profileNotificationsEnabledSnackBar =>
+      'Напоминания о подкормках включены';
+
+  @override
+  String get profileNotificationsPermissionDenied =>
+      'Разрешите уведомления в настройках устройства';
+
+  @override
   String get plantUntitled => 'Без названия';
 
   @override

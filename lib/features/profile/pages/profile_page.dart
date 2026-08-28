@@ -37,19 +37,43 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
   late final Stream<List<Plant>> _plantsStream;
   late final Stream<List<Propagation>> _propagationsStream;
   late final Stream<UserProfileDoc> _profileStream;
   bool _busy = false;
   String? _busyMessage;
+  bool _notificationsGranted = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _plantsStream = PlantService().getPlants();
     _propagationsStream = PropagationService().watchActivePropagations();
     _profileStream = UserProfileService().watchUserProfile();
+    _checkNotificationPermission();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkNotificationPermission();
+    }
+  }
+
+  Future<void> _checkNotificationPermission() async {
+    final granted =
+        await FertilizingNotificationService.instance.isPermissionGranted();
+    if (mounted) {
+      setState(() => _notificationsGranted = granted);
+    }
   }
 
   String _currencyLabel(AppLocalizations l10n, AppCurrency currency) {
@@ -81,11 +105,22 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _requestNotifications() async {
-    await FertilizingNotificationService.instance.requestPermission();
-    await FertilizingNotificationService.instance.rescheduleAllActivePlants();
+    final l10n = AppLocalizations.of(context);
+    final granted =
+        await FertilizingNotificationService.instance.requestPermission();
+    if (granted) {
+      await FertilizingNotificationService.instance.rescheduleAllActivePlants();
+    }
     if (!mounted) return;
+    setState(() => _notificationsGranted = granted);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppLocalizations.of(context).settingsNotificationsEnable)),
+      SnackBar(
+        content: Text(
+          granted
+              ? l10n.profileNotificationsEnabledSnackBar
+              : l10n.profileNotificationsPermissionDenied,
+        ),
+      ),
     );
   }
 
@@ -658,18 +693,38 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ],
                       spacing.vMd,
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: ExcludeSemantics(
-                          child: Icon(context.icons.notifications,
-                              color: colors.icon),
+                      if (_notificationsGranted)
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: ExcludeSemantics(
+                            child: Icon(context.icons.notifications,
+                                color: colors.icon),
+                          ),
+                          title: Text(
+                            l10n.profileNotificationsAccepted,
+                            style: typography.bodyMedium,
+                          ),
+                        )
+                      else
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: ExcludeSemantics(
+                            child: Icon(context.icons.notifications,
+                                color: colors.icon),
+                          ),
+                          title: Text(
+                            l10n.settingsNotificationsEnable,
+                            style: typography.bodyEmphasis,
+                          ),
+                          trailing: ExcludeSemantics(
+                            child: Icon(
+                              context.icons.chevronRight,
+                              color: colors.icon,
+                              size: dimensions.iconSm,
+                            ),
+                          ),
+                          onTap: _busy ? null : _requestNotifications,
                         ),
-                        title: Text(
-                          l10n.settingsNotificationsEnable,
-                          style: typography.bodyEmphasis,
-                        ),
-                        onTap: _busy ? null : _requestNotifications,
-                      ),
                     ],
                   );
                 },

@@ -906,6 +906,18 @@ class AppLocalizationsFr extends AppLocalizations {
       'Autoriser les rappels de fertilisation';
 
   @override
+  String get profileNotificationsAccepted =>
+      'Autorisation pour les rappels de fertilisation accordée';
+
+  @override
+  String get profileNotificationsEnabledSnackBar =>
+      'Rappels de fertilisation activés';
+
+  @override
+  String get profileNotificationsPermissionDenied =>
+      'Veuillez autoriser les notifications dans les paramètres de l’appareil';
+
+  @override
   String get plantUntitled => 'Sans titre';
 
   @override
