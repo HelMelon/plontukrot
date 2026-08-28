@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:hugeicons/hugeicons.dart';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -177,7 +178,8 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
 
       final stages = <Map<String, dynamic>>[];
       for (final stage in stageKeys) {
-        final stagePlants = List<Plant>.from(grouped[stage]!)..sort(comparePlants);
+        final stagePlants = List<Plant>.from(grouped[stage]!)
+          ..sort(comparePlants);
         stages.add({
           'stage': l10n.stageTitle(stage),
           'count': stagePlants.length,
@@ -335,7 +337,10 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
     final currencyController = AppCurrencyController.instance;
 
     final languageOptions = <({String code, String label})>[
-      (code: AppLocaleController.systemCode, label: l10n.settingsLanguageSystem),
+      (
+        code: AppLocaleController.systemCode,
+        label: l10n.settingsLanguageSystem
+      ),
       (code: 'en', label: l10n.settingsLanguageEnglish),
       (code: 'ru', label: l10n.settingsLanguageRussian),
       (code: 'de', label: l10n.settingsLanguageGerman),
@@ -477,14 +482,14 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                                     spacing.vSm,
                                     _StatRow(
                                       label: l10n.profileFavoriteFamily,
-                                      value: favoriteFamily ??
-                                          l10n.profileEmDash,
+                                      value:
+                                          favoriteFamily ?? l10n.profileEmDash,
                                     ),
                                     spacing.vSm,
                                     _StatRow(
                                       label: l10n.profileFavoriteGenus,
-                                      value: favoriteGenus ??
-                                          l10n.profileEmDash,
+                                      value:
+                                          favoriteGenus ?? l10n.profileEmDash,
                                     ),
                                     spacing.vSm,
                                     _StatRow(
@@ -637,7 +642,8 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                           FertilizingSeasonMode.custom) ...[
                         spacing.vMd,
                         DropdownButtonFormField<int>(
-                          key: ValueKey('start-${seasonSettings.springStartMonth}'),
+                          key: ValueKey(
+                              'start-${seasonSettings.springStartMonth}'),
                           initialValue: seasonSettings.springStartMonth,
                           isExpanded: true,
                           style: profileTheme.dropdownTextStyle,
@@ -697,7 +703,8 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                         ListTile(
                           contentPadding: EdgeInsets.zero,
                           leading: ExcludeSemantics(
-                            child: Icon(context.icons.notifications,
+                            child: HugeIcon(
+                                icon: context.icons.notifications,
                                 color: colors.icon),
                           ),
                           title: Text(
@@ -709,7 +716,8 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                         ListTile(
                           contentPadding: EdgeInsets.zero,
                           leading: ExcludeSemantics(
-                            child: Icon(context.icons.notifications,
+                            child: HugeIcon(
+                                icon: context.icons.notifications,
                                 color: colors.icon),
                           ),
                           title: Text(
@@ -720,7 +728,7 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                             child: Icon(
                               context.icons.chevronRight,
                               color: colors.icon,
-                              size: dimensions.iconSm,
+                              size: dimensions.iconLg,
                             ),
                           ),
                           onTap: _busy ? null : _requestNotifications,
@@ -729,25 +737,34 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   );
                 },
               ),
-              spacing.vXl,
+              spacing.vSm,
               ListTile(
                 contentPadding: EdgeInsets.zero,
+                leading: ExcludeSemantics(
+                  child: HugeIcon(
+                    icon: context.icons.personalData,
+                    color: colors.icon,
+                    size: 24,
+                  ),
+                ),
                 title: Text(
                   l10n.profileConsentAccepted,
                   style: typography.bodyMedium,
                 ),
-                subtitle: TextButton(
-                  onPressed: _openPrivacyPolicy,
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    alignment: Alignment.centerLeft,
-                  ),
-                  child: Text(
-                    l10n.privacyPolicyLink,
-                    style: typography.bodyMedium.copyWith(
-                      color: profileTheme.privacyLinkColor,
-                      decoration: TextDecoration.underline,
-                    ),
+              ),
+              TextButton(
+                onPressed: _openPrivacyPolicy,
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  alignment: Alignment.centerLeft,
+                ),
+                child: Text(
+                  l10n.privacyPolicyLink,
+                  style: typography.bodyMedium.copyWith(
+                    color: profileTheme.privacyLinkColor,
+                    decoration: TextDecoration.underline,
                   ),
                 ),
               ),

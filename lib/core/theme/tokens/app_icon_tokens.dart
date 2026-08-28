@@ -49,6 +49,7 @@ class AppIconTokens {
     required this.archiveAction,
     required this.gift,
     required this.notifications,
+    required this.personalData,
     required this.friends,
     required this.profile,
     required this.collection,
@@ -159,7 +160,8 @@ class AppIconTokens {
     archive: Icons.inventory_2_outlined,
     archiveAction: Icons.archive_outlined,
     gift: Icons.card_giftcard_outlined,
-    notifications: Icons.notifications_outlined,
+    notifications: HugeIcons.strokeRoundedNotification02,
+    personalData: HugeIcons.strokeRoundedShieldUser,
     friends: Icons.people_outline,
     profile: Icons.person,
     collection: Icons.grid_view,
@@ -266,10 +268,11 @@ class AppIconTokens {
   final List<List<dynamic>> propagations;
   final List<List<dynamic>> wishlist;
   final List<List<dynamic>> finances;
+  final List<List<dynamic>> personalData;
   final IconData archive;
   final IconData archiveAction;
   final IconData gift;
-  final IconData notifications;
+  final List<List<dynamic>> notifications;
   final IconData friends;
   final IconData profile;
   final IconData collection;
@@ -371,10 +374,11 @@ class AppIconTokens {
     List<List<dynamic>>? propagations,
     List<List<dynamic>>? wishlist,
     List<List<dynamic>>? finances,
+    List<List<dynamic>>? personalData,
     IconData? archive,
     IconData? archiveAction,
     IconData? gift,
-    IconData? notifications,
+    List<List<dynamic>>? notifications,
     IconData? friends,
     IconData? profile,
     IconData? collection,
@@ -470,6 +474,7 @@ class AppIconTokens {
       propagations: propagations ?? this.propagations,
       wishlist: wishlist ?? this.wishlist,
       finances: finances ?? this.finances,
+      personalData: personalData ?? this.personalData,
       archive: archive ?? this.archive,
       archiveAction: archiveAction ?? this.archiveAction,
       gift: gift ?? this.gift,
