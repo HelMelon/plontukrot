@@ -567,6 +567,20 @@
   "propagationByMethods": "Par méthodes : {methods}",
   "propagationByFamilies": "Par familles : {families}",
   "propagationQuantityPieces": "{count} pcs",
+  "propagationLeftCount": "{count} restant(s)",
+  "@propagationLeftCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationAliveOfTotal": "{alive} sur {total} {method} restant(s)",
+  "@propagationAliveOfTotal": {
+    "placeholders": {
+      "alive": {"type": "int"},
+      "total": {"type": "int"},
+      "method": {}
+    }
+  },
   "propagationDeleteTitle": "Supprimer la multiplication",
   "propagationDeleteConfirm": "Le lot de multiplication et tout l’historique des stades seront définitivement supprimés. Continuer ?",
   "propagationDeleteHistoryEntry": "Supprimer l’entrée d’historique ?",

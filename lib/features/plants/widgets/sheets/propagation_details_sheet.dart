@@ -36,6 +36,28 @@ class PropagationDetailsSheet extends StatelessWidget {
     );
   }
 
+  /// For an outcome entry (sold/gifted/traded/lost) the stored [entry.quantityAlive]
+  /// is the *remainder after* the outcome, not the affected count. Show the
+  /// real affected count as the difference vs. the previous entry, plus the
+  /// remaining amount.
+  String _outcomeWithCount(
+    AppLocalizations l10n,
+    PropagationStageEntry entry,
+    List<PropagationStageEntry> history,
+    int index,
+    Propagation shown,
+  ) {
+    final label = l10n.propagationOutcomeLabel(entry.outcome!);
+    final currentAlive = entry.quantityAlive;
+    if (currentAlive == null) return label;
+    final prevAlive = (index > 0 && history[index - 1].quantityAlive != null)
+        ? history[index - 1].quantityAlive!
+        : shown.quantity;
+    final count = prevAlive - currentAlive;
+    if (count < 1) return label;
+    return '${l10n.propagationQuantityPieces(count)} $label · ${l10n.propagationLeftCount(currentAlive)}';
+  }
+
   Future<void> _openChangeStage(
     BuildContext context,
     Propagation current,
@@ -212,7 +234,11 @@ class PropagationDetailsSheet extends StatelessWidget {
                         spacing.vXxs,
                         Text(
                           isActive
-                              ? '${l10n.propagationAliveWithMethod(shown.quantityAlive, l10n.propagationMethodPlural(shown.method))} · ${l10n.propagationMethodLabel(shown.method)}'
+                              ? l10n.propagationAliveOfTotal(
+                                  shown.quantityAlive,
+                                  shown.quantity,
+                                  l10n.propagationMethodPlural(shown.method),
+                                )
                               : '${l10n.propagationMethodLabel(shown.method)} · ${l10n.propagationStatusLabel(shown.status)}',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -353,16 +379,19 @@ class PropagationDetailsSheet extends StatelessWidget {
                                       if (entry.outcome != null) ...[
                                         spacing.vXxs,
                                         Text(
-                                          l10n.propagationOutcomeLabel(
-                                            entry.outcome!,
+                                          _outcomeWithCount(
+                                            l10n,
+                                            entry,
+                                            history,
+                                            index,
+                                            shown,
                                           ),
                                           style: typography.bodySmall.copyWith(
                                             color: colors.icon,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
-                                      ],
-                                      if (entry.quantityAlive != null) ...[
+                                      ] else if (entry.quantityAlive != null) ...[
                                         spacing.vXxs,
                                         Text(
                                           l10n.propagationQuantityPieces(

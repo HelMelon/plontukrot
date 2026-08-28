@@ -1582,6 +1582,16 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String propagationLeftCount(int count) {
+    return 'осталось $count';
+  }
+
+  @override
+  String propagationAliveOfTotal(int alive, int total, Object method) {
+    return 'осталось $alive из $total $method';
+  }
+
+  @override
   String get propagationDeleteTitle => 'Удалить размножение';
 
   @override

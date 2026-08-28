@@ -2970,6 +2970,18 @@ abstract class AppLocalizations {
   /// **'{count} pcs'**
   String propagationQuantityPieces(int count);
 
+  /// No description provided for @propagationLeftCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} left'**
+  String propagationLeftCount(int count);
+
+  /// No description provided for @propagationAliveOfTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'{alive} of {total} {method} left'**
+  String propagationAliveOfTotal(int alive, int total, Object method);
+
   /// No description provided for @propagationDeleteTitle.
   ///
   /// In en, this message translates to:

@@ -1593,6 +1593,16 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String propagationLeftCount(int count) {
+    return '$count restant(s)';
+  }
+
+  @override
+  String propagationAliveOfTotal(int alive, int total, Object method) {
+    return '$alive sur $total $method restant(s)';
+  }
+
+  @override
   String get propagationDeleteTitle => 'Supprimer la multiplication';
 
   @override

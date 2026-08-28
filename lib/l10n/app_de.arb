@@ -567,6 +567,20 @@
   "propagationByMethods": "Nach Methoden: {methods}",
   "propagationByFamilies": "Nach Familien: {families}",
   "propagationQuantityPieces": "{count} Stk.",
+  "propagationLeftCount": "{count} übrig",
+  "@propagationLeftCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationAliveOfTotal": "{alive} von {total} {method} übrig",
+  "@propagationAliveOfTotal": {
+    "placeholders": {
+      "alive": {"type": "int"},
+      "total": {"type": "int"},
+      "method": {}
+    }
+  },
   "propagationDeleteTitle": "Vermehrung löschen",
   "propagationDeleteConfirm": "Die Vermehrungscharge und der gesamte Stufenverlauf werden unwiderruflich gelöscht. Fortfahren?",
   "propagationDeleteHistoryEntry": "Verlaufseintrag löschen?",

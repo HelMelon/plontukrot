@@ -775,6 +775,20 @@
     }
   },
   "propagationQuantityPieces": "{count} pcs",
+  "propagationLeftCount": "{count} left",
+  "@propagationLeftCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationAliveOfTotal": "{alive} of {total} {method} left",
+  "@propagationAliveOfTotal": {
+    "placeholders": {
+      "alive": {"type": "int"},
+      "total": {"type": "int"},
+      "method": {}
+    }
+  },
   "@propagationQuantityPieces": {
     "placeholders": {
       "count": {"type": "int"}

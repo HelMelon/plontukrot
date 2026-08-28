@@ -61,9 +61,10 @@ class _MarkPropagationOutcomeSheetState
   @override
   void initState() {
     super.initState();
-    _quantityController = TextEditingController(
-      text: '${widget.propagation.quantityAlive}',
-    );
+    // Leave the quantity empty so the user explicitly types how many they
+    // sold/lost/traded. Pre-filling with quantityAlive caused the whole
+    // alive batch to be recorded by mistake (e.g. "sold 5" when only 1).
+    _quantityController = TextEditingController();
   }
 
   @override

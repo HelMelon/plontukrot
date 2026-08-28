@@ -1587,6 +1587,16 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String propagationLeftCount(int count) {
+    return '$count übrig';
+  }
+
+  @override
+  String propagationAliveOfTotal(int alive, int total, Object method) {
+    return '$alive von $total $method übrig';
+  }
+
+  @override
   String get propagationDeleteTitle => 'Vermehrung löschen';
 
   @override

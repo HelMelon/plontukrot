@@ -583,6 +583,20 @@
   "propagationByMethods": "По способам: {methods}",
   "propagationByFamilies": "По семействам: {families}",
   "propagationQuantityPieces": "{count} шт",
+  "propagationLeftCount": "осталось {count}",
+  "@propagationLeftCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "propagationAliveOfTotal": "осталось {alive} из {total} {method}",
+  "@propagationAliveOfTotal": {
+    "placeholders": {
+      "alive": {"type": "int"},
+      "total": {"type": "int"},
+      "method": {}
+    }
+  },
   "propagationDeleteTitle": "Удалить размножение",
   "propagationDeleteConfirm": "Партия размножения и вся история стадий будут удалены безвозвратно. Продолжить?",
   "propagationDeleteHistoryEntry": "Удалить запись истории?",

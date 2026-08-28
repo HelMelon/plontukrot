@@ -1576,6 +1576,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String propagationLeftCount(int count) {
+    return '$count left';
+  }
+
+  @override
+  String propagationAliveOfTotal(int alive, int total, Object method) {
+    return '$alive of $total $method left';
+  }
+
+  @override
   String get propagationDeleteTitle => 'Delete propagation';
 
   @override
