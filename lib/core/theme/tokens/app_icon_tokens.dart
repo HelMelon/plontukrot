@@ -90,6 +90,10 @@ class AppIconTokens {
     required this.fertilizingEco,
     required this.repotting,
     required this.repottingAction,
+    required this.light,
+    required this.humidity,
+    required this.toxicity,
+    required this.aiCare,
     required this.note,
     required this.noteAction,
     required this.notesOutlined,
@@ -202,6 +206,10 @@ class AppIconTokens {
     fertilizingEco: Icons.eco_outlined,
     repotting: HugeIcons.strokeRoundedShovel,
     repottingAction: HugeIcons.strokeRoundedShovel,
+    light: Icons.wb_sunny_outlined,
+    humidity: Icons.opacity_outlined,
+    toxicity: Icons.pets_outlined,
+    aiCare: Icons.auto_awesome,
     note: HugeIcons.strokeRoundedNoteEdit,
     noteAction: Icons.sticky_note_2_outlined,
     notesOutlined: Icons.notes_outlined,
@@ -313,6 +321,10 @@ class AppIconTokens {
   final IconData fertilizingEco;
   final List<List<dynamic>> repotting;
   final List<List<dynamic>> repottingAction;
+  final IconData light;
+  final IconData humidity;
+  final IconData toxicity;
+  final IconData aiCare;
   final List<List<dynamic>> note;
   final IconData noteAction;
   final IconData notesOutlined;
@@ -415,6 +427,10 @@ class AppIconTokens {
     IconData? fertilizingEco,
     List<List<dynamic>>? repotting,
     List<List<dynamic>>? repottingAction,
+    IconData? light,
+    IconData? humidity,
+    IconData? toxicity,
+    IconData? aiCare,
     List<List<dynamic>>? note,
     IconData? noteAction,
     IconData? notesOutlined,
@@ -515,6 +531,10 @@ class AppIconTokens {
       fertilizingEco: fertilizingEco ?? this.fertilizingEco,
       repotting: repotting ?? this.repotting,
       repottingAction: repottingAction ?? this.repottingAction,
+      light: light ?? this.light,
+      humidity: humidity ?? this.humidity,
+      toxicity: toxicity ?? this.toxicity,
+      aiCare: aiCare ?? this.aiCare,
       note: note ?? this.note,
       noteAction: noteAction ?? this.noteAction,
       notesOutlined: notesOutlined ?? this.notesOutlined,

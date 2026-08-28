@@ -2201,4 +2201,49 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get plantDisposeArchived => 'Plante déplacée vers les archives';
+
+  @override
+  String get genusCareTitle => 'À propos du genre et soins';
+
+  @override
+  String get genusCareAiBadge => 'Guide d\'entretien';
+
+  @override
+  String get genusCareOrigin => 'Origine';
+
+  @override
+  String get genusCareLight => 'Lumière';
+
+  @override
+  String get genusCareWatering => 'Arrosage';
+
+  @override
+  String get genusCareFertilizing => 'Engrais';
+
+  @override
+  String get genusCareSoil => 'Substrat';
+
+  @override
+  String get genusCareHumidity => 'Humidité';
+
+  @override
+  String get genusCareToxicity => 'Toxicité';
+
+  @override
+  String get genusCareExpand => 'Afficher tout';
+
+  @override
+  String get genusCareCollapse => 'Réduire';
+
+  @override
+  String get genusCareLoading => 'Chargement du guide d\'entretien...';
+
+  @override
+  String get genusCareRetry => 'Réessayer';
+
+  @override
+  String get a11yGenusCareExpand => 'Développer le guide d\'entretien';
+
+  @override
+  String get a11yGenusCareCollapse => 'Réduire le guide d\'entretien';
 }

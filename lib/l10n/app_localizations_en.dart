@@ -2179,4 +2179,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plantDisposeArchived => 'Plant moved to archive';
+
+  @override
+  String get genusCareTitle => 'About genus & care';
+
+  @override
+  String get genusCareAiBadge => 'Care guide';
+
+  @override
+  String get genusCareOrigin => 'Origin';
+
+  @override
+  String get genusCareLight => 'Light';
+
+  @override
+  String get genusCareWatering => 'Watering';
+
+  @override
+  String get genusCareFertilizing => 'Fertilizing';
+
+  @override
+  String get genusCareSoil => 'Soil';
+
+  @override
+  String get genusCareHumidity => 'Humidity';
+
+  @override
+  String get genusCareToxicity => 'Toxicity';
+
+  @override
+  String get genusCareExpand => 'Show all details';
+
+  @override
+  String get genusCareCollapse => 'Collapse';
+
+  @override
+  String get genusCareLoading => 'Loading care guide...';
+
+  @override
+  String get genusCareRetry => 'Retry';
+
+  @override
+  String get a11yGenusCareExpand => 'Expand care guide';
+
+  @override
+  String get a11yGenusCareCollapse => 'Collapse care guide';
 }

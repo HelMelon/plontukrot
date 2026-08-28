@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import 'package:plontukrot/core/theme/theme_context.dart';
+import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/app_bar_chrome_actions.dart';
 
 import '../../../models/plant.dart';
 import '../../../services/plant_service.dart';
+import '../widgets/cards/genus_care_guide_card.dart';
 import '../widgets/cards/plant_card.dart';
-import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 class PlantGenusDetailsPage extends StatefulWidget {
   final String genus;
@@ -74,39 +75,74 @@ class _PlantGenusDetailsPageState extends State<PlantGenusDetailsPage> {
               .where((plant) => plant.genus.trim() == genus)
               .toList();
 
-          if (plants.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: spacing.allXl,
-                child: Text(
-                  l10n.plantEmptyGenus,
-                  textAlign: TextAlign.center,
-                  style: typography.bodyLarge,
-                ),
-              ),
-            );
-          }
-
           return LayoutBuilder(
             builder: (context, constraints) {
               final crossAxisCount = _crossAxisCount(constraints.maxWidth);
-              return GridView.builder(
-                padding: EdgeInsets.fromLTRB(
-                  spacing.md,
-                  spacing.xs,
-                  spacing.md,
-                  spacing.xl,
-                ),
-                itemCount: plants.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: spacing.sm,
-                  mainAxisSpacing: spacing.md,
-                  childAspectRatio: 0.55,
-                ),
-                itemBuilder: (context, index) {
-                  return PlantCard(plant: plants[index]);
-                },
+              final isMobile = crossAxisCount <= 2;
+              final childAspectRatio = isMobile ? 0.45 : 0.625;
+              final double? mainAxisExtent;
+              if (isMobile) {
+                final cellWidth = (constraints.maxWidth -
+                        spacing.md * 2 -
+                        spacing.sm * (crossAxisCount - 1)) /
+                    crossAxisCount;
+                mainAxisExtent = cellWidth / 0.45 + 22;
+              } else {
+                mainAxisExtent = null;
+              }
+
+              return CustomScrollView(
+                slivers: [
+                  if (genus.isNotEmpty)
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(
+                        spacing.md,
+                        spacing.xs,
+                        spacing.md,
+                        spacing.md,
+                      ),
+                      sliver: SliverToBoxAdapter(
+                        child: GenusCareGuideCard(genus: genus),
+                      ),
+                    ),
+                  if (plants.isEmpty)
+                    SliverToBoxAdapter(
+                      child: Center(
+                        child: Padding(
+                          padding: spacing.allXl,
+                          child: Text(
+                            l10n.plantEmptyGenus,
+                            textAlign: TextAlign.center,
+                            style: typography.bodyLarge,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(
+                        spacing.md,
+                        0,
+                        spacing.md,
+                        spacing.xl,
+                      ),
+                      sliver: SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          crossAxisSpacing: spacing.sm,
+                          mainAxisSpacing: spacing.md,
+                          childAspectRatio: childAspectRatio,
+                          mainAxisExtent: mainAxisExtent,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            return PlantCard(plant: plants[index]);
+                          },
+                          childCount: plants.length,
+                        ),
+                      ),
+                    ),
+                ],
               );
             },
           );

@@ -861,5 +861,21 @@
   "plantDisposeDeathNoteRequired": "Опишите причину гибели",
   "plantDisposeSaleAmount": "Сумма продажи",
   "plantDisposeConfirm": "В архив",
-  "plantDisposeArchived": "Растение перемещено в архив"
+  "plantDisposeArchived": "Растение перемещено в архив",
+
+  "genusCareTitle": "О роде и уходе",
+  "genusCareAiBadge": "Справка",
+  "genusCareOrigin": "Происхождение",
+  "genusCareLight": "Освещение",
+  "genusCareWatering": "Полив",
+  "genusCareFertilizing": "Подкормка",
+  "genusCareSoil": "Грунт",
+  "genusCareHumidity": "Влажность",
+  "genusCareToxicity": "Токсичность",
+  "genusCareExpand": "Показать полностью",
+  "genusCareCollapse": "Свернуть",
+  "genusCareLoading": "Загрузка справки по уходу...",
+  "genusCareRetry": "Повторить попытку",
+  "a11yGenusCareExpand": "Развернуть справку по уходу",
+  "a11yGenusCareCollapse": "Свернуть справку по уходу"
 }

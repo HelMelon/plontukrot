@@ -4019,6 +4019,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Plant moved to archive'**
   String get plantDisposeArchived;
+
+  /// No description provided for @genusCareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About genus & care'**
+  String get genusCareTitle;
+
+  /// No description provided for @genusCareAiBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Care guide'**
+  String get genusCareAiBadge;
+
+  /// No description provided for @genusCareOrigin.
+  ///
+  /// In en, this message translates to:
+  /// **'Origin'**
+  String get genusCareOrigin;
+
+  /// No description provided for @genusCareLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get genusCareLight;
+
+  /// No description provided for @genusCareWatering.
+  ///
+  /// In en, this message translates to:
+  /// **'Watering'**
+  String get genusCareWatering;
+
+  /// No description provided for @genusCareFertilizing.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilizing'**
+  String get genusCareFertilizing;
+
+  /// No description provided for @genusCareSoil.
+  ///
+  /// In en, this message translates to:
+  /// **'Soil'**
+  String get genusCareSoil;
+
+  /// No description provided for @genusCareHumidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity'**
+  String get genusCareHumidity;
+
+  /// No description provided for @genusCareToxicity.
+  ///
+  /// In en, this message translates to:
+  /// **'Toxicity'**
+  String get genusCareToxicity;
+
+  /// No description provided for @genusCareExpand.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all details'**
+  String get genusCareExpand;
+
+  /// No description provided for @genusCareCollapse.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse'**
+  String get genusCareCollapse;
+
+  /// No description provided for @genusCareLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading care guide...'**
+  String get genusCareLoading;
+
+  /// No description provided for @genusCareRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get genusCareRetry;
+
+  /// No description provided for @a11yGenusCareExpand.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand care guide'**
+  String get a11yGenusCareExpand;
+
+  /// No description provided for @a11yGenusCareCollapse.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse care guide'**
+  String get a11yGenusCareCollapse;
 }
 
 class _AppLocalizationsDelegate

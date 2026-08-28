@@ -2188,4 +2188,49 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plantDisposeArchived => 'Растение перемещено в архив';
+
+  @override
+  String get genusCareTitle => 'О роде и уходе';
+
+  @override
+  String get genusCareAiBadge => 'Справка';
+
+  @override
+  String get genusCareOrigin => 'Происхождение';
+
+  @override
+  String get genusCareLight => 'Освещение';
+
+  @override
+  String get genusCareWatering => 'Полив';
+
+  @override
+  String get genusCareFertilizing => 'Подкормка';
+
+  @override
+  String get genusCareSoil => 'Грунт';
+
+  @override
+  String get genusCareHumidity => 'Влажность';
+
+  @override
+  String get genusCareToxicity => 'Токсичность';
+
+  @override
+  String get genusCareExpand => 'Показать полностью';
+
+  @override
+  String get genusCareCollapse => 'Свернуть';
+
+  @override
+  String get genusCareLoading => 'Загрузка справки по уходу...';
+
+  @override
+  String get genusCareRetry => 'Повторить попытку';
+
+  @override
+  String get a11yGenusCareExpand => 'Развернуть справку по уходу';
+
+  @override
+  String get a11yGenusCareCollapse => 'Свернуть справку по уходу';
 }

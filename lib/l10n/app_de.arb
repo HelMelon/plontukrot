@@ -845,5 +845,21 @@
   "plantDisposeDeathNoteRequired": "Beschreiben Sie die Todesursache",
   "plantDisposeSaleAmount": "Verkaufsbetrag",
   "plantDisposeConfirm": "Ins Archiv",
-  "plantDisposeArchived": "Pflanze ins Archiv verschoben"
+  "plantDisposeArchived": "Pflanze ins Archiv verschoben",
+
+  "genusCareTitle": "Über Gattung & Pflege",
+  "genusCareAiBadge": "Pflegeanleitung",
+  "genusCareOrigin": "Herkunft",
+  "genusCareLight": "Licht",
+  "genusCareWatering": "Gießen",
+  "genusCareFertilizing": "Düngung",
+  "genusCareSoil": "Substrat",
+  "genusCareHumidity": "Luftfeuchtigkeit",
+  "genusCareToxicity": "Toxizität",
+  "genusCareExpand": "Alle Details anzeigen",
+  "genusCareCollapse": "Einklappen",
+  "genusCareLoading": "Lade Pflegeanleitung...",
+  "genusCareRetry": "Wiederholen",
+  "a11yGenusCareExpand": "Pflegeanleitung ausklappen",
+  "a11yGenusCareCollapse": "Pflegeanleitung einklappen"
 }

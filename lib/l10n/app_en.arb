@@ -1125,5 +1125,21 @@
   "plantDisposeDeathNoteRequired": "Describe why the plant died",
   "plantDisposeSaleAmount": "Sale amount",
   "plantDisposeConfirm": "Move to archive",
-  "plantDisposeArchived": "Plant moved to archive"
+  "plantDisposeArchived": "Plant moved to archive",
+
+  "genusCareTitle": "About genus & care",
+  "genusCareAiBadge": "Care guide",
+  "genusCareOrigin": "Origin",
+  "genusCareLight": "Light",
+  "genusCareWatering": "Watering",
+  "genusCareFertilizing": "Fertilizing",
+  "genusCareSoil": "Soil",
+  "genusCareHumidity": "Humidity",
+  "genusCareToxicity": "Toxicity",
+  "genusCareExpand": "Show all details",
+  "genusCareCollapse": "Collapse",
+  "genusCareLoading": "Loading care guide...",
+  "genusCareRetry": "Retry",
+  "a11yGenusCareExpand": "Expand care guide",
+  "a11yGenusCareCollapse": "Collapse care guide"
 }
