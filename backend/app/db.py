@@ -89,6 +89,44 @@ def auto_migrate() -> None:
                     name TEXT NOT NULL,
                     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
                 );
+
+                CREATE TABLE IF NOT EXISTS genus_care_guides (
+                    genus TEXT NOT NULL,
+                    locale TEXT NOT NULL DEFAULT 'ru',
+                    genus_name TEXT NOT NULL,
+                    origin TEXT,
+                    light TEXT,
+                    watering TEXT,
+                    fertilizing TEXT,
+                    soil TEXT,
+                    humidity TEXT,
+                    toxicity TEXT,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                    PRIMARY KEY (genus, locale)
+                );
+
+                ALTER TABLE genus_care_guides
+                    ADD COLUMN IF NOT EXISTS locale TEXT NOT NULL DEFAULT 'ru';
+
+                DO $genus_care_locale_pk$
+                BEGIN
+                    IF NOT EXISTS (
+                        SELECT 1
+                        FROM information_schema.table_constraints tc
+                        JOIN information_schema.key_column_usage kcu
+                          ON tc.constraint_name = kcu.constraint_name
+                         AND tc.table_schema = kcu.table_schema
+                        WHERE tc.table_name = 'genus_care_guides'
+                          AND tc.constraint_type = 'PRIMARY KEY'
+                          AND kcu.column_name = 'locale'
+                    ) THEN
+                        ALTER TABLE genus_care_guides
+                            DROP CONSTRAINT IF EXISTS genus_care_guides_pkey;
+                        ALTER TABLE genus_care_guides
+                            ADD PRIMARY KEY (genus, locale);
+                    END IF;
+                END $genus_care_locale_pk$;
             """)
     except Exception:
         pass

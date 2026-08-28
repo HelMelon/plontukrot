@@ -449,4 +449,17 @@ class GiftCreate(BaseModel):
     status: int = 0
 
 
+# ---- Genus Care Guide ----
+class GenusCareGuideOut(BaseModel):
+    genus: str
+    origin: Optional[str] = None
+    light: Optional[str] = None
+    watering: Optional[str] = None
+    fertilizing: Optional[str] = None
+    soil: Optional[str] = None
+    humidity: Optional[str] = None
+    toxicity: Optional[str] = None
+
+
+
 

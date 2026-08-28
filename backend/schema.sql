@@ -14,6 +14,23 @@ CREATE TABLE IF NOT EXISTS plant_species (
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Genus botanical care guides (cached AI generations).
+CREATE TABLE IF NOT EXISTS genus_care_guides (
+    genus       TEXT NOT NULL,
+    locale      TEXT NOT NULL DEFAULT 'ru',
+    genus_name  TEXT NOT NULL,
+    origin      TEXT,
+    light       TEXT,
+    watering    TEXT,
+    fertilizing TEXT,
+    soil        TEXT,
+    humidity    TEXT,
+    toxicity    TEXT,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (genus, locale)
+);
+
 -- ============================= AUTH / USERS =======================
 -- Replaces Firestore `users/{uid}` profile.
 CREATE TABLE IF NOT EXISTS users (
