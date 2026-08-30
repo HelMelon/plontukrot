@@ -108,6 +108,24 @@ abstract class AppLocalizations {
   /// **'SKÖRD'**
   String get appName;
 
+  /// No description provided for @appBrandName.
+  ///
+  /// In en, this message translates to:
+  /// **'Plöntukrot'**
+  String get appBrandName;
+
+  /// No description provided for @appFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'{appName} · {version} · © {year}'**
+  String appFooter(String appName, String version, String year);
+
+  /// No description provided for @a11yAppFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'{appName}, version {version}, {year}'**
+  String a11yAppFooter(String appName, String version, String year);
+
   /// No description provided for @brandTagline.
   ///
   /// In en, this message translates to:

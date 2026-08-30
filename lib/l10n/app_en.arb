@@ -2,6 +2,23 @@
   "@@locale": "en",
 
   "appName": "SKÖRD",
+  "appBrandName": "Plöntukrot",
+  "appFooter": "{appName} · {version} · © {year}",
+  "@appFooter": {
+    "placeholders": {
+      "appName": {"type": "String"},
+      "version": {"type": "String"},
+      "year": {"type": "String"}
+    }
+  },
+  "a11yAppFooter": "{appName}, version {version}, {year}",
+  "@a11yAppFooter": {
+    "placeholders": {
+      "appName": {"type": "String"},
+      "version": {"type": "String"},
+      "year": {"type": "String"}
+    }
+  },
   "brandTagline": "A journal of the fight for light and moisture. Sprouts are no guarantee. Only observation.",
 
   "commonCancel": "Cancel",

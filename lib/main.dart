@@ -7,6 +7,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
+import 'core/app_footer_controller.dart';
 import 'core/currency/app_currency_controller.dart';
 import 'core/keyboard/app_keyboard.dart';
 import 'core/locale/app_locale_controller.dart';
@@ -25,6 +26,7 @@ import 'services/token_store.dart';
 import 'services/fertilizing_notification_service.dart';
 import 'services/gift_service.dart';
 import 'services/plant_service.dart';
+import 'package:plontukrot/core/widgets/app_page_shell.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 
 Future<void> main() async {
@@ -72,7 +74,9 @@ class MyApp extends StatelessWidget {
                 return Theme(
                   data: AppTheme.themeForWidth(width),
                   child: AppKeyboardScope(
+                    child: AppPageShell(
                     child: child ?? const SizedBox.shrink(),
+                  ),
                   ),
                 );
               },
@@ -149,7 +153,14 @@ class _AppStartupState extends State<AppStartup> {
   @override
   void initState() {
     super.initState();
+    AppFooterController.instance.setVisible(false);
     _bootstrap();
+  }
+
+  void _syncFooterVisibility() {
+    AppFooterController.instance.setVisible(
+      _phase == _StartupPhase.app && _splashDismissed,
+    );
   }
 
   Future<void> _bootstrap() async {
@@ -193,6 +204,7 @@ class _AppStartupState extends State<AppStartup> {
       await Future<void>.delayed(const Duration(milliseconds: 100));
       if (!mounted) return;
       setState(() => _phase = _StartupPhase.app);
+      _syncFooterVisibility();
     } catch (error, stack) {
       await AppCrashReporting.instance.recordError(
         error,
@@ -201,6 +213,7 @@ class _AppStartupState extends State<AppStartup> {
       );
       if (!mounted) return;
       setState(() => _phase = _StartupPhase.app);
+      _syncFooterVisibility();
     }
   }
 
@@ -244,6 +257,7 @@ class _AppStartupState extends State<AppStartup> {
                   onFinished: () {
                     if (!mounted) return;
                     setState(() => _splashDismissed = true);
+                    _syncFooterVisibility();
                   },
                 ),
               ),

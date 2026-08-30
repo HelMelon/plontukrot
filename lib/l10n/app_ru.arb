@@ -2,6 +2,23 @@
   "@@locale": "ru",
 
   "appName": "SKÖRD",
+  "appBrandName": "Plöntukrot",
+  "appFooter": "{appName} · {version} · © {year}",
+  "@appFooter": {
+    "placeholders": {
+      "appName": {"type": "String"},
+      "version": {"type": "String"},
+      "year": {"type": "String"}
+    }
+  },
+  "a11yAppFooter": "{appName}, версия {version}, {year} год",
+  "@a11yAppFooter": {
+    "placeholders": {
+      "appName": {"type": "String"},
+      "version": {"type": "String"},
+      "year": {"type": "String"}
+    }
+  },
   "brandTagline": "Журнал борьбы за свет и влагу. Всходы — не гарантия. Только наблюдение.",
 
   "commonCancel": "Отмена",

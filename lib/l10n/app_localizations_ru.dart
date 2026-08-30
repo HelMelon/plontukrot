@@ -12,6 +12,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get appName => 'SKÖRD';
 
   @override
+  String get appBrandName => 'Plöntukrot';
+
+  @override
+  String appFooter(String appName, String version, String year) {
+    return '$appName · $version · © $year';
+  }
+
+  @override
+  String a11yAppFooter(String appName, String version, String year) {
+    return '$appName, версия $version, $year год';
+  }
+
+  @override
   String get brandTagline =>
       'Журнал борьбы за свет и влагу. Всходы — не гарантия. Только наблюдение.';
 

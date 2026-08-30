@@ -286,6 +286,38 @@ class AppChipComponentTheme {
 }
 
 @immutable
+class AppFooterComponentTheme {
+  const AppFooterComponentTheme({
+    required this.brandTextStyle,
+    required this.textStyle,
+    required this.padding,
+  });
+
+  factory AppFooterComponentTheme.standard({
+    required AppColorTokens colors,
+    required AppSpacingTokens spacing,
+    required AppTypographyTokens typography,
+  }) {
+    final metaColor = colors.textSecondary;
+    return AppFooterComponentTheme(
+      brandTextStyle: typography.captionSmall.copyWith(
+        color: metaColor,
+        fontWeight: FontWeight.bold,
+      ),
+      textStyle: typography.captionSmall.copyWith(color: metaColor),
+      padding: spacing.symmetric(
+        horizontal: spacing.md,
+        vertical: spacing.xs,
+      ),
+    );
+  }
+
+  final TextStyle brandTextStyle;
+  final TextStyle textStyle;
+  final EdgeInsets padding;
+}
+
+@immutable
 class AppDialogComponentTheme {
   const AppDialogComponentTheme({
     required this.background,
@@ -322,6 +354,7 @@ class AppComponentThemes {
     required this.cards,
     required this.chips,
     required this.dialogs,
+    required this.footer,
   });
 
   factory AppComponentThemes.standard({
@@ -367,6 +400,11 @@ class AppComponentThemes {
         radii: radii,
         typography: typography,
       ),
+      footer: AppFooterComponentTheme.standard(
+        colors: colors,
+        spacing: spacing,
+        typography: typography,
+      ),
     );
   }
 
@@ -376,4 +414,5 @@ class AppComponentThemes {
   final AppCardComponentTheme cards;
   final AppChipComponentTheme chips;
   final AppDialogComponentTheme dialogs;
+  final AppFooterComponentTheme footer;
 }

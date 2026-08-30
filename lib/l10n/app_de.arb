@@ -2,6 +2,23 @@
   "@@locale": "de",
 
   "appName": "SKÖRD",
+  "appBrandName": "Plöntukrot",
+  "appFooter": "{appName} · {version} · © {year}",
+  "@appFooter": {
+    "placeholders": {
+      "appName": {"type": "String"},
+      "version": {"type": "String"},
+      "year": {"type": "String"}
+    }
+  },
+  "a11yAppFooter": "{appName}, Version {version}, {year}",
+  "@a11yAppFooter": {
+    "placeholders": {
+      "appName": {"type": "String"},
+      "version": {"type": "String"},
+      "year": {"type": "String"}
+    }
+  },
   "brandTagline": "Ein Journal des Kampfes um Licht und Feuchtigkeit. Keimlinge sind keine Garantie. Nur Beobachtung.",
 
   "commonCancel": "Abbrechen",
