@@ -400,15 +400,13 @@ class _HomePageState extends State<HomePage> {
         _sortField == _PlantSortField.plantFamily;
     final isMobile = crossAxisCount <= 2;
     final childAspectRatio = isMobile ? 0.45 : 0.625;
-    // Mobile cards: square photo + footer. Give the footer extra height so
-    // title/subtitle and stat chips never overflow.
     final double? mainAxisExtent;
     if (isMobile) {
       final screenWidth = MediaQuery.sizeOf(context).width;
       final cellWidth =
           (screenWidth - 2 * _spacing.lg - _spacing.sm * (crossAxisCount - 1)) /
               crossAxisCount;
-      mainAxisExtent = cellWidth / 0.45 + 22;
+      mainAxisExtent = PlantCard.mobileGridMainAxisExtent(context, cellWidth);
     } else {
       mainAxisExtent = null;
     }
@@ -848,7 +846,7 @@ class _HomePageState extends State<HomePage> {
       title: Align(
         alignment: Alignment.centerLeft,
         child: AutoSizeText(
-          'Plöntukrot',
+          l10n.appBrandName,
           minFontSize: 18,
           maxFontSize: 36,
           style: _homeTheme.brandStyle,

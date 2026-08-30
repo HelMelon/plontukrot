@@ -38,6 +38,80 @@ class PlantCard extends StatelessWidget {
     this.onLongPress,
   });
 
+  /// Mobile grid cell height: square photo + text (2+2 lines) + care stats.
+  static double mobileGridMainAxisExtent(
+    BuildContext context,
+    double cellWidth,
+  ) {
+    return cellWidth + _mobileFooterHeight(context) + _mobileGridHeightSlack;
+  }
+
+  static double _mobileFooterHeight(BuildContext context) {
+    return _mobileTextBlockHeight(context) + _mobileStatsBlockHeight(context);
+  }
+
+  static double _mobileTextBlockHeight(BuildContext context) {
+    final spacing = context.spacing;
+    return spacing.sm * 2 +
+        _mobileNicknameBlockHeight(context) +
+        spacing.xxs +
+        _mobileSpeciesBlockHeight(context);
+  }
+
+  static double _mobileNicknameBlockHeight(BuildContext context) {
+    return _twoLineBlockHeight(
+      _mobileNicknameStyle(context.typography, context.colors.primary),
+    );
+  }
+
+  static double _mobileSpeciesBlockHeight(BuildContext context) {
+    return _twoLineBlockHeight(
+      _mobileSpeciesStyle(context.typography, context.colors.textSecondary),
+    );
+  }
+
+  static TextStyle _mobileNicknameStyle(
+    AppTypographyTokens typography,
+    Color color,
+  ) {
+    return typography.bodyEmphasis.copyWith(
+      fontWeight: FontWeight.bold,
+      letterSpacing: -0.3,
+      color: color,
+      height: 1.2,
+    );
+  }
+
+  static TextStyle _mobileSpeciesStyle(
+    AppTypographyTokens typography,
+    Color color,
+  ) {
+    return typography.bodySmall.copyWith(
+      color: color,
+      height: 1.2,
+    );
+  }
+
+  static double _twoLineBlockHeight(TextStyle style) {
+    return _textLineHeight(style, style.height ?? 1.2) * 2;
+  }
+
+  static const double _mobileDividerHeight = 16;
+  static const double _mobileGridHeightSlack = 1.5;
+
+  static double _mobileStatsBlockHeight(BuildContext context) {
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final dimensions = context.dimensions;
+    final statRowHeight = _textLineHeight(typography.caption, 1.1)
+        .clamp(dimensions.iconSm, double.infinity);
+    return _mobileDividerHeight + statRowHeight * 3 + spacing.xxs * 2;
+  }
+
+  static double _textLineHeight(TextStyle style, double heightFactor) {
+    return (style.fontSize ?? 14) * heightFactor;
+  }
+
   String _dateLabel(DateTime? date, String empty) {
     if (date == null) return empty;
     return DateFormat('d.MM').format(date);
@@ -72,9 +146,13 @@ class PlantCard extends StatelessWidget {
     final title = showSpeciesOnTop ? species : nickname;
     final subtitle =
         showSpeciesOnTop ? (hasNickname ? nickname : null) : species;
+    final mobileNicknameStyle =
+        PlantCard._mobileNicknameStyle(typography, colors.primary);
+    final mobileSpeciesStyle =
+        PlantCard._mobileSpeciesStyle(typography, colors.textSecondary);
     final semanticsLabel = [
-      title,
-      if (subtitle != null) subtitle,
+      if (hasNickname) nickname,
+      species,
       l10n.a11yLastFertilized(fertilizedLabel),
       l10n.a11yLastWatered(wateredLabel),
       l10n.a11yPropagationBatches(propagationBatchCount),
@@ -129,103 +207,149 @@ class PlantCard extends StatelessWidget {
                             )
                           : const _PlantAssetPlaceholder(),
                     ),
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.all(spacing.sm),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    title,
-                                    maxLines: isMobile && subtitle != null ? 1 : 2,
+                    if (isMobile)
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(spacing.sm),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: PlantCard._mobileNicknameBlockHeight(
+                                  context,
+                                ),
+                                child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    hasNickname ? nickname : '',
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
-                                    style: typography.bodyEmphasis.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: -0.3,
-                                      color: colors.primary,
-                                      height: 1.2,
-                                    ),
+                                    style: mobileNicknameStyle,
                                   ),
-                                  if (subtitle != null) ...[
+                                ),
+                              ),
+                              spacing.vXxs,
+                              SizedBox(
+                                height: PlantCard._mobileSpeciesBlockHeight(
+                                  context,
+                                ),
+                                child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    species,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: mobileSpeciesStyle,
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                height: PlantCard._mobileDividerHeight,
+                                color: colors.primary,
+                                thickness: 1,
+                              ),
+                              ExcludeSemantics(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _StatChip(
+                                      icon: context.icons.fertilizing,
+                                      label: fertilizedLabel,
+                                    ),
                                     spacing.vXxs,
+                                    _StatChip(
+                                      icon: context.icons.watering,
+                                      label: wateredLabel,
+                                    ),
+                                    spacing.vXxs,
+                                    _StatChip(
+                                      hugeIcon: context.icons.propagations,
+                                      label: batchesLabel,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    else
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(spacing.sm),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
                                     Text(
-                                      subtitle,
-                                      maxLines: isMobile ? 1 : 2,
+                                      title,
+                                      maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: typography.bodySmall.copyWith(
-                                        color: colors.textSecondary,
+                                      style: typography.bodyEmphasis.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: -0.3,
+                                        color: colors.primary,
                                         height: 1.2,
                                       ),
                                     ),
+                                    if (subtitle != null) ...[
+                                      spacing.vXxs,
+                                      Text(
+                                        subtitle,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: typography.bodySmall.copyWith(
+                                          color: colors.textSecondary,
+                                          height: 1.2,
+                                        ),
+                                      ),
+                                    ],
                                   ],
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Divider(color: colors.primary, thickness: 1),
+                                  ExcludeSemantics(
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: _StatChip(
+                                            icon: context.icons.fertilizing,
+                                            label: fertilizedLabel,
+                                          ),
+                                        ),
+                                        spacing.hXxs,
+                                        Expanded(
+                                          child: _StatChip(
+                                            icon: context.icons.watering,
+                                            label: wateredLabel,
+                                          ),
+                                        ),
+                                        spacing.hXxs,
+                                        Expanded(
+                                          child: _StatChip(
+                                            hugeIcon:
+                                                context.icons.propagations,
+                                            label: batchesLabel,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Divider(color: colors.primary, thickness: 1),
-                                ExcludeSemantics(
-                                  child: isMobile
-                                      ? Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            _StatChip(
-                                              icon: context.icons.fertilizing,
-                                              label: fertilizedLabel,
-                                            ),
-                                            spacing.vXxs,
-                                            _StatChip(
-                                              icon: context.icons.watering,
-                                              label: wateredLabel,
-                                            ),
-                                            spacing.vXxs,
-                                            _StatChip(
-                                              hugeIcon: context
-                                                  .icons.propagations,
-                                              label: batchesLabel,
-                                            ),
-                                          ],
-                                        )
-                                      : Row(
-                                          children: [
-                                            Expanded(
-                                              child: _StatChip(
-                                                icon: context.icons.fertilizing,
-                                                label: fertilizedLabel,
-                                              ),
-                                            ),
-                                            spacing.hXxs,
-                                            Expanded(
-                                              child: _StatChip(
-                                                icon: context.icons.watering,
-                                                label: wateredLabel,
-                                              ),
-                                            ),
-                                            spacing.hXxs,
-                                            Expanded(
-                                              child: _StatChip(
-                                                hugeIcon: context
-                                                    .icons.propagations,
-                                                label: batchesLabel,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                ),
-                              ],
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),

@@ -104,7 +104,8 @@ class _FriendCollectionPageState extends State<FriendCollectionPage> {
                         spacing.md * 2 -
                         spacing.md * (crossAxisCount - 1)) /
                     crossAxisCount;
-                mainAxisExtent = cellWidth / 0.45 + 22;
+                mainAxisExtent =
+                    PlantCard.mobileGridMainAxisExtent(context, cellWidth);
               } else {
                 mainAxisExtent = null;
               }
