@@ -32,11 +32,11 @@ class _AppFooterState extends State<AppFooter> {
         final version = snapshot.data ?? '...';
         final brand = l10n.appBrandName;
         final footer = context.components.footer;
-        final meta = ' · $version · © $year';
+        final meta = ' · · v.$version · · © $year';
 
         return Semantics(
           label: l10n.a11yAppFooter(brand, version, year),
-          child: ColoredBox(
+          child: Material(
             color: colors.screen.withValues(alpha: 0.92),
             child: SafeArea(
               top: false,
