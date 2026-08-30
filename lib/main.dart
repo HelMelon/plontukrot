@@ -22,6 +22,7 @@ import 'features/splash/pages/splash_flow.dart';
 import 'models/app_user.dart';
 import 'services/app_crash_reporting.dart';
 import 'services/auth_service.dart';
+import 'services/genus_care_service.dart';
 import 'services/token_store.dart';
 import 'services/fertilizing_notification_service.dart';
 import 'services/gift_service.dart';
@@ -181,6 +182,7 @@ class _AppStartupState extends State<AppStartup> {
 
       await TokenStore.instance.load();
       await AuthService().restoreSession();
+      await GenusCareService.warmDiskCache();
       await AppCrashReporting.instance.install();
       await AppCrashReporting.instance.setUserId(
         AuthService().currentUser?.uid,

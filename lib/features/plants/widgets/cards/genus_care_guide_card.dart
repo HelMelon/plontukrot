@@ -57,6 +57,17 @@ class _GenusCareGuideCardState extends State<GenusCareGuideCard> {
 
     _loadedLocale = locale;
     _loadedGenus = genus.toLowerCase();
+
+    if (!force) {
+      final cached = GenusCareService.peekCached(genus, locale: locale);
+      if (cached != null) {
+        setState(() {
+          _careGuideFuture = Future.value(cached);
+        });
+        return;
+      }
+    }
+
     _loadGuide(forceRefresh: force);
   }
 
