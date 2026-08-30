@@ -122,6 +122,8 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                       Text(
                         value,
                         textAlign: TextAlign.end,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: details.infoRowValueStyle,
                       ),
                 ),
@@ -321,6 +323,8 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                 Flexible(
                   child: Text(
                     plant.nickname,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: details.nicknameStyle,
                   ),
                 ),

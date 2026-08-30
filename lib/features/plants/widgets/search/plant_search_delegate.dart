@@ -315,7 +315,7 @@ class PlantSearchDelegate extends SearchDelegate {
                     ),
                     title: Text(
                       titleText,
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: typography.bodyLarge.copyWith(
                         color: colors.heading,
@@ -327,7 +327,7 @@ class PlantSearchDelegate extends SearchDelegate {
                             padding: EdgeInsets.only(top: spacing.xxs),
                             child: Text(
                               subtitleText,
-                              maxLines: 1,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: typography.bodySmall.copyWith(
                                 color: colors.textSecondary,
