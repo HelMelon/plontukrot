@@ -38,12 +38,14 @@ class PlantCard extends StatelessWidget {
     this.onLongPress,
   });
 
+  static const double _mobileDividerHeight = 16;
+
   /// Mobile grid cell height: square photo + text (2+2 lines) + care stats.
   static double mobileGridMainAxisExtent(
     BuildContext context,
     double cellWidth,
   ) {
-    return cellWidth + _mobileFooterHeight(context) + _mobileGridHeightSlack;
+    return cellWidth + _mobileFooterHeight(context);
   }
 
   static double _mobileFooterHeight(BuildContext context) {
@@ -52,7 +54,8 @@ class PlantCard extends StatelessWidget {
 
   static double _mobileTextBlockHeight(BuildContext context) {
     final spacing = context.spacing;
-    return spacing.sm * 2 +
+    final padding = _mobileFooterPadding(spacing);
+    return padding.vertical +
         _mobileNicknameBlockHeight(context) +
         spacing.xxs +
         _mobileSpeciesBlockHeight(context);
@@ -96,16 +99,21 @@ class PlantCard extends StatelessWidget {
     return _textLineHeight(style, style.height ?? 1.2) * 2;
   }
 
-  static const double _mobileDividerHeight = 16;
-  static const double _mobileGridHeightSlack = 1.5;
+  static EdgeInsets _mobileFooterPadding(AppSpacingTokens spacing) {
+    return EdgeInsets.all(spacing.sm);
+  }
 
   static double _mobileStatsBlockHeight(BuildContext context) {
     final spacing = context.spacing;
+    final statRowHeight = _statRowHeight(context);
+    return _mobileDividerHeight + statRowHeight * 3 + spacing.xxs * 2;
+  }
+
+  static double _statRowHeight(BuildContext context) {
     final typography = context.typography;
     final dimensions = context.dimensions;
-    final statRowHeight = _textLineHeight(typography.caption, 1.1)
+    return _textLineHeight(typography.caption, 1.1)
         .clamp(dimensions.iconSm, double.infinity);
-    return _mobileDividerHeight + statRowHeight * 3 + spacing.xxs * 2;
   }
 
   static double _textLineHeight(TextStyle style, double heightFactor) {
@@ -208,69 +216,82 @@ class PlantCard extends StatelessWidget {
                           : const _PlantAssetPlaceholder(),
                     ),
                     if (isMobile)
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.all(spacing.sm),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                height: PlantCard._mobileNicknameBlockHeight(
-                                  context,
-                                ),
-                                child: Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    hasNickname ? nickname : '',
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: mobileNicknameStyle,
+                      SizedBox(
+                        height: _mobileFooterHeight(context),
+                        child: ClipRect(
+                          child: SingleChildScrollView(
+                            physics: const NeverScrollableScrollPhysics(),
+                            child: Padding(
+                              padding: _mobileFooterPadding(spacing),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: _mobileNicknameBlockHeight(context),
+                                    child: Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Text(
+                                        hasNickname ? nickname : '',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: mobileNicknameStyle,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              spacing.vXxs,
-                              SizedBox(
-                                height: PlantCard._mobileSpeciesBlockHeight(
-                                  context,
-                                ),
-                                child: Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    species,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: mobileSpeciesStyle,
+                                  spacing.vXxs,
+                                  SizedBox(
+                                    height: _mobileSpeciesBlockHeight(context),
+                                    child: Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Text(
+                                        species,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: mobileSpeciesStyle,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              Divider(
-                                height: PlantCard._mobileDividerHeight,
-                                color: colors.primary,
-                                thickness: 1,
-                              ),
-                              ExcludeSemantics(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _StatChip(
-                                      icon: context.icons.fertilizing,
-                                      label: fertilizedLabel,
+                                  Divider(
+                                    height: _mobileDividerHeight,
+                                    color: colors.primary,
+                                    thickness: 1,
+                                  ),
+                                  ExcludeSemantics(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          height: _statRowHeight(context),
+                                          child: _StatChip(
+                                            icon: context.icons.fertilizing,
+                                            label: fertilizedLabel,
+                                          ),
+                                        ),
+                                        spacing.vXxs,
+                                        SizedBox(
+                                          height: _statRowHeight(context),
+                                          child: _StatChip(
+                                            icon: context.icons.watering,
+                                            label: wateredLabel,
+                                          ),
+                                        ),
+                                        spacing.vXxs,
+                                        SizedBox(
+                                          height: _statRowHeight(context),
+                                          child: _StatChip(
+                                            hugeIcon:
+                                                context.icons.propagations,
+                                            label: batchesLabel,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    spacing.vXxs,
-                                    _StatChip(
-                                      icon: context.icons.watering,
-                                      label: wateredLabel,
-                                    ),
-                                    spacing.vXxs,
-                                    _StatChip(
-                                      hugeIcon: context.icons.propagations,
-                                      label: batchesLabel,
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       )
