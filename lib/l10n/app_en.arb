@@ -719,6 +719,31 @@
   "propagationEmptyArchiveHint": "Completed batches are kept for 1 year",
   "propagationAdd": "Add propagation",
   "propagationChangeStage": "Change stage",
+  "propagationSplit": "Split",
+  "propagationSplitTitle": "Split plants",
+  "propagationSplitQuantity": "Quantity to split",
+  "propagationSplitQuantityMin": "Enter a quantity (minimum 1)",
+  "propagationSplitQuantityMax": "Cannot split all plants (maximum {max})",
+  "@propagationSplitQuantityMax": {
+    "placeholders": {
+      "max": {"type": "int"}
+    }
+  },
+  "propagationSplitNewStage": "New stage",
+  "propagationSplitSourceNote": "Split off {count} pcs ({stage})",
+  "@propagationSplitSourceNote": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "stage": {"type": "String"}
+    }
+  },
+  "propagationSplitNewBatchNote": "Split from batch ({date})",
+  "@propagationSplitNewBatchNote": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "propagationSplitSuccess": "Plants split successfully",
   "propagationSell": "Sold",
   "propagationGift": "Gifted",
   "propagationTrade": "Traded",
@@ -1158,5 +1183,58 @@
   "genusCareLoading": "Loading care guide...",
   "genusCareRetry": "Retry",
   "a11yGenusCareExpand": "Expand care guide",
-  "a11yGenusCareCollapse": "Collapse care guide"
+  "a11yGenusCareCollapse": "Collapse care guide",
+  "balconyOn": "On the balcony",
+  "balconyOff": "Indoors",
+  "balconyBandLabel": "Survives down to {minTemp}°C",
+  "@balconyBandLabel": {
+    "placeholders": {
+      "minTemp": {"type": "double"}
+    }
+  },
+  "balconyAlertTitle": "Balcony is {temp}°C — bring the plants inside",
+  "@balconyAlertTitle": {
+    "placeholders": {
+      "temp": {"type": "double"}
+    }
+  },
+  "balconyAlertTitleNoTemp": "It got cold on the balcony — bring the plants inside",
+  "sensorBindingTitle": "Moisture sensor",
+  "sensorBindingUnbound": "Not bound",
+  "sensorBindingSelect": "Bind a sensor",
+  "sensorBindingPot": "Sensor {pot}",
+  "@sensorBindingPot": {
+    "placeholders": {
+      "pot": {"type": "int"}
+    }
+  },
+  "sensorBindingMoisture": "Moisture: {moisture}%",
+  "@sensorBindingMoisture": {
+    "placeholders": {
+      "moisture": {"type": "double"}
+    }
+  },
+  "sensorBindingNoReading": "No readings",
+  "sensorBindingUnbind": "Unbind sensor",
+  "sensorBindingBound": "Bound to sensor {pot}",
+  "@sensorBindingBound": {
+    "placeholders": {
+      "pot": {"type": "int"}
+    }
+  },
+  "telegramLinkTitle": "Telegram notifications",
+  "telegramLinkSubtitle": "Get watering and balcony alerts in Telegram",
+  "telegramLinkButton": "Link Telegram",
+  "telegramLinkLinked": "Linked",
+  "telegramLinkUnlink": "Unlink",
+  "telegramLinkOpen": "Open bot",
+  "telegramLinkCopied": "Link copied",
+  "telegramLinkError": "Could not create link",
+  "balconyHistoryTitle": "Balcony temperature",
+  "balconyHistoryToday": "Today",
+  "balconyHistoryYesterday": "Yesterday",
+  "balconyHistoryDayBefore": "Day before",
+  "balconyHistoryDay": "Day",
+  "balconyHistoryNight": "Night",
+  "balconyHistoryNoData": "No data"
 }

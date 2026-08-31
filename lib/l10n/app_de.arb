@@ -596,6 +596,31 @@
   "propagationEmptyArchiveHint": "Abgeschlossene Chargen werden 1 Jahr aufbewahrt",
   "propagationAdd": "Vermehrung hinzufügen",
   "propagationChangeStage": "Stadium ändern",
+  "propagationSplit": "Abtrennen",
+  "propagationSplitTitle": "Pflanzen abtrennen",
+  "propagationSplitQuantity": "Anzahl zum Abtrennen",
+  "propagationSplitQuantityMin": "Menge eingeben (mindestens 1)",
+  "propagationSplitQuantityMax": "Es können nicht alle Pflanzen abgetrennt werden (maximal {max})",
+  "@propagationSplitQuantityMax": {
+    "placeholders": {
+      "max": {"type": "int"}
+    }
+  },
+  "propagationSplitNewStage": "Neues Stadium",
+  "propagationSplitSourceNote": "{count} Stk. abgetrennt ({stage})",
+  "@propagationSplitSourceNote": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "stage": {"type": "String"}
+    }
+  },
+  "propagationSplitNewBatchNote": "Aus Charge abgetrennt ({date})",
+  "@propagationSplitNewBatchNote": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "propagationSplitSuccess": "Pflanzen erfolgreich abgetrennt",
   "propagationSell": "Verkauft",
   "propagationGift": "Verschenkt",
   "propagationTrade": "Getauscht",
@@ -878,5 +903,58 @@
   "genusCareLoading": "Lade Pflegeanleitung...",
   "genusCareRetry": "Wiederholen",
   "a11yGenusCareExpand": "Pflegeanleitung ausklappen",
-  "a11yGenusCareCollapse": "Pflegeanleitung einklappen"
+  "a11yGenusCareCollapse": "Pflegeanleitung einklappen",
+  "balconyOn": "Auf dem Balkon",
+  "balconyOff": "Drinnen",
+  "balconyBandLabel": "Überlebt bis {minTemp}°C",
+  "@balconyBandLabel": {
+    "placeholders": {
+      "minTemp": {"type": "double"}
+    }
+  },
+  "balconyAlertTitle": "Balkon ist {temp}°C — Pflanzen reinholen",
+  "@balconyAlertTitle": {
+    "placeholders": {
+      "temp": {"type": "double"}
+    }
+  },
+  "balconyAlertTitleNoTemp": "Auf dem Balkon ist es kalt geworden — Pflanzen reinholen",
+  "sensorBindingTitle": "Feuchtigkeitssensor",
+  "sensorBindingUnbound": "Nicht verbunden",
+  "sensorBindingSelect": "Sensor verbinden",
+  "sensorBindingPot": "Sensor {pot}",
+  "@sensorBindingPot": {
+    "placeholders": {
+      "pot": {"type": "int"}
+    }
+  },
+  "sensorBindingMoisture": "Feuchtigkeit: {moisture}%",
+  "@sensorBindingMoisture": {
+    "placeholders": {
+      "moisture": {"type": "double"}
+    }
+  },
+  "sensorBindingNoReading": "Keine Messwerte",
+  "sensorBindingUnbind": "Sensor trennen",
+  "sensorBindingBound": "Verbunden mit Sensor {pot}",
+  "@sensorBindingBound": {
+    "placeholders": {
+      "pot": {"type": "int"}
+    }
+  },
+  "telegramLinkTitle": "Telegram-Benachrichtigungen",
+  "telegramLinkSubtitle": "Erhalte Gieß- und Balkon-Benachrichtigungen in Telegram",
+  "telegramLinkButton": "Telegram verbinden",
+  "telegramLinkLinked": "Verbunden",
+  "telegramLinkUnlink": "Trennen",
+  "telegramLinkOpen": "Bot öffnen",
+  "telegramLinkCopied": "Link kopiert",
+  "telegramLinkError": "Link konnte nicht erstellt werden",
+  "balconyHistoryTitle": "Balkontemperatur",
+  "balconyHistoryToday": "Heute",
+  "balconyHistoryYesterday": "Gestern",
+  "balconyHistoryDayBefore": "Vorgestern",
+  "balconyHistoryDay": "Tagsüber",
+  "balconyHistoryNight": "Nachts",
+  "balconyHistoryNoData": "Keine Daten"
 }

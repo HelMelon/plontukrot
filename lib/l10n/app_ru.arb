@@ -607,6 +607,31 @@
   "propagationEmptyArchiveHint": "Завершённые партии хранятся 1 год",
   "propagationAdd": "Добавить размножение",
   "propagationChangeStage": "Изменить стадию",
+  "propagationSplit": "Отделить",
+  "propagationSplitTitle": "Отделить растения",
+  "propagationSplitQuantity": "Сколько отделить",
+  "propagationSplitQuantityMin": "Укажите количество (минимум 1)",
+  "propagationSplitQuantityMax": "Нельзя отделить все растения (максимум {max})",
+  "@propagationSplitQuantityMax": {
+    "placeholders": {
+      "max": {"type": "int"}
+    }
+  },
+  "propagationSplitNewStage": "Новая стадия",
+  "propagationSplitSourceNote": "Отделено {count} шт. ({stage})",
+  "@propagationSplitSourceNote": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "stage": {"type": "String"}
+    }
+  },
+  "propagationSplitNewBatchNote": "Отделено из партии ({date})",
+  "@propagationSplitNewBatchNote": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "propagationSplitSuccess": "Растения успешно отделены",
   "propagationSell": "Продала",
   "propagationGift": "Подарила",
   "propagationTrade": "Обменяла",
@@ -894,5 +919,58 @@
   "genusCareLoading": "Загрузка справки по уходу...",
   "genusCareRetry": "Повторить попытку",
   "a11yGenusCareExpand": "Развернуть справку по уходу",
-  "a11yGenusCareCollapse": "Свернуть справку по уходу"
+  "a11yGenusCareCollapse": "Свернуть справку по уходу",
+  "balconyOn": "На балконе",
+  "balconyOff": "В помещении",
+  "balconyBandLabel": "Выдержит до {minTemp}°C",
+  "@balconyBandLabel": {
+    "placeholders": {
+      "minTemp": {"type": "double"}
+    }
+  },
+  "balconyAlertTitle": "На балконе {temp}°C — пора занести растения",
+  "@balconyAlertTitle": {
+    "placeholders": {
+      "temp": {"type": "double"}
+    }
+  },
+  "balconyAlertTitleNoTemp": "На балконе похолодало — пора занести растения",
+  "sensorBindingTitle": "Датчик влажности",
+  "sensorBindingUnbound": "Не привязан",
+  "sensorBindingSelect": "Привязать датчик",
+  "sensorBindingPot": "Датчик {pot}",
+  "@sensorBindingPot": {
+    "placeholders": {
+      "pot": {"type": "int"}
+    }
+  },
+  "sensorBindingMoisture": "Влажность: {moisture}%",
+  "@sensorBindingMoisture": {
+    "placeholders": {
+      "moisture": {"type": "double"}
+    }
+  },
+  "sensorBindingNoReading": "Нет показаний",
+  "sensorBindingUnbind": "Отвязать датчик",
+  "sensorBindingBound": "Привязан к датчику {pot}",
+  "@sensorBindingBound": {
+    "placeholders": {
+      "pot": {"type": "int"}
+    }
+  },
+  "telegramLinkTitle": "Telegram-уведомления",
+  "telegramLinkSubtitle": "Получай уведомления о поливе и балконе в Telegram",
+  "telegramLinkButton": "Привязать Telegram",
+  "telegramLinkLinked": "Привязано",
+  "telegramLinkUnlink": "Отвязать",
+  "telegramLinkOpen": "Открыть бота",
+  "telegramLinkCopied": "Ссылка скопирована",
+  "telegramLinkError": "Не удалось создать ссылку",
+  "balconyHistoryTitle": "Температура на балконе",
+  "balconyHistoryToday": "Сегодня",
+  "balconyHistoryYesterday": "Вчера",
+  "balconyHistoryDayBefore": "Позавчера",
+  "balconyHistoryDay": "Днём",
+  "balconyHistoryNight": "Ночью",
+  "balconyHistoryNoData": "Нет данных"
 }

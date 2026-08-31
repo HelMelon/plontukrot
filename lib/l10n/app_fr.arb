@@ -596,6 +596,31 @@
   "propagationEmptyArchiveHint": "Les lots terminés sont conservés 1 an",
   "propagationAdd": "Ajouter une multiplication",
   "propagationChangeStage": "Changer de stade",
+  "propagationSplit": "Séparer",
+  "propagationSplitTitle": "Séparer les plantes",
+  "propagationSplitQuantity": "Quantité à séparer",
+  "propagationSplitQuantityMin": "Indiquez une quantité (minimum 1)",
+  "propagationSplitQuantityMax": "Impossible de séparer toutes les plantes (maximum {max})",
+  "@propagationSplitQuantityMax": {
+    "placeholders": {
+      "max": {"type": "int"}
+    }
+  },
+  "propagationSplitNewStage": "Nouveau stade",
+  "propagationSplitSourceNote": "{count} pcs séparées ({stage})",
+  "@propagationSplitSourceNote": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "stage": {"type": "String"}
+    }
+  },
+  "propagationSplitNewBatchNote": "Séparé du lot ({date})",
+  "@propagationSplitNewBatchNote": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "propagationSplitSuccess": "Plantes séparées avec succès",
   "propagationSell": "Vendue",
   "propagationGift": "Offerte",
   "propagationTrade": "Échangée",
@@ -878,5 +903,58 @@
   "genusCareLoading": "Chargement du guide d'entretien...",
   "genusCareRetry": "Réessayer",
   "a11yGenusCareExpand": "Développer le guide d'entretien",
-  "a11yGenusCareCollapse": "Réduire le guide d'entretien"
+  "a11yGenusCareCollapse": "Réduire le guide d'entretien",
+  "balconyOn": "Sur le balcon",
+  "balconyOff": "À l'intérieur",
+  "balconyBandLabel": "Survit jusqu'à {minTemp}°C",
+  "@balconyBandLabel": {
+    "placeholders": {
+      "minTemp": {"type": "double"}
+    }
+  },
+  "balconyAlertTitle": "Balcon à {temp}°C — rentrez les plantes",
+  "@balconyAlertTitle": {
+    "placeholders": {
+      "temp": {"type": "double"}
+    }
+  },
+  "balconyAlertTitleNoTemp": "Il fait froid sur le balcon — rentrez les plantes",
+  "sensorBindingTitle": "Capteur d'humidité",
+  "sensorBindingUnbound": "Non lié",
+  "sensorBindingSelect": "Lier un capteur",
+  "sensorBindingPot": "Capteur {pot}",
+  "@sensorBindingPot": {
+    "placeholders": {
+      "pot": {"type": "int"}
+    }
+  },
+  "sensorBindingMoisture": "Humidité : {moisture}%",
+  "@sensorBindingMoisture": {
+    "placeholders": {
+      "moisture": {"type": "double"}
+    }
+  },
+  "sensorBindingNoReading": "Aucune mesure",
+  "sensorBindingUnbind": "Détacher le capteur",
+  "sensorBindingBound": "Lié au capteur {pot}",
+  "@sensorBindingBound": {
+    "placeholders": {
+      "pot": {"type": "int"}
+    }
+  },
+  "telegramLinkTitle": "Notifications Telegram",
+  "telegramLinkSubtitle": "Recevez les alertes d'arrosage et de balcon dans Telegram",
+  "telegramLinkButton": "Lier Telegram",
+  "telegramLinkLinked": "Lié",
+  "telegramLinkUnlink": "Détacher",
+  "telegramLinkOpen": "Ouvrir le bot",
+  "telegramLinkCopied": "Lien copié",
+  "telegramLinkError": "Impossible de créer le lien",
+  "balconyHistoryTitle": "Température du balcon",
+  "balconyHistoryToday": "Aujourd'hui",
+  "balconyHistoryYesterday": "Hier",
+  "balconyHistoryDayBefore": "Avant-hier",
+  "balconyHistoryDay": "Le jour",
+  "balconyHistoryNight": "La nuit",
+  "balconyHistoryNoData": "Aucune donnée"
 }

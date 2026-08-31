@@ -1548,6 +1548,39 @@ class AppLocalizationsRu extends AppLocalizations {
   String get propagationChangeStage => 'Изменить стадию';
 
   @override
+  String get propagationSplit => 'Отделить';
+
+  @override
+  String get propagationSplitTitle => 'Отделить растения';
+
+  @override
+  String get propagationSplitQuantity => 'Сколько отделить';
+
+  @override
+  String get propagationSplitQuantityMin => 'Укажите количество (минимум 1)';
+
+  @override
+  String propagationSplitQuantityMax(int max) {
+    return 'Нельзя отделить все растения (максимум $max)';
+  }
+
+  @override
+  String get propagationSplitNewStage => 'Новая стадия';
+
+  @override
+  String propagationSplitSourceNote(int count, String stage) {
+    return 'Отделено $count шт. ($stage)';
+  }
+
+  @override
+  String propagationSplitNewBatchNote(String date) {
+    return 'Отделено из партии ($date)';
+  }
+
+  @override
+  String get propagationSplitSuccess => 'Растения успешно отделены';
+
+  @override
   String get propagationSell => 'Продала';
 
   @override
@@ -2246,4 +2279,100 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get a11yGenusCareCollapse => 'Свернуть справку по уходу';
+
+  @override
+  String get balconyOn => 'На балконе';
+
+  @override
+  String get balconyOff => 'В помещении';
+
+  @override
+  String balconyBandLabel(double minTemp) {
+    return 'Выдержит до $minTemp°C';
+  }
+
+  @override
+  String balconyAlertTitle(double temp) {
+    return 'На балконе $temp°C — пора занести растения';
+  }
+
+  @override
+  String get balconyAlertTitleNoTemp =>
+      'На балконе похолодало — пора занести растения';
+
+  @override
+  String get sensorBindingTitle => 'Датчик влажности';
+
+  @override
+  String get sensorBindingUnbound => 'Не привязан';
+
+  @override
+  String get sensorBindingSelect => 'Привязать датчик';
+
+  @override
+  String sensorBindingPot(int pot) {
+    return 'Датчик $pot';
+  }
+
+  @override
+  String sensorBindingMoisture(double moisture) {
+    return 'Влажность: $moisture%';
+  }
+
+  @override
+  String get sensorBindingNoReading => 'Нет показаний';
+
+  @override
+  String get sensorBindingUnbind => 'Отвязать датчик';
+
+  @override
+  String sensorBindingBound(int pot) {
+    return 'Привязан к датчику $pot';
+  }
+
+  @override
+  String get telegramLinkTitle => 'Telegram-уведомления';
+
+  @override
+  String get telegramLinkSubtitle =>
+      'Получай уведомления о поливе и балконе в Telegram';
+
+  @override
+  String get telegramLinkButton => 'Привязать Telegram';
+
+  @override
+  String get telegramLinkLinked => 'Привязано';
+
+  @override
+  String get telegramLinkUnlink => 'Отвязать';
+
+  @override
+  String get telegramLinkOpen => 'Открыть бота';
+
+  @override
+  String get telegramLinkCopied => 'Ссылка скопирована';
+
+  @override
+  String get telegramLinkError => 'Не удалось создать ссылку';
+
+  @override
+  String get balconyHistoryTitle => 'Температура на балконе';
+
+  @override
+  String get balconyHistoryToday => 'Сегодня';
+
+  @override
+  String get balconyHistoryYesterday => 'Вчера';
+
+  @override
+  String get balconyHistoryDayBefore => 'Позавчера';
+
+  @override
+  String get balconyHistoryDay => 'Днём';
+
+  @override
+  String get balconyHistoryNight => 'Ночью';
+
+  @override
+  String get balconyHistoryNoData => 'Нет данных';
 }

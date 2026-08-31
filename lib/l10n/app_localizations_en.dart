@@ -1542,6 +1542,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get propagationChangeStage => 'Change stage';
 
   @override
+  String get propagationSplit => 'Split';
+
+  @override
+  String get propagationSplitTitle => 'Split plants';
+
+  @override
+  String get propagationSplitQuantity => 'Quantity to split';
+
+  @override
+  String get propagationSplitQuantityMin => 'Enter a quantity (minimum 1)';
+
+  @override
+  String propagationSplitQuantityMax(int max) {
+    return 'Cannot split all plants (maximum $max)';
+  }
+
+  @override
+  String get propagationSplitNewStage => 'New stage';
+
+  @override
+  String propagationSplitSourceNote(int count, String stage) {
+    return 'Split off $count pcs ($stage)';
+  }
+
+  @override
+  String propagationSplitNewBatchNote(String date) {
+    return 'Split from batch ($date)';
+  }
+
+  @override
+  String get propagationSplitSuccess => 'Plants split successfully';
+
+  @override
   String get propagationSell => 'Sold';
 
   @override
@@ -2237,4 +2270,100 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get a11yGenusCareCollapse => 'Collapse care guide';
+
+  @override
+  String get balconyOn => 'On the balcony';
+
+  @override
+  String get balconyOff => 'Indoors';
+
+  @override
+  String balconyBandLabel(double minTemp) {
+    return 'Survives down to $minTemp°C';
+  }
+
+  @override
+  String balconyAlertTitle(double temp) {
+    return 'Balcony is $temp°C — bring the plants inside';
+  }
+
+  @override
+  String get balconyAlertTitleNoTemp =>
+      'It got cold on the balcony — bring the plants inside';
+
+  @override
+  String get sensorBindingTitle => 'Moisture sensor';
+
+  @override
+  String get sensorBindingUnbound => 'Not bound';
+
+  @override
+  String get sensorBindingSelect => 'Bind a sensor';
+
+  @override
+  String sensorBindingPot(int pot) {
+    return 'Sensor $pot';
+  }
+
+  @override
+  String sensorBindingMoisture(double moisture) {
+    return 'Moisture: $moisture%';
+  }
+
+  @override
+  String get sensorBindingNoReading => 'No readings';
+
+  @override
+  String get sensorBindingUnbind => 'Unbind sensor';
+
+  @override
+  String sensorBindingBound(int pot) {
+    return 'Bound to sensor $pot';
+  }
+
+  @override
+  String get telegramLinkTitle => 'Telegram notifications';
+
+  @override
+  String get telegramLinkSubtitle =>
+      'Get watering and balcony alerts in Telegram';
+
+  @override
+  String get telegramLinkButton => 'Link Telegram';
+
+  @override
+  String get telegramLinkLinked => 'Linked';
+
+  @override
+  String get telegramLinkUnlink => 'Unlink';
+
+  @override
+  String get telegramLinkOpen => 'Open bot';
+
+  @override
+  String get telegramLinkCopied => 'Link copied';
+
+  @override
+  String get telegramLinkError => 'Could not create link';
+
+  @override
+  String get balconyHistoryTitle => 'Balcony temperature';
+
+  @override
+  String get balconyHistoryToday => 'Today';
+
+  @override
+  String get balconyHistoryYesterday => 'Yesterday';
+
+  @override
+  String get balconyHistoryDayBefore => 'Day before';
+
+  @override
+  String get balconyHistoryDay => 'Day';
+
+  @override
+  String get balconyHistoryNight => 'Night';
+
+  @override
+  String get balconyHistoryNoData => 'No data';
 }

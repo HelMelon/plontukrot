@@ -2940,6 +2940,60 @@ abstract class AppLocalizations {
   /// **'Change stage'**
   String get propagationChangeStage;
 
+  /// No description provided for @propagationSplit.
+  ///
+  /// In en, this message translates to:
+  /// **'Split'**
+  String get propagationSplit;
+
+  /// No description provided for @propagationSplitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Split plants'**
+  String get propagationSplitTitle;
+
+  /// No description provided for @propagationSplitQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity to split'**
+  String get propagationSplitQuantity;
+
+  /// No description provided for @propagationSplitQuantityMin.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a quantity (minimum 1)'**
+  String get propagationSplitQuantityMin;
+
+  /// No description provided for @propagationSplitQuantityMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot split all plants (maximum {max})'**
+  String propagationSplitQuantityMax(int max);
+
+  /// No description provided for @propagationSplitNewStage.
+  ///
+  /// In en, this message translates to:
+  /// **'New stage'**
+  String get propagationSplitNewStage;
+
+  /// No description provided for @propagationSplitSourceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Split off {count} pcs ({stage})'**
+  String propagationSplitSourceNote(int count, String stage);
+
+  /// No description provided for @propagationSplitNewBatchNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Split from batch ({date})'**
+  String propagationSplitNewBatchNote(String date);
+
+  /// No description provided for @propagationSplitSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Plants split successfully'**
+  String get propagationSplitSuccess;
+
   /// No description provided for @propagationSell.
   ///
   /// In en, this message translates to:
@@ -4127,6 +4181,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Collapse care guide'**
   String get a11yGenusCareCollapse;
+
+  /// No description provided for @balconyOn.
+  ///
+  /// In en, this message translates to:
+  /// **'On the balcony'**
+  String get balconyOn;
+
+  /// No description provided for @balconyOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Indoors'**
+  String get balconyOff;
+
+  /// No description provided for @balconyBandLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Survives down to {minTemp}°C'**
+  String balconyBandLabel(double minTemp);
+
+  /// No description provided for @balconyAlertTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Balcony is {temp}°C — bring the plants inside'**
+  String balconyAlertTitle(double temp);
+
+  /// No description provided for @balconyAlertTitleNoTemp.
+  ///
+  /// In en, this message translates to:
+  /// **'It got cold on the balcony — bring the plants inside'**
+  String get balconyAlertTitleNoTemp;
+
+  /// No description provided for @sensorBindingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Moisture sensor'**
+  String get sensorBindingTitle;
+
+  /// No description provided for @sensorBindingUnbound.
+  ///
+  /// In en, this message translates to:
+  /// **'Not bound'**
+  String get sensorBindingUnbound;
+
+  /// No description provided for @sensorBindingSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Bind a sensor'**
+  String get sensorBindingSelect;
+
+  /// No description provided for @sensorBindingPot.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensor {pot}'**
+  String sensorBindingPot(int pot);
+
+  /// No description provided for @sensorBindingMoisture.
+  ///
+  /// In en, this message translates to:
+  /// **'Moisture: {moisture}%'**
+  String sensorBindingMoisture(double moisture);
+
+  /// No description provided for @sensorBindingNoReading.
+  ///
+  /// In en, this message translates to:
+  /// **'No readings'**
+  String get sensorBindingNoReading;
+
+  /// No description provided for @sensorBindingUnbind.
+  ///
+  /// In en, this message translates to:
+  /// **'Unbind sensor'**
+  String get sensorBindingUnbind;
+
+  /// No description provided for @sensorBindingBound.
+  ///
+  /// In en, this message translates to:
+  /// **'Bound to sensor {pot}'**
+  String sensorBindingBound(int pot);
+
+  /// No description provided for @telegramLinkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Telegram notifications'**
+  String get telegramLinkTitle;
+
+  /// No description provided for @telegramLinkSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get watering and balcony alerts in Telegram'**
+  String get telegramLinkSubtitle;
+
+  /// No description provided for @telegramLinkButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Telegram'**
+  String get telegramLinkButton;
+
+  /// No description provided for @telegramLinkLinked.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked'**
+  String get telegramLinkLinked;
+
+  /// No description provided for @telegramLinkUnlink.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink'**
+  String get telegramLinkUnlink;
+
+  /// No description provided for @telegramLinkOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open bot'**
+  String get telegramLinkOpen;
+
+  /// No description provided for @telegramLinkCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied'**
+  String get telegramLinkCopied;
+
+  /// No description provided for @telegramLinkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create link'**
+  String get telegramLinkError;
+
+  /// No description provided for @balconyHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Balcony temperature'**
+  String get balconyHistoryTitle;
+
+  /// No description provided for @balconyHistoryToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get balconyHistoryToday;
+
+  /// No description provided for @balconyHistoryYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get balconyHistoryYesterday;
+
+  /// No description provided for @balconyHistoryDayBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'Day before'**
+  String get balconyHistoryDayBefore;
+
+  /// No description provided for @balconyHistoryDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get balconyHistoryDay;
+
+  /// No description provided for @balconyHistoryNight.
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get balconyHistoryNight;
+
+  /// No description provided for @balconyHistoryNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No data'**
+  String get balconyHistoryNoData;
 }
 
 class _AppLocalizationsDelegate

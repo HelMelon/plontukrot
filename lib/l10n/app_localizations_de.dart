@@ -1553,6 +1553,39 @@ class AppLocalizationsDe extends AppLocalizations {
   String get propagationChangeStage => 'Stadium ändern';
 
   @override
+  String get propagationSplit => 'Abtrennen';
+
+  @override
+  String get propagationSplitTitle => 'Pflanzen abtrennen';
+
+  @override
+  String get propagationSplitQuantity => 'Anzahl zum Abtrennen';
+
+  @override
+  String get propagationSplitQuantityMin => 'Menge eingeben (mindestens 1)';
+
+  @override
+  String propagationSplitQuantityMax(int max) {
+    return 'Es können nicht alle Pflanzen abgetrennt werden (maximal $max)';
+  }
+
+  @override
+  String get propagationSplitNewStage => 'Neues Stadium';
+
+  @override
+  String propagationSplitSourceNote(int count, String stage) {
+    return '$count Stk. abgetrennt ($stage)';
+  }
+
+  @override
+  String propagationSplitNewBatchNote(String date) {
+    return 'Aus Charge abgetrennt ($date)';
+  }
+
+  @override
+  String get propagationSplitSuccess => 'Pflanzen erfolgreich abgetrennt';
+
+  @override
   String get propagationSell => 'Verkauft';
 
   @override
@@ -2250,4 +2283,100 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get a11yGenusCareCollapse => 'Pflegeanleitung einklappen';
+
+  @override
+  String get balconyOn => 'Auf dem Balkon';
+
+  @override
+  String get balconyOff => 'Drinnen';
+
+  @override
+  String balconyBandLabel(double minTemp) {
+    return 'Überlebt bis $minTemp°C';
+  }
+
+  @override
+  String balconyAlertTitle(double temp) {
+    return 'Balkon ist $temp°C — Pflanzen reinholen';
+  }
+
+  @override
+  String get balconyAlertTitleNoTemp =>
+      'Auf dem Balkon ist es kalt geworden — Pflanzen reinholen';
+
+  @override
+  String get sensorBindingTitle => 'Feuchtigkeitssensor';
+
+  @override
+  String get sensorBindingUnbound => 'Nicht verbunden';
+
+  @override
+  String get sensorBindingSelect => 'Sensor verbinden';
+
+  @override
+  String sensorBindingPot(int pot) {
+    return 'Sensor $pot';
+  }
+
+  @override
+  String sensorBindingMoisture(double moisture) {
+    return 'Feuchtigkeit: $moisture%';
+  }
+
+  @override
+  String get sensorBindingNoReading => 'Keine Messwerte';
+
+  @override
+  String get sensorBindingUnbind => 'Sensor trennen';
+
+  @override
+  String sensorBindingBound(int pot) {
+    return 'Verbunden mit Sensor $pot';
+  }
+
+  @override
+  String get telegramLinkTitle => 'Telegram-Benachrichtigungen';
+
+  @override
+  String get telegramLinkSubtitle =>
+      'Erhalte Gieß- und Balkon-Benachrichtigungen in Telegram';
+
+  @override
+  String get telegramLinkButton => 'Telegram verbinden';
+
+  @override
+  String get telegramLinkLinked => 'Verbunden';
+
+  @override
+  String get telegramLinkUnlink => 'Trennen';
+
+  @override
+  String get telegramLinkOpen => 'Bot öffnen';
+
+  @override
+  String get telegramLinkCopied => 'Link kopiert';
+
+  @override
+  String get telegramLinkError => 'Link konnte nicht erstellt werden';
+
+  @override
+  String get balconyHistoryTitle => 'Balkontemperatur';
+
+  @override
+  String get balconyHistoryToday => 'Heute';
+
+  @override
+  String get balconyHistoryYesterday => 'Gestern';
+
+  @override
+  String get balconyHistoryDayBefore => 'Vorgestern';
+
+  @override
+  String get balconyHistoryDay => 'Tagsüber';
+
+  @override
+  String get balconyHistoryNight => 'Nachts';
+
+  @override
+  String get balconyHistoryNoData => 'Keine Daten';
 }
