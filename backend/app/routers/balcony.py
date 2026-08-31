@@ -167,29 +167,87 @@ def _record_temp(user_id: str, temp: float) -> None:
 def balcony_history(user_id: str = Depends(get_current_user_id)):
     """Per-day balcony temperature summary for the last 3 days.
 
-    Returns one entry per day (today, yesterday, day before) with the
-    average day/night temperature and the latest reading.
+    Day average: 08:00–21:00 (local, Europe/Minsk) on that calendar day.
+    Night average: 21:00 previous day – 08:00 on that day (the night that
+    ended that morning). Omitted until 08:00 on that day has passed so an
+    in-progress night is never shown.
     """
     with get_pool().connection() as conn:
         rows = conn.execute(
             """
+            WITH local_now AS (
+              SELECT (now() AT TIME ZONE 'Europe/Minsk') AS ts
+            ),
+            days AS (
+              SELECT (date_trunc('day', ts)::date - offs) AS day
+              FROM local_now, generate_series(0, 2) AS offs
+            ),
+            readings AS (
+              SELECT
+                temp_c,
+                read_at AT TIME ZONE 'Europe/Minsk' AS local_ts
+              FROM balcony_temp_readings, local_now
+              WHERE user_id = %s
+                AND read_at >= (SELECT ts FROM local_now) - interval '4 days'
+            )
             SELECT
-              date_trunc('day', read_at AT TIME ZONE 'Europe/Minsk') AS day,
-              AVG(temp_c) FILTER (
-                WHERE EXTRACT(HOUR FROM read_at AT TIME ZONE 'Europe/Minsk') >= 8
-                  AND EXTRACT(HOUR FROM read_at AT TIME ZONE 'Europe/Minsk') < 22
+              d.day,
+              (
+                SELECT AVG(r.temp_c)
+                FROM readings r
+                WHERE r.local_ts::date = d.day
+                  AND EXTRACT(HOUR FROM r.local_ts) >= 8
+                  AND EXTRACT(HOUR FROM r.local_ts) < 21
               ) AS day_avg,
-              AVG(temp_c) FILTER (
-                WHERE EXTRACT(HOUR FROM read_at AT TIME ZONE 'Europe/Minsk') < 8
-                  OR EXTRACT(HOUR FROM read_at AT TIME ZONE 'Europe/Minsk') >= 22
-              ) AS night_avg,
-              AVG(temp_c) AS overall_avg,
-              (array_agg(temp_c ORDER BY read_at DESC))[1] AS latest
-            FROM balcony_temp_readings
-            WHERE user_id = %s
-              AND read_at >= now() - interval '3 days'
-            GROUP BY day
-            ORDER BY day DESC
+              CASE
+                WHEN (SELECT ts FROM local_now)
+                     < (d.day + time '08:00')::timestamp
+                THEN NULL
+                ELSE (
+                  SELECT AVG(r.temp_c)
+                  FROM readings r
+                  WHERE (
+                    (r.local_ts::date = d.day - 1
+                     AND EXTRACT(HOUR FROM r.local_ts) >= 21)
+                    OR (r.local_ts::date = d.day
+                        AND EXTRACT(HOUR FROM r.local_ts) < 8)
+                  )
+                )
+              END AS night_avg,
+              (
+                SELECT AVG(r.temp_c)
+                FROM readings r
+                WHERE (
+                  (r.local_ts::date = d.day
+                   AND EXTRACT(HOUR FROM r.local_ts) >= 8
+                   AND EXTRACT(HOUR FROM r.local_ts) < 21)
+                  OR (
+                    (r.local_ts::date = d.day - 1
+                     AND EXTRACT(HOUR FROM r.local_ts) >= 21)
+                    OR (r.local_ts::date = d.day
+                        AND EXTRACT(HOUR FROM r.local_ts) < 8)
+                  )
+                )
+              ) AS overall_avg,
+              (
+                SELECT r.temp_c
+                FROM readings r
+                WHERE (
+                  (r.local_ts::date = d.day
+                   AND EXTRACT(HOUR FROM r.local_ts) >= 8
+                   AND EXTRACT(HOUR FROM r.local_ts) < 21)
+                  OR (
+                    (r.local_ts::date = d.day - 1
+                     AND EXTRACT(HOUR FROM r.local_ts) >= 21)
+                    OR (r.local_ts::date = d.day
+                        AND EXTRACT(HOUR FROM r.local_ts) < 8)
+                  )
+                )
+                ORDER BY r.local_ts DESC
+                LIMIT 1
+              ) AS latest
+            FROM days d
+            ORDER BY d.day DESC
             """,
             (user_id,),
         ).fetchall()
