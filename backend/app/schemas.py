@@ -35,6 +35,7 @@ class UserOut(BaseModel):
     currency_code: Optional[str] = None
     collection_visibility: Optional[str] = None
     personal_data_consent_at: Optional[datetime] = None
+    photo_url: Optional[str] = None
     created_at: datetime
 
 

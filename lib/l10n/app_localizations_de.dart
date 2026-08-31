@@ -89,6 +89,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get a11yProfilePhoto => 'Profilfoto';
 
   @override
+  String get a11yChangeProfilePhoto => 'Profilfoto ändern';
+
+  @override
+  String get profileChangePhoto => 'Foto ändern';
+
+  @override
   String get a11yOpenProfile => 'Profil öffnen';
 
   @override

@@ -17,8 +17,7 @@ class PlantImageUploadResult {
   });
 }
 
-/// Photo files are stored as URLs in Postgres. Binary upload is not available
-/// until Object Storage is wired on the backend (ADR-033 Phase 4).
+/// Photo files are stored on disk and referenced by URL in Postgres.
 class StorageService {
   final ApiClient _api = ApiClient.instance;
 
@@ -99,6 +98,33 @@ class StorageService {
       plantId: plantId,
     );
     return result.imageUrl;
+  }
+
+  /// Upload a square-cropped profile avatar. Returns the public photo URL.
+  Future<String> uploadAvatar({required Uint8List imageBytes}) async {
+    try {
+      final rawResponse = await _api.postMultipart(
+        '/auth/me/avatar/upload',
+        fileField: 'file',
+        filename: 'avatar_${DateTime.now().millisecondsSinceEpoch}.jpg',
+        fileBytes: imageBytes,
+      );
+      final json = jsonMap(rawResponse);
+      final photoUrl = readString(json, 'photoUrl')?.trim() ??
+          readString(json, 'photo_url')?.trim() ??
+          '';
+      if (photoUrl.isEmpty) {
+        throw StateError('Upload succeeded but no photo URL returned');
+      }
+      return photoUrl;
+    } catch (error, stack) {
+      await AppCrashReporting.instance.recordError(
+        error,
+        stack,
+        reason: 'storage_upload_avatar_failed',
+      );
+      rethrow;
+    }
   }
 
   Future<void> deletePlantPhoto(String plantId, String photoId) async {

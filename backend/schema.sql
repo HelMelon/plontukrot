@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS users (
     currency_code         TEXT DEFAULT 'BYN',
     collection_visibility TEXT DEFAULT 'friends',
     personal_data_consent_at TIMESTAMPTZ,
+    photo_url             TEXT,
     created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

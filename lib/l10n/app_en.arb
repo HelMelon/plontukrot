@@ -55,6 +55,8 @@
     }
   },
   "a11yProfilePhoto": "Profile photo",
+  "a11yChangeProfilePhoto": "Change profile photo",
+  "profileChangePhoto": "Change photo",
   "a11yOpenProfile": "Open profile",
   "a11yLastFertilized": "Last fertilized: {date}",
   "@a11yLastFertilized": {

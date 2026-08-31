@@ -1,10 +1,13 @@
 """Auth endpoints: register, login, current user."""
-from datetime import datetime, timezone
+import os
+import time
 import uuid
+from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+from ..config import settings
 from ..db import get_pool
 from ..schemas import (
     LoginRequest,
@@ -25,7 +28,7 @@ _bearer = HTTPBearer(auto_error=False)
 
 _SELECT_USER = (
     "SELECT id, email, password_hash, name, locale_code, currency_code, "
-    "collection_visibility, personal_data_consent_at, created_at "
+    "collection_visibility, personal_data_consent_at, photo_url, created_at "
     "FROM users"
 )
 
@@ -43,6 +46,7 @@ def _row_to_user_out(row) -> UserOut:
         currency_code=row["currency_code"],
         collection_visibility=row["collection_visibility"],
         personal_data_consent_at=row["personal_data_consent_at"],
+        photo_url=row.get("photo_url"),
         created_at=row["created_at"],
     )
 
@@ -160,6 +164,49 @@ def patch_me(
             )
 
     with get_pool().connection() as conn:
+        row = conn.execute(
+            f"{_SELECT_USER} WHERE id = %s",
+            (user_id,),
+        ).fetchone()
+    if row is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    return _row_to_user_out(row)
+
+
+@router.post("/me/avatar/upload", response_model=UserOut)
+def upload_avatar(
+    file: UploadFile = File(...),
+    user_id: str = Depends(get_current_user_id),
+):
+    """Save a square-cropped avatar and update the user's profile photo URL."""
+    ext = os.path.splitext(file.filename or "")[1] or ".jpg"
+    if ext.lower() not in {".jpg", ".jpeg", ".png", ".webp", ".gif"}:
+        raise HTTPException(status_code=400, detail="Unsupported image type")
+
+    avatar_dir = os.path.join(settings.photos_dir, "avatars", user_id)
+    os.makedirs(avatar_dir, exist_ok=True)
+    filename = f"avatar{ext.lower()}"
+    dest = os.path.join(avatar_dir, filename)
+    with open(dest, "wb") as out:
+        while True:
+            chunk = file.file.read(1024 * 1024)
+            if not chunk:
+                break
+            out.write(chunk)
+
+    version = int(time.time())
+    photo_url = (
+        f"{settings.public_base_url}/photos/avatars/{user_id}/{filename}"
+        f"?v={version}"
+    )
+    with get_pool().connection() as conn:
+        conn.execute(
+            "UPDATE users SET photo_url = %s WHERE id = %s",
+            (photo_url, user_id),
+        )
         row = conn.execute(
             f"{_SELECT_USER} WHERE id = %s",
             (user_id,),

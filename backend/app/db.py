@@ -147,6 +147,8 @@ def auto_migrate() -> None:
                 ALTER TABLE genus_care_guides
                     ADD COLUMN IF NOT EXISTS locale TEXT NOT NULL DEFAULT 'ru';
 
+                ALTER TABLE users ADD COLUMN IF NOT EXISTS photo_url TEXT;
+
                 DO $genus_care_locale_pk$
                 BEGIN
                     IF NOT EXISTS (

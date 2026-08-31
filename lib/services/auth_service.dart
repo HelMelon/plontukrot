@@ -119,7 +119,7 @@ class AuthService {
       uid: id,
       email: _email,
       name: readString(json, 'name'),
-      photoUrl: readString(json, 'photoUrl'),
+      photoUrl: readString(json, 'photoUrl') ?? readString(json, 'photo_url'),
     );
     await TokenStore.instance.saveUser(user);
     _emit(user);

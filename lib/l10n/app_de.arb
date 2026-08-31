@@ -55,6 +55,8 @@
     }
   },
   "a11yProfilePhoto": "Profilfoto",
+  "a11yChangeProfilePhoto": "Profilfoto ändern",
+  "profileChangePhoto": "Foto ändern",
   "a11yOpenProfile": "Profil öffnen",
   "a11yLastFertilized": "Zuletzt gedüngt: {date}",
   "@a11yLastFertilized": {

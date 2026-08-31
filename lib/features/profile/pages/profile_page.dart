@@ -20,7 +20,10 @@ import '../../../models/app_user.dart';
 import '../../../models/fertilizing_growth_season.dart';
 import '../../../models/plant.dart';
 import '../../../models/propagation.dart';
+import '../../../core/widgets/focusable_tap.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/storage_service.dart';
+import '../../plants/widgets/common/pick_and_crop_plant_photo.dart';
 import '../../../services/user_profile_service.dart';
 import '../../../services/fertilizing_notification_service.dart';
 import '../../../services/plant_service.dart';
@@ -46,6 +49,7 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
   bool _busy = false;
   String? _busyMessage;
   bool _notificationsGranted = false;
+  bool _avatarUploading = false;
 
   @override
   void initState() {
@@ -75,6 +79,26 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
         await FertilizingNotificationService.instance.isPermissionGranted();
     if (mounted) {
       setState(() => _notificationsGranted = granted);
+    }
+  }
+
+  Future<void> _changeAvatar() async {
+    if (_avatarUploading || _busy) return;
+    final bytes = await pickAndCropPlantPhoto(context);
+    if (bytes == null || !mounted) return;
+
+    setState(() => _avatarUploading = true);
+    try {
+      await StorageService().uploadAvatar(imageBytes: bytes);
+      await AuthService().reloadCurrentUser();
+    } catch (e) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commonError('$e'))),
+      );
+    } finally {
+      if (mounted) setState(() => _avatarUploading = false);
     }
   }
 
@@ -375,35 +399,74 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   return Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      SizedBox(
-                        width: profileTheme.avatarSize,
-                        height: profileTheme.avatarSize,
-                        child: ClipOval(
-                          child: widget.user.photoUrl != null &&
-                                  widget.user.photoUrl!.isNotEmpty
-                              ? Semantics(
-                                  image: true,
-                                  label: l10n.a11yProfilePhoto,
-                                  child: ExcludeSemantics(
-                                    child: Image.network(
-                                      widget.user.photoUrl!,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Icon(
-                                        context.icons.profile,
-                                        color: colors.icon,
-                                        size: dimensions.iconXl,
+                      StreamBuilder<AppUser?>(
+                        stream: AuthService().watchAuthState(),
+                        initialData: widget.user,
+                        builder: (context, authSnap) {
+                          final user = authSnap.data ?? widget.user;
+                          return Semantics(
+                            button: true,
+                            label: l10n.a11yChangeProfilePhoto,
+                            child: Tooltip(
+                              message: l10n.profileChangePhoto,
+                              child: FocusableTap(
+                                onTap: (_avatarUploading || _busy)
+                                    ? null
+                                    : _changeAvatar,
+                                borderRadius: BorderRadius.circular(
+                                  profileTheme.avatarSize / 2,
+                                ),
+                                child: SizedBox(
+                                  width: profileTheme.avatarSize,
+                                  height: profileTheme.avatarSize,
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      ClipOval(
+                                        child: user.photoUrl != null &&
+                                                user.photoUrl!.isNotEmpty
+                                            ? ExcludeSemantics(
+                                                child: Image.network(
+                                                  user.photoUrl!,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder:
+                                                      (_, __, ___) => Icon(
+                                                    context.icons.profile,
+                                                    color: colors.icon,
+                                                    size: dimensions.iconXl,
+                                                  ),
+                                                ),
+                                              )
+                                            : ExcludeSemantics(
+                                                child: Icon(
+                                                  context.icons.profile,
+                                                  color: colors.icon,
+                                                  size: dimensions.iconXl,
+                                                ),
+                                              ),
                                       ),
-                                    ),
-                                  ),
-                                )
-                              : ExcludeSemantics(
-                                  child: Icon(
-                                    context.icons.profile,
-                                    color: colors.icon,
-                                    size: dimensions.iconXl,
+                                      if (_avatarUploading)
+                                        ClipOval(
+                                          child: ColoredBox(
+                                            color: colors.screen.withValues(
+                                              alpha: 0.55,
+                                            ),
+                                            child: Center(
+                                              child:
+                                                  AccessibleProgressIndicator(
+                                                color: colors.primary,
+                                                size: dimensions.iconXl,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 ),
-                        ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                       spacing.hMd,
                       Expanded(

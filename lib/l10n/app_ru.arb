@@ -55,6 +55,8 @@
     }
   },
   "a11yProfilePhoto": "Фото профиля",
+  "a11yChangeProfilePhoto": "Сменить фото профиля",
+  "profileChangePhoto": "Сменить фото",
   "a11yOpenProfile": "Открыть профиль",
   "a11yLastFertilized": "Последняя подкормка: {date}",
   "@a11yLastFertilized": {

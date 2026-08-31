@@ -89,6 +89,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get a11yProfilePhoto => 'Фото профиля';
 
   @override
+  String get a11yChangeProfilePhoto => 'Сменить фото профиля';
+
+  @override
+  String get profileChangePhoto => 'Сменить фото';
+
+  @override
   String get a11yOpenProfile => 'Открыть профиль';
 
   @override

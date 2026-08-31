@@ -240,6 +240,18 @@ abstract class AppLocalizations {
   /// **'Profile photo'**
   String get a11yProfilePhoto;
 
+  /// No description provided for @a11yChangeProfilePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change profile photo'**
+  String get a11yChangeProfilePhoto;
+
+  /// No description provided for @profileChangePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get profileChangePhoto;
+
   /// No description provided for @a11yOpenProfile.
   ///
   /// In en, this message translates to:
