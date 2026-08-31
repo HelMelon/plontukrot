@@ -25,6 +25,7 @@ class PlantCard extends StatelessWidget {
   final bool isSelected;
   final bool preferSpeciesAsTitle;
   final int propagationBatchCount;
+  final double? moisture;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
@@ -34,6 +35,7 @@ class PlantCard extends StatelessWidget {
     this.isSelected = false,
     this.preferSpeciesAsTitle = false,
     this.propagationBatchCount = 0,
+    this.moisture,
     this.onTap,
     this.onLongPress,
   });
@@ -390,6 +392,14 @@ class PlantCard extends StatelessWidget {
                     ),
                   ),
                 ),
+              if (moisture != null)
+                Positioned(
+                  top: spacing.xs,
+                  left: spacing.xs,
+                  child: ExcludeSemantics(
+                    child: _MoistureBadge(moisture: moisture!),
+                  ),
+                ),
             ],
           ),
         ),
@@ -442,6 +452,46 @@ class _StatChip extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _MoistureBadge extends StatelessWidget {
+  final double moisture;
+
+  const _MoistureBadge({required this.moisture});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final typography = context.typography;
+    final dry = moisture < 20;
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.spacing.xs,
+        vertical: context.spacing.xxs,
+      ),
+      decoration: BoxDecoration(
+        color: dry ? colors.error : colors.modal.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(context.radii.sm),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          HugeIcon(
+            icon: context.icons.humidity,
+            size: context.dimensions.iconMd,
+          ),
+          SizedBox(width: context.spacing.xxs),
+          Text(
+            '${moisture.round()}%',
+            style: typography.caption.copyWith(
+              color: dry ? Colors.white : colors.textPrimary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

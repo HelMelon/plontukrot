@@ -1,4 +1,6 @@
 """FastAPI application entry point."""
+import asyncio
+import logging
 import os
 from contextlib import asynccontextmanager
 
@@ -10,6 +12,7 @@ from .config import settings
 from .db import auto_migrate, get_pool
 from .routers import (
     auth,
+    balcony,
     catalogs,
     genera,
     manipulations,
@@ -17,10 +20,30 @@ from .routers import (
     plants,
     propagations,
     sensor,
+    sensor_bindings,
     smart_home,
     social,
     species,
+    telegram,
 )
+
+log = logging.getLogger(__name__)
+
+# Balcony monitor: check the temperature every 30 minutes.
+_BALCONY_INTERVAL_SECONDS = 30 * 60
+
+
+async def _balcony_monitor_loop() -> None:
+    """Periodically check the balcony temperature and alert when a plant
+    needs bringing inside. Runs for the life of the process."""
+    while True:
+        try:
+            result = balcony.check_and_alert()
+            if result.get("alerted"):
+                log.info("Balcony alert sent: %s", result.get("needs_inside"))
+        except Exception:
+            log.exception("balcony monitor pass failed")
+        await asyncio.sleep(_BALCONY_INTERVAL_SECONDS)
 
 
 @asynccontextmanager
@@ -29,7 +52,9 @@ async def lifespan(app: FastAPI):
     os.makedirs(settings.photos_dir, exist_ok=True)
     get_pool().open()
     auto_migrate()
+    monitor_task = asyncio.create_task(_balcony_monitor_loop())
     yield
+    monitor_task.cancel()
     get_pool().close()
 
 
@@ -49,6 +74,9 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+# sensor_bindings must come BEFORE plants so its static /sensor-bindings
+# path is matched before plants' dynamic /{plant_id}.
+app.include_router(sensor_bindings.router)
 app.include_router(plants.router)
 app.include_router(plant_care.router)
 app.include_router(propagations.router)
@@ -59,6 +87,8 @@ app.include_router(genera.router)
 app.include_router(manipulations.router)
 app.include_router(sensor.router)
 app.include_router(smart_home.router)
+app.include_router(balcony.router)
+app.include_router(telegram.router)
 
 # Serve uploaded photos from disk.
 os.makedirs(settings.photos_dir, exist_ok=True)

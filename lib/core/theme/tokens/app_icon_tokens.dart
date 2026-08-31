@@ -207,7 +207,7 @@ class AppIconTokens {
     repotting: HugeIcons.strokeRoundedShovel,
     repottingAction: HugeIcons.strokeRoundedShovel,
     light: Icons.wb_sunny_outlined,
-    humidity: Icons.opacity_outlined,
+    humidity: HugeIcons.strokeRoundedHumidity,
     toxicity: Icons.pets_outlined,
     aiCare: Icons.auto_awesome,
     note: HugeIcons.strokeRoundedNoteEdit,
@@ -322,7 +322,7 @@ class AppIconTokens {
   final List<List<dynamic>> repotting;
   final List<List<dynamic>> repottingAction;
   final IconData light;
-  final IconData humidity;
+  final List<List<dynamic>> humidity;
   final IconData toxicity;
   final IconData aiCare;
   final List<List<dynamic>> note;
@@ -428,7 +428,7 @@ class AppIconTokens {
     List<List<dynamic>>? repotting,
     List<List<dynamic>>? repottingAction,
     IconData? light,
-    IconData? humidity,
+    List<List<dynamic>>? humidity,
     IconData? toxicity,
     IconData? aiCare,
     List<List<dynamic>>? note,

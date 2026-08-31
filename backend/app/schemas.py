@@ -73,6 +73,8 @@ class PlantCreate(BaseModel):
     archive_note: Optional[str] = Field(default=None, alias="archiveNote")
     merged_into_plant_id: Optional[str] = Field(default=None, alias="mergedIntoPlantId")
     gifted_to_uid: Optional[str] = Field(default=None, alias="giftedToUid")
+    on_balcony: Optional[bool] = Field(default=None, alias="onBalcony")
+    balcony_band: Optional[int] = Field(default=None, alias="balconyBand")
 
 
 class PlantUpdate(BaseModel):
@@ -100,6 +102,8 @@ class PlantUpdate(BaseModel):
     archive_note: Optional[str] = Field(default=None, alias="archiveNote")
     merged_into_plant_id: Optional[str] = Field(default=None, alias="mergedIntoPlantId")
     gifted_to_uid: Optional[str] = Field(default=None, alias="giftedToUid")
+    on_balcony: Optional[bool] = Field(default=None, alias="onBalcony")
+    balcony_band: Optional[int] = Field(default=None, alias="balconyBand")
 
 
 class PlantOut(BaseModel):
@@ -128,6 +132,8 @@ class PlantOut(BaseModel):
     archive_note: Optional[str] = None
     merged_into_plant_id: Optional[str] = None
     gifted_to_uid: Optional[str] = None
+    on_balcony: Optional[bool] = None
+    balcony_band: Optional[int] = None
     created_at: datetime
     photos: list[PlantPhotoOut] = []
 
@@ -327,6 +333,7 @@ class StageHistoryCreate(BaseModel):
     quantity_alive: int = 0
     outcome: Optional[str] = None
     note: Optional[str] = None
+    changed_at: Optional[datetime] = None
 
 
 class StageHistoryOut(BaseModel):
@@ -449,6 +456,37 @@ class GiftCreate(BaseModel):
     status: int = 0
 
 
+# ---- Telegram linking ----
+class TelegramLinkOut(BaseModel):
+    code: str
+    bot_username: str
+    expires_at: datetime
+
+
+class TelegramConfirmIn(BaseModel):
+    code: str
+    chat_id: str
+
+
+class TelegramStatusOut(BaseModel):
+    linked: bool
+    chat_id: Optional[str] = None
+
+
+# ---- Plant sensor binding ----
+class PlantSensorBindingCreate(BaseModel):
+    pot: int
+
+
+class PlantSensorBindingOut(BaseModel):
+    plant_id: str
+    pot: int
+    moisture: Optional[float] = None
+    raw: Optional[int] = None
+    read_at: Optional[datetime] = None
+    created_at: datetime
+
+
 # ---- Genus Care Guide ----
 class GenusCareGuideOut(BaseModel):
     genus: str
@@ -459,6 +497,7 @@ class GenusCareGuideOut(BaseModel):
     soil: Optional[str] = None
     humidity: Optional[str] = None
     toxicity: Optional[str] = None
+    min_temp_c: Optional[float] = None
 
 
 

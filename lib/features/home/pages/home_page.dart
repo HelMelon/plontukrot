@@ -13,8 +13,10 @@ import '../../../core/widgets/prompt_text_dialog.dart';
 import '../../../models/app_user.dart';
 import '../../../models/plant.dart';
 import '../../../models/plant_filter_criteria.dart';
+import '../../../models/plant_sensor_binding.dart';
 import '../../../models/stage_info.dart';
 import '../widgets/sheets/plant_filter_sheet.dart';
+import '../widgets/balcony_alert_banner.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
 import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
 import '../../plants/widgets/sheets/add_manipulation_sheet.dart';
@@ -24,6 +26,7 @@ import '../../plants/widgets/sheets/merge_plant_sheet.dart';
 import '../../../services/manipulation_service.dart';
 import '../../../services/note_service.dart';
 import '../../../services/plant_service.dart';
+import '../../../services/plant_sensor_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../../services/startup_warmup_service.dart';
 import '../../../services/watering_service.dart';
@@ -72,6 +75,7 @@ class _HomePageState extends State<HomePage> {
   late final Stream<List<Plant>> _plantsStream;
   late final Stream<Map<String, int>> _activeBatchCountsStream;
   late final Stream<Set<String>> _rerootingPlantIdsStream;
+  late final Stream<Map<String, PlantSensorBinding>> _sensorBindingsStream;
   List<Plant> _latestPlants = const [];
   _PlantSortField _sortField = _PlantSortField.createdAt;
   bool _sortAscending = false;
@@ -100,6 +104,7 @@ class _HomePageState extends State<HomePage> {
         PropagationService().watchActiveBatchCountsByPlantId();
     _rerootingPlantIdsStream =
         ManipulationService().watchActiveRerootingPlantIds();
+    _sensorBindingsStream = PlantSensorService().watchAllBindings();
   }
 
   Future<void> _signalFirstContentReady(List<Plant> plants) async {
@@ -325,6 +330,7 @@ class _HomePageState extends State<HomePage> {
     int crossAxisCount, {
     required String Function(String key) titleForKey,
     required Map<String, int> batchCounts,
+    required Map<String, PlantSensorBinding> bindings,
   }) {
     final colors = _colors;
     final spacing = _spacing;
@@ -383,6 +389,7 @@ class _HomePageState extends State<HomePage> {
                   entry.value,
                   crossAxisCount,
                   batchCounts: batchCounts,
+                  bindings: bindings,
                 ),
             ],
           ),
@@ -395,6 +402,7 @@ class _HomePageState extends State<HomePage> {
     List<Plant> plants,
     int crossAxisCount, {
     required Map<String, int> batchCounts,
+    required Map<String, PlantSensorBinding> bindings,
   }) {
     final preferSpeciesAsTitle = _sortField == _PlantSortField.species ||
         _sortField == _PlantSortField.plantFamily;
@@ -429,6 +437,7 @@ class _HomePageState extends State<HomePage> {
           isSelected: _selectedPlantIds.contains(plant.id),
           preferSpeciesAsTitle: preferSpeciesAsTitle,
           propagationBatchCount: batchCounts[plant.id] ?? 0,
+          moisture: bindings[plant.id]?.moisture,
           onTap:
               _isSelectionMode ? () => _togglePlantSelection(plant.id) : null,
           onLongPress: () => _togglePlantSelection(plant.id),
@@ -1020,6 +1029,7 @@ class _HomePageState extends State<HomePage> {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                const BalconyAlertBanner(),
                                 if (!_isSelectionMode) ...[
                                   Row(
                                     children: [
@@ -1346,49 +1356,90 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   )
                                 else if (_sortField == _PlantSortField.species)
-                                  _buildGroupedPlants(
-                                    _groupPlantsByLetter(sortedPlants),
-                                    crossAxisCount,
-                                    titleForKey: (key) => key,
-                                    batchCounts: batchCounts,
+                                  StreamBuilder<Map<String, PlantSensorBinding>>(
+                                    stream: _sensorBindingsStream,
+                                    builder: (context, bindingSnapshot) {
+                                      final bindings =
+                                          bindingSnapshot.data ?? const {};
+                                      return _buildGroupedPlants(
+                                        _groupPlantsByLetter(sortedPlants),
+                                        crossAxisCount,
+                                        titleForKey: (key) => key,
+                                        batchCounts: batchCounts,
+                                        bindings: bindings,
+                                      );
+                                    },
                                   )
                                 else if (_sortField ==
                                     _PlantSortField.plantFamily)
-                                  _buildGroupedPlants(
-                                    _groupPlantsByFamily(sortedPlants),
-                                    crossAxisCount,
-                                    titleForKey: groupTitle,
-                                    batchCounts: batchCounts,
+                                  StreamBuilder<Map<String, PlantSensorBinding>>(
+                                    stream: _sensorBindingsStream,
+                                    builder: (context, bindingSnapshot) {
+                                      final bindings =
+                                          bindingSnapshot.data ?? const {};
+                                      return _buildGroupedPlants(
+                                        _groupPlantsByFamily(sortedPlants),
+                                        crossAxisCount,
+                                        titleForKey: groupTitle,
+                                        batchCounts: batchCounts,
+                                        bindings: bindings,
+                                      );
+                                    },
                                   )
                                 else if (_sortField ==
                                     _PlantSortField.lastWateredAt)
-                                  _buildGroupedPlants(
-                                    _groupPlantsByCareDate(
-                                      sortedPlants,
-                                      dateOf: (plant) => plant.lastWateredAt,
-                                      noDateLabel: l10n.commonNoDate,
-                                    ),
-                                    crossAxisCount,
-                                    titleForKey: (key) => key,
-                                    batchCounts: batchCounts,
+                                  StreamBuilder<Map<String, PlantSensorBinding>>(
+                                    stream: _sensorBindingsStream,
+                                    builder: (context, bindingSnapshot) {
+                                      final bindings =
+                                          bindingSnapshot.data ?? const {};
+                                      return _buildGroupedPlants(
+                                        _groupPlantsByCareDate(
+                                          sortedPlants,
+                                          dateOf: (plant) => plant.lastWateredAt,
+                                          noDateLabel: l10n.commonNoDate,
+                                        ),
+                                        crossAxisCount,
+                                        titleForKey: (key) => key,
+                                        batchCounts: batchCounts,
+                                        bindings: bindings,
+                                      );
+                                    },
                                   )
                                 else if (_sortField ==
                                     _PlantSortField.lastFertilizedAt)
-                                  _buildGroupedPlants(
-                                    _groupPlantsByCareDate(
-                                      sortedPlants,
-                                      dateOf: (plant) => plant.lastFertilizedAt,
-                                      noDateLabel: l10n.commonNoDate,
-                                    ),
-                                    crossAxisCount,
-                                    titleForKey: (key) => key,
-                                    batchCounts: batchCounts,
+                                  StreamBuilder<Map<String, PlantSensorBinding>>(
+                                    stream: _sensorBindingsStream,
+                                    builder: (context, bindingSnapshot) {
+                                      final bindings =
+                                          bindingSnapshot.data ?? const {};
+                                      return _buildGroupedPlants(
+                                        _groupPlantsByCareDate(
+                                          sortedPlants,
+                                          dateOf: (plant) =>
+                                              plant.lastFertilizedAt,
+                                          noDateLabel: l10n.commonNoDate,
+                                        ),
+                                        crossAxisCount,
+                                        titleForKey: (key) => key,
+                                        batchCounts: batchCounts,
+                                        bindings: bindings,
+                                      );
+                                    },
                                   )
                                 else
-                                  _buildPlantGrid(
-                                    sortedPlants,
-                                    crossAxisCount,
-                                    batchCounts: batchCounts,
+                                  StreamBuilder<Map<String, PlantSensorBinding>>(
+                                    stream: _sensorBindingsStream,
+                                    builder: (context, bindingSnapshot) {
+                                      final bindings =
+                                          bindingSnapshot.data ?? const {};
+                                      return _buildPlantGrid(
+                                        sortedPlants,
+                                        crossAxisCount,
+                                        batchCounts: batchCounts,
+                                        bindings: bindings,
+                                      );
+                                    },
                                   ),
                               ],
                             );

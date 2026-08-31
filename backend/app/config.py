@@ -78,6 +78,11 @@ class Settings:
             "OPENAI_BASE_URL", "https://api.openai.com/v1"
         )
         self.openai_model: str = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+        # OpenRouter (free-tier models) — preferred over DeepSeek when set.
+        self.openrouter_api_key: str = os.environ.get("OPENROUTER_API_KEY", "")
+        self.openrouter_model: str = os.environ.get(
+            "OPENROUTER_MODEL", "nvidia/nemotron-3-ultra-550b-a55b:free"
+        )
         # Yandex Smart Home skill credentials (filled after registering).
         self.yandex_client_id: str = os.environ.get("YANDEX_CLIENT_ID", "")
         self.yandex_client_secret: str = os.environ.get(
@@ -86,6 +91,20 @@ class Settings:
         # Fixed access token the skill always hands out; survives restarts.
         self.yandex_access_token: str = os.environ.get(
             "YANDEX_ACCESS_TOKEN", ""
+        )
+        # OAuth token to READ the user's own Yandex Smart Home devices
+        # (the balcony climate sensor). Used by the balcony monitor.
+        self.yandex_iot_token: str = os.environ.get("YANDEX_IOT_TOKEN", "")
+        # Balcony climate sensor device id in the Yandex IOT API.
+        self.balcony_sensor_id: str = os.environ.get(
+            "BALCONY_SENSOR_ID", "bf56b858-16fa-4a59-a807-72615cdeb438"
+        )
+        # Telegram delivery for "bring the plant inside" alerts.
+        self.telegram_token: str = os.environ.get("TELEGRAM_TOKEN", "")
+        self.telegram_chat_id: str = os.environ.get("TELEGRAM_CHAT_ID", "")
+        # Bot username used to build the deep-link (t.me/<username>?start=<code>).
+        self.telegram_bot_username: str = os.environ.get(
+            "TELEGRAM_BOT_USERNAME", "plants_scanner_bot"
         )
 
 

@@ -22,7 +22,9 @@ import '../sheets/fertilizing_history_sheet.dart';
 import '../sheets/manipulations_history_sheet.dart';
 import '../sheets/repotting_history_sheet.dart';
 import '../sheets/watering_history_sheet.dart';
+import 'balcony_toggle.dart';
 import 'info_card.dart';
+import 'sensor_binding_toggle.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
 import 'package:hugeicons/hugeicons.dart';
 
@@ -466,6 +468,10 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
               ),
             ),
           ],
+          spacing.vXs,
+          BalconyToggle(plant: plant, plantId: plantId),
+          spacing.vXs,
+          SensorBindingToggle(plantId: plantId),
         ],
       ),
     );

@@ -36,6 +36,8 @@ class Plant {
   final String? archiveNote;
   final String? mergedIntoPlantId;
   final String? giftedToUid;
+  final bool onBalcony;
+  final int? balconyBand;
 
   const Plant({
     required this.id,
@@ -67,6 +69,8 @@ class Plant {
     this.archiveNote,
     this.mergedIntoPlantId,
     this.giftedToUid,
+    this.onBalcony = false,
+    this.balconyBand,
   });
 
   bool get isGroup => members.length >= 2;
@@ -205,6 +209,8 @@ class Plant {
           readString(data, 'merged_into_plant_id'),
       giftedToUid: readString(data, 'giftedToUid') ??
           readString(data, 'gifted_to_uid'),
+      onBalcony: readBool(data, 'onBalcony') || readBool(data, 'on_balcony'),
+      balconyBand: readInt(data, 'balconyBand') ?? readInt(data, 'balcony_band'),
     );
   }
 
@@ -254,6 +260,10 @@ class Plant {
       if (archiveNote != null) 'archiveNote': archiveNote,
       if (mergedIntoPlantId != null) 'mergedIntoPlantId': mergedIntoPlantId,
       if (giftedToUid != null) 'giftedToUid': giftedToUid,
+      'onBalcony': onBalcony,
+      'on_balcony': onBalcony,
+      if (balconyBand != null) 'balconyBand': balconyBand,
+      if (balconyBand != null) 'balcony_band': balconyBand,
     };
   }
 }

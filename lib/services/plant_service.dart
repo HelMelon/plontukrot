@@ -107,6 +107,22 @@ class PlantService {
     await _rescheduleNotifications(plantId);
   }
 
+  /// Mark a plant as on the balcony (or bring it back inside).
+  ///
+  /// [band] is the cold-tolerance band (0..4) used by the balcony monitor to
+  /// decide when the plant must be brought inside. Pass null to keep the
+  /// current band when only toggling [onBalcony].
+  Future<void> setOnBalcony({
+    required String plantId,
+    required bool onBalcony,
+    int? band,
+  }) async {
+    await _patchPlant(plantId, {
+      'on_balcony': onBalcony,
+      if (band != null) 'balcony_band': band,
+    });
+  }
+
   Future<void> _patchPlant(String plantId, Map<String, dynamic> body) async {
     try {
       await _api.patch('/plants/$plantId', body: body);

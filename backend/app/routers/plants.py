@@ -30,6 +30,8 @@ _FIELDS = {
     "archive_note": "archive_note",
     "merged_into_plant_id": "merged_into_plant_id",
     "gifted_to_uid": "gifted_to_uid",
+    "on_balcony": "on_balcony",
+    "balcony_band": "balcony_band",
 }
 
 
@@ -47,7 +49,8 @@ def list_plants(user_id: str = Depends(get_current_user_id)):
             "fertilizing_frequency_days, initial_leaf_count, last_watered_at, "
             "last_fertilized_at, last_repotted_at, last_manipulation_at, "
             "members, archived_at, expires_at, archive_reason, archive_note, "
-            "merged_into_plant_id, gifted_to_uid, created_at "
+            "merged_into_plant_id, gifted_to_uid, on_balcony, balcony_band, "
+            "created_at "
             "FROM plants WHERE user_id = %s ORDER BY created_at",
             (user_id,),
         ).fetchall()
@@ -102,7 +105,8 @@ def create_plant(payload: PlantCreate, user_id: str = Depends(get_current_user_i
             "fertilizing_frequency_days, initial_leaf_count, last_watered_at, "
             "last_fertilized_at, last_repotted_at, last_manipulation_at, "
             "members, archived_at, expires_at, archive_reason, archive_note, "
-            "merged_into_plant_id, gifted_to_uid, created_at "
+            "merged_into_plant_id, gifted_to_uid, on_balcony, balcony_band, "
+            "created_at "
             "FROM plants WHERE id = %s",
             (plant_id,),
         ).fetchone()
@@ -118,7 +122,8 @@ def get_plant(plant_id: str, user_id: str = Depends(get_current_user_id)):
             "fertilizing_frequency_days, initial_leaf_count, last_watered_at, "
             "last_fertilized_at, last_repotted_at, last_manipulation_at, "
             "members, archived_at, expires_at, archive_reason, archive_note, "
-            "merged_into_plant_id, gifted_to_uid, created_at "
+            "merged_into_plant_id, gifted_to_uid, on_balcony, balcony_band, "
+            "created_at "
             "FROM plants WHERE id = %s AND user_id = %s",
             (plant_id, user_id),
         ).fetchone()
@@ -195,7 +200,8 @@ def update_plant(
             "fertilizing_frequency_days, initial_leaf_count, last_watered_at, "
             "last_fertilized_at, last_repotted_at, last_manipulation_at, "
             "members, archived_at, expires_at, archive_reason, archive_note, "
-            "merged_into_plant_id, gifted_to_uid, created_at "
+            "merged_into_plant_id, gifted_to_uid, on_balcony, balcony_band, "
+            "created_at "
             "FROM plants WHERE id = %s",
             (plant_id,),
         ).fetchone()
@@ -252,5 +258,7 @@ def _row_to_plant(row) -> PlantOut:
         archive_note=row.get("archive_note"),
         merged_into_plant_id=row.get("merged_into_plant_id"),
         gifted_to_uid=row.get("gifted_to_uid"),
+        on_balcony=row.get("on_balcony"),
+        balcony_band=row.get("balcony_band"),
         created_at=row["created_at"],
     )

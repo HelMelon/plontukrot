@@ -63,6 +63,8 @@ def auto_migrate() -> None:
                 ALTER TABLE plants ADD COLUMN IF NOT EXISTS archive_note TEXT;
                 ALTER TABLE plants ADD COLUMN IF NOT EXISTS merged_into_plant_id TEXT;
                 ALTER TABLE plants ADD COLUMN IF NOT EXISTS gifted_to_uid TEXT;
+                ALTER TABLE plants ADD COLUMN IF NOT EXISTS on_balcony BOOLEAN NOT NULL DEFAULT false;
+                ALTER TABLE plants ADD COLUMN IF NOT EXISTS balcony_band INT;
 
                 ALTER TABLE plant_manipulations ADD COLUMN IF NOT EXISTS ended_at TIMESTAMPTZ;
                 ALTER TABLE plant_manipulations ADD COLUMN IF NOT EXISTS reanimation_tags JSONB;
@@ -90,6 +92,38 @@ def auto_migrate() -> None:
                     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
                 );
 
+                CREATE TABLE IF NOT EXISTS telegram_links (
+                    user_id TEXT PRIMARY KEY,
+                    chat_id TEXT NOT NULL,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                );
+
+                CREATE TABLE IF NOT EXISTS telegram_link_codes (
+                    code TEXT PRIMARY KEY,
+                    user_id TEXT NOT NULL,
+                    expires_at TIMESTAMPTZ NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS idx_telegram_link_codes_user
+                    ON telegram_link_codes (user_id);
+
+                CREATE TABLE IF NOT EXISTS plant_sensor_bindings (
+                    plant_id TEXT PRIMARY KEY,
+                    pot INT NOT NULL,
+                    user_id TEXT NOT NULL,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                );
+                CREATE INDEX IF NOT EXISTS idx_plant_sensor_bindings_user
+                    ON plant_sensor_bindings (user_id);
+
+                CREATE TABLE IF NOT EXISTS balcony_temp_readings (
+                    id BIGSERIAL PRIMARY KEY,
+                    user_id TEXT NOT NULL,
+                    temp_c DOUBLE PRECISION NOT NULL,
+                    read_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                );
+                CREATE INDEX IF NOT EXISTS idx_balcony_temp_readings_user_time
+                    ON balcony_temp_readings (user_id, read_at DESC);
+
                 CREATE TABLE IF NOT EXISTS genus_care_guides (
                     genus TEXT NOT NULL,
                     locale TEXT NOT NULL DEFAULT 'ru',
@@ -101,10 +135,14 @@ def auto_migrate() -> None:
                     soil TEXT,
                     humidity TEXT,
                     toxicity TEXT,
+                    min_temp_c DOUBLE PRECISION,
                     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
                     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
                     PRIMARY KEY (genus, locale)
                 );
+
+                ALTER TABLE genus_care_guides
+                    ADD COLUMN IF NOT EXISTS min_temp_c DOUBLE PRECISION;
 
                 ALTER TABLE genus_care_guides
                     ADD COLUMN IF NOT EXISTS locale TEXT NOT NULL DEFAULT 'ru';
