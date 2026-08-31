@@ -26,6 +26,7 @@ import '../../../services/fertilizing_notification_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../friends/pages/friends_page.dart';
+import '../widgets/telegram_link_tile.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
 
@@ -737,6 +738,8 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   );
                 },
               ),
+              spacing.vSm,
+              TelegramLinkTile(),
               spacing.vSm,
               ListTile(
                 contentPadding: EdgeInsets.zero,
