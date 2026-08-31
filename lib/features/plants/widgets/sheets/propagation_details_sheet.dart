@@ -18,6 +18,7 @@ import 'add_note_sheet.dart';
 import 'add_plant_sheet.dart';
 import 'change_propagation_stage_sheet.dart';
 import 'sell_lose_propagation_sheet.dart';
+import 'split_propagation_sheet.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
 
@@ -68,6 +69,25 @@ class PropagationDetailsSheet extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (_) => ChangePropagationStageSheet(propagation: current),
     );
+  }
+
+  Future<void> _openSplit(
+    BuildContext context,
+    Propagation current,
+  ) async {
+    final result = await showAppModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => SplitPropagationSheet(propagation: current),
+    );
+    if (result == true && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context).propagationSplitSuccess),
+        ),
+      );
+    }
   }
 
   Future<void> _openOutcome(
@@ -471,6 +491,32 @@ class PropagationDetailsSheet extends StatelessWidget {
                               child: Text(l10n.propagationChangeStage),
                             ),
                           ),
+                          if (shown.quantityAlive > 1) ...[
+                            spacing.vSm,
+                            SizedBox(
+                              width: double.infinity,
+                              height: dimensions.buttonHeight,
+                              child: OutlinedButton(
+                                onPressed: () => _openSplit(context, shown),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: colors.primary,
+                                  side: BorderSide(color: colors.primary),
+                                  minimumSize:
+                                      Size.fromHeight(buttons.height),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      buttons.radius,
+                                    ),
+                                  ),
+                                ),
+                                child: Text(
+                                  l10n.propagationSplit,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                          ],
                           spacing.vSm,
                           Row(
                             children: [

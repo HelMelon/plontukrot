@@ -289,8 +289,90 @@ class PropagationService {
     await _api.post('/propagations/$propagationId/stage-history', body: {
       'stage': stage,
       'quantity_alive': alive,
+      'changed_at': isoDate(changedAt),
       if (note != null && note.trim().isNotEmpty) 'note': note.trim(),
     });
+  }
+
+  Future<String> splitPropagation({
+    required String sourcePropagationId,
+    required int countToSplit,
+    required int newStage,
+    required DateTime splitAt,
+    String? sourceNote,
+    String? newBatchNote,
+  }) async {
+    final current = await _get(sourcePropagationId);
+    if (current == null) {
+      throw Exception('Propagation batch not found');
+    }
+    if (countToSplit < 1 || countToSplit >= current.quantityAlive) {
+      throw ArgumentError(
+        'countToSplit must be between 1 and ${current.quantityAlive - 1}',
+      );
+    }
+
+    final remainingAlive = current.quantityAlive - countToSplit;
+    final remainingQuantity =
+        (current.quantity - countToSplit).clamp(remainingAlive, current.quantity);
+
+    final updatedSource = Propagation(
+      id: current.id,
+      parentPlantId: current.parentPlantId,
+      parentPlantName: current.parentPlantName,
+      parentPlantFamily: current.parentPlantFamily,
+      method: current.method,
+      quantity: remainingQuantity,
+      quantityAlive: remainingAlive,
+      soldQuantity: current.soldQuantity,
+      giftedQuantity: current.giftedQuantity,
+      tradedQuantity: current.tradedQuantity,
+      lostQuantity: current.lostQuantity,
+      stage: current.stage,
+      status: current.status,
+      startedAt: current.startedAt,
+      soldAt: current.soldAt,
+      archivedAt: current.archivedAt,
+      expiresAt: current.expiresAt,
+      createdAt: current.createdAt,
+    );
+    await _patch(updatedSource);
+    await _api.post('/propagations/$sourcePropagationId/stage-history', body: {
+      'stage': current.stage,
+      'quantity_alive': remainingAlive,
+      'changed_at': isoDate(splitAt),
+      if (sourceNote != null && sourceNote.trim().isNotEmpty)
+        'note': sourceNote.trim(),
+    });
+
+    final created = jsonMap(await _api.post('/propagations', body: {
+      'parent_plant_id': current.parentPlantId,
+      'parent_plant_name': current.parentPlantName,
+      'parent_plant_family': current.parentPlantFamily,
+      'method': current.method.index,
+      'quantity': countToSplit,
+      'quantity_alive': countToSplit,
+      'sold_quantity': 0,
+      'gifted_quantity': 0,
+      'traded_quantity': 0,
+      'lost_quantity': 0,
+      'stage': newStage,
+      'status': PropagationStatus.active.index,
+      'started_at': isoDate(current.startedAt),
+    }));
+
+    final newId = readString(created, 'id') ?? '';
+    if (newId.isNotEmpty) {
+      await _api.post('/propagations/$newId/stage-history', body: {
+        'stage': newStage,
+        'quantity_alive': countToSplit,
+        'changed_at': isoDate(splitAt),
+        if (newBatchNote != null && newBatchNote.trim().isNotEmpty)
+          'note': newBatchNote.trim(),
+      });
+    }
+
+    return newId;
   }
 
   Future<void> markOutcome({

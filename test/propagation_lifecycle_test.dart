@@ -265,4 +265,75 @@ void main() {
       );
     });
   });
+
+  group('batch splitting', () {
+    test('splitting preserves total quantity and keeps lost quantity at 0', () {
+      final source = Propagation(
+        id: 'source-1',
+        parentPlantId: 'plant-begonia',
+        parentPlantName: 'Begonia rex',
+        parentPlantFamily: 'Begoniaceae',
+        method: PropagationMethod.leaf,
+        quantity: 10,
+        quantityAlive: 10,
+        soldQuantity: 0,
+        lostQuantity: 0,
+        stage: propagationStageBaby,
+        status: PropagationStatus.active,
+        startedAt: DateTime(2026, 5, 1),
+      );
+
+      const countToSplit = 2;
+      const newStage = propagationStageJuvenile;
+
+      final updatedSource = Propagation(
+        id: source.id,
+        parentPlantId: source.parentPlantId,
+        parentPlantName: source.parentPlantName,
+        parentPlantFamily: source.parentPlantFamily,
+        method: source.method,
+        quantity: source.quantity - countToSplit,
+        quantityAlive: source.quantityAlive - countToSplit,
+        soldQuantity: source.soldQuantity,
+        giftedQuantity: source.giftedQuantity,
+        tradedQuantity: source.tradedQuantity,
+        lostQuantity: source.lostQuantity,
+        stage: source.stage,
+        status: source.status,
+        startedAt: source.startedAt,
+      );
+
+      final newBatch = Propagation(
+        id: 'new-batch-1',
+        parentPlantId: source.parentPlantId,
+        parentPlantName: source.parentPlantName,
+        parentPlantFamily: source.parentPlantFamily,
+        method: source.method,
+        quantity: countToSplit,
+        quantityAlive: countToSplit,
+        soldQuantity: 0,
+        giftedQuantity: 0,
+        tradedQuantity: 0,
+        lostQuantity: 0,
+        stage: newStage,
+        status: PropagationStatus.active,
+        startedAt: source.startedAt,
+      );
+
+      expect(updatedSource.quantityAlive, 8);
+      expect(updatedSource.quantity, 8);
+      expect(updatedSource.lostQuantity, 0);
+      expect(updatedSource.stage, propagationStageBaby);
+
+      expect(newBatch.quantityAlive, 2);
+      expect(newBatch.quantity, 2);
+      expect(newBatch.lostQuantity, 0);
+      expect(newBatch.stage, propagationStageJuvenile);
+
+      final stats = PropagationYearStats.fromList(2026, [updatedSource, newBatch]);
+      expect(stats.startedQuantity, 10);
+      expect(stats.startedBatches, 2);
+      expect(stats.lostQuantity, 0);
+    });
+  });
 }

@@ -144,10 +144,10 @@ def add_stage_history(prop_id: str, payload: StageHistoryCreate,
         _ensure_prop(conn, prop_id, user_id)
         conn.execute(
             "INSERT INTO propagation_stage_history (id, propagation_id, "
-            "stage, quantity_alive, outcome, note) VALUES (%s, %s, %s, %s, "
-            "%s, %s)",
+            "stage, quantity_alive, outcome, note, changed_at) VALUES (%s, %s, %s, %s, "
+            "%s, %s, COALESCE(%s, now()))",
             (h_id, prop_id, payload.stage, payload.quantity_alive,
-             payload.outcome, payload.note),
+             payload.outcome, payload.note, payload.changed_at),
         )
         row = conn.execute(
             "SELECT id, propagation_id, stage, quantity_alive, outcome, note, "
