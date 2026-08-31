@@ -44,7 +44,8 @@ Reply STRICTLY as JSON without Markdown fences:
   "fertilizing": "feeding frequency and fertilizer type during growth (1-2 sentences)",
   "soil": "ideal soil mix and properties (1-2 sentences)",
   "humidity": "humidity and misting needs (1-2 sentences)",
-  "toxicity": "brief toxicity info for cats/dogs (or null if safe)"
+  "toxicity": "brief toxicity info for cats/dogs (or null if safe)",
+  "min_temp_c": "minimum survivable temperature in Celsius as a NUMBER (e.g. 10, -5, 4). Use the lowest temperature the plant can survive without damage. For tropical houseplants this is usually 10; for frost-hardy plants like Hedera it is -20. Return a number, not a string."
 }}
 """
 
@@ -199,51 +200,15 @@ def _request_openai_compatible(
         return json.loads(_clean_json_text(content))
 
 
-def _mock_care_guide(genus: str, locale: str) -> dict[str, Any]:
-    """Fallback draft when no AI API keys are configured."""
-    if locale == "en":
-        return {
-            "genus": genus,
-            "origin": f"Plants of the genus {genus} are native mainly to tropical and subtropical regions.",
-            "light": "Bright indirect light without harsh midday sun.",
-            "watering": "Moderate watering once the top 2–3 cm of soil has dried out.",
-            "fertilizing": "Feed with balanced fertilizer every 2–3 weeks during active growth.",
-            "soil": "Loose, airy, well-draining substrate with a slightly acidic to neutral pH.",
-            "humidity": "Moderate to high humidity (50–70%).",
-            "toxicity": None,
-        }
-    if locale == "de":
-        return {
-            "genus": genus,
-            "origin": f"Pflanzen der Gattung {genus} stammen überwiegend aus tropischen und subtropischen Regionen.",
-            "light": "Helles, indirektes Licht ohne direkte Mittagssonne.",
-            "watering": "Mäßig gießen, wenn die obersten 2–3 cm des Substrats getrocknet sind.",
-            "fertilizing": "Alle 2–3 Wochen während der Wachstumsphase mit Volldünger düngen.",
-            "soil": "Lockere, luftige und gut drainierende Erde mit schwach saurer bis neutraler Reaktion.",
-            "humidity": "Mäßige bis hohe Luftfeuchtigkeit (50–70 %).",
-            "toxicity": None,
-        }
-    if locale == "fr":
-        return {
-            "genus": genus,
-            "origin": f"Les plantes du genre {genus} sont originaires surtout de régions tropicales et subtropicales.",
-            "light": "Lumière vive indirecte, sans soleil direct en milieu de journée.",
-            "watering": "Arrosage modéré lorsque les 2–3 cm supérieurs du substrat sont secs.",
-            "fertilizing": "Engrais complet toutes les 2–3 semaines pendant la croissance active.",
-            "soil": "Substrat léger, aéré et bien drainant, légèrement acide à neutre.",
-            "humidity": "Humidité modérée à élevée (50–70 %).",
-            "toxicity": None,
-        }
-    return {
-        "genus": genus,
-        "origin": f"Растения рода {genus} произрастают преимущественно в тропических и субтропических регионах.",
-        "light": "Яркий рассеянный свет без прямых полуденных солнечных лучей.",
-        "watering": "Умеренный полив после просыхания верхнего слоя субстрата на 2–3 см.",
-        "fertilizing": "Подкормка комплексным удобрением раз в 2–3 недели в период активного роста.",
-        "soil": "Рыхлый, воздухо- и влагопроницаемый субстрат со слабокислой или нейтральной реакцией.",
-        "humidity": "Умеренная или повышенная влажность воздуха (50–70%).",
-        "toxicity": None,
-    }
+def _request_openrouter(genus: str, locale: str) -> dict[str, Any]:
+    """Call OpenRouter (free-tier models) via its OpenAI-compatible API."""
+    return _request_openai_compatible(
+        genus,
+        locale,
+        api_key=settings.openrouter_api_key,
+        base_url="https://openrouter.ai/api/v1",
+        model=settings.openrouter_model,
+    )
 
 
 def generate_care_guide(genus: str, locale: str = "ru") -> dict[str, Any]:
@@ -254,7 +219,16 @@ def generate_care_guide(genus: str, locale: str = "ru") -> dict[str, Any]:
 
     normalized_locale = normalize_locale(locale)
 
-    # 1. Try YandexGPT if configured
+    # 1. Try OpenRouter (free-tier) if configured — preferred over paid DeepSeek.
+    if settings.openrouter_api_key:
+        try:
+            data = _request_openrouter(trimmed, normalized_locale)
+            data["genus"] = trimmed
+            return data
+        except Exception as e:
+            logger.warning("OpenRouter generation failed for %s: %s", trimmed, e)
+
+    # 2. Try YandexGPT if configured
     if settings.yandex_gpt_api_key and settings.yandex_folder_id:
         try:
             data = _request_yandex_gpt(trimmed, normalized_locale)
@@ -263,7 +237,7 @@ def generate_care_guide(genus: str, locale: str = "ru") -> dict[str, Any]:
         except Exception as e:
             logger.warning("YandexGPT generation failed for %s: %s", trimmed, e)
 
-    # 2. Try Gemini if configured
+    # 3. Try Gemini if configured
     if settings.gemini_api_key:
         try:
             data = _request_gemini(trimmed, normalized_locale)
@@ -272,7 +246,7 @@ def generate_care_guide(genus: str, locale: str = "ru") -> dict[str, Any]:
         except Exception as e:
             logger.warning("Gemini generation failed for %s: %s", trimmed, e)
 
-    # 3. Try DeepSeek if configured
+    # 4. Try DeepSeek if configured
     if settings.deepseek_api_key:
         try:
             data = _request_openai_compatible(
@@ -287,7 +261,7 @@ def generate_care_guide(genus: str, locale: str = "ru") -> dict[str, Any]:
         except Exception as e:
             logger.warning("DeepSeek generation failed for %s: %s", trimmed, e)
 
-    # 4. Try OpenAI if configured
+    # 5. Try OpenAI if configured
     if settings.openai_api_key:
         try:
             data = _request_openai_compatible(
@@ -302,10 +276,10 @@ def generate_care_guide(genus: str, locale: str = "ru") -> dict[str, Any]:
         except Exception as e:
             logger.warning("OpenAI generation failed for %s: %s", trimmed, e)
 
-    # 5. Fallback mock
-    logger.info(
-        "No AI API keys configured; using botanical fallback for %s (%s)",
-        trimmed,
-        normalized_locale,
+    # 6. No provider answered — do NOT fabricate data. Raise so the endpoint
+    #    returns an error and nothing is cached. The user explicitly does not
+    #    want a mock/fallback that invents care info.
+    raise RuntimeError(
+        f"No AI provider returned a care guide for {trimmed} ({normalized_locale}). "
+        "Check that an AI API key is configured and funded."
     )
-    return _mock_care_guide(trimmed, normalized_locale)

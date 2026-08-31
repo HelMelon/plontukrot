@@ -10,6 +10,7 @@ class GenusCareGuide {
   final String? soil;
   final String? humidity;
   final String? toxicity;
+  final double? minTempC;
 
   const GenusCareGuide({
     required this.genus,
@@ -20,6 +21,7 @@ class GenusCareGuide {
     this.soil,
     this.humidity,
     this.toxicity,
+    this.minTempC,
   });
 
   bool get isEmpty =>
@@ -43,6 +45,7 @@ class GenusCareGuide {
       soil: readString(data, 'soil')?.trim(),
       humidity: readString(data, 'humidity')?.trim(),
       toxicity: readString(data, 'toxicity')?.trim(),
+      minTempC: readDouble(data, 'min_temp_c') ?? readDouble(data, 'minTempC'),
     );
   }
 
@@ -56,6 +59,7 @@ class GenusCareGuide {
       if (soil != null) 'soil': soil,
       if (humidity != null) 'humidity': humidity,
       if (toxicity != null) 'toxicity': toxicity,
+      if (minTempC != null) 'min_temp_c': minTempC,
     };
   }
 }

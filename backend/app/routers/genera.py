@@ -33,7 +33,7 @@ def get_genus_care_guide(
         with get_pool().connection() as conn:
             row = conn.execute(
                 "SELECT genus, genus_name, origin, light, watering, fertilizing, "
-                "soil, humidity, toxicity FROM genus_care_guides "
+                "soil, humidity, toxicity, min_temp_c FROM genus_care_guides "
                 "WHERE genus = %s AND locale = %s",
                 (normalized_key, normalized_locale),
             ).fetchone()
@@ -48,6 +48,7 @@ def get_genus_care_guide(
                     soil=row.get("soil"),
                     humidity=row.get("humidity"),
                     toxicity=row.get("toxicity"),
+                    min_temp_c=row.get("min_temp_c"),
                 )
 
     # Generate via AI service
@@ -72,6 +73,7 @@ def get_genus_care_guide(
     soil = data.get("soil")
     humidity = data.get("humidity")
     toxicity = data.get("toxicity")
+    min_temp_c = data.get("min_temp_c")
 
     # Persist in DB cache for all users (per genus + locale)
     with get_pool().connection() as conn:
@@ -79,8 +81,8 @@ def get_genus_care_guide(
             """
             INSERT INTO genus_care_guides (
                 genus, locale, genus_name, origin, light, watering,
-                fertilizing, soil, humidity, toxicity, updated_at
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now())
+                fertilizing, soil, humidity, toxicity, min_temp_c, updated_at
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now())
             ON CONFLICT (genus, locale) DO UPDATE SET
                 genus_name = EXCLUDED.genus_name,
                 origin = EXCLUDED.origin,
@@ -90,6 +92,7 @@ def get_genus_care_guide(
                 soil = EXCLUDED.soil,
                 humidity = EXCLUDED.humidity,
                 toxicity = EXCLUDED.toxicity,
+                min_temp_c = EXCLUDED.min_temp_c,
                 updated_at = now()
             """,
             (
@@ -103,6 +106,7 @@ def get_genus_care_guide(
                 soil,
                 humidity,
                 toxicity,
+                min_temp_c,
             ),
         )
 
@@ -115,6 +119,7 @@ def get_genus_care_guide(
         soil=soil,
         humidity=humidity,
         toxicity=toxicity,
+        min_temp_c=min_temp_c,
     )
 
 
