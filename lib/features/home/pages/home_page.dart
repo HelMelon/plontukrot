@@ -23,6 +23,7 @@ import '../../plants/widgets/sheets/add_manipulation_sheet.dart';
 import '../../plants/widgets/sheets/add_note_sheet.dart';
 import '../../plants/widgets/sheets/add_repotting_sheet.dart';
 import '../../plants/widgets/sheets/merge_plant_sheet.dart';
+import '../../../services/api_refresh.dart';
 import '../../../services/manipulation_service.dart';
 import '../../../services/note_service.dart';
 import '../../../services/plant_service.dart';
@@ -408,16 +409,15 @@ class _HomePageState extends State<HomePage> {
         _sortField == _PlantSortField.plantFamily;
     final isMobile = crossAxisCount <= 2;
     final childAspectRatio = isMobile ? 0.45 : 0.625;
-    final double? mainAxisExtent;
-    if (isMobile) {
-      final screenWidth = MediaQuery.sizeOf(context).width;
-      final cellWidth =
-          (screenWidth - 2 * _spacing.lg - _spacing.sm * (crossAxisCount - 1)) /
-              crossAxisCount;
-      mainAxisExtent = PlantCard.mobileGridMainAxisExtent(context, cellWidth);
-    } else {
-      mainAxisExtent = null;
-    }
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final cellWidth =
+        (screenWidth - 2 * _spacing.lg - _spacing.sm * (crossAxisCount - 1)) /
+            crossAxisCount;
+    final mainAxisExtent = PlantCard.gridMainAxisExtent(
+      context,
+      cellWidth: cellWidth,
+      compactGrid: isMobile,
+    );
 
     return GridView.builder(
       shrinkWrap: true,
@@ -930,13 +930,16 @@ class _HomePageState extends State<HomePage> {
             );
           }
 
-          return SingleChildScrollView(
-            padding: spacing.allLg,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                StreamBuilder<List<Plant>>(
-                  stream: _plantsStream,
+          return RefreshIndicator(
+            onRefresh: () => ApiRefresh.instance.refresh(),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: spacing.allLg,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  StreamBuilder<List<Plant>>(
+                    stream: _plantsStream,
                   builder: (context, plantSnapshot) {
                     if (plantSnapshot.connectionState ==
                         ConnectionState.waiting) {
@@ -1452,6 +1455,7 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
               ],
+            ),
             ),
           );
         },

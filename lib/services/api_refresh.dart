@@ -1,19 +1,36 @@
 import 'dart:async';
 
-/// Broadcast ping after a mutating REST call so polling streams re-fetch.
+typedef ApiRefreshHandler = Future<void> Function();
+
+/// Triggers re-fetch for every active [restPollStream] listener.
+///
+/// [ping] is fire-and-forget (after mutating REST calls).
+/// [refresh] awaits registered fetches — use from [RefreshIndicator].
 class ApiRefresh {
   ApiRefresh._();
 
   static final ApiRefresh instance = ApiRefresh._();
 
-  final StreamController<void> _controller =
-      StreamController<void>.broadcast();
+  final Set<ApiRefreshHandler> _handlers = <ApiRefreshHandler>{};
 
-  Stream<void> get stream => _controller.stream;
+  void register(ApiRefreshHandler handler) {
+    _handlers.add(handler);
+  }
+
+  void unregister(ApiRefreshHandler handler) {
+    _handlers.remove(handler);
+  }
 
   void ping() {
-    if (!_controller.isClosed) {
-      _controller.add(null);
+    for (final handler in List<ApiRefreshHandler>.from(_handlers)) {
+      unawaited(handler());
     }
+  }
+
+  Future<void> refresh() async {
+    if (_handlers.isEmpty) return;
+    await Future.wait(
+      List<ApiRefreshHandler>.from(_handlers).map((handler) => handler()),
+    );
   }
 }
