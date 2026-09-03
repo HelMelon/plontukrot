@@ -47,16 +47,23 @@ class _ManageFertilizerIngredientsSheetState
     final name = await _promptName(title: l10n.fertilizingAddIngredient);
     if (name == null) return;
 
-    final existing = await _service.findIngredientByName(name);
-    if (existing != null) {
+    try {
+      final existing = await _service.findIngredientByName(name);
+      if (existing != null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.catalogItemAlreadyExists(name))),
+        );
+        return;
+      }
+
+      await _service.addIngredient(name: name);
+    } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.catalogItemAlreadyExists(name))),
+        SnackBar(content: Text(l10n.fertilizerIngredientsSaveError)),
       );
-      return;
     }
-
-    await _service.addIngredient(name: name);
   }
 
   Future<void> _edit(FertilizerIngredient ingredient) async {
@@ -67,20 +74,27 @@ class _ManageFertilizerIngredientsSheetState
     );
     if (name == null || name == ingredient.name) return;
 
-    final existing = await _service.findIngredientByName(name);
-    if (existing != null && existing.id != ingredient.id) {
+    try {
+      final existing = await _service.findIngredientByName(name);
+      if (existing != null && existing.id != ingredient.id) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.catalogItemAlreadyExists(name))),
+        );
+        return;
+      }
+
+      await _service.updateIngredient(
+        ingredientId: ingredient.id,
+        name: name,
+      );
+      widget.onRenamed?.call(ingredient.name, name);
+    } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.catalogItemAlreadyExists(name))),
+        SnackBar(content: Text(l10n.fertilizerIngredientsSaveError)),
       );
-      return;
     }
-
-    await _service.updateIngredient(
-      ingredientId: ingredient.id,
-      name: name,
-    );
-    widget.onRenamed?.call(ingredient.name, name);
   }
 
   Future<void> _delete(FertilizerIngredient ingredient) async {
@@ -107,8 +121,15 @@ class _ManageFertilizerIngredientsSheetState
     );
 
     if (confirmed != true) return;
-    await _service.deleteIngredient(ingredient.id);
-    widget.onDeleted?.call(ingredient.name);
+    try {
+      await _service.deleteIngredient(ingredient.id);
+      widget.onDeleted?.call(ingredient.name);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.fertilizerIngredientsSaveError)),
+      );
+    }
   }
 
   @override
@@ -150,7 +171,18 @@ class _ManageFertilizerIngredientsSheetState
                 stream: _service.getIngredients(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
-                    return Center(child: Text(snapshot.error.toString()));
+                    return Center(
+                      child: Padding(
+                        padding: spacing.allMd,
+                        child: Text(
+                          l10n.fertilizerIngredientsLoadError,
+                          textAlign: TextAlign.center,
+                          style: typography.bodyMedium.copyWith(
+                            color: context.colors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    );
                   }
                   if (!snapshot.hasData) {
                     return const Center(child: AccessibleProgressIndicator());

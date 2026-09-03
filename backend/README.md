@@ -42,7 +42,7 @@ backend/
 │       ├── plants.py         # plant CRUD
 │       ├── plant_care.py     # photos / notes / growth / care / manipulations
 │       ├── propagations.py   # propagation CRUD + notes + stage-history
-│       ├── catalogs.py       # fertilizers / soils / components / stimulators / wish-list / finance
+│       ├── catalogs.py       # fertilizers / soils / components / fertilizer-components / stimulators / wish-list / finance
 │       ├── social.py         # friends / friend-requests / gifts
 │       └── species.py        # global plant-species catalog
 ├── schema.sql                # 24-table Postgres schema

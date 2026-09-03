@@ -1,5 +1,5 @@
-"""Per-user catalog endpoints: fertilizers, soils, components, stimulators,
-wish-list, finance entries."""
+"""Per-user catalog endpoints: fertilizers, soils, soil components,
+fertilizer ingredients, stimulators, wish-list, finance entries."""
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -105,7 +105,7 @@ def delete_soil(soil_id: str, user_id: str = Depends(get_current_user_id)):
                      (soil_id, user_id))
 
 
-# ---- Components (shared) ----
+# ---- Soil components ----
 @router.get("/components", response_model=list[ComponentOut])
 def list_components(user_id: str = Depends(get_current_user_id)):
     with get_pool().connection() as conn:
@@ -133,12 +133,87 @@ def create_component(payload: ComponentCreate,
     return ComponentOut(**row)
 
 
+@router.patch("/components/{component_id}", response_model=ComponentOut)
+def update_component(component_id: str, payload: ComponentCreate,
+                     user_id: str = Depends(get_current_user_id)):
+    with get_pool().connection() as conn:
+        row = conn.execute(
+            "UPDATE components SET name = %s "
+            "WHERE id = %s AND user_id = %s "
+            "RETURNING id, name, created_at",
+            (payload.name, component_id, user_id),
+        ).fetchone()
+        if row is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Component not found")
+    return ComponentOut(**row)
+
+
 @router.delete("/components/{component_id}", status_code=204)
 def delete_component(component_id: str,
                      user_id: str = Depends(get_current_user_id)):
     with get_pool().connection() as conn:
         conn.execute("DELETE FROM components WHERE id = %s AND user_id = %s",
                      (component_id, user_id))
+
+
+# ---- Fertilizer ingredients ----
+@router.get("/fertilizer-components", response_model=list[ComponentOut])
+def list_fertilizer_components(user_id: str = Depends(get_current_user_id)):
+    with get_pool().connection() as conn:
+        rows = conn.execute(
+            "SELECT id, name, created_at FROM fertilizer_components "
+            "WHERE user_id = %s ORDER BY created_at",
+            (user_id,),
+        ).fetchall()
+    return [ComponentOut(**r) for r in rows]
+
+
+@router.post("/fertilizer-components", response_model=ComponentOut,
+             status_code=201)
+def create_fertilizer_component(payload: ComponentCreate,
+                                user_id: str = Depends(get_current_user_id)):
+    c_id = _make_id()
+    with get_pool().connection() as conn:
+        conn.execute(
+            "INSERT INTO fertilizer_components (id, user_id, name) "
+            "VALUES (%s, %s, %s)",
+            (c_id, user_id, payload.name),
+        )
+        row = conn.execute(
+            "SELECT id, name, created_at FROM fertilizer_components "
+            "WHERE id = %s",
+            (c_id,),
+        ).fetchone()
+    return ComponentOut(**row)
+
+
+@router.patch("/fertilizer-components/{component_id}",
+              response_model=ComponentOut)
+def update_fertilizer_component(component_id: str, payload: ComponentCreate,
+                                user_id: str = Depends(get_current_user_id)):
+    with get_pool().connection() as conn:
+        row = conn.execute(
+            "UPDATE fertilizer_components SET name = %s "
+            "WHERE id = %s AND user_id = %s "
+            "RETURNING id, name, created_at",
+            (payload.name, component_id, user_id),
+        ).fetchone()
+        if row is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Fertilizer component not found")
+    return ComponentOut(**row)
+
+
+@router.delete("/fertilizer-components/{component_id}", status_code=204)
+def delete_fertilizer_component(component_id: str,
+                                user_id: str = Depends(get_current_user_id)):
+    with get_pool().connection() as conn:
+        conn.execute(
+            "DELETE FROM fertilizer_components "
+            "WHERE id = %s AND user_id = %s",
+            (component_id, user_id),
+        )
 
 
 # ---- Stimulators ----

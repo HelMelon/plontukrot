@@ -102,7 +102,7 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
       _selectedDate = DateTime.now();
       _mode = _FertilizerMode.saved;
       _components = [];
-      _waterMl = 250;
+      _waterMl = 1000;
       _applicationMethod = FertilizerApplicationMethod.root;
     }
   }
@@ -644,7 +644,16 @@ class _AddFertilizingSheetState extends State<AddFertilizingSheet> {
                   stream: _service.getIngredients(),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
-                      return Text(snapshot.error.toString());
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: spacing.md),
+                        child: Text(
+                          l10n.fertilizerIngredientsLoadError,
+                          textAlign: TextAlign.center,
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.textSecondary,
+                          ),
+                        ),
+                      );
                     }
                     if (!snapshot.hasData) {
                       return Padding(

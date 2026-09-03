@@ -18,7 +18,7 @@ class FertilizeService {
   String? get uid => null;
 
   Future<List<FertilizerIngredient>> _fetchIngredients() async {
-    final list = jsonMapList(await _api.get('/components'));
+    final list = jsonMapList(await _api.get('/fertilizer-components'));
     return list
         .map((m) => FertilizerIngredient.fromMap(readString(m, 'id') ?? '', m))
         .toList();
@@ -53,7 +53,7 @@ class FertilizeService {
   }
 
   Future<String> addIngredient({required String name}) async {
-    final created = jsonMap(await _api.post('/components', body: {
+    final created = jsonMap(await _api.post('/fertilizer-components', body: {
       'name': name.trim(),
     }));
     return readString(created, 'id') ?? '';
@@ -64,7 +64,7 @@ class FertilizeService {
     required String name,
   }) async {
     try {
-      await _api.patch('/components/$ingredientId', body: {
+      await _api.patch('/fertilizer-components/$ingredientId', body: {
         'name': name.trim(),
       });
     } on ApiException catch (error) {
@@ -73,7 +73,7 @@ class FertilizeService {
   }
 
   Future<void> deleteIngredient(String ingredientId) async {
-    await _api.delete('/components/$ingredientId');
+    await _api.delete('/fertilizer-components/$ingredientId');
   }
 
   Stream<List<FertilizerIngredient>> getIngredients() {
@@ -97,7 +97,7 @@ class FertilizeService {
   Future<String> ensureFertilizer({
     required String name,
     FertilizerKind kind = FertilizerKind.mix,
-    int waterMl = 250,
+    int waterMl = 1000,
     List<FertilizerDose> components = const [],
   }) async {
     final existing = await findFertilizerByName(name);
@@ -113,7 +113,7 @@ class FertilizeService {
   Future<String> addFertilizer({
     required String name,
     FertilizerKind kind = FertilizerKind.mix,
-    int waterMl = 250,
+    int waterMl = 1000,
     List<FertilizerDose> components = const [],
   }) async {
     final created = jsonMap(await _api.post('/fertilizers', body: {
