@@ -103,6 +103,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get a11yFertilizingOverdue => 'Fertilizing overdue';
+
+  @override
+  String a11yFertilizingDue(String date) {
+    return 'Fertilizing was due: $date';
+  }
+
+  @override
   String a11yLastWatered(String date) {
     return 'Last watered: $date';
   }
@@ -888,6 +896,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Time to fertilize. Tap Accept when done.';
 
   @override
+  String get fertilizingReminderOverdueBody =>
+      'Fertilizing is overdue. Tap Accept when done.';
+
+  @override
   String get fertilizingReminderAccept => 'Accepted';
 
   @override
@@ -1312,6 +1324,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emptyIngredients => 'No ingredients yet';
+
+  @override
+  String get fertilizerIngredientsLoadError =>
+      'Couldn’t load fertilizing ingredients. Please try again later.';
+
+  @override
+  String get fertilizerIngredientsSaveError =>
+      'Couldn’t save the ingredient. Please try again later.';
 
   @override
   String get emptyComponents => 'No components yet';

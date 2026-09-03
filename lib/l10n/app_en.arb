@@ -64,6 +64,13 @@
       "date": {"type": "String"}
     }
   },
+  "a11yFertilizingOverdue": "Fertilizing overdue",
+  "a11yFertilizingDue": "Fertilizing was due: {date}",
+  "@a11yFertilizingDue": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
   "a11yLastWatered": "Last watered: {date}",
   "@a11yLastWatered": {
     "placeholders": {
@@ -421,6 +428,7 @@
     }
   },
   "fertilizingReminderDayBody": "Time to fertilize. Tap Accept when done.",
+  "fertilizingReminderOverdueBody": "Fertilizing is overdue. Tap Accept when done.",
   "fertilizingReminderAccept": "Accepted",
   "settingsFertilizingSeason": "Fertilizing season",
   "settingsSeasonNorthern": "Northern hemisphere (Apr–Sep active)",
@@ -617,6 +625,8 @@
   "componentNameHint": "Component name",
   "emptyFertilizers": "No fertilizers yet",
   "emptyIngredients": "No ingredients yet",
+  "fertilizerIngredientsLoadError": "Couldn’t load fertilizing ingredients. Please try again later.",
+  "fertilizerIngredientsSaveError": "Couldn’t save the ingredient. Please try again later.",
   "emptyComponents": "No components yet",
   "emptyComposition": "Composition is empty",
 

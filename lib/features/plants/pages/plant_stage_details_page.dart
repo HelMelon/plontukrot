@@ -92,17 +92,15 @@ class _PlantStageDetailsPageState extends State<PlantStageDetailsPage> {
               final crossAxisCount = _crossAxisCount(constraints.maxWidth);
               final isMobile = crossAxisCount <= 2;
               final childAspectRatio = isMobile ? 0.45 : 0.625;
-              final double? mainAxisExtent;
-              if (isMobile) {
-                final cellWidth = (constraints.maxWidth -
-                        spacing.md * 2 -
-                        spacing.sm * (crossAxisCount - 1)) /
-                    crossAxisCount;
-                mainAxisExtent =
-                    PlantCard.mobileGridMainAxisExtent(context, cellWidth);
-              } else {
-                mainAxisExtent = null;
-              }
+              final cellWidth = (constraints.maxWidth -
+                      spacing.md * 2 -
+                      spacing.sm * (crossAxisCount - 1)) /
+                  crossAxisCount;
+              final mainAxisExtent = PlantCard.gridMainAxisExtent(
+                context,
+                cellWidth: cellWidth,
+                compactGrid: isMobile,
+              );
 
               return GridView.builder(
                 padding: EdgeInsets.fromLTRB(

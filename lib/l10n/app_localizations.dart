@@ -264,6 +264,18 @@ abstract class AppLocalizations {
   /// **'Last fertilized: {date}'**
   String a11yLastFertilized(String date);
 
+  /// No description provided for @a11yFertilizingOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilizing overdue'**
+  String get a11yFertilizingOverdue;
+
+  /// No description provided for @a11yFertilizingDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilizing was due: {date}'**
+  String a11yFertilizingDue(String date);
+
   /// No description provided for @a11yLastWatered.
   ///
   /// In en, this message translates to:
@@ -1710,6 +1722,12 @@ abstract class AppLocalizations {
   /// **'Time to fertilize. Tap Accept when done.'**
   String get fertilizingReminderDayBody;
 
+  /// No description provided for @fertilizingReminderOverdueBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilizing is overdue. Tap Accept when done.'**
+  String get fertilizingReminderOverdueBody;
+
   /// No description provided for @fertilizingReminderAccept.
   ///
   /// In en, this message translates to:
@@ -2507,6 +2525,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No ingredients yet'**
   String get emptyIngredients;
+
+  /// No description provided for @fertilizerIngredientsLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn’t load fertilizing ingredients. Please try again later.'**
+  String get fertilizerIngredientsLoadError;
+
+  /// No description provided for @fertilizerIngredientsSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn’t save the ingredient. Please try again later.'**
+  String get fertilizerIngredientsSaveError;
 
   /// No description provided for @emptyComponents.
   ///

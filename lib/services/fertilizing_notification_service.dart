@@ -110,6 +110,7 @@ class FertilizingNotificationService {
       final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       final granted = await android?.requestNotificationsPermission();
+      await android?.requestExactAlarmsPermission();
       return granted ?? true;
     }
 
@@ -183,11 +184,20 @@ class FertilizingNotificationService {
           : l10n.fertilizingReminderDayTitleStage(
               l10n.fertilizingStageGenitive(plant.stage),
             );
+      final overdue = isFertilizingOverdue(
+        frequencyDays: frequency,
+        lastFertilizedAt: plant.lastFertilizedAt,
+        createdAt: plant.createdAt,
+        now: now,
+        isArchived: plant.isArchived,
+      );
       await _schedule(
         id: _dayNotificationId(plant.id),
         when: dayAt,
         title: dayTitle,
-        body: l10n.fertilizingReminderDayBody,
+        body: overdue
+            ? l10n.fertilizingReminderOverdueBody
+            : l10n.fertilizingReminderDayBody,
         acceptLabel: l10n.fertilizingReminderAccept,
         fullScreen: true,
         plantId: plant.id,

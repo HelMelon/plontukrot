@@ -103,6 +103,14 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get a11yFertilizingOverdue => 'Подкормка просрочена';
+
+  @override
+  String a11yFertilizingDue(String date) {
+    return 'Подкормка должна была быть: $date';
+  }
+
+  @override
   String a11yLastWatered(String date) {
     return 'Последний полив: $date';
   }
@@ -891,6 +899,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Сегодня день подкормки. Нажмите «Принято», когда выполните.';
 
   @override
+  String get fertilizingReminderOverdueBody =>
+      'Подкормка просрочена. Нажмите «Принято», когда выполните.';
+
+  @override
   String get fertilizingReminderAccept => 'Принято';
 
   @override
@@ -1316,6 +1328,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get emptyIngredients => 'Ингредиентов пока нет';
+
+  @override
+  String get fertilizerIngredientsLoadError =>
+      'Не удалось загрузить ингредиенты подкормки. Попробуйте позже.';
+
+  @override
+  String get fertilizerIngredientsSaveError =>
+      'Не удалось сохранить ингредиент. Попробуйте позже.';
 
   @override
   String get emptyComponents => 'Компонентов пока нет';

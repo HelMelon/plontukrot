@@ -64,6 +64,13 @@
       "date": {"type": "String"}
     }
   },
+  "a11yFertilizingOverdue": "Fertilisation en retard",
+  "a11yFertilizingDue": "Fertilisation due le : {date}",
+  "@a11yFertilizingDue": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
   "a11yLastWatered": "Dernier arrosage : {date}",
   "@a11yLastWatered": {
     "placeholders": {
@@ -361,6 +368,7 @@
     }
   },
   "fertilizingReminderDayBody": "C’est le jour de fertilisation. Appuyez sur « Accepté » une fois terminé.",
+  "fertilizingReminderOverdueBody": "Fertilisation en retard. Appuyez sur « Accepté » une fois terminé.",
   "fertilizingReminderAccept": "Accepté",
   "settingsFertilizingSeason": "Saison de fertilisation",
   "settingsSeasonNorthern": "Hémisphère nord (actif avr–sep)",
@@ -510,6 +518,8 @@
   "componentNameHint": "Nom du composant",
   "emptyFertilizers": "Aucun engrais pour le moment",
   "emptyIngredients": "Aucun ingrédient pour le moment",
+  "fertilizerIngredientsLoadError": "Impossible de charger les ingrédients d’engrais. Réessayez plus tard.",
+  "fertilizerIngredientsSaveError": "Impossible d’enregistrer l’ingrédient. Réessayez plus tard.",
   "emptyComponents": "Aucun composant pour le moment",
   "emptyComposition": "La composition est vide",
 

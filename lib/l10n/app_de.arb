@@ -64,6 +64,13 @@
       "date": {"type": "String"}
     }
   },
+  "a11yFertilizingOverdue": "Düngung überfällig",
+  "a11yFertilizingDue": "Düngung fällig war: {date}",
+  "@a11yFertilizingDue": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
   "a11yLastWatered": "Zuletzt gegossen: {date}",
   "@a11yLastWatered": {
     "placeholders": {
@@ -361,6 +368,7 @@
     }
   },
   "fertilizingReminderDayBody": "Heute ist Düngungstag. Tippen Sie auf «Akzeptiert», wenn erledigt.",
+  "fertilizingReminderOverdueBody": "Düngung überfällig. Tippen Sie auf «Akzeptiert», wenn erledigt.",
   "fertilizingReminderAccept": "Akzeptiert",
   "settingsFertilizingSeason": "Düngungssaison",
   "settingsSeasonNorthern": "Nördliche Hemisphäre (aktiv Apr–Sep)",
@@ -510,6 +518,8 @@
   "componentNameHint": "Name der Komponente",
   "emptyFertilizers": "Noch keine Dünger",
   "emptyIngredients": "Noch keine Inhaltsstoffe",
+  "fertilizerIngredientsLoadError": "Dünge-Inhaltsstoffe konnten nicht geladen werden. Bitte später erneut versuchen.",
+  "fertilizerIngredientsSaveError": "Inhaltsstoff konnte nicht gespeichert werden. Bitte später erneut versuchen.",
   "emptyComponents": "Noch keine Komponenten",
   "emptyComposition": "Zusammensetzung ist leer",
 

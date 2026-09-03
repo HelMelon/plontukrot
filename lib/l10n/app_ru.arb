@@ -64,6 +64,13 @@
       "date": {"type": "String"}
     }
   },
+  "a11yFertilizingOverdue": "Подкормка просрочена",
+  "a11yFertilizingDue": "Подкормка должна была быть: {date}",
+  "@a11yFertilizingDue": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
   "a11yLastWatered": "Последний полив: {date}",
   "@a11yLastWatered": {
     "placeholders": {
@@ -361,6 +368,7 @@
     }
   },
   "fertilizingReminderDayBody": "Сегодня день подкормки. Нажмите «Принято», когда выполните.",
+  "fertilizingReminderOverdueBody": "Подкормка просрочена. Нажмите «Принято», когда выполните.",
   "fertilizingReminderAccept": "Принято",
   "settingsFertilizingSeason": "Сезон подкормки",
   "settingsSeasonNorthern": "Северное полушарие (активный апр–сен)",
@@ -510,6 +518,8 @@
   "componentNameHint": "Название компонента",
   "emptyFertilizers": "Удобрений пока нет",
   "emptyIngredients": "Ингредиентов пока нет",
+  "fertilizerIngredientsLoadError": "Не удалось загрузить ингредиенты подкормки. Попробуйте позже.",
+  "fertilizerIngredientsSaveError": "Не удалось сохранить ингредиент. Попробуйте позже.",
   "emptyComponents": "Компонентов пока нет",
   "emptyComposition": "Состав пуст",
 

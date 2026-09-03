@@ -56,6 +56,9 @@ int? resolveFertilizingFrequencyDays({
   );
 }
 
+DateTime _dateOnly(DateTime value) =>
+    DateTime(value.year, value.month, value.day);
+
 /// Next calendar date when fertilizing is due.
 ///
 /// [anchor] is [lastFertilizedAt] when present, otherwise [createdAt] or [now].
@@ -68,8 +71,29 @@ DateTime? nextFertilizingDate({
   if (frequencyDays == null || frequencyDays <= 0) return null;
   final clock = now ?? DateTime.now();
   final anchor = lastFertilizedAt ?? createdAt ?? clock;
-  final anchorDay = DateTime(anchor.year, anchor.month, anchor.day);
+  final anchorDay = _dateOnly(anchor);
   return anchorDay.add(Duration(days: frequencyDays));
+}
+
+/// Whether fertilizing is due today or past due (until recorded again).
+bool isFertilizingOverdue({
+  required int? frequencyDays,
+  DateTime? lastFertilizedAt,
+  DateTime? createdAt,
+  DateTime? now,
+  bool isArchived = false,
+}) {
+  if (isArchived) return false;
+  if (!isFertilizingActive(frequencyDays)) return false;
+  final next = nextFertilizingDate(
+    frequencyDays: frequencyDays,
+    lastFertilizedAt: lastFertilizedAt,
+    createdAt: createdAt,
+    now: now,
+  );
+  if (next == null) return false;
+  final clock = now ?? DateTime.now();
+  return !_dateOnly(next).isAfter(_dateOnly(clock));
 }
 
 /// Evening reminder (day before feeding) at 19:00 local time.
@@ -94,6 +118,8 @@ DateTime? fertilizingEveNotificationAt({
 }
 
 /// Feeding-day confirmation at 08:00 local time.
+///
+/// When due today or overdue, schedules 08:00 today or soon after [now].
 DateTime? fertilizingDayNotificationAt({
   required int? frequencyDays,
   DateTime? lastFertilizedAt,
@@ -107,8 +133,17 @@ DateTime? fertilizingDayNotificationAt({
     now: now,
   );
   if (next == null) return null;
-  final scheduled = DateTime(next.year, next.month, next.day, 8);
   final clock = now ?? DateTime.now();
+  final today = _dateOnly(clock);
+  final nextDay = _dateOnly(next);
+
+  if (!nextDay.isAfter(today)) {
+    final todayAt8 = DateTime(today.year, today.month, today.day, 8);
+    if (clock.isBefore(todayAt8)) return todayAt8;
+    return clock.add(const Duration(seconds: 5));
+  }
+
+  final scheduled = DateTime(next.year, next.month, next.day, 8);
   if (!scheduled.isAfter(clock)) return null;
   return scheduled;
 }

@@ -98,17 +98,15 @@ class _FriendCollectionPageState extends State<FriendCollectionPage> {
               final crossAxisCount = screenWidth >= 700 ? 3 : 2;
               final isMobile = crossAxisCount <= 2;
               final childAspectRatio = isMobile ? 0.45 : 0.625;
-              final double? mainAxisExtent;
-              if (isMobile) {
-                final cellWidth = (screenWidth -
-                        spacing.md * 2 -
-                        spacing.md * (crossAxisCount - 1)) /
-                    crossAxisCount;
-                mainAxisExtent =
-                    PlantCard.mobileGridMainAxisExtent(context, cellWidth);
-              } else {
-                mainAxisExtent = null;
-              }
+              final cellWidth = (screenWidth -
+                      spacing.md * 2 -
+                      spacing.md * (crossAxisCount - 1)) /
+                  crossAxisCount;
+              final mainAxisExtent = PlantCard.gridMainAxisExtent(
+                context,
+                cellWidth: cellWidth,
+                compactGrid: isMobile,
+              );
 
               return GridView.builder(
                 padding: EdgeInsets.all(spacing.md),

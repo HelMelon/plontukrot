@@ -5,6 +5,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
 import '../../../../core/widgets/focusable_tap.dart';
+import '../../../../models/fertilizing_frequency.dart';
 import '../../../../models/plant.dart';
 import '../../pages/plant_details_page.dart';
 import '../common/plant_image.dart';
@@ -41,6 +42,25 @@ class PlantCard extends StatelessWidget {
   });
 
   static const double _mobileDividerHeight = 16;
+
+  static bool isLandscape(BuildContext context) {
+    return MediaQuery.orientationOf(context) == Orientation.landscape;
+  }
+
+  /// Grid cell height: compact mobile layout, or wide layout in landscape.
+  static double? gridMainAxisExtent(
+    BuildContext context, {
+    required double cellWidth,
+    required bool compactGrid,
+  }) {
+    if (compactGrid) {
+      return mobileGridMainAxisExtent(context, cellWidth);
+    }
+    if (isLandscape(context)) {
+      return cellWidth + _wideLandscapeFooterHeight(context);
+    }
+    return null;
+  }
 
   /// Mobile grid cell height: square photo + text (2+2 lines) + care stats.
   static double mobileGridMainAxisExtent(
@@ -111,6 +131,25 @@ class PlantCard extends StatelessWidget {
     return _mobileDividerHeight + statRowHeight * 3 + spacing.xxs * 2;
   }
 
+  static double _wideLandscapeFooterHeight(BuildContext context) {
+    final spacing = context.spacing;
+    final typography = context.typography;
+    final titleHeight = _twoLineBlockHeight(
+      typography.bodyEmphasis.copyWith(
+        fontWeight: FontWeight.bold,
+        height: 1.2,
+      ),
+    );
+    final subtitleHeight = _twoLineBlockHeight(
+      typography.bodySmall.copyWith(height: 1.2),
+    );
+    return spacing.sm * 2 +
+        titleHeight +
+        spacing.xxs +
+        subtitleHeight +
+        _mobileStatsBlockHeight(context);
+  }
+
   static double _statRowHeight(BuildContext context) {
     final typography = context.typography;
     final dimensions = context.dimensions;
@@ -139,10 +178,27 @@ class PlantCard extends StatelessWidget {
     final fullUrl = plant.imageUrl?.trim();
     final hasImage = imageUrl != null;
     final isMobile = MediaQuery.sizeOf(context).width < 600;
+    final useColumnStats = isMobile || isLandscape(context);
     final emptyDate = l10n.profileEmDash;
     final fertilizedLabel = _dateLabel(plant.lastFertilizedAt, emptyDate);
     final wateredLabel = _dateLabel(plant.lastWateredAt, emptyDate);
     final batchesLabel = '$propagationBatchCount';
+    final fertilizingOverdue = isFertilizingOverdue(
+      frequencyDays: plant.fertilizingFrequencyDays,
+      lastFertilizedAt: plant.lastFertilizedAt,
+      createdAt: plant.createdAt,
+      isArchived: plant.isArchived,
+    );
+    final fertilizingDueAt = fertilizingOverdue
+        ? nextFertilizingDate(
+            frequencyDays: plant.fertilizingFrequencyDays,
+            lastFertilizedAt: plant.lastFertilizedAt,
+            createdAt: plant.createdAt,
+          )
+        : null;
+    final fertilizingStatLabel = fertilizingOverdue && fertilizingDueAt != null
+        ? _dateLabel(fertilizingDueAt, emptyDate)
+        : fertilizedLabel;
 
     final speciesBase =
         (plant.species.isEmpty ? l10n.commonUntitled : plant.species)
@@ -163,7 +219,10 @@ class PlantCard extends StatelessWidget {
     final semanticsLabel = [
       if (hasNickname) nickname,
       species,
-      l10n.a11yLastFertilized(fertilizedLabel),
+      if (fertilizingOverdue && fertilizingDueAt != null)
+        l10n.a11yFertilizingDue(_dateLabel(fertilizingDueAt, emptyDate))
+      else
+        l10n.a11yLastFertilized(fertilizedLabel),
       l10n.a11yLastWatered(wateredLabel),
       l10n.a11yPropagationBatches(propagationBatchCount),
     ].join('. ');
@@ -260,35 +319,12 @@ class PlantCard extends StatelessWidget {
                                     thickness: 1,
                                   ),
                                   ExcludeSemantics(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          height: _statRowHeight(context),
-                                          child: _StatChip(
-                                            icon: context.icons.fertilizing,
-                                            label: fertilizedLabel,
-                                          ),
-                                        ),
-                                        spacing.vXxs,
-                                        SizedBox(
-                                          height: _statRowHeight(context),
-                                          child: _StatChip(
-                                            icon: context.icons.watering,
-                                            label: wateredLabel,
-                                          ),
-                                        ),
-                                        spacing.vXxs,
-                                        SizedBox(
-                                          height: _statRowHeight(context),
-                                          child: _StatChip(
-                                            hugeIcon:
-                                                context.icons.propagations,
-                                            label: batchesLabel,
-                                          ),
-                                        ),
-                                      ],
+                                    child: _buildStatsColumn(
+                                      context,
+                                      fertilizingStatLabel: fertilizingStatLabel,
+                                      wateredLabel: wateredLabel,
+                                      batchesLabel: batchesLabel,
+                                      fertilizingOverdue: fertilizingOverdue,
                                     ),
                                   ),
                                 ],
@@ -339,33 +375,55 @@ class PlantCard extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Divider(color: colors.primary, thickness: 1),
+                                  Divider(
+                                    height: useColumnStats
+                                        ? _mobileDividerHeight
+                                        : null,
+                                    color: colors.primary,
+                                    thickness: 1,
+                                  ),
                                   ExcludeSemantics(
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: _StatChip(
-                                            icon: context.icons.fertilizing,
-                                            label: fertilizedLabel,
+                                    child: useColumnStats
+                                        ? _buildStatsColumn(
+                                            context,
+                                            fertilizingStatLabel:
+                                                fertilizingStatLabel,
+                                            wateredLabel: wateredLabel,
+                                            batchesLabel: batchesLabel,
+                                            fertilizingOverdue:
+                                                fertilizingOverdue,
+                                          )
+                                        : Row(
+                                            children: [
+                                              Expanded(
+                                                child: _StatChip(
+                                                  icon: context.icons.fertilizing,
+                                                  label: fertilizingStatLabel,
+                                                  iconColor: fertilizingOverdue
+                                                      ? colors.error
+                                                      : null,
+                                                  labelColor: fertilizingOverdue
+                                                      ? colors.error
+                                                      : null,
+                                                ),
+                                              ),
+                                              spacing.hXxs,
+                                              Expanded(
+                                                child: _StatChip(
+                                                  icon: context.icons.watering,
+                                                  label: wateredLabel,
+                                                ),
+                                              ),
+                                              spacing.hXxs,
+                                              Expanded(
+                                                child: _StatChip(
+                                                  hugeIcon:
+                                                      context.icons.propagations,
+                                                  label: batchesLabel,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                        spacing.hXxs,
-                                        Expanded(
-                                          child: _StatChip(
-                                            icon: context.icons.watering,
-                                            label: wateredLabel,
-                                          ),
-                                        ),
-                                        spacing.hXxs,
-                                        Expanded(
-                                          child: _StatChip(
-                                            hugeIcon:
-                                                context.icons.propagations,
-                                            label: batchesLabel,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
                                   ),
                                 ],
                               ),
@@ -376,6 +434,21 @@ class PlantCard extends StatelessWidget {
                   ],
                 ),
               ),
+              if (fertilizingOverdue)
+                Positioned(
+                  top: isSelected ? null : spacing.xs,
+                  bottom: isSelected ? spacing.xs : null,
+                  right: spacing.xs,
+                  child: ExcludeSemantics(
+                    child: _FertilizingOverdueBadge(
+                      tooltip: fertilizingDueAt != null
+                          ? l10n.a11yFertilizingDue(
+                              _dateLabel(fertilizingDueAt, emptyDate),
+                            )
+                          : l10n.a11yFertilizingOverdue,
+                    ),
+                  ),
+                ),
               if (isSelected)
                 Positioned(
                   top: spacing.xs,
@@ -406,17 +479,64 @@ class PlantCard extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildStatsColumn(
+    BuildContext context, {
+    required String fertilizingStatLabel,
+    required String wateredLabel,
+    required String batchesLabel,
+    required bool fertilizingOverdue,
+  }) {
+    final spacing = context.spacing;
+    final statRowHeight = _statRowHeight(context);
+    final colors = context.colors;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: statRowHeight,
+          child: _StatChip(
+            icon: context.icons.fertilizing,
+            label: fertilizingStatLabel,
+            iconColor: fertilizingOverdue ? colors.error : null,
+            labelColor: fertilizingOverdue ? colors.error : null,
+          ),
+        ),
+        spacing.vXxs,
+        SizedBox(
+          height: statRowHeight,
+          child: _StatChip(
+            icon: context.icons.watering,
+            label: wateredLabel,
+          ),
+        ),
+        spacing.vXxs,
+        SizedBox(
+          height: statRowHeight,
+          child: _StatChip(
+            hugeIcon: context.icons.propagations,
+            label: batchesLabel,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _StatChip extends StatelessWidget {
   final IconData? icon;
   final List<List<dynamic>>? hugeIcon;
   final String label;
+  final Color? iconColor;
+  final Color? labelColor;
 
   const _StatChip({
     this.icon,
     this.hugeIcon,
     required this.label,
+    this.iconColor,
+    this.labelColor,
   });
 
   @override
@@ -425,9 +545,10 @@ class _StatChip extends StatelessWidget {
     final spacing = context.spacing;
     final typography = context.typography;
     final iconSize = context.dimensions.iconSm;
+    final resolvedIconColor = iconColor ?? colors.icon;
     final Widget leading;
     if (icon != null) {
-      leading = Icon(icon, size: iconSize, color: colors.icon);
+      leading = Icon(icon, size: iconSize, color: resolvedIconColor);
     } else {
       leading = HugeIcon(
         icon: hugeIcon!,
@@ -446,12 +567,40 @@ class _StatChip extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: typography.caption.copyWith(
-              color: colors.textSecondary,
+              color: labelColor ?? colors.textSecondary,
               height: 1.1,
             ),
           ),
         ),
       ],
+    );
+  }
+}
+
+class _FertilizingOverdueBadge extends StatelessWidget {
+  final String tooltip;
+
+  const _FertilizingOverdueBadge({required this.tooltip});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final dimensions = context.dimensions;
+    return Tooltip(
+      message: tooltip,
+      child: Container(
+        padding: EdgeInsets.all(context.spacing.xxs),
+        decoration: BoxDecoration(
+          color: colors.error,
+          shape: BoxShape.circle,
+          boxShadow: context.shadows.card,
+        ),
+        child: Icon(
+          context.icons.fertilizing,
+          size: dimensions.iconMd,
+          color: colors.onPrimary,
+        ),
+      ),
     );
   }
 }

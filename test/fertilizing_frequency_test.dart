@@ -165,17 +165,103 @@ void main() {
       );
     });
 
-    test('past notifications are not returned', () {
+    test('missed due date schedules soon after now', () {
       final now = DateTime(2026, 4, 25, 9);
       final last = DateTime(2026, 4, 10);
+      final scheduled = fertilizingDayNotificationAt(
+        frequencyDays: frequency,
+        lastFertilizedAt: last,
+        createdAt: created,
+        now: now,
+      );
+      expect(scheduled, isNotNull);
+      expect(scheduled!.isAfter(now), isTrue);
+    });
+
+    test('overdue day notification schedules soon after now', () {
+      final now = DateTime(2026, 9, 2, 11, 18);
+      final last = DateTime(2026, 8, 16);
+      final scheduled = fertilizingDayNotificationAt(
+        frequencyDays: 14,
+        lastFertilizedAt: last,
+        now: now,
+      );
+      expect(scheduled, isNotNull);
+      expect(scheduled!.isAfter(now), isTrue);
+      expect(
+        scheduled.difference(now).inSeconds,
+        lessThanOrEqualTo(5),
+      );
+    });
+
+    test('due today before 08:00 schedules at 08:00', () {
+      final now = DateTime(2026, 8, 30, 6);
+      final last = DateTime(2026, 8, 16);
       expect(
         fertilizingDayNotificationAt(
-          frequencyDays: frequency,
+          frequencyDays: 14,
           lastFertilizedAt: last,
-          createdAt: created,
           now: now,
         ),
-        isNull,
+        DateTime(2026, 8, 30, 8),
+      );
+    });
+  });
+
+  group('isFertilizingOverdue', () {
+    test('true when due date is before today', () {
+      expect(
+        isFertilizingOverdue(
+          frequencyDays: 14,
+          lastFertilizedAt: DateTime(2026, 8, 16),
+          now: DateTime(2026, 9, 2),
+        ),
+        isTrue,
+      );
+    });
+
+    test('true on due day', () {
+      expect(
+        isFertilizingOverdue(
+          frequencyDays: 14,
+          lastFertilizedAt: DateTime(2026, 8, 16),
+          now: DateTime(2026, 8, 30, 6),
+        ),
+        isTrue,
+      );
+    });
+
+    test('false before due day', () {
+      expect(
+        isFertilizingOverdue(
+          frequencyDays: 14,
+          lastFertilizedAt: DateTime(2026, 8, 16),
+          now: DateTime(2026, 8, 29),
+        ),
+        isFalse,
+      );
+    });
+
+    test('false when fertilizing is stopped', () {
+      expect(
+        isFertilizingOverdue(
+          frequencyDays: fertilizingFrequencyStop,
+          lastFertilizedAt: DateTime(2026, 8, 16),
+          now: DateTime(2026, 9, 2),
+        ),
+        isFalse,
+      );
+    });
+
+    test('false when archived', () {
+      expect(
+        isFertilizingOverdue(
+          frequencyDays: 14,
+          lastFertilizedAt: DateTime(2026, 8, 16),
+          now: DateTime(2026, 9, 2),
+          isArchived: true,
+        ),
+        isFalse,
       );
     });
   });

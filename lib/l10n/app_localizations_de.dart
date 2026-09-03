@@ -103,6 +103,14 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get a11yFertilizingOverdue => 'Düngung überfällig';
+
+  @override
+  String a11yFertilizingDue(String date) {
+    return 'Düngung fällig war: $date';
+  }
+
+  @override
   String a11yLastWatered(String date) {
     return 'Zuletzt gegossen: $date';
   }
@@ -895,6 +903,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Heute ist Düngungstag. Tippen Sie auf «Akzeptiert», wenn erledigt.';
 
   @override
+  String get fertilizingReminderOverdueBody =>
+      'Düngung überfällig. Tippen Sie auf «Akzeptiert», wenn erledigt.';
+
+  @override
   String get fertilizingReminderAccept => 'Akzeptiert';
 
   @override
@@ -1321,6 +1333,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get emptyIngredients => 'Noch keine Inhaltsstoffe';
+
+  @override
+  String get fertilizerIngredientsLoadError =>
+      'Dünge-Inhaltsstoffe konnten nicht geladen werden. Bitte später erneut versuchen.';
+
+  @override
+  String get fertilizerIngredientsSaveError =>
+      'Inhaltsstoff konnte nicht gespeichert werden. Bitte später erneut versuchen.';
 
   @override
   String get emptyComponents => 'Noch keine Komponenten';
