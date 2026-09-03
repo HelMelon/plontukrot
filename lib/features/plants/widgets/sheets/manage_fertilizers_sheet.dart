@@ -261,7 +261,7 @@ class _FertilizerFormDialog extends StatefulWidget {
     required this.confirmLabel,
     this.initialName = '',
     this.initialKind = FertilizerKind.purchased,
-    this.initialWaterMl = 250,
+    this.initialWaterMl = 1000,
     this.initialComponents = const [],
   });
 
@@ -287,7 +287,7 @@ class _FertilizerFormDialogState extends State<_FertilizerFormDialog> {
     final firstDose = widget.initialComponents.isNotEmpty
         ? widget.initialComponents.first
         : null;
-    _doseUnit = firstDose?.unit ?? FertilizerDoseUnit.g;
+    _doseUnit = firstDose?.unit ?? FertilizerDoseUnit.ml;
     _doseController = TextEditingController(
       text: firstDose == null
           ? ''

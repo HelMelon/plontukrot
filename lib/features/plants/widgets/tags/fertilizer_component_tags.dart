@@ -44,7 +44,7 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
   void initState() {
     super.initState();
     final initial = widget.initial;
-    _unit = initial?.unit ?? FertilizerDoseUnit.g;
+    _unit = initial?.unit ?? FertilizerDoseUnit.ml;
     _amountController = TextEditingController(
       text: initial == null
           ? ''
@@ -128,14 +128,6 @@ class _FertilizerDoseDialogState extends State<_FertilizerDoseDialog> {
               ],
               onChanged: (value) {
                 if (_errorText != null) setState(() => _errorText = null);
-                // After typing 0, append a decimal point so doses like 0.5
-                // are easy to enter without switching to the punctuation key.
-                if (value == '0') {
-                  _amountController.value = const TextEditingValue(
-                    text: '0.',
-                    selection: TextSelection.collapsed(offset: 2),
-                  );
-                }
               },
               onSubmitted: (_) => _save(),
               decoration: InputDecoration(

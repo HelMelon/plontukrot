@@ -9,7 +9,7 @@ FertilizerDoseUnit parseFertilizerDoseUnit(String? raw) {
 
 int normalizeWaterMl(int? raw) {
   if (raw != null && kWaterVolumesMl.contains(raw)) return raw;
-  return 250;
+  return 1000;
 }
 
 class FertilizerDose {
@@ -20,7 +20,7 @@ class FertilizerDose {
   const FertilizerDose({
     required this.component,
     required this.amount,
-    this.unit = FertilizerDoseUnit.g,
+    this.unit = FertilizerDoseUnit.ml,
   });
 
   double get grams => amount;

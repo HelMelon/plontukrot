@@ -25,7 +25,7 @@ class Fertilizer {
     required this.name,
     this.kind = FertilizerKind.mix,
     this.createdAt,
-    this.waterMl = 250,
+    this.waterMl = 1000,
     this.components = const [],
   });
 

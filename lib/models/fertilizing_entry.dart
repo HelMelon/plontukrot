@@ -18,7 +18,7 @@ class FertilizingEntry {
     required this.fertilizerName,
     required this.appliedAt,
     this.nextFertilizing,
-    this.waterMl = 250,
+    this.waterMl = 1000,
     this.components = const [],
     this.applicationMethod = FertilizerApplicationMethod.root,
   });
