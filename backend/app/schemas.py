@@ -204,6 +204,16 @@ class FertilizingCreate(BaseModel):
     next_fertilizing: Optional[datetime] = None
 
 
+class FertilizingUpdate(BaseModel):
+    fertilizer_id: Optional[str] = None
+    fertilizer_name: Optional[str] = None
+    application_method: Optional[str] = None
+    components: Optional[list] = None
+    water_ml: Optional[int] = None
+    applied_at: Optional[datetime] = None
+    next_fertilizing: Optional[datetime] = None
+
+
 class FertilizingOut(BaseModel):
     id: str
     plant_id: str

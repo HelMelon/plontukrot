@@ -11,6 +11,7 @@ from ..routers.auth import get_current_user_id
 from ..schemas import (
     FertilizingCreate,
     FertilizingOut,
+    FertilizingUpdate,
     GrowthEventCreate,
     GrowthEventOut,
     ManipulationCreate,
@@ -282,6 +283,77 @@ def add_fertilizing(plant_id: str, payload: FertilizingCreate,
             (f_id,),
         ).fetchone()
     return FertilizingOut(**row)
+
+
+@router.patch("/fertilizings/{fertilizing_id}", response_model=FertilizingOut)
+def update_fertilizing(
+    plant_id: str,
+    fertilizing_id: str,
+    payload: FertilizingUpdate,
+    user_id: str = Depends(get_current_user_id),
+):
+    _ensure_owned(plant_id, user_id)
+    data = payload.model_dump(exclude_unset=True)
+    fields = []
+    values = []
+    for key, val in data.items():
+        fields.append(f"{key} = %s")
+        if key == "components":
+            values.append(jsonb(val))
+        else:
+            values.append(val)
+
+    with get_pool().connection() as conn:
+        existing = conn.execute(
+            "SELECT id FROM plant_fertilizings WHERE id = %s AND plant_id = %s",
+            (fertilizing_id, plant_id),
+        ).fetchone()
+        if not existing:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Fertilizing not found",
+            )
+        if fields:
+            values.extend([fertilizing_id, plant_id])
+            conn.execute(
+                f"UPDATE plant_fertilizings SET {', '.join(fields)} "
+                "WHERE id = %s AND plant_id = %s",
+                tuple(values),
+            )
+            conn.execute(
+                "UPDATE plants SET last_fertilized_at = "
+                "(SELECT MAX(applied_at) FROM plant_fertilizings "
+                "WHERE plant_id = %s) WHERE id = %s",
+                (plant_id, plant_id),
+            )
+        row = conn.execute(
+            "SELECT id, plant_id, fertilizer_id, fertilizer_name, "
+            "application_method, components, water_ml, applied_at, "
+            "next_fertilizing, created_at FROM plant_fertilizings WHERE id=%s",
+            (fertilizing_id,),
+        ).fetchone()
+    return FertilizingOut(**row)
+
+
+@router.delete("/fertilizings/{fertilizing_id}", status_code=204)
+def delete_fertilizing(
+    plant_id: str,
+    fertilizing_id: str,
+    user_id: str = Depends(get_current_user_id),
+):
+    _ensure_owned(plant_id, user_id)
+    with get_pool().connection() as conn:
+        conn.execute(
+            "DELETE FROM plant_fertilizings WHERE id = %s AND plant_id = %s",
+            (fertilizing_id, plant_id),
+        )
+        conn.execute(
+            "UPDATE plants SET last_fertilized_at = "
+            "(SELECT MAX(applied_at) FROM plant_fertilizings "
+            "WHERE plant_id = %s) WHERE id = %s",
+            (plant_id, plant_id),
+        )
+    return None
 
 
 # ---- Repotting ----
