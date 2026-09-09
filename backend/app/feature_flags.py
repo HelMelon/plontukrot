@@ -1,7 +1,8 @@
 """Server-resolved feature flags (no client persistence).
 
-Flags are toggled on the server via env JSON and optional per-user overrides.
-The Flutter app only reads `GET /features` into memory.
+Flags are toggled on the server via env JSON, optional per-user env
+overrides, and DB per-user overrides (profile admin). The Flutter app
+only reads `GET /features` into memory.
 """
 from __future__ import annotations
 
@@ -11,6 +12,7 @@ from typing import Callable
 
 from fastapi import Depends, HTTPException, status
 
+from .db import get_pool, jsonb
 from .owner_iot import OWNER_IOT_USER_ID, is_owner_iot_user
 from .routers.auth import get_current_user_id
 
@@ -100,6 +102,58 @@ def _parse_user_overrides(raw: str | None) -> dict[str, dict[str, bool]]:
     return out
 
 
+def _normalize_flag_map(data: object) -> dict[str, bool]:
+    if not isinstance(data, dict):
+        return {}
+    out: dict[str, bool] = {}
+    for key, value in data.items():
+        if key in ALL_FLAGS:
+            out[key] = bool(value)
+    return out
+
+
+def get_db_overrides(user_id: str) -> dict[str, bool]:
+    """Load persisted per-user flag overrides from PostgreSQL."""
+    try:
+        with get_pool().connection() as conn:
+            row = conn.execute(
+                "SELECT flags FROM user_feature_flag_overrides "
+                "WHERE user_id = %s",
+                (user_id,),
+            ).fetchone()
+    except Exception:
+        return {}
+    if row is None:
+        return {}
+    flags = row.get("flags")
+    if isinstance(flags, str):
+        try:
+            flags = json.loads(flags)
+        except json.JSONDecodeError:
+            return {}
+    return _normalize_flag_map(flags)
+
+
+def upsert_db_overrides(user_id: str, patch: dict[str, bool]) -> dict[str, bool]:
+    """Merge ``patch`` into the user's DB overrides and return the stored map."""
+    normalized = _normalize_flag_map(patch)
+    if not normalized:
+        return get_db_overrides(user_id)
+
+    current = get_db_overrides(user_id)
+    current.update(normalized)
+
+    with get_pool().connection() as conn:
+        conn.execute(
+            "INSERT INTO user_feature_flag_overrides (user_id, flags, updated_at) "
+            "VALUES (%s, %s::jsonb, now()) "
+            "ON CONFLICT (user_id) DO UPDATE SET "
+            "flags = EXCLUDED.flags, updated_at = now()",
+            (user_id, jsonb(current)),
+        )
+    return current
+
+
 def resolve_feature_flags(user_id: str) -> dict[str, bool]:
     """Resolve effective flags for a user.
 
@@ -107,24 +161,27 @@ def resolve_feature_flags(user_id: str) -> dict[str, bool]:
     1. Code defaults
     2. Global ``FEATURE_FLAGS`` JSON env
     3. Legacy owner IoT allowlist for unset IoT flags
-    4. Per-user ``FEATURE_FLAG_USER_OVERRIDES`` JSON env (highest priority)
+    4. Per-user ``FEATURE_FLAG_USER_OVERRIDES`` JSON env
+    5. DB per-user overrides (highest priority)
     """
     global_env = _parse_bool_map(os.environ.get("FEATURE_FLAGS"))
     user_map = _parse_user_overrides(
         os.environ.get("FEATURE_FLAG_USER_OVERRIDES")
     )
     user_env = user_map.get(user_id, {})
+    db_overrides = get_db_overrides(user_id)
 
     result = dict(_DEFAULTS)
     result.update(global_env)
 
-    explicit = set(global_env) | set(user_env)
+    explicit = set(global_env) | set(user_env) | set(db_overrides)
     if is_owner_iot_user(user_id):
         for flag in _IOT_FLAGS:
             if flag not in explicit:
                 result[flag] = True
 
     result.update(user_env)
+    result.update(db_overrides)
     return {key: bool(result[key]) for key in ALL_FLAGS}
 
 
@@ -148,6 +205,18 @@ def require_feature(flag: str) -> Callable:
     return _dependency
 
 
+def require_feature_flags_admin(
+    user_id: str = Depends(get_current_user_id),
+) -> str:
+    """Only the collection owner may mutate personal flag overrides via API."""
+    if not is_owner_iot_user(user_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Feature not available",
+        )
+    return user_id
+
+
 # Re-export owner id for background jobs that still attribute shared hardware.
 __all__ = [
     "ALL_FLAGS",
@@ -163,7 +232,10 @@ __all__ = [
     "FLAG_TELEGRAM_ALERTS",
     "FLAG_WISH_LIST",
     "OWNER_IOT_USER_ID",
+    "get_db_overrides",
     "is_feature_enabled",
     "require_feature",
+    "require_feature_flags_admin",
     "resolve_feature_flags",
+    "upsert_db_overrides",
 ]
