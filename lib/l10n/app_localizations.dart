@@ -744,6 +744,336 @@ abstract class AppLocalizations {
   /// **'Friends'**
   String get profileFriends;
 
+  /// No description provided for @profileFeatureFlagsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Feature flags'**
+  String get profileFeatureFlagsTitle;
+
+  /// No description provided for @profileTabProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileTabProfile;
+
+  /// No description provided for @profileTabAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin'**
+  String get profileTabAdmin;
+
+  /// No description provided for @adminShowUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Show users'**
+  String get adminShowUsers;
+
+  /// No description provided for @adminShowArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Show archive'**
+  String get adminShowArchive;
+
+  /// No description provided for @adminUsersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Users: {count}'**
+  String adminUsersCount(int count);
+
+  /// No description provided for @adminArchivedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived: {count}'**
+  String adminArchivedCount(int count);
+
+  /// No description provided for @adminColumnName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get adminColumnName;
+
+  /// No description provided for @adminColumnEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get adminColumnEmail;
+
+  /// No description provided for @adminColumnId.
+  ///
+  /// In en, this message translates to:
+  /// **'ID'**
+  String get adminColumnId;
+
+  /// No description provided for @adminColumnStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get adminColumnStatus;
+
+  /// No description provided for @adminColumnDeletedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted'**
+  String get adminColumnDeletedAt;
+
+  /// No description provided for @adminColumnActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get adminColumnActions;
+
+  /// No description provided for @adminStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get adminStatusActive;
+
+  /// No description provided for @adminStatusBanned.
+  ///
+  /// In en, this message translates to:
+  /// **'Banned'**
+  String get adminStatusBanned;
+
+  /// No description provided for @adminStatusDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get adminStatusDeleted;
+
+  /// No description provided for @adminCopyId.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy ID'**
+  String get adminCopyId;
+
+  /// No description provided for @adminIdCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'ID copied'**
+  String get adminIdCopied;
+
+  /// No description provided for @profileFeatureFlagsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Affects the selected account. Values are stored on the server.'**
+  String get profileFeatureFlagsSubtitle;
+
+  /// No description provided for @featureFlagFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get featureFlagFriends;
+
+  /// No description provided for @featureFlagWishList.
+  ///
+  /// In en, this message translates to:
+  /// **'WishLeafs'**
+  String get featureFlagWishList;
+
+  /// No description provided for @featureFlagFinances.
+  ///
+  /// In en, this message translates to:
+  /// **'Finances'**
+  String get featureFlagFinances;
+
+  /// No description provided for @featureFlagPropagations.
+  ///
+  /// In en, this message translates to:
+  /// **'Propagations'**
+  String get featureFlagPropagations;
+
+  /// No description provided for @featureFlagArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get featureFlagArchive;
+
+  /// No description provided for @featureFlagGenusCare.
+  ///
+  /// In en, this message translates to:
+  /// **'Genus care guide'**
+  String get featureFlagGenusCare;
+
+  /// No description provided for @featureFlagSoilSensors.
+  ///
+  /// In en, this message translates to:
+  /// **'Soil moisture sensors'**
+  String get featureFlagSoilSensors;
+
+  /// No description provided for @featureFlagTelegramAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Telegram alerts'**
+  String get featureFlagTelegramAlerts;
+
+  /// No description provided for @featureFlagBalcony.
+  ///
+  /// In en, this message translates to:
+  /// **'Balcony'**
+  String get featureFlagBalcony;
+
+  /// No description provided for @featureFlagFertilizingReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilizing reminders'**
+  String get featureFlagFertilizingReminders;
+
+  /// No description provided for @featureFlagBulkActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Bulk actions'**
+  String get featureFlagBulkActions;
+
+  /// No description provided for @featureFlagsUserIdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'User ID'**
+  String get featureFlagsUserIdLabel;
+
+  /// No description provided for @featureFlagsUserIdRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a user ID'**
+  String get featureFlagsUserIdRequired;
+
+  /// No description provided for @featureFlagsLoadUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Load'**
+  String get featureFlagsLoadUser;
+
+  /// No description provided for @featureFlagsForUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Flags for {userId}'**
+  String featureFlagsForUser(String userId);
+
+  /// No description provided for @featureFlagsBanSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ban'**
+  String get featureFlagsBanSectionTitle;
+
+  /// No description provided for @featureFlagsBanHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A banned user cannot sign in.'**
+  String get featureFlagsBanHint;
+
+  /// No description provided for @featureFlagsBanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ban user'**
+  String get featureFlagsBanTitle;
+
+  /// No description provided for @featureFlagsBanReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ban reason'**
+  String get featureFlagsBanReasonLabel;
+
+  /// No description provided for @featureFlagsBanConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Ban'**
+  String get featureFlagsBanConfirm;
+
+  /// No description provided for @featureFlagsBanReasonUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'no reason provided'**
+  String get featureFlagsBanReasonUnknown;
+
+  /// No description provided for @featureFlagsCannotBanSelf.
+  ///
+  /// In en, this message translates to:
+  /// **'This account cannot be banned'**
+  String get featureFlagsCannotBanSelf;
+
+  /// No description provided for @featureFlagsUnbanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unban?'**
+  String get featureFlagsUnbanTitle;
+
+  /// No description provided for @featureFlagsUnbanConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'The user will be able to sign in again.'**
+  String get featureFlagsUnbanConfirm;
+
+  /// No description provided for @featureFlagsUnbanAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Unban'**
+  String get featureFlagsUnbanAction;
+
+  /// No description provided for @featureFlagsDeleteSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get featureFlagsDeleteSectionTitle;
+
+  /// No description provided for @featureFlagsDeleteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The user moves to the archive for 3 months. Data is kept; sign-in is blocked. Then the account is permanently deleted.'**
+  String get featureFlagsDeleteHint;
+
+  /// No description provided for @featureFlagsDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete user'**
+  String get featureFlagsDeleteTitle;
+
+  /// No description provided for @featureFlagsDeleteReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete reason'**
+  String get featureFlagsDeleteReasonLabel;
+
+  /// No description provided for @featureFlagsDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get featureFlagsDeleteConfirm;
+
+  /// No description provided for @featureFlagsCannotDeleteSelf.
+  ///
+  /// In en, this message translates to:
+  /// **'This account cannot be deleted'**
+  String get featureFlagsCannotDeleteSelf;
+
+  /// No description provided for @featureFlagsRestoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore?'**
+  String get featureFlagsRestoreTitle;
+
+  /// No description provided for @featureFlagsRestoreConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'The user will be able to sign in again.'**
+  String get featureFlagsRestoreConfirm;
+
+  /// No description provided for @featureFlagsRestoreAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get featureFlagsRestoreAction;
+
+  /// No description provided for @authBannedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have been banned by the administration. Reason: {reason}'**
+  String authBannedMessage(String reason);
+
+  /// No description provided for @authDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This account was deleted by an administrator. Reason: {reason}'**
+  String authDeletedMessage(String reason);
+
   /// No description provided for @profileExportPlants.
   ///
   /// In en, this message translates to:

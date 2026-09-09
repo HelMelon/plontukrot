@@ -189,6 +189,86 @@
   },
   "profileDeleteAccountFailed": "Could not delete profile. Please try again.",
   "profileFriends": "Friends",
+  "profileFeatureFlagsTitle": "Feature flags",
+  "profileTabProfile": "Profile",
+  "profileTabAdmin": "Admin",
+  "adminShowUsers": "Show users",
+  "adminShowArchive": "Show archive",
+  "adminUsersCount": "Users: {count}",
+  "@adminUsersCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "adminArchivedCount": "Archived: {count}",
+  "@adminArchivedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "adminColumnName": "Name",
+  "adminColumnEmail": "Email",
+  "adminColumnId": "ID",
+  "adminColumnStatus": "Status",
+  "adminColumnDeletedAt": "Deleted",
+  "adminColumnActions": "Actions",
+  "adminStatusActive": "Active",
+  "adminStatusBanned": "Banned",
+  "adminStatusDeleted": "Archived",
+  "adminCopyId": "Copy ID",
+  "adminIdCopied": "ID copied",
+  "profileFeatureFlagsSubtitle": "Affects the selected account. Values are stored on the server.",
+  "featureFlagFriends": "Friends",
+  "featureFlagWishList": "WishLeafs",
+  "featureFlagFinances": "Finances",
+  "featureFlagPropagations": "Propagations",
+  "featureFlagArchive": "Archive",
+  "featureFlagGenusCare": "Genus care guide",
+  "featureFlagSoilSensors": "Soil moisture sensors",
+  "featureFlagTelegramAlerts": "Telegram alerts",
+  "featureFlagBalcony": "Balcony",
+  "featureFlagFertilizingReminders": "Fertilizing reminders",
+  "featureFlagBulkActions": "Bulk actions",
+  "featureFlagsUserIdLabel": "User ID",
+  "featureFlagsUserIdRequired": "Enter a user ID",
+  "featureFlagsLoadUser": "Load",
+  "featureFlagsForUser": "Flags for {userId}",
+  "@featureFlagsForUser": {
+    "placeholders": {
+      "userId": {"type": "String"}
+    }
+  },
+  "featureFlagsBanSectionTitle": "Ban",
+  "featureFlagsBanHint": "A banned user cannot sign in.",
+  "featureFlagsBanTitle": "Ban user",
+  "featureFlagsBanReasonLabel": "Ban reason",
+  "featureFlagsBanConfirm": "Ban",
+  "featureFlagsBanReasonUnknown": "no reason provided",
+  "featureFlagsCannotBanSelf": "This account cannot be banned",
+  "featureFlagsUnbanTitle": "Unban?",
+  "featureFlagsUnbanConfirm": "The user will be able to sign in again.",
+  "featureFlagsUnbanAction": "Unban",
+  "featureFlagsDeleteSectionTitle": "Delete",
+  "featureFlagsDeleteHint": "The user moves to the archive for 3 months. Data is kept; sign-in is blocked. Then the account is permanently deleted.",
+  "featureFlagsDeleteTitle": "Delete user",
+  "featureFlagsDeleteReasonLabel": "Delete reason",
+  "featureFlagsDeleteConfirm": "Delete",
+  "featureFlagsCannotDeleteSelf": "This account cannot be deleted",
+  "featureFlagsRestoreTitle": "Restore?",
+  "featureFlagsRestoreConfirm": "The user will be able to sign in again.",
+  "featureFlagsRestoreAction": "Restore",
+  "authBannedMessage": "You have been banned by the administration. Reason: {reason}",
+  "@authBannedMessage": {
+    "placeholders": {
+      "reason": {"type": "String"}
+    }
+  },
+  "authDeletedMessage": "This account was deleted by an administrator. Reason: {reason}",
+  "@authDeletedMessage": {
+    "placeholders": {
+      "reason": {"type": "String"}
+    }
+  },
   "profileExportPlants": "Export plant names",
   "profileExportPlantsEmpty": "No plants to export",
   "profileExportingPlants": "Exporting plants…",

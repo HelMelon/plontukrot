@@ -164,6 +164,86 @@
   "profileDeleteAccountError": "Impossible de supprimer le profil : {error}",
   "profileDeleteAccountFailed": "Impossible de supprimer le profil. Veuillez réessayer.",
   "profileFriends": "Amis",
+  "profileFeatureFlagsTitle": "Feature flags",
+  "profileTabProfile": "Profil",
+  "profileTabAdmin": "Admin",
+  "adminShowUsers": "Afficher les utilisateurs",
+  "adminShowArchive": "Afficher l'archive",
+  "adminUsersCount": "Utilisateurs : {count}",
+  "@adminUsersCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "adminArchivedCount": "En archive : {count}",
+  "@adminArchivedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "adminColumnName": "Nom",
+  "adminColumnEmail": "E-mail",
+  "adminColumnId": "ID",
+  "adminColumnStatus": "Statut",
+  "adminColumnDeletedAt": "Supprimé",
+  "adminColumnActions": "Actions",
+  "adminStatusActive": "Actif",
+  "adminStatusBanned": "Bloqué",
+  "adminStatusDeleted": "En archive",
+  "adminCopyId": "Copier l'ID",
+  "adminIdCopied": "ID copié",
+  "profileFeatureFlagsSubtitle": "Concerne le compte sélectionné. Les valeurs sont stockées sur le serveur.",
+  "featureFlagFriends": "Amis",
+  "featureFlagWishList": "WishLeafs",
+  "featureFlagFinances": "Finances",
+  "featureFlagPropagations": "Multiplications",
+  "featureFlagArchive": "Archives",
+  "featureFlagGenusCare": "Guide d'entretien du genre",
+  "featureFlagSoilSensors": "Capteurs d'humidité",
+  "featureFlagTelegramAlerts": "Alertes Telegram",
+  "featureFlagBalcony": "Balcon",
+  "featureFlagFertilizingReminders": "Rappels de fertilisation",
+  "featureFlagBulkActions": "Actions groupées",
+  "featureFlagsUserIdLabel": "ID utilisateur",
+  "featureFlagsUserIdRequired": "Saisissez un ID utilisateur",
+  "featureFlagsLoadUser": "Charger",
+  "featureFlagsForUser": "Flags pour {userId}",
+  "@featureFlagsForUser": {
+    "placeholders": {
+      "userId": {"type": "String"}
+    }
+  },
+  "featureFlagsBanSectionTitle": "Blocage",
+  "featureFlagsBanHint": "Un utilisateur bloqué ne peut pas se connecter.",
+  "featureFlagsBanTitle": "Bloquer l'utilisateur",
+  "featureFlagsBanReasonLabel": "Motif du blocage",
+  "featureFlagsBanConfirm": "Bloquer",
+  "featureFlagsBanReasonUnknown": "motif non indiqué",
+  "featureFlagsCannotBanSelf": "Ce compte ne peut pas être bloqué",
+  "featureFlagsUnbanTitle": "Débloquer ?",
+  "featureFlagsUnbanConfirm": "L'utilisateur pourra à nouveau se connecter.",
+  "featureFlagsUnbanAction": "Débloquer",
+  "featureFlagsDeleteSectionTitle": "Suppression",
+  "featureFlagsDeleteHint": "L'utilisateur passe en archive pour 3 mois. Les données sont conservées ; la connexion est bloquée. Ensuite le compte est définitivement supprimé.",
+  "featureFlagsDeleteTitle": "Supprimer l'utilisateur",
+  "featureFlagsDeleteReasonLabel": "Motif de suppression",
+  "featureFlagsDeleteConfirm": "Supprimer",
+  "featureFlagsCannotDeleteSelf": "Ce compte ne peut pas être supprimé",
+  "featureFlagsRestoreTitle": "Restaurer ?",
+  "featureFlagsRestoreConfirm": "L'utilisateur pourra à nouveau se connecter.",
+  "featureFlagsRestoreAction": "Restaurer",
+  "authBannedMessage": "Vous avez été bloqué par l'administration. Motif : {reason}",
+  "@authBannedMessage": {
+    "placeholders": {
+      "reason": {"type": "String"}
+    }
+  },
+  "authDeletedMessage": "Ce compte a été supprimé par l'administration. Motif : {reason}",
+  "@authDeletedMessage": {
+    "placeholders": {
+      "reason": {"type": "String"}
+    }
+  },
   "profileExportPlants": "Exporter les noms de plantes",
   "profileExportPlantsEmpty": "Aucune plante à exporter",
   "profileExportingPlants": "Export des plantes…",

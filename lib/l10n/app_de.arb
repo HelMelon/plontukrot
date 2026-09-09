@@ -164,6 +164,86 @@
   "profileDeleteAccountError": "Profil konnte nicht gelöscht werden: {error}",
   "profileDeleteAccountFailed": "Profil konnte nicht gelöscht werden. Bitte erneut versuchen.",
   "profileFriends": "Freunde",
+  "profileFeatureFlagsTitle": "Feature-Flags",
+  "profileTabProfile": "Profil",
+  "profileTabAdmin": "Admin",
+  "adminShowUsers": "Benutzer anzeigen",
+  "adminShowArchive": "Archiv anzeigen",
+  "adminUsersCount": "Benutzer: {count}",
+  "@adminUsersCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "adminArchivedCount": "Im Archiv: {count}",
+  "@adminArchivedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "adminColumnName": "Name",
+  "adminColumnEmail": "E-Mail",
+  "adminColumnId": "ID",
+  "adminColumnStatus": "Status",
+  "adminColumnDeletedAt": "Gelöscht",
+  "adminColumnActions": "Aktionen",
+  "adminStatusActive": "Aktiv",
+  "adminStatusBanned": "Gesperrt",
+  "adminStatusDeleted": "Im Archiv",
+  "adminCopyId": "ID kopieren",
+  "adminIdCopied": "ID kopiert",
+  "profileFeatureFlagsSubtitle": "Betrifft das ausgewählte Konto. Werte werden auf dem Server gespeichert.",
+  "featureFlagFriends": "Freunde",
+  "featureFlagWishList": "WishLeafs",
+  "featureFlagFinances": "Finanzen",
+  "featureFlagPropagations": "Vermehrung",
+  "featureFlagArchive": "Archiv",
+  "featureFlagGenusCare": "Gattungs-Pflegeguide",
+  "featureFlagSoilSensors": "Bodenfeuchtesensoren",
+  "featureFlagTelegramAlerts": "Telegram-Benachrichtigungen",
+  "featureFlagBalcony": "Balkon",
+  "featureFlagFertilizingReminders": "Düngeerinnerungen",
+  "featureFlagBulkActions": "Massenaktionen",
+  "featureFlagsUserIdLabel": "Benutzer-ID",
+  "featureFlagsUserIdRequired": "Benutzer-ID eingeben",
+  "featureFlagsLoadUser": "Laden",
+  "featureFlagsForUser": "Flags für {userId}",
+  "@featureFlagsForUser": {
+    "placeholders": {
+      "userId": {"type": "String"}
+    }
+  },
+  "featureFlagsBanSectionTitle": "Sperre",
+  "featureFlagsBanHint": "Gesperrte Benutzer können sich nicht anmelden.",
+  "featureFlagsBanTitle": "Benutzer sperren",
+  "featureFlagsBanReasonLabel": "Sperrgrund",
+  "featureFlagsBanConfirm": "Sperren",
+  "featureFlagsBanReasonUnknown": "kein Grund angegeben",
+  "featureFlagsCannotBanSelf": "Dieses Konto kann nicht gesperrt werden",
+  "featureFlagsUnbanTitle": "Entsperren?",
+  "featureFlagsUnbanConfirm": "Der Benutzer kann sich wieder anmelden.",
+  "featureFlagsUnbanAction": "Entsperren",
+  "featureFlagsDeleteSectionTitle": "Löschen",
+  "featureFlagsDeleteHint": "Der Benutzer kommt für 3 Monate ins Archiv. Daten bleiben; Anmeldung gesperrt. Danach wird das Konto dauerhaft gelöscht.",
+  "featureFlagsDeleteTitle": "Benutzer löschen",
+  "featureFlagsDeleteReasonLabel": "Löschgrund",
+  "featureFlagsDeleteConfirm": "Löschen",
+  "featureFlagsCannotDeleteSelf": "Dieses Konto kann nicht gelöscht werden",
+  "featureFlagsRestoreTitle": "Wiederherstellen?",
+  "featureFlagsRestoreConfirm": "Der Benutzer kann sich wieder anmelden.",
+  "featureFlagsRestoreAction": "Wiederherstellen",
+  "authBannedMessage": "Sie wurden von der Administration gesperrt. Grund: {reason}",
+  "@authBannedMessage": {
+    "placeholders": {
+      "reason": {"type": "String"}
+    }
+  },
+  "authDeletedMessage": "Dieses Konto wurde von der Administration gelöscht. Grund: {reason}",
+  "@authDeletedMessage": {
+    "placeholders": {
+      "reason": {"type": "String"}
+    }
+  },
   "profileExportPlants": "Pflanzennamen exportieren",
   "profileExportPlantsEmpty": "Keine Pflanzen zum Exportieren",
   "profileExportingPlants": "Pflanzen werden exportiert…",

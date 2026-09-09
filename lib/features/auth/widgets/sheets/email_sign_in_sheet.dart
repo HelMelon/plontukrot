@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
+import '../../../../services/api_exception.dart';
 import '../../../../services/auth_service.dart';
 import '../../auth_failure_messages.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
@@ -63,6 +64,42 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
   Future<void> _showAuthError(Object error) async {
     if (!mounted) return;
     final l10n = AppLocalizations.of(context);
+    if (error is ApiException && error.isUserBanned) {
+      final reason =
+          error.banReason ?? l10n.featureFlagsBanReasonUnknown;
+      await showAppDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(l10n.authSignInFailed),
+          content: Text(l10n.authBannedMessage(reason)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(l10n.commonOk),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+    if (error is ApiException && error.isUserDeleted) {
+      final reason =
+          error.deleteReason ?? l10n.featureFlagsBanReasonUnknown;
+      await showAppDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(l10n.authSignInFailed),
+          content: Text(l10n.authDeletedMessage(reason)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(l10n.commonOk),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
     final message =
         authFailureMessage(AuthService.classifyFailure(error), l10n);
     if (message == null) return;
