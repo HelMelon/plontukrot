@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
+import 'package:plontukrot/core/features/feature_flags.dart';
 import 'package:plontukrot/core/theme/theme_context.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/app_bar_chrome_actions.dart';
@@ -92,7 +93,9 @@ class _PlantGenusDetailsPageState extends State<PlantGenusDetailsPage> {
 
               return CustomScrollView(
                 slivers: [
-                  if (genus.isNotEmpty)
+                  if (genus.isNotEmpty &&
+                      FeatureFlagsController.instance
+                          .isEnabled(FeatureFlag.genusCare))
                     SliverPadding(
                       padding: EdgeInsets.fromLTRB(
                         spacing.md,

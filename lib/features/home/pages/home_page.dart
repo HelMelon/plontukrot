@@ -77,7 +77,8 @@ class _HomePageState extends State<HomePage> {
   late final Stream<List<Plant>> _plantsStream;
   late final Stream<Map<String, int>> _activeBatchCountsStream;
   late final Stream<Set<String>> _rerootingPlantIdsStream;
-  late final Stream<Map<String, PlantSensorBinding>> _sensorBindingsStream;
+  late Stream<Map<String, PlantSensorBinding>> _sensorBindingsStream;
+  bool? _sensorBindingsEnabled;
   List<Plant> _latestPlants = const [];
   _PlantSortField _sortField = _PlantSortField.createdAt;
   bool _sortAscending = false;
@@ -106,10 +107,17 @@ class _HomePageState extends State<HomePage> {
         PropagationService().watchActiveBatchCountsByPlantId();
     _rerootingPlantIdsStream =
         ManipulationService().watchActiveRerootingPlantIds();
-    _sensorBindingsStream =
-        FeatureFlagsController.instance.isEnabled(FeatureFlag.soilSensors)
-            ? PlantSensorService().watchAllBindings()
-            : Stream.value(const <String, PlantSensorBinding>{});
+    _syncSensorBindingsStream();
+  }
+
+  void _syncSensorBindingsStream() {
+    final enabled = FeatureFlagsController.instance
+        .isEnabled(FeatureFlag.soilSensors);
+    if (_sensorBindingsEnabled == enabled) return;
+    _sensorBindingsEnabled = enabled;
+    _sensorBindingsStream = enabled
+        ? PlantSensorService().watchAllBindings()
+        : Stream.value(const <String, PlantSensorBinding>{});
   }
 
   Future<void> _signalFirstContentReady(List<Plant> plants) async {
@@ -900,6 +908,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildHome(BuildContext context) {
+    _syncSensorBindingsStream();
     final l10n = AppLocalizations.of(context);
     final isWide = MediaQuery.sizeOf(context).width >= _wideBreakpoint;
     final colors = _colors;

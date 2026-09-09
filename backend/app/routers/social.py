@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..db import get_pool, jsonb
 from ..feature_flags import FLAG_FRIENDS, require_feature
-from ..routers.auth import get_current_user_id
 from ..schemas import FriendRequestCreate, FriendRequestOut, GiftCreate
 
 router = APIRouter(tags=["social"])

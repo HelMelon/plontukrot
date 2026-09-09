@@ -47,6 +47,8 @@ user id on both the Flutter client and the FastAPI backend.
 - Adding more allowed users later means updating the same constant on client and
   server (or replacing it with a proper feature flag).
 - Existing non-owner Telegram links, if any, no longer receive alerts.
+- Superseded for client gating by ADR-055 (server `GET /features`); the owner
+  allowlist remains as the server default for IoT flags.
 
 ## Verification
 

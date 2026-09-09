@@ -10,7 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/currency/app_currency.dart';
 import '../../../core/currency/app_currency_controller.dart';
-import '../../../core/features/owner_iot_features.dart';
+import '../../../core/features/feature_flags.dart';
 import '../../../core/locale/app_locale_controller.dart';
 import '../../../core/season/fertilizing_season_controller.dart';
 import '../../../core/privacy/privacy_constants.dart';
@@ -352,6 +352,13 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: FeatureFlagsController.instance,
+      builder: (context, _) => _buildProfile(context),
+    );
+  }
+
+  Widget _buildProfile(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final colors = context.colors;
     final spacing = context.spacing;
@@ -570,29 +577,31 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                 },
               ),
               spacing.vXl,
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: ExcludeSemantics(
-                  child: Icon(context.icons.friends, color: colors.icon),
+              if (FeatureFlagsController.instance
+                  .isEnabled(FeatureFlag.friends))
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: ExcludeSemantics(
+                    child: Icon(context.icons.friends, color: colors.icon),
+                  ),
+                  title: Text(
+                    l10n.profileFriends,
+                    style: typography.bodyEmphasis,
+                  ),
+                  trailing: ExcludeSemantics(
+                    child: Icon(context.icons.chevronRight, color: colors.icon),
+                  ),
+                  onTap: _busy
+                      ? null
+                      : () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const FriendsPage(),
+                            ),
+                          );
+                        },
                 ),
-                title: Text(
-                  l10n.profileFriends,
-                  style: typography.bodyEmphasis,
-                ),
-                trailing: ExcludeSemantics(
-                  child: Icon(context.icons.chevronRight, color: colors.icon),
-                ),
-                onTap: _busy
-                    ? null
-                    : () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const FriendsPage(),
-                          ),
-                        );
-                      },
-              ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: ExcludeSemantics(
@@ -610,10 +619,13 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   localeController,
                   currencyController,
                   FertilizingSeasonController.instance,
+                  FeatureFlagsController.instance,
                 ]),
                 builder: (context, _) {
                   final seasonController = FertilizingSeasonController.instance;
                   final seasonSettings = seasonController.settings;
+                  final remindersEnabled = FeatureFlagsController.instance
+                      .isEnabled(FeatureFlag.fertilizingReminders);
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -763,46 +775,49 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                                 },
                         ),
                       ],
-                      spacing.vMd,
-                      if (_notificationsGranted)
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: ExcludeSemantics(
-                            child: HugeIcon(
-                                icon: context.icons.notifications,
-                                color: colors.icon),
-                          ),
-                          title: Text(
-                            l10n.profileNotificationsAccepted,
-                            style: typography.bodyMedium,
-                          ),
-                        )
-                      else
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: ExcludeSemantics(
-                            child: HugeIcon(
-                                icon: context.icons.notifications,
-                                color: colors.icon),
-                          ),
-                          title: Text(
-                            l10n.settingsNotificationsEnable,
-                            style: typography.bodyEmphasis,
-                          ),
-                          trailing: ExcludeSemantics(
-                            child: Icon(
-                              context.icons.chevronRight,
-                              color: colors.icon,
-                              size: dimensions.iconLg,
+                      if (remindersEnabled) ...[
+                        spacing.vMd,
+                        if (_notificationsGranted)
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: ExcludeSemantics(
+                              child: HugeIcon(
+                                  icon: context.icons.notifications,
+                                  color: colors.icon),
                             ),
+                            title: Text(
+                              l10n.profileNotificationsAccepted,
+                              style: typography.bodyMedium,
+                            ),
+                          )
+                        else
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: ExcludeSemantics(
+                              child: HugeIcon(
+                                  icon: context.icons.notifications,
+                                  color: colors.icon),
+                            ),
+                            title: Text(
+                              l10n.settingsNotificationsEnable,
+                              style: typography.bodyEmphasis,
+                            ),
+                            trailing: ExcludeSemantics(
+                              child: Icon(
+                                context.icons.chevronRight,
+                                color: colors.icon,
+                                size: dimensions.iconLg,
+                              ),
+                            ),
+                            onTap: _busy ? null : _requestNotifications,
                           ),
-                          onTap: _busy ? null : _requestNotifications,
-                        ),
+                      ],
                     ],
                   );
                 },
               ),
-              if (OwnerIotFeatures.isEnabledForCurrentUser) ...[
+              if (FeatureFlagsController.instance
+                  .isEnabled(FeatureFlag.telegramAlerts)) ...[
                 spacing.vSm,
                 const TelegramLinkTile(),
               ],

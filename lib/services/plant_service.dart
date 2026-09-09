@@ -1,3 +1,4 @@
+import '../core/features/feature_flags.dart';
 import '../core/season/fertilizing_season_controller.dart';
 import '../models/fertilizing_frequency.dart';
 import '../models/model_helpers.dart';
@@ -37,6 +38,11 @@ class PlantService {
   }
 
   Future<void> _rescheduleNotifications(String plantId) async {
+    if (!FeatureFlagsController.instance
+        .isEnabled(FeatureFlag.fertilizingReminders)) {
+      await FertilizingNotificationService.instance.cancelForPlant(plantId);
+      return;
+    }
     try {
       final plant = await getPlant(plantId);
       if (plant != null) {

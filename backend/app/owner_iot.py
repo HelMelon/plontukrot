@@ -1,8 +1,8 @@
-"""Allowlist for hardware IoT features (sensors, Telegram, balcony).
+"""Allowlist for hardware IoT owner account.
 
-These features depend on shared physical hardware and a single Yandex /
-Telegram setup. Until per-user hardware is ready, only the collection
-owner may use the related API and UI.
+Used by [feature_flags.resolve_feature_flags] so soil/telegram/balcony stay
+on for the collection owner until multi-tenant hardware is ready. Prefer
+`require_feature(...)` / `is_feature_enabled(...)` in routers.
 """
 from fastapi import Depends, HTTPException, status
 
@@ -18,7 +18,7 @@ def is_owner_iot_user(user_id: str | None) -> bool:
 def require_owner_iot_user(
     user_id: str = Depends(get_current_user_id),
 ) -> str:
-    """FastAPI dependency: allow only the owner IoT account."""
+    """Deprecated: use feature_flags.require_feature instead."""
     if not is_owner_iot_user(user_id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
