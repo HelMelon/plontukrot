@@ -5,6 +5,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..db import get_pool, jsonb
+from ..feature_flags import FLAG_FINANCES, FLAG_WISH_LIST, require_feature
 from ..routers.auth import get_current_user_id
 from ..schemas import (
     ComponentCreate,
@@ -256,7 +257,7 @@ def delete_stimulator(stimulator_id: str,
 
 # ---- Wish list ----
 @router.get("/wish-list", response_model=list[WishListOut])
-def list_wish_list(user_id: str = Depends(get_current_user_id)):
+def list_wish_list(user_id: str = Depends(require_feature(FLAG_WISH_LIST))):
     with get_pool().connection() as conn:
         rows = conn.execute(
             "SELECT id, name_en, name_alt, created_at, updated_at "
@@ -268,7 +269,7 @@ def list_wish_list(user_id: str = Depends(get_current_user_id)):
 
 @router.post("/wish-list", response_model=WishListOut, status_code=201)
 def create_wish_list(payload: WishListCreate,
-                     user_id: str = Depends(get_current_user_id)):
+                     user_id: str = Depends(require_feature(FLAG_WISH_LIST))):
     w_id = _make_id()
     with get_pool().connection() as conn:
         conn.execute(
@@ -285,7 +286,8 @@ def create_wish_list(payload: WishListCreate,
 
 
 @router.delete("/wish-list/{item_id}", status_code=204)
-def delete_wish_list(item_id: str, user_id: str = Depends(get_current_user_id)):
+def delete_wish_list(item_id: str,
+                     user_id: str = Depends(require_feature(FLAG_WISH_LIST))):
     with get_pool().connection() as conn:
         conn.execute("DELETE FROM wish_list_items WHERE id = %s AND user_id = %s",
                      (item_id, user_id))
@@ -293,7 +295,7 @@ def delete_wish_list(item_id: str, user_id: str = Depends(get_current_user_id)):
 
 # ---- Finance entries ----
 @router.get("/finance-entries", response_model=list[FinanceEntryOut])
-def list_finance(user_id: str = Depends(get_current_user_id)):
+def list_finance(user_id: str = Depends(require_feature(FLAG_FINANCES))):
     with get_pool().connection() as conn:
         rows = conn.execute(
             "SELECT id, title, amount, type, source, date, wish_list_item_id, "
@@ -306,7 +308,7 @@ def list_finance(user_id: str = Depends(get_current_user_id)):
 
 @router.post("/finance-entries", response_model=FinanceEntryOut, status_code=201)
 def create_finance(payload: FinanceEntryCreate,
-                   user_id: str = Depends(get_current_user_id)):
+                   user_id: str = Depends(require_feature(FLAG_FINANCES))):
     f_id = _make_id()
     with get_pool().connection() as conn:
         conn.execute(
@@ -325,7 +327,8 @@ def create_finance(payload: FinanceEntryCreate,
 
 
 @router.delete("/finance-entries/{entry_id}", status_code=204)
-def delete_finance(entry_id: str, user_id: str = Depends(get_current_user_id)):
+def delete_finance(entry_id: str,
+                   user_id: str = Depends(require_feature(FLAG_FINANCES))):
     with get_pool().connection() as conn:
         conn.execute("DELETE FROM finance_entries WHERE id = %s AND user_id = %s",
                      (entry_id, user_id))

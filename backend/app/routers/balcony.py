@@ -24,7 +24,12 @@ from fastapi.responses import JSONResponse
 
 from ..config import settings
 from ..db import get_pool
-from ..routers.auth import get_current_user_id
+from ..feature_flags import (
+    FLAG_BALCONY,
+    OWNER_IOT_USER_ID,
+    is_feature_enabled,
+    require_feature,
+)
 from ..routers.telegram import send_telegram_alert
 
 log = logging.getLogger(__name__)
@@ -82,11 +87,13 @@ def _read_balcony_temp() -> float | None:
 
 
 def _plants_on_balcony():
-    """Return (id, nickname, species, band) for plants currently on the balcony."""
+    """Return (id, nickname, species, band) for the owner's balcony plants."""
     with get_pool().connection() as conn:
         rows = conn.execute(
             "SELECT id, nickname, species, balcony_band FROM plants "
-            "WHERE on_balcony = true AND archived_at IS NULL"
+            "WHERE on_balcony = true AND archived_at IS NULL "
+            "AND user_id = %s",
+            (OWNER_IOT_USER_ID,),
         ).fetchall()
     return rows
 
@@ -119,7 +126,7 @@ def _needs_inside(rows, temp: float) -> list[dict]:
 
 
 @router.get("/status")
-def balcony_status(user_id: str = Depends(get_current_user_id)):
+def balcony_status(user_id: str = Depends(require_feature(FLAG_BALCONY))):
     """Current balcony temperature + which plants need bringing inside."""
     if not _in_season():
         return {
@@ -164,7 +171,7 @@ def _record_temp(user_id: str, temp: float) -> None:
 
 
 @router.get("/history")
-def balcony_history(user_id: str = Depends(get_current_user_id)):
+def balcony_history(user_id: str = Depends(require_feature(FLAG_BALCONY))):
     """Per-day balcony temperature summary for the last 3 days.
 
     Day average: 08:00–21:00 (local, Europe/Minsk) on that calendar day.
@@ -273,6 +280,9 @@ def check_and_alert() -> dict:
     """
     if not _in_season():
         return {"active": False, "alerted": False, "needs_inside": []}
+    if not is_feature_enabled(OWNER_IOT_USER_ID, FLAG_BALCONY):
+        return {"active": False, "alerted": False, "needs_inside": [],
+                "reason": "feature_disabled"}
     temp = _read_balcony_temp()
     if temp is None:
         return {"active": True, "alerted": False, "needs_inside": [],
@@ -286,22 +296,18 @@ def check_and_alert() -> dict:
 
 
 def _record_temp_for_primary(temp: float) -> None:
-    """Record a balcony temperature reading for the primary user.
+    """Record a balcony temperature reading for the owner IoT account.
 
-    The background monitor has no per-user context, so it attributes the
-    reading to the first (primary) user — the collection owner.
+    The background monitor has no per-user JWT context, so it attributes
+    readings to the allowlisted owner account.
     """
     try:
         with get_pool().connection() as conn:
-            row = conn.execute(
-                "SELECT id FROM users ORDER BY created_at ASC LIMIT 1"
-            ).fetchone()
-            if row:
-                conn.execute(
-                    "INSERT INTO balcony_temp_readings (user_id, temp_c, read_at) "
-                    "VALUES (%s, %s, now())",
-                    (row["id"], temp),
-                )
+            conn.execute(
+                "INSERT INTO balcony_temp_readings (user_id, temp_c, read_at) "
+                "VALUES (%s, %s, now())",
+                (OWNER_IOT_USER_ID, temp),
+            )
     except Exception as exc:
         log.warning("Failed to record balcony temp (monitor): %s", exc)
 

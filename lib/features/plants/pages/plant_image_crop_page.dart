@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:crop_your_image/crop_your_image.dart';
@@ -19,11 +20,54 @@ class PlantImageCropPage extends StatefulWidget {
 }
 
 class _PlantImageCropPageState extends State<PlantImageCropPage> {
+  static const _loadTimeout = Duration(seconds: 20);
+
   final _cropController = CropController();
   bool _isCropping = false;
+  bool _isReady = false;
+  Timer? _loadTimeoutTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTimeoutTimer = Timer(_loadTimeout, _onReadyTimeout);
+  }
+
+  @override
+  void dispose() {
+    _loadTimeoutTimer?.cancel();
+    super.dispose();
+  }
+
+  void _onReadyTimeout() {
+    if (!mounted || _isReady || _isCropping) return;
+    final l10n = AppLocalizations.of(context);
+    final colors = context.colors;
+    final typography = context.typography;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: colors.card,
+        content: Text(
+          l10n.plantCropError(l10n.plantCropLoadFailed),
+          style: typography.bodyLarge,
+        ),
+      ),
+    );
+    Navigator.of(context).pop();
+  }
+
+  void _onStatusChanged(CropStatus status) {
+    if (!mounted) return;
+    if (status == CropStatus.ready) {
+      _loadTimeoutTimer?.cancel();
+      setState(() => _isReady = true);
+    } else if (status == CropStatus.loading) {
+      setState(() => _isReady = false);
+    }
+  }
 
   void _confirm() {
-    if (_isCropping) return;
+    if (_isCropping || !_isReady) return;
     setState(() => _isCropping = true);
     _cropController.crop();
   }
@@ -84,8 +128,14 @@ class _PlantImageCropPageState extends State<PlantImageCropPage> {
                     image: widget.imageBytes,
                     controller: _cropController,
                     onCropped: _onCropped,
+                    onStatusChanged: _onStatusChanged,
                     aspectRatio: 1,
+                    initialRectBuilder: InitialRectBuilder.withSizeAndRatio(
+                      size: 1,
+                      aspectRatio: 1,
+                    ),
                     interactive: true,
+                    fixCropRect: true,
                     radius: radii.sm,
                     baseColor: colors.screen,
                     maskColor: colors.screen.withValues(alpha: 0.72),
@@ -100,12 +150,15 @@ class _PlantImageCropPageState extends State<PlantImageCropPage> {
                 width: double.infinity,
                 height: dimensions.buttonHeight,
                 child: ElevatedButton(
-                  onPressed: _isCropping ? null : _confirm,
+                  onPressed: (_isCropping || !_isReady) ? null : _confirm,
                   child: _isCropping
                       ? SizedBox(
                           width: dimensions.iconXl,
                           height: dimensions.iconXl,
-                          child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
+                          child: AccessibleProgressIndicator(
+                            strokeWidth: 2,
+                            color: colors.onPrimary,
+                          ),
                         )
                       : Text(l10n.plantCropConfirm),
                 ),

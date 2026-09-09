@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
 import 'core/app_footer_controller.dart';
 import 'core/currency/app_currency_controller.dart';
+import 'core/features/feature_flags.dart';
 import 'core/keyboard/app_keyboard.dart';
 import 'core/locale/app_locale_controller.dart';
 import 'core/season/fertilizing_season_controller.dart';
@@ -33,6 +35,8 @@ import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SemanticsBinding.instance.ensureSemantics();
+  // Prefetch Amatic SC so login/consent don't flash a system fallback font.
+  await GoogleFonts.pendingFonts([GoogleFonts.amaticSc()]);
   await AppLocaleController.instance.load();
   await AppCurrencyController.instance.load();
   await FertilizingSeasonController.instance.load();
@@ -379,15 +383,26 @@ class _AuthenticatedShellState extends State<_AuthenticatedShell> {
   }
 
   Future<void> _syncPreferences() async {
+    await FeatureFlagsController.instance.refresh();
     await AppLocaleController.instance.syncWithCloud();
     await AppCurrencyController.instance.syncWithCloud();
     await FertilizingSeasonController.instance.syncWithCloud();
     await FertilizingNotificationService.instance.initialize();
-    unawaited(FertilizingNotificationService.instance.requestPermission());
+    final remindersOn = FeatureFlagsController.instance
+        .isEnabled(FeatureFlag.fertilizingReminders);
+    if (remindersOn) {
+      unawaited(FertilizingNotificationService.instance.requestPermission());
+    }
     // Backfill auto frequency for legacy plants (null in Firestore) and
     // re-sync any that drifted from the current season.
     unawaited(PlantService().recalculateAutoFertilizingFrequencies());
-    unawaited(FertilizingNotificationService.instance.rescheduleAllActivePlants());
+    if (remindersOn) {
+      unawaited(
+        FertilizingNotificationService.instance.rescheduleAllActivePlants(),
+      );
+    } else {
+      unawaited(FertilizingNotificationService.instance.cancelAll());
+    }
   }
 
   @override

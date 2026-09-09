@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from ..ai_care import generate_care_guide, normalize_locale
 from ..db import get_pool
-from ..routers.auth import get_current_user_id
+from ..feature_flags import FLAG_GENUS_CARE, require_feature
 from ..schemas import GenusCareGuideOut
 
 logger = logging.getLogger("plontukrot.genera")
@@ -19,7 +19,7 @@ def get_genus_care_guide(
     genus: str,
     locale: str = Query(default="ru"),
     force_refresh: bool = Query(default=False, alias="forceRefresh"),
-    user_id: str = Depends(get_current_user_id),
+    user_id: str = Depends(require_feature(FLAG_GENUS_CARE)),
 ):
     """Return botanical overview & care guide for a genus (cached or AI-generated)."""
     trimmed = genus.strip()
@@ -127,7 +127,7 @@ def get_genus_care_guide(
 def refresh_genus_care_guide(
     genus: str,
     locale: str = Query(default="ru"),
-    user_id: str = Depends(get_current_user_id),
+    user_id: str = Depends(require_feature(FLAG_GENUS_CARE)),
 ):
     """Force re-generate and update the cached care guide for a genus."""
     return get_genus_care_guide(

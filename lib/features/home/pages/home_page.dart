@@ -8,6 +8,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import 'package:plontukrot/core/theme/theme_context.dart';
 import 'package:plontukrot/core/theme/screens/app_screen_themes.dart';
+import '../../../core/features/feature_flags.dart';
 import '../../../core/widgets/app_bar_chrome_actions.dart';
 import '../../../core/widgets/prompt_text_dialog.dart';
 import '../../../models/app_user.dart';
@@ -105,7 +106,10 @@ class _HomePageState extends State<HomePage> {
         PropagationService().watchActiveBatchCountsByPlantId();
     _rerootingPlantIdsStream =
         ManipulationService().watchActiveRerootingPlantIds();
-    _sensorBindingsStream = PlantSensorService().watchAllBindings();
+    _sensorBindingsStream =
+        FeatureFlagsController.instance.isEnabled(FeatureFlag.soilSensors)
+            ? PlantSensorService().watchAllBindings()
+            : Stream.value(const <String, PlantSensorBinding>{});
   }
 
   Future<void> _signalFirstContentReady(List<Plant> plants) async {
@@ -440,7 +444,10 @@ class _HomePageState extends State<HomePage> {
           moisture: bindings[plant.id]?.moisture,
           onTap:
               _isSelectionMode ? () => _togglePlantSelection(plant.id) : null,
-          onLongPress: () => _togglePlantSelection(plant.id),
+          onLongPress: FeatureFlagsController.instance
+                  .isEnabled(FeatureFlag.bulkActions)
+              ? () => _togglePlantSelection(plant.id)
+              : null,
         );
       },
     );
@@ -779,61 +786,66 @@ class _HomePageState extends State<HomePage> {
 
   List<Widget> _buildHomeHubActions(AppLocalizations l10n) {
     final colors = _colors;
+    final flags = FeatureFlagsController.instance;
 
     return [
-      IconButton(
-        tooltip: l10n.homePropagation,
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const PropagationsPage(),
-            ),
-          );
-        },
-        icon: HugeIcon(
-          icon: _icons.propagations,
-          color: colors.icon,
+      if (flags.isEnabled(FeatureFlag.propagations))
+        IconButton(
+          tooltip: l10n.homePropagation,
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const PropagationsPage(),
+              ),
+            );
+          },
+          icon: HugeIcon(
+            icon: _icons.propagations,
+            color: colors.icon,
+          ),
         ),
-      ),
-      IconButton(
-        tooltip: l10n.homeArchive,
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const PlantArchivePage(),
-            ),
-          );
-        },
-        icon: Icon(_icons.archive, color: colors.icon),
-      ),
-      IconButton(
-        tooltip: l10n.homeWishList,
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const WishListPage(),
-            ),
-          );
-        },
-        icon: HugeIcon(
-          icon: _icons.wishlist,
-          color: colors.icon,
+      if (flags.isEnabled(FeatureFlag.archive))
+        IconButton(
+          tooltip: l10n.homeArchive,
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const PlantArchivePage(),
+              ),
+            );
+          },
+          icon: Icon(_icons.archive, color: colors.icon),
         ),
-      ),
-      IconButton(
-        tooltip: l10n.homeFinances,
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const FinancesPage(),
-            ),
-          );
-        },
-        icon: HugeIcon(
-          icon: _icons.finances,
-          color: colors.icon,
+      if (flags.isEnabled(FeatureFlag.wishList))
+        IconButton(
+          tooltip: l10n.homeWishList,
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const WishListPage(),
+              ),
+            );
+          },
+          icon: HugeIcon(
+            icon: _icons.wishlist,
+            color: colors.icon,
+          ),
         ),
-      ),
+      if (flags.isEnabled(FeatureFlag.finances))
+        IconButton(
+          tooltip: l10n.homeFinances,
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const FinancesPage(),
+              ),
+            );
+          },
+          icon: HugeIcon(
+            icon: _icons.finances,
+            color: colors.icon,
+          ),
+        ),
     ];
   }
 
@@ -881,6 +893,13 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: FeatureFlagsController.instance,
+      builder: (context, _) => _buildHome(context),
+    );
+  }
+
+  Widget _buildHome(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isWide = MediaQuery.sizeOf(context).width >= _wideBreakpoint;
     final colors = _colors;
@@ -1032,7 +1051,9 @@ class _HomePageState extends State<HomePage> {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const BalconyAlertBanner(),
+                                if (FeatureFlagsController.instance
+                                    .isEnabled(FeatureFlag.balcony))
+                                  const BalconyAlertBanner(),
                                 if (!_isSelectionMode) ...[
                                   Row(
                                     children: [

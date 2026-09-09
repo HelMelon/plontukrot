@@ -38,17 +38,38 @@ class LoginScreenTheme {
   const LoginScreenTheme({
     required this.brandStyle,
     required this.subtitleStyle,
+    required this.sheetTitleStyle,
+    required this.fieldStyle,
+    required this.fieldLabelStyle,
+    required this.buttonLabelStyle,
+    required this.linkStyle,
+    required this.consentStyle,
   });
 
+  /// Auth login + email sheets: one size below [bodyMedium] (17), shared.
   factory LoginScreenTheme.standard(AppTypographyTokens typography) {
+    final body = typography.bodyMedium;
+    final auth = body.copyWith(fontSize: (body.fontSize ?? 18) - 1);
     return LoginScreenTheme(
       brandStyle: typography.brand,
-      subtitleStyle: typography.bodySmall,
+      subtitleStyle: auth,
+      sheetTitleStyle: auth,
+      fieldStyle: auth,
+      fieldLabelStyle: auth,
+      buttonLabelStyle: auth.copyWith(color: typography.button.color),
+      linkStyle: auth.copyWith(color: typography.link.color),
+      consentStyle: auth.copyWith(color: typography.brand.color),
     );
   }
 
   final TextStyle brandStyle;
   final TextStyle subtitleStyle;
+  final TextStyle sheetTitleStyle;
+  final TextStyle fieldStyle;
+  final TextStyle fieldLabelStyle;
+  final TextStyle buttonLabelStyle;
+  final TextStyle linkStyle;
+  final TextStyle consentStyle;
 }
 
 @immutable

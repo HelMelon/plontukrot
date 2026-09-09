@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
+import '../../../../core/features/feature_flags.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/growth_event.dart';
 import '../../../../models/manipulation_entry.dart';
@@ -468,10 +469,23 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
               ),
             ),
           ],
-          spacing.vXs,
-          BalconyToggle(plant: plant, plantId: plantId),
-          spacing.vXs,
-          SensorBindingToggle(plantId: plantId),
+          if (FeatureFlagsController.instance
+                  .isEnabled(FeatureFlag.balcony) ||
+              FeatureFlagsController.instance
+                  .isEnabled(FeatureFlag.soilSensors)) ...[
+            spacing.vXs,
+            if (FeatureFlagsController.instance
+                .isEnabled(FeatureFlag.balcony))
+              BalconyToggle(plant: plant, plantId: plantId),
+            if (FeatureFlagsController.instance
+                    .isEnabled(FeatureFlag.balcony) &&
+                FeatureFlagsController.instance
+                    .isEnabled(FeatureFlag.soilSensors))
+              spacing.vXs,
+            if (FeatureFlagsController.instance
+                .isEnabled(FeatureFlag.soilSensors))
+              SensorBindingToggle(plantId: plantId),
+          ],
         ],
       ),
     );
@@ -515,14 +529,19 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
       ),
     );
 
-    final propagation = _section(
-      child: PlantPropagationsSection(
-        plantId: plantId,
-        plantName:
-            plant.species.isNotEmpty ? plant.species : l10n.commonUntitled,
-        plantFamily: plant.plantFamily ?? '',
-      ),
-    );
+    final propagationEnabled =
+        FeatureFlagsController.instance.isEnabled(FeatureFlag.propagations);
+    final propagation = !propagationEnabled
+        ? null
+        : _section(
+            child: PlantPropagationsSection(
+              plantId: plantId,
+              plantName: plant.species.isNotEmpty
+                  ? plant.species
+                  : l10n.commonUntitled,
+              plantFamily: plant.plantFamily ?? '',
+            ),
+          );
 
     final journal = _section(
       child: Column(
@@ -640,8 +659,10 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
         mainInfo,
         SizedBox(height: _sectionGap),
         careHistory,
-        SizedBox(height: _sectionGap),
-        propagation,
+        if (propagation != null) ...[
+          SizedBox(height: _sectionGap),
+          propagation,
+        ],
         SizedBox(height: _sectionGap),
         journal,
         if (botanical != null) ...[

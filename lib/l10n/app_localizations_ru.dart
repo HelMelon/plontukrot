@@ -1017,6 +1017,9 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get plantCropLoadFailed => 'не удалось открыть изображение';
+
+  @override
   String get plantEmptyStage => 'Растений этой стадии в коллекции пока нет';
 
   @override

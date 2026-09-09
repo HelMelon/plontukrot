@@ -4,6 +4,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..db import get_pool, jsonb
+from ..feature_flags import FLAG_FRIENDS, require_feature
 from ..routers.auth import get_current_user_id
 from ..schemas import FriendRequestCreate, FriendRequestOut, GiftCreate
 
@@ -16,7 +17,7 @@ def _make_id() -> str:
 
 # ---- Friend requests ----
 @router.get("/friend-requests", response_model=list[FriendRequestOut])
-def list_friend_requests(user_id: str = Depends(get_current_user_id)):
+def list_friend_requests(user_id: str = Depends(require_feature(FLAG_FRIENDS))):
     with get_pool().connection() as conn:
         rows = conn.execute(
             "SELECT id, from_uid, to_uid, from_display_name, from_photo_url, "
@@ -30,7 +31,7 @@ def list_friend_requests(user_id: str = Depends(get_current_user_id)):
 @router.post("/friend-requests", response_model=FriendRequestOut,
              status_code=201)
 def create_friend_request(payload: FriendRequestCreate,
-                          user_id: str = Depends(get_current_user_id)):
+                          user_id: str = Depends(require_feature(FLAG_FRIENDS))):
     r_id = _make_id()
     with get_pool().connection() as conn:
         conn.execute(
@@ -51,7 +52,7 @@ def create_friend_request(payload: FriendRequestCreate,
 @router.patch("/friend-requests/{request_id}/status")
 def update_friend_request_status(
     request_id: str, status_code: int,
-    user_id: str = Depends(get_current_user_id),
+    user_id: str = Depends(require_feature(FLAG_FRIENDS)),
 ):
     with get_pool().connection() as conn:
         row = conn.execute(
@@ -80,7 +81,7 @@ def update_friend_request_status(
 
 # ---- Friends ----
 @router.get("/friends")
-def list_friends(user_id: str = Depends(get_current_user_id)):
+def list_friends(user_id: str = Depends(require_feature(FLAG_FRIENDS))):
     with get_pool().connection() as conn:
         rows = conn.execute(
             "SELECT id, user_a, user_b, created_at FROM friends "
@@ -92,7 +93,7 @@ def list_friends(user_id: str = Depends(get_current_user_id)):
 
 # ---- Gifts ----
 @router.post("/gifts/outgoing", status_code=201)
-def send_gift(payload: GiftCreate, user_id: str = Depends(get_current_user_id)):
+def send_gift(payload: GiftCreate, user_id: str = Depends(require_feature(FLAG_FRIENDS))):
     g_id = _make_id()
     with get_pool().connection() as conn:
         conn.execute(
@@ -111,7 +112,7 @@ def send_gift(payload: GiftCreate, user_id: str = Depends(get_current_user_id)):
 
 
 @router.get("/gifts/incoming")
-def list_incoming_gifts(user_id: str = Depends(get_current_user_id)):
+def list_incoming_gifts(user_id: str = Depends(require_feature(FLAG_FRIENDS))):
     with get_pool().connection() as conn:
         rows = conn.execute(
             "SELECT id, to_uid, from_uid, from_display_name, from_plant_id, "
@@ -123,7 +124,7 @@ def list_incoming_gifts(user_id: str = Depends(get_current_user_id)):
 
 
 @router.get("/gifts/outgoing")
-def list_outgoing_gifts(user_id: str = Depends(get_current_user_id)):
+def list_outgoing_gifts(user_id: str = Depends(require_feature(FLAG_FRIENDS))):
     with get_pool().connection() as conn:
         rows = conn.execute(
             "SELECT id, from_uid, to_uid, from_display_name, from_plant_id, "

@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/currency/app_currency.dart';
 import '../../../core/currency/app_currency_controller.dart';
+import '../../../core/features/owner_iot_features.dart';
 import '../../../core/locale/app_locale_controller.dart';
 import '../../../core/season/fertilizing_season_controller.dart';
 import '../../../core/privacy/privacy_constants.dart';
@@ -801,8 +802,10 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   );
                 },
               ),
-              spacing.vSm,
-              TelegramLinkTile(),
+              if (OwnerIotFeatures.isEnabledForCurrentUser) ...[
+                spacing.vSm,
+                const TelegramLinkTile(),
+              ],
               spacing.vSm,
               ListTile(
                 contentPadding: EdgeInsets.zero,

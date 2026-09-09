@@ -492,6 +492,7 @@
       "error": {"type": "String"}
     }
   },
+  "plantCropLoadFailed": "could not open the image",
   "plantEmptyStage": "No plants of this stage in the collection yet",
   "plantEmptyGenus": "No plants of this genus in the collection yet",
   "plantNote": "Note",

@@ -7,7 +7,7 @@ plant at a time; a plant can have at most one pot.
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..db import get_pool
-from ..routers.auth import get_current_user_id
+from ..feature_flags import FLAG_SOIL_SENSORS, require_feature
 from ..schemas import PlantSensorBindingCreate, PlantSensorBindingOut
 
 router = APIRouter(prefix="/plants", tags=["sensor-bindings"])
@@ -25,7 +25,7 @@ def _latest_for_pot(conn, pot: int) -> dict | None:
 # NOTE: static paths (/sensor-bindings) MUST be declared before dynamic
 # paths (/{plant_id}/...) or FastAPI matches "sensor-bindings" as a plant_id.
 @router.get("/sensor-bindings", response_model=list[PlantSensorBindingOut])
-def list_bindings(user_id: str = Depends(get_current_user_id)):
+def list_bindings(user_id: str = Depends(require_feature(FLAG_SOIL_SENSORS))):
     """All of the user's plant↔pot bindings with latest moisture.
 
     Used by the home grid so it can show each plant's moisture in one
@@ -61,7 +61,7 @@ def list_bindings(user_id: str = Depends(get_current_user_id)):
 def bind_sensor(
     plant_id: str,
     payload: PlantSensorBindingCreate,
-    user_id: str = Depends(get_current_user_id),
+    user_id: str = Depends(require_feature(FLAG_SOIL_SENSORS)),
 ):
     """Bind a pot to a plant. Fails if the pot is already bound to another
     plant, or if the plant already has a different pot bound."""
@@ -109,7 +109,7 @@ def bind_sensor(
 
 
 @router.get("/{plant_id}/sensor-binding", response_model=PlantSensorBindingOut)
-def get_binding(plant_id: str, user_id: str = Depends(get_current_user_id)):
+def get_binding(plant_id: str, user_id: str = Depends(require_feature(FLAG_SOIL_SENSORS))):
     """The plant's current pot binding + latest moisture, if any."""
     with get_pool().connection() as conn:
         plant = conn.execute(
@@ -137,7 +137,7 @@ def get_binding(plant_id: str, user_id: str = Depends(get_current_user_id)):
 
 
 @router.delete("/{plant_id}/sensor-binding", status_code=status.HTTP_204_NO_CONTENT)
-def unbind_sensor(plant_id: str, user_id: str = Depends(get_current_user_id)):
+def unbind_sensor(plant_id: str, user_id: str = Depends(require_feature(FLAG_SOIL_SENSORS))):
     """Remove the plant's pot binding."""
     with get_pool().connection() as conn:
         plant = conn.execute(

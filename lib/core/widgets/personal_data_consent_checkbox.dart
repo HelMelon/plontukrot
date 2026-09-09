@@ -15,11 +15,15 @@ class PersonalDataConsentCheckbox extends StatelessWidget {
   /// Shown in error color under the row when the action is blocked.
   final String? errorText;
 
+  /// Optional override (login uses [LoginScreenTheme.consentStyle]).
+  final TextStyle? labelStyle;
+
   const PersonalDataConsentCheckbox({
     super.key,
     required this.value,
     required this.onChanged,
     this.errorText,
+    this.labelStyle,
   });
 
   Future<void> _openPrivacyPolicy() async {
@@ -36,8 +40,8 @@ class PersonalDataConsentCheckbox extends StatelessWidget {
     final linkColor = context.screens.profile.privacyLinkColor;
     final hasError = errorText != null && errorText!.trim().isNotEmpty;
 
-    final labelStyle = typography.bodyMedium.copyWith(
-      color: colors.heading,
+    final labelStyle = (this.labelStyle ?? typography.bodyMedium).copyWith(
+      color: this.labelStyle?.color ?? colors.heading,
     );
 
     return Column(

@@ -211,6 +211,11 @@ class FertilizingNotificationService {
     await _plugin.cancel(_dayNotificationId(plantId));
   }
 
+  Future<void> cancelAll() async {
+    await initialize();
+    await _plugin.cancelAll();
+  }
+
   Future<void> _schedule({
     required int id,
     required DateTime when,

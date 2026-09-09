@@ -14,6 +14,7 @@ from .routers import (
     auth,
     balcony,
     catalogs,
+    features,
     genera,
     manipulations,
     plant_care,
@@ -74,6 +75,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(features.router)
 # sensor_bindings must come BEFORE plants so its static /sensor-bindings
 # path is matched before plants' dynamic /{plant_id}.
 app.include_router(sensor_bindings.router)

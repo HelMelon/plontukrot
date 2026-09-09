@@ -407,6 +407,7 @@
       "error": {"type": "String"}
     }
   },
+  "plantCropLoadFailed": "impossible d'ouvrir l'image",
   "plantEmptyStage": "Aucune plante de ce stade dans la collection pour le moment",
   "plantEmptyGenus": "Aucune plante de ce genre dans la collection pour le moment",
   "plantNote": "Note",

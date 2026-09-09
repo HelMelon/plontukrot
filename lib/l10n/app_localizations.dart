@@ -1926,6 +1926,12 @@ abstract class AppLocalizations {
   /// **'Crop error: {error}'**
   String plantCropError(String error);
 
+  /// No description provided for @plantCropLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'could not open the image'**
+  String get plantCropLoadFailed;
+
   /// No description provided for @plantEmptyStage.
   ///
   /// In en, this message translates to:

@@ -4,6 +4,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..db import get_pool, jsonb
+from ..feature_flags import FLAG_BALCONY, is_feature_enabled
 from ..routers.auth import get_current_user_id
 from ..schemas import PlantCreate, PlantOut, PlantPhotoOut, PlantUpdate
 
@@ -81,6 +82,10 @@ def create_plant(payload: PlantCreate, user_id: str = Depends(get_current_user_i
         "user_id": user_id,
     }
     for schema_field, column in _FIELDS.items():
+        if column in ("on_balcony", "balcony_band") and not is_feature_enabled(
+            user_id, FLAG_BALCONY
+        ):
+            continue
         val = getattr(payload, schema_field, None)
         if val is not None:
             if column == "members":
@@ -152,6 +157,9 @@ def update_plant(
     user_id: str = Depends(get_current_user_id),
 ):
     data = payload.model_dump(exclude_unset=True)
+    if not is_feature_enabled(user_id, FLAG_BALCONY):
+        data.pop("on_balcony", None)
+        data.pop("balcony_band", None)
     fields = []
     values = []
     for key, val in data.items():

@@ -407,6 +407,7 @@
       "error": {"type": "String"}
     }
   },
+  "plantCropLoadFailed": "не удалось открыть изображение",
   "plantEmptyStage": "Растений этой стадии в коллекции пока нет",
   "plantEmptyGenus": "Растений этого рода в коллекции пока нет",
   "plantNote": "Заметка",

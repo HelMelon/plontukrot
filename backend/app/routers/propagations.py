@@ -4,7 +4,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..db import get_pool
-from ..routers.auth import get_current_user_id
+from ..feature_flags import FLAG_PROPAGATIONS, require_feature
 from ..schemas import (
     PropagationCreate,
     PropagationOut,
@@ -26,7 +26,7 @@ def _ensure_prop(conn, prop_id: str, user_id: str) -> None:
 
 
 @router.get("", response_model=list[PropagationOut])
-def list_propagations(user_id: str = Depends(get_current_user_id)):
+def list_propagations(user_id: str = Depends(require_feature(FLAG_PROPAGATIONS))):
     with get_pool().connection() as conn:
         rows = conn.execute(
             "SELECT id, parent_plant_id, parent_plant_name, "
@@ -41,7 +41,7 @@ def list_propagations(user_id: str = Depends(get_current_user_id)):
 
 @router.post("", response_model=PropagationOut, status_code=201)
 def create_propagation(payload: PropagationCreate,
-                       user_id: str = Depends(get_current_user_id)):
+                       user_id: str = Depends(require_feature(FLAG_PROPAGATIONS))):
     prop_id = uuid.uuid4().hex
     with get_pool().connection() as conn:
         conn.execute(
@@ -71,7 +71,7 @@ def create_propagation(payload: PropagationCreate,
 
 @router.patch("/{prop_id}", response_model=PropagationOut)
 def update_propagation(prop_id: str, payload: PropagationCreate,
-                       user_id: str = Depends(get_current_user_id)):
+                       user_id: str = Depends(require_feature(FLAG_PROPAGATIONS))):
     with get_pool().connection() as conn:
         _ensure_prop(conn, prop_id, user_id)
         conn.execute(
@@ -100,7 +100,7 @@ def update_propagation(prop_id: str, payload: PropagationCreate,
 
 @router.delete("/{prop_id}", status_code=204)
 def delete_propagation(prop_id: str,
-                       user_id: str = Depends(get_current_user_id)):
+                       user_id: str = Depends(require_feature(FLAG_PROPAGATIONS))):
     with get_pool().connection() as conn:
         _ensure_prop(conn, prop_id, user_id)
         conn.execute("DELETE FROM propagations WHERE id = %s", (prop_id,))
@@ -108,7 +108,7 @@ def delete_propagation(prop_id: str,
 
 # ---- Notes ----
 @router.get("/{prop_id}/notes", response_model=list)
-def list_prop_notes(prop_id: str, user_id: str = Depends(get_current_user_id)):
+def list_prop_notes(prop_id: str, user_id: str = Depends(require_feature(FLAG_PROPAGATIONS))):
     with get_pool().connection() as conn:
         _ensure_prop(conn, prop_id, user_id)
         rows = conn.execute(
@@ -123,7 +123,7 @@ def list_prop_notes(prop_id: str, user_id: str = Depends(get_current_user_id)):
 # ---- Stage history ----
 @router.get("/{prop_id}/stage-history", response_model=list[StageHistoryOut])
 def list_stage_history(prop_id: str,
-                       user_id: str = Depends(get_current_user_id)):
+                       user_id: str = Depends(require_feature(FLAG_PROPAGATIONS))):
     with get_pool().connection() as conn:
         _ensure_prop(conn, prop_id, user_id)
         rows = conn.execute(
@@ -138,7 +138,7 @@ def list_stage_history(prop_id: str,
 @router.post("/{prop_id}/stage-history", response_model=StageHistoryOut,
              status_code=201)
 def add_stage_history(prop_id: str, payload: StageHistoryCreate,
-                      user_id: str = Depends(get_current_user_id)):
+                      user_id: str = Depends(require_feature(FLAG_PROPAGATIONS))):
     h_id = uuid.uuid4().hex
     with get_pool().connection() as conn:
         _ensure_prop(conn, prop_id, user_id)

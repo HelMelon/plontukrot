@@ -47,11 +47,17 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
     Widget? prefixIcon,
     Widget? suffixIcon,
   }) {
-    return context.components.inputs.decoration(
-      labelText: labelText,
-      prefixIcon: prefixIcon,
-      suffixIcon: suffixIcon,
-    );
+    final login = context.screens.login;
+    return context.components.inputs
+        .decoration(
+          labelText: labelText,
+          prefixIcon: prefixIcon,
+          suffixIcon: suffixIcon,
+        )
+        .copyWith(
+          labelStyle: login.fieldLabelStyle,
+          hintStyle: login.fieldLabelStyle,
+        );
   }
 
   Future<void> _showAuthError(Object error) async {
@@ -110,6 +116,7 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
     final spacing = context.spacing;
     final sheets = context.components.sheets;
     final dimensions = context.dimensions;
+    final login = context.screens.login;
 
     return AnimatedPadding(
       duration: const Duration(milliseconds: 100),
@@ -138,7 +145,7 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
                       spacing.vLg,
                       Text(
                         l10n.authSignInEmailTitle,
-                        style: sheets.titleStyle,
+                        style: login.sheetTitleStyle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -146,6 +153,7 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
                       TextFormField(
                         controller: _emailController,
                         enabled: !_isLoading,
+                        style: login.fieldStyle,
                         keyboardType: TextInputType.emailAddress,
                         autofillHints: const [AutofillHints.email],
                         textInputAction: TextInputAction.next,
@@ -172,6 +180,7 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
                       TextFormField(
                         controller: _passwordController,
                         enabled: !_isLoading,
+                        style: login.fieldStyle,
                         obscureText: _obscurePassword,
                         autofillHints: const [AutofillHints.password],
                         textInputAction: TextInputAction.done,
@@ -215,17 +224,27 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
                         height: dimensions.buttonHeight,
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _signIn,
+                          style: ElevatedButton.styleFrom(
+                            textStyle: login.buttonLabelStyle,
+                          ),
                           child: Text(
                             _isLoading
                                 ? l10n.authSigningIn
                                 : l10n.authSignInEmailSubmit,
+                            style: login.buttonLabelStyle,
                           ),
                         ),
                       ),
                       spacing.vMd,
                       TextButton(
                         onPressed: _isLoading ? null : _openRegister,
-                        child: Text(l10n.authNoAccountRegister),
+                        style: TextButton.styleFrom(
+                          textStyle: login.linkStyle,
+                        ),
+                        child: Text(
+                          l10n.authNoAccountRegister,
+                          style: login.linkStyle,
+                        ),
                       ),
                     ],
                   ),

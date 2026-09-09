@@ -47,11 +47,17 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
     Widget? prefixIcon,
     Widget? suffixIcon,
   }) {
-    return context.components.inputs.decoration(
-      labelText: labelText,
-      prefixIcon: prefixIcon,
-      suffixIcon: suffixIcon,
-    );
+    final login = context.screens.login;
+    return context.components.inputs
+        .decoration(
+          labelText: labelText,
+          prefixIcon: prefixIcon,
+          suffixIcon: suffixIcon,
+        )
+        .copyWith(
+          labelStyle: login.fieldLabelStyle,
+          hintStyle: login.fieldLabelStyle,
+        );
   }
 
   Future<void> _showAuthError(Object error) async {
@@ -104,6 +110,7 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
     final spacing = context.spacing;
     final sheets = context.components.sheets;
     final dimensions = context.dimensions;
+    final login = context.screens.login;
 
     return AnimatedPadding(
       duration: const Duration(milliseconds: 100),
@@ -132,7 +139,7 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                       spacing.vLg,
                       Text(
                         l10n.authRegisterTitle,
-                        style: sheets.titleStyle,
+                        style: login.sheetTitleStyle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -140,6 +147,7 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                       TextFormField(
                         controller: _nameController,
                         enabled: !_isLoading,
+                        style: login.fieldStyle,
                         textCapitalization: TextCapitalization.words,
                         autofillHints: const [AutofillHints.nickname],
                         textInputAction: TextInputAction.next,
@@ -164,6 +172,7 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                       TextFormField(
                         controller: _emailController,
                         enabled: !_isLoading,
+                        style: login.fieldStyle,
                         keyboardType: TextInputType.emailAddress,
                         autofillHints: const [AutofillHints.email],
                         textInputAction: TextInputAction.next,
@@ -190,6 +199,7 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                       TextFormField(
                         controller: _passwordController,
                         enabled: !_isLoading,
+                        style: login.fieldStyle,
                         obscureText: _obscurePassword,
                         autofillHints: const [AutofillHints.newPassword],
                         textInputAction: TextInputAction.done,
@@ -234,10 +244,14 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                         height: dimensions.buttonHeight,
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _register,
+                          style: ElevatedButton.styleFrom(
+                            textStyle: login.buttonLabelStyle,
+                          ),
                           child: Text(
                             _isLoading
                                 ? l10n.authRegistering
                                 : l10n.authRegisterAction,
+                            style: login.buttonLabelStyle,
                           ),
                         ),
                       ),
@@ -246,7 +260,13 @@ class _EmailRegisterSheetState extends State<EmailRegisterSheet> {
                         onPressed: _isLoading
                             ? null
                             : () => Navigator.of(context).pop(),
-                        child: Text(l10n.commonCancel),
+                        style: TextButton.styleFrom(
+                          textStyle: login.linkStyle,
+                        ),
+                        child: Text(
+                          l10n.commonCancel,
+                          style: login.linkStyle,
+                        ),
                       ),
                     ],
                   ),

@@ -1024,6 +1024,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get plantCropLoadFailed => 'impossible d\'ouvrir l\'image';
+
+  @override
   String get plantEmptyStage =>
       'Aucune plante de ce stade dans la collection pour le moment';
 

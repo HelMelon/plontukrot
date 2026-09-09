@@ -4,6 +4,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import 'package:plontukrot/core/theme/theme_context.dart';
 import 'package:plontukrot/core/widgets/app_bar_chrome_actions.dart';
 
+import '../../../core/features/feature_flags.dart';
 import '../../../models/growth_event.dart';
 import '../../../models/plant.dart';
 import '../../../models/plant_photo.dart';
@@ -462,6 +463,7 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
         final actionsBarHeight = spacing.xxxl + spacing.md;
 
         final icons = context.icons;
+        final flags = FeatureFlagsController.instance;
         final actionButtons = <Widget>[
           IconButton(
             tooltip: l10n.watering,
@@ -484,14 +486,15 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               color: actionIconColor,
             ),
           ),
-          IconButton(
-            tooltip: l10n.plantPropagation,
-            onPressed: () => _openPropagation(plant),
-            icon: HugeIcon(
-              icon: icons.propagations,
-              color: actionIconColor,
+          if (flags.isEnabled(FeatureFlag.propagations))
+            IconButton(
+              tooltip: l10n.plantPropagation,
+              onPressed: () => _openPropagation(plant),
+              icon: HugeIcon(
+                icon: icons.propagations,
+                color: actionIconColor,
+              ),
             ),
-          ),
           IconButton(
             tooltip: l10n.commonEdit,
             onPressed: () => _openUpdatePlant(plant),
@@ -506,11 +509,13 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
             ),
           ),
           if (!plant.isArchived) ...[
-            IconButton(
-              tooltip: l10n.plantGift,
-              onPressed: () => showGiftPlantSheet(context: context, plant: plant),
-              icon: Icon(icons.gift, color: actionIconColor),
-            ),
+            if (flags.isEnabled(FeatureFlag.friends))
+              IconButton(
+                tooltip: l10n.plantGift,
+                onPressed: () =>
+                    showGiftPlantSheet(context: context, plant: plant),
+                icon: Icon(icons.gift, color: actionIconColor),
+              ),
             IconButton(
               tooltip: l10n.plantDispose,
               onPressed: () => _openDispose(plant),

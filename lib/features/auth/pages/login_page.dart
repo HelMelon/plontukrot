@@ -116,6 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                     value: _consentAccepted,
                     onChanged: _onConsentChanged,
                     errorText: _consentError ? l10n.authConsentRequired : null,
+                    labelStyle: loginTheme.consentStyle,
                   ),
                   spacing.vXl,
                 ],
@@ -124,6 +125,9 @@ class _LoginPageState extends State<LoginPage> {
                   height: dimensions.buttonHeight,
                   child: ElevatedButton.icon(
                     onPressed: canSubmit ? _openEmailSignIn : null,
+                    style: ElevatedButton.styleFrom(
+                      textStyle: loginTheme.buttonLabelStyle,
+                    ),
                     icon: isLoading
                         ? SizedBox(
                             width: dimensions.iconLg,
@@ -136,6 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                         : Icon(context.icons.email),
                     label: Text(
                       isLoading ? l10n.authSigningIn : l10n.authSignInEmail,
+                      style: loginTheme.buttonLabelStyle,
                     ),
                   ),
                 ),

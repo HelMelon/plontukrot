@@ -22,7 +22,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..config import settings
 from ..db import get_pool
-from ..routers.auth import get_current_user_id
+from ..feature_flags import (
+    FLAG_TELEGRAM_ALERTS,
+    is_feature_enabled,
+    require_feature,
+)
 from ..schemas import TelegramConfirmIn, TelegramLinkOut, TelegramStatusOut
 
 log = logging.getLogger(__name__)
@@ -39,7 +43,7 @@ def _make_code() -> str:
 
 
 @router.post("/link", response_model=TelegramLinkOut, status_code=201)
-def create_link(user_id: str = Depends(get_current_user_id)):
+def create_link(user_id: str = Depends(require_feature(FLAG_TELEGRAM_ALERTS))):
     """Mint a one-time code the user pastes into the bot (via deep-link)."""
     code = _make_code()
     expires_at = datetime.now(timezone.utc) + _LINK_CODE_TTL
@@ -83,7 +87,13 @@ def confirm_link(payload: TelegramConfirmIn):
         if row["expires_at"] < now:
             conn.execute("DELETE FROM telegram_link_codes WHERE code = %s", (code,))
             raise HTTPException(status_code=410, detail="Code expired")
-        user_id = row["user_id"]
+        user_id = str(row["user_id"])
+        if not is_feature_enabled(user_id, FLAG_TELEGRAM_ALERTS):
+            conn.execute("DELETE FROM telegram_link_codes WHERE code = %s", (code,))
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Feature not available",
+            )
         conn.execute(
             "INSERT INTO telegram_links (user_id, chat_id) VALUES (%s, %s) "
             "ON CONFLICT (user_id) DO UPDATE SET chat_id = EXCLUDED.chat_id",
@@ -94,7 +104,7 @@ def confirm_link(payload: TelegramConfirmIn):
 
 
 @router.get("/status", response_model=TelegramStatusOut)
-def link_status(user_id: str = Depends(get_current_user_id)):
+def link_status(user_id: str = Depends(require_feature(FLAG_TELEGRAM_ALERTS))):
     """Whether the current user has linked a Telegram chat."""
     with get_pool().connection() as conn:
         row = conn.execute(
@@ -107,7 +117,7 @@ def link_status(user_id: str = Depends(get_current_user_id)):
 
 
 @router.delete("/link", status_code=status.HTTP_204_NO_CONTENT)
-def unlink(user_id: str = Depends(get_current_user_id)):
+def unlink(user_id: str = Depends(require_feature(FLAG_TELEGRAM_ALERTS))):
     """Remove the user's Telegram binding."""
     with get_pool().connection() as conn:
         conn.execute("DELETE FROM telegram_links WHERE user_id = %s", (user_id,))
@@ -117,10 +127,16 @@ def unlink(user_id: str = Depends(get_current_user_id)):
 # ---- Alert delivery ----
 
 def _all_chat_ids() -> list[str]:
-    """Every linked Telegram chat_id."""
+    """Linked Telegram chat_ids for users with telegram_alerts enabled."""
     with get_pool().connection() as conn:
-        rows = conn.execute("SELECT chat_id FROM telegram_links").fetchall()
-    return [r["chat_id"] for r in rows]
+        rows = conn.execute(
+            "SELECT user_id, chat_id FROM telegram_links"
+        ).fetchall()
+    return [
+        r["chat_id"]
+        for r in rows
+        if is_feature_enabled(str(r["user_id"]), FLAG_TELEGRAM_ALERTS)
+    ]
 
 
 def send_telegram_alert(text: str, chat_ids: list[str] | None = None) -> bool:

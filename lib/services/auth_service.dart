@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import '../core/features/feature_flags.dart';
 import '../core/privacy/device_consent_store.dart';
 import '../models/app_user.dart';
 import '../models/model_helpers.dart';
@@ -135,6 +136,7 @@ class AuthService {
 
   Future<void> _clearSession() async {
     await TokenStore.instance.clear();
+    FeatureFlagsController.instance.clear();
     _emit(null);
     await AppCrashReporting.instance.setUserId(null);
   }
