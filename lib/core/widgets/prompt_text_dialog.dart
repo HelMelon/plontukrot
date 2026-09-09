@@ -101,10 +101,12 @@ class _PromptTextDialogState extends State<_PromptTextDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final media = MediaQuery.of(context);
-    final maxContentHeight =
-        (media.size.height - media.viewInsets.bottom) * 0.4;
     final dialogs = context.components.dialogs;
     final spacing = context.spacing;
+    final keyboardOpen = media.viewInsets.bottom > 0;
+    // Floating label sits above the outline; keep room so it is not clipped
+    // when the keyboard shrinks the dialog.
+    final labelTopGap = widget.labelText == null ? 0.0 : spacing.sm;
 
     return AlertDialog(
       backgroundColor: dialogs.background,
@@ -113,36 +115,37 @@ class _PromptTextDialogState extends State<_PromptTextDialog> {
       ),
       insetPadding: EdgeInsets.symmetric(
         horizontal: spacing.xl,
-        vertical: spacing.xl,
+        vertical: keyboardOpen ? spacing.sm : spacing.xl,
       ),
+      // Title + field + actions scroll together when space above the
+      // keyboard is tight (landscape / short screens).
+      scrollable: true,
       title: Text(
         widget.title,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
         style: dialogs.titleStyle,
       ),
-      content: ConstrainedBox(
-        constraints:
-            BoxConstraints(maxHeight: maxContentHeight.clamp(120.0, 320.0)),
-        child: SingleChildScrollView(
-          child: TextField(
-            controller: _controller,
-            autofocus: true,
-            obscureText: widget.obscureText,
-            keyboardType: widget.keyboardType,
-            inputFormatters: widget.inputFormatters,
-            textCapitalization: widget.obscureText
-                ? TextCapitalization.none
-                : widget.textCapitalization,
-            onChanged: (_) {
-              if (_errorText != null) setState(() => _errorText = null);
-            },
-            onSubmitted: (_) => _submit(),
-            decoration: InputDecoration(
-              hintText: widget.hintText,
-              labelText: widget.labelText,
-              errorText: _errorText,
-            ),
+      content: Padding(
+        padding: EdgeInsets.only(top: labelTopGap),
+        child: TextField(
+          controller: _controller,
+          autofocus: true,
+          obscureText: widget.obscureText,
+          keyboardType: widget.keyboardType,
+          inputFormatters: widget.inputFormatters,
+          textCapitalization: widget.obscureText
+              ? TextCapitalization.none
+              : widget.textCapitalization,
+          onChanged: (_) {
+            if (_errorText != null) setState(() => _errorText = null);
+          },
+          onSubmitted: (_) => _submit(),
+          decoration: InputDecoration(
+            hintText: widget.hintText,
+            labelText: widget.labelText,
+            errorText: _errorText,
+            floatingLabelBehavior: FloatingLabelBehavior.always,
           ),
         ),
       ),
