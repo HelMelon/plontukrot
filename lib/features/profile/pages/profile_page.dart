@@ -30,7 +30,6 @@ import '../../../services/fertilizing_notification_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../friends/pages/friends_page.dart';
-import 'admin_panel_tab.dart';
 import '../widgets/telegram_link_tile.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
@@ -45,17 +44,14 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage>
-    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
+    with WidgetsBindingObserver {
   late final Stream<List<Plant>> _plantsStream;
   late final Stream<List<Propagation>> _propagationsStream;
   late final Stream<UserProfileDoc> _profileStream;
-  TabController? _tabController;
   bool _busy = false;
   String? _busyMessage;
   bool _notificationsGranted = false;
   bool _avatarUploading = false;
-
-  bool get _isAdmin => FeatureFlagsController.isAdminUid(widget.user.uid);
 
   @override
   void initState() {
@@ -65,14 +61,10 @@ class _ProfilePageState extends State<ProfilePage>
     _propagationsStream = PropagationService().watchActivePropagations();
     _profileStream = UserProfileService().watchUserProfile();
     _checkNotificationPermission();
-    if (_isAdmin) {
-      _tabController = TabController(length: 2, vsync: this);
-    }
   }
 
   @override
   void dispose() {
-    _tabController?.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -369,7 +361,6 @@ class _ProfilePageState extends State<ProfilePage>
 
   Widget _buildProfile(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final tabController = _tabController;
 
     final languageOptions = <({String code, String label})>[
       (
@@ -382,11 +373,6 @@ class _ProfilePageState extends State<ProfilePage>
       (code: 'fr', label: l10n.settingsLanguageFrench),
     ];
 
-    final profileBody = _buildProfileBody(
-      context,
-      languageOptions: languageOptions,
-    );
-
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
@@ -397,25 +383,11 @@ class _ProfilePageState extends State<ProfilePage>
           user: widget.user,
           showProfile: false,
         ),
-        bottom: _isAdmin && tabController != null
-            ? TabBar(
-                controller: tabController,
-                tabs: [
-                  Tab(text: l10n.profileTabProfile),
-                  Tab(text: l10n.profileTabAdmin),
-                ],
-              )
-            : null,
       ),
-      body: _isAdmin && tabController != null
-          ? TabBarView(
-              controller: tabController,
-              children: [
-                profileBody,
-                const AdminPanelTab(),
-              ],
-            )
-          : profileBody,
+      body: _buildProfileBody(
+        context,
+        languageOptions: languageOptions,
+      ),
     );
   }
 

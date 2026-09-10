@@ -22,9 +22,6 @@ from ..security import (
     hash_password,
     verify_password,
 )
-from ..user_bans import raise_if_banned
-from ..user_deletions import raise_if_deleted
-
 router = APIRouter(prefix="/auth", tags=["auth"])
 _bearer = HTTPBearer(auto_error=False)
 
@@ -95,8 +92,6 @@ def login(payload: LoginRequest):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",
         )
-    raise_if_banned(str(row["id"]))
-    raise_if_deleted(str(row["id"]))
     token = create_access_token(str(row["id"]))
     return TokenResponse(access_token=token)
 
@@ -116,8 +111,6 @@ def get_current_user_id(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
         )
-    raise_if_banned(sub)
-    raise_if_deleted(sub)
     return sub
 
 

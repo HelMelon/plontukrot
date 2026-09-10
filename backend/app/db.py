@@ -149,37 +149,6 @@ def auto_migrate() -> None:
 
                 ALTER TABLE users ADD COLUMN IF NOT EXISTS photo_url TEXT;
             """)
-            # Feature-flag / ban tables: run separately so a failure here
-            # does not roll back unrelated migrations above.
-            for stmt in (
-                """
-                CREATE TABLE IF NOT EXISTS user_feature_flag_overrides (
-                    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-                    flags JSONB NOT NULL DEFAULT '{}',
-                    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-                )
-                """,
-                """
-                CREATE TABLE IF NOT EXISTS user_bans (
-                    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-                    reason TEXT NOT NULL,
-                    banned_by UUID REFERENCES users(id) ON DELETE SET NULL,
-                    banned_at TIMESTAMPTZ NOT NULL DEFAULT now()
-                )
-                """,
-                """
-                CREATE TABLE IF NOT EXISTS user_deletions (
-                    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-                    reason TEXT NOT NULL,
-                    deleted_by UUID REFERENCES users(id) ON DELETE SET NULL,
-                    deleted_at TIMESTAMPTZ NOT NULL DEFAULT now()
-                )
-                """,
-            ):
-                try:
-                    conn.execute(stmt)
-                except Exception:
-                    pass
             conn.execute("""
                 DO $genus_care_locale_pk$
                 BEGIN

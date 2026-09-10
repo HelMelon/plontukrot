@@ -206,17 +206,6 @@ class ApiClient {
         _extractMessage(response),
         body: response.body,
       );
-      if (exception.isUserBanned || exception.isUserDeleted) {
-        final isAuthForm = path.startsWith('/auth/login') ||
-            path.startsWith('/auth/register');
-        if (!isAuthForm) {
-          await TokenStore.instance.clear();
-          final callback = onUnauthorized;
-          if (callback != null) {
-            await callback();
-          }
-        }
-      }
       if (response.statusCode >= 500 ||
           response.statusCode == 400 ||
           response.statusCode == 422) {

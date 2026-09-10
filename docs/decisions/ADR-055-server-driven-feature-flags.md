@@ -60,14 +60,10 @@ account when the `balcony` flag is enabled for that account.
 
 ## Consequences
 
-- Changing global flags still requires server env update (or a future
-  global admin API)
-- Personal overrides for the owner account can be toggled from Profile
-  via `PATCH /features` and DB storage (ADR-056); those overrides
-  supersede env for that user
+- Changing flags requires a server env update (or a later admin API)
 - Clients that skip `GET /features` fall back to enum defaults (IoT off)
 - ADR-054 allowlist behavior is preserved inside flag resolution unless
-  a higher-priority override sets the IoT flag explicitly
+  a higher-priority env override sets the IoT flag explicitly
 
 ## Verification
 
