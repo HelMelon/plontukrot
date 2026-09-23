@@ -5,6 +5,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/plant.dart';
 import '../../../../models/plant_member.dart';
+import '../../../../models/quarantine_reason.dart';
 import '../../../../models/variegation.dart';
 import '../../../../core/season/fertilizing_season_controller.dart';
 import '../../../../models/fertilizing_frequency.dart';
@@ -12,6 +13,7 @@ import '../../../../services/plant_service.dart';
 import '../../../../services/storage_service.dart';
 import '../common/pick_and_crop_plant_photo.dart';
 import '../common/plant_pending_photo_control.dart';
+import '../common/plant_quarantine_fields.dart';
 import '../selectors/fertilizing_frequency_field.dart';
 import '../selectors/plant_stage_selector.dart';
 import '../selectors/plant_variegation_selector.dart';
@@ -68,6 +70,10 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   String? nicknameError;
   bool isHybrid = false;
   bool isRegularWatering = false;
+  bool isQuarantine = false;
+  QuarantineReason? quarantineReason;
+  late final bool _initialQuarantine;
+  late final QuarantineReason? _initialQuarantineReason;
   Uint8List? _pendingPhotoBytes;
 
   bool get _isGroup => widget.plant.isGroup;
@@ -102,6 +108,11 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
       wateringFrequencyController.text = '';
     }
     isRegularWatering = wateringFrequencyController.text.isNotEmpty;
+    isQuarantine = widget.plant.isInQuarantine();
+    quarantineReason = widget.plant.quarantineReason ??
+        (isQuarantine ? QuarantineReason.purchase : null);
+    _initialQuarantine = isQuarantine;
+    _initialQuarantineReason = quarantineReason;
     initialLeafCountController.text = widget.plant.initialLeafCount.toString();
     selectedStage = widget.plant.stage;
     isFertilizingFrequencyCustom = widget.plant.isFertilizingFrequencyCustom;
@@ -301,6 +312,18 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     });
 
     try {
+      bool? quarantineArg;
+      QuarantineReason? quarantineReasonArg;
+      if (isQuarantine != _initialQuarantine) {
+        quarantineArg = isQuarantine;
+        quarantineReasonArg =
+            isQuarantine ? (quarantineReason ?? QuarantineReason.purchase) : null;
+      } else if (isQuarantine &&
+          quarantineReason != _initialQuarantineReason) {
+        quarantineArg = true;
+        quarantineReasonArg = quarantineReason;
+      }
+
       await PlantService().updatePlant(
         plantId: widget.plantId,
         genus: genus,
@@ -316,6 +339,8 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
         members: members,
         fertilizingFrequencyDays: fertilizingFrequencyDays,
         isFertilizingFrequencyCustom: isFertilizingFrequencyCustom,
+        quarantine: quarantineArg,
+        quarantineReason: quarantineReasonArg,
       );
 
       Object? photoError;
@@ -611,6 +636,22 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                               ),
                             ),
                           ],
+                          spacing.vMd,
+                          PlantQuarantineFields(
+                            enabled: isQuarantine,
+                            reason: quarantineReason,
+                            onEnabledChanged: (value) {
+                              setState(() {
+                                isQuarantine = value;
+                                if (value && quarantineReason == null) {
+                                  quarantineReason = QuarantineReason.purchase;
+                                }
+                              });
+                            },
+                            onReasonChanged: (value) {
+                              setState(() => quarantineReason = value);
+                            },
+                          ),
                           spacing.vMd,
                           TextField(
                             controller: initialLeafCountController,

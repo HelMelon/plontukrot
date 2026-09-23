@@ -275,6 +275,7 @@
   },
   "homeGroups": "Группы",
   "homeReanimation": "Реанимация",
+  "homeQuarantine": "Карантин",
   "homeArchive": "Архив",
   "homeMerge": "Объединить",
   "homeMergeNeedCount": "Выберите от 2 до 3 растений",
@@ -333,6 +334,27 @@
   "plantNickname": "Прозвище",
   "plantNicknameRequired": "Укажите название растения",
   "plantRegularWatering": "Регулярный полив",
+  "plantQuarantine": "Карантин",
+  "plantQuarantineHint": "Изоляция на 14 дней (покупка или пересадка)",
+  "plantQuarantineReasonPurchase": "Покупка",
+  "plantQuarantineReasonRepotting": "Пересадка",
+  "plantQuarantineBadge": "Карантин",
+  "quarantineOn": "На карантине",
+  "quarantineOff": "Без карантина",
+  "quarantineUntilLabel": "До {date}",
+  "@quarantineUntilLabel": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "quarantineEndedTitle": "Карантин завершён",
+  "quarantineEndedBody": "Растение «{name}» снято с карантина",
+  "@quarantineEndedBody": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "a11yPlantQuarantine": "Растение на карантине",
   "plantWateringFrequency": "Частота полива",
   "plantGrowthStage": "Стадия роста",
   "plantGenusRequired": "Укажите род растения",
@@ -410,6 +432,15 @@
   "plantCropLoadFailed": "не удалось открыть изображение",
   "plantEmptyStage": "Растений этой стадии в коллекции пока нет",
   "plantEmptyGenus": "Растений этого рода в коллекции пока нет",
+  "plantEmptyFamily": "Растений этого семейства в коллекции пока нет",
+  "plantFamilyFallback": "Семейство",
+  "familyPlantsButton": "Растения семейства",
+  "familyPlantsSheetTitle": "Растения: {family}",
+  "@familyPlantsSheetTitle": {
+    "placeholders": {
+      "family": {"type": "String"}
+    }
+  },
   "plantNote": "Заметка",
   "plantPropagation": "Размножение",
   "plantInitialLeafCount": "Начальное число листьев",
@@ -933,6 +964,10 @@
   "genusCareRetry": "Повторить попытку",
   "a11yGenusCareExpand": "Развернуть справку по уходу",
   "a11yGenusCareCollapse": "Свернуть справку по уходу",
+  "familyCareTitle": "О семействе и уходе",
+  "familyCareAiBadge": "Справка",
+  "a11yFamilyCareExpand": "Развернуть справку по семейству",
+  "a11yFamilyCareCollapse": "Свернуть справку по семейству",
   "balconyOn": "На балконе",
   "balconyOff": "В помещении",
   "balconyBandLabel": "Выдержит до {minTemp}°C",

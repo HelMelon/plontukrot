@@ -5,10 +5,12 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
 import '../../../../core/widgets/focusable_tap.dart';
+import '../../../../core/season/fertilizing_season_controller.dart';
 import '../../../../models/fertilizing_frequency.dart';
 import '../../../../models/plant.dart';
 import '../../pages/plant_details_page.dart';
 import '../common/plant_image.dart';
+import '../common/quarantine_badge.dart';
 
 extension CapitalizeString on String {
   String toTitleCase() {
@@ -183,17 +185,25 @@ class PlantCard extends StatelessWidget {
     final fertilizedLabel = _dateLabel(plant.lastFertilizedAt, emptyDate);
     final wateredLabel = _dateLabel(plant.lastWateredAt, emptyDate);
     final batchesLabel = '$propagationBatchCount';
+    final quarantineSeason = plant.quarantineUntil == null
+        ? null
+        : FertilizingSeasonController.instance.settings
+            .growthSeasonForDate(plant.quarantineUntil!);
     final fertilizingOverdue = isFertilizingOverdue(
       frequencyDays: plant.fertilizingFrequencyDays,
       lastFertilizedAt: plant.lastFertilizedAt,
       createdAt: plant.createdAt,
       isArchived: plant.isArchived,
+      quarantineUntil: plant.quarantineUntil,
+      quarantineSeason: quarantineSeason,
     );
     final fertilizingDueAt = fertilizingOverdue
         ? nextFertilizingDate(
             frequencyDays: plant.fertilizingFrequencyDays,
             lastFertilizedAt: plant.lastFertilizedAt,
             createdAt: plant.createdAt,
+            quarantineUntil: plant.quarantineUntil,
+            quarantineSeason: quarantineSeason,
           )
         : null;
     final fertilizingStatLabel = fertilizingOverdue && fertilizingDueAt != null
@@ -219,6 +229,7 @@ class PlantCard extends StatelessWidget {
     final semanticsLabel = [
       if (hasNickname) nickname,
       species,
+      if (plant.isInQuarantine()) l10n.a11yPlantQuarantine,
       if (fertilizingOverdue && fertilizingDueAt != null)
         l10n.a11yFertilizingDue(_dateLabel(fertilizingDueAt, emptyDate))
       else
@@ -465,12 +476,22 @@ class PlantCard extends StatelessWidget {
                     ),
                   ),
                 ),
-              if (moisture != null)
+              if (moisture != null || plant.isInQuarantine())
                 Positioned(
                   top: spacing.xs,
                   left: spacing.xs,
-                  child: ExcludeSemantics(
-                    child: _MoistureBadge(moisture: moisture!),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (moisture != null)
+                        ExcludeSemantics(
+                          child: _MoistureBadge(moisture: moisture!),
+                        ),
+                      if (moisture != null && plant.isInQuarantine())
+                        SizedBox(height: spacing.xs),
+                      if (plant.isInQuarantine()) const QuarantineBadge(),
+                    ],
                   ),
                 ),
             ],

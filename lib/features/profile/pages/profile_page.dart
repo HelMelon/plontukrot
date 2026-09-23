@@ -27,6 +27,7 @@ import '../../../services/storage_service.dart';
 import '../../plants/widgets/common/pick_and_crop_plant_photo.dart';
 import '../../../services/user_profile_service.dart';
 import '../../../services/fertilizing_notification_service.dart';
+import '../../../services/quarantine_notification_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
 import '../../friends/pages/friends_page.dart';
@@ -138,6 +139,7 @@ class _ProfilePageState extends State<ProfilePage>
         await FertilizingNotificationService.instance.requestPermission();
     if (granted) {
       await FertilizingNotificationService.instance.rescheduleAllActivePlants();
+      await QuarantineNotificationService.instance.rescheduleAllActivePlants();
     }
     if (!mounted) return;
     setState(() => _notificationsGranted = granted);

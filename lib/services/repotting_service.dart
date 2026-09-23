@@ -1,9 +1,11 @@
 import '../models/component.dart';
 import '../models/model_helpers.dart';
+import '../models/quarantine_reason.dart';
 import '../models/repotting_entry.dart';
 import 'api_client.dart';
 import 'api_exception.dart';
 import 'growth_event_service.dart';
+import 'plant_service.dart';
 import 'rest_stream.dart';
 
 class RepottingService {
@@ -40,6 +42,12 @@ class RepottingService {
       'slow_release_fertilizer': slowReleaseFertilizer,
     });
     await GrowthEventService().addRepottingEvent(plantId, at: repottedAt);
+    await PlantService().setQuarantine(
+      plantId: plantId,
+      enabled: true,
+      reason: QuarantineReason.repotting,
+      startedAt: repottedAt,
+    );
   }
 
   Future<void> addRepottings({

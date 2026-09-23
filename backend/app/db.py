@@ -65,6 +65,8 @@ def auto_migrate() -> None:
                 ALTER TABLE plants ADD COLUMN IF NOT EXISTS gifted_to_uid TEXT;
                 ALTER TABLE plants ADD COLUMN IF NOT EXISTS on_balcony BOOLEAN NOT NULL DEFAULT false;
                 ALTER TABLE plants ADD COLUMN IF NOT EXISTS balcony_band INT;
+                ALTER TABLE plants ADD COLUMN IF NOT EXISTS quarantine_until TIMESTAMPTZ;
+                ALTER TABLE plants ADD COLUMN IF NOT EXISTS quarantine_reason TEXT;
 
                 ALTER TABLE plant_manipulations ADD COLUMN IF NOT EXISTS ended_at TIMESTAMPTZ;
                 ALTER TABLE plant_manipulations ADD COLUMN IF NOT EXISTS reanimation_tags JSONB;
@@ -139,6 +141,23 @@ def auto_migrate() -> None:
                     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
                     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
                     PRIMARY KEY (genus, locale)
+                );
+
+                CREATE TABLE IF NOT EXISTS family_care_guides (
+                    family TEXT NOT NULL,
+                    locale TEXT NOT NULL DEFAULT 'ru',
+                    family_name TEXT NOT NULL,
+                    origin TEXT,
+                    light TEXT,
+                    watering TEXT,
+                    fertilizing TEXT,
+                    soil TEXT,
+                    humidity TEXT,
+                    toxicity TEXT,
+                    min_temp_c DOUBLE PRECISION,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                    PRIMARY KEY (family, locale)
                 );
 
                 ALTER TABLE genus_care_guides

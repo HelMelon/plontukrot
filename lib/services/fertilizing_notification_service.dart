@@ -10,9 +10,11 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '../core/locale/app_locale_controller.dart';
 import '../core/l10n/app_localizations_x.dart';
+import '../core/season/fertilizing_season_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../models/fertilizing_frequency.dart';
 import '../models/plant.dart';
+import '../models/quarantine.dart';
 import 'plant_service.dart';
 
 /// Local notifications for fertilizing reminders (eve + feeding day).
@@ -141,8 +143,24 @@ class FertilizingNotificationService {
     await initialize();
     await cancelForPlant(plant.id);
 
+    if (plant.isArchived) {
+      return;
+    }
+
     final frequency = plant.fertilizingFrequencyDays;
-    if (!isFertilizingActive(frequency) || plant.isArchived) {
+    final quarantineSeason = plant.quarantineUntil == null
+        ? null
+        : FertilizingSeasonController.instance.settings
+            .growthSeasonForDate(plant.quarantineUntil!);
+    final hasQuarantineFeed = firstFertilizingAfterQuarantine(
+          quarantineUntil: plant.quarantineUntil,
+          lastFertilizedAt: plant.lastFertilizedAt,
+          season: quarantineSeason ??
+              FertilizingSeasonController.instance.settings
+                  .growthSeasonForDate(DateTime.now()),
+        ) !=
+        null;
+    if (!isFertilizingActive(frequency) && !hasQuarantineFeed) {
       return;
     }
 
@@ -153,12 +171,16 @@ class FertilizingNotificationService {
       lastFertilizedAt: plant.lastFertilizedAt,
       createdAt: plant.createdAt,
       now: now,
+      quarantineUntil: plant.quarantineUntil,
+      quarantineSeason: quarantineSeason,
     );
     final dayAt = fertilizingDayNotificationAt(
       frequencyDays: frequency,
       lastFertilizedAt: plant.lastFertilizedAt,
       createdAt: plant.createdAt,
       now: now,
+      quarantineUntil: plant.quarantineUntil,
+      quarantineSeason: quarantineSeason,
     );
 
     if (eveAt != null) {
@@ -190,6 +212,8 @@ class FertilizingNotificationService {
         createdAt: plant.createdAt,
         now: now,
         isArchived: plant.isArchived,
+        quarantineUntil: plant.quarantineUntil,
+        quarantineSeason: quarantineSeason,
       );
       await _schedule(
         id: _dayNotificationId(plant.id),

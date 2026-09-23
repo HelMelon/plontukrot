@@ -485,6 +485,26 @@ class _PlantFilterSheetState extends State<PlantFilterSheet> {
                                   });
                                 },
                               ),
+                              _buildChip(
+                                label: l10n.homeQuarantine,
+                                selected: _criteria.quarantineOnly,
+                                avatar: Icon(
+                                  icons.quarantine,
+                                  size: dimensions.iconSm,
+                                  color: _criteria.quarantineOnly
+                                      ? context.components.chips.selectedForeground
+                                      : colors.icon,
+                                ),
+                                onSelected: (selected) {
+                                  setState(() {
+                                    _criteria = _criteria.copyWith(
+                                      quarantineOnly: selected,
+                                      clearPresetId: true,
+                                      clearPresetName: true,
+                                    );
+                                  });
+                                },
+                              ),
                             ],
                           ),
                           spacing.vSm,

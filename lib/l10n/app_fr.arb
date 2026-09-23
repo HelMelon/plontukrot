@@ -280,6 +280,7 @@
   "homePropagation": "Multiplication",
   "homeGroups": "Groupes",
   "homeReanimation": "Sauvetage",
+  "homeQuarantine": "Quarantaine",
   "homeArchive": "Archives",
   "homeMerge": "Fusionner",
   "homeMergeNeedCount": "Sélectionnez 2 à 3 plantes",
@@ -333,6 +334,27 @@
   "plantNickname": "Surnom",
   "plantNicknameRequired": "Saisissez le nom de la plante",
   "plantRegularWatering": "Arrosage régulier",
+  "plantQuarantine": "Quarantaine",
+  "plantQuarantineHint": "Isolation pendant 14 jours (achat ou rempotage)",
+  "plantQuarantineReasonPurchase": "Achat",
+  "plantQuarantineReasonRepotting": "Rempotage",
+  "plantQuarantineBadge": "Quarantaine",
+  "quarantineOn": "En quarantaine",
+  "quarantineOff": "Pas de quarantaine",
+  "quarantineUntilLabel": "Jusqu’au {date}",
+  "@quarantineUntilLabel": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "quarantineEndedTitle": "Quarantaine terminée",
+  "quarantineEndedBody": "La plante « {name} » est sortie de quarantaine",
+  "@quarantineEndedBody": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "a11yPlantQuarantine": "Plante en quarantaine",
   "plantWateringFrequency": "Fréquence d'arrosage",
   "plantGrowthStage": "Stade de croissance",
   "plantGenusRequired": "Indiquez le genre de la plante",
@@ -410,6 +432,15 @@
   "plantCropLoadFailed": "impossible d'ouvrir l'image",
   "plantEmptyStage": "Aucune plante de ce stade dans la collection pour le moment",
   "plantEmptyGenus": "Aucune plante de ce genre dans la collection pour le moment",
+  "plantEmptyFamily": "Aucune plante de cette famille dans la collection pour le moment",
+  "plantFamilyFallback": "Famille",
+  "familyPlantsButton": "Plantes de la famille",
+  "familyPlantsSheetTitle": "Plantes : {family}",
+  "@familyPlantsSheetTitle": {
+    "placeholders": {
+      "family": {"type": "String"}
+    }
+  },
   "plantNote": "Note",
   "plantPropagation": "Multiplication",
   "plantInitialLeafCount": "Nombre initial de feuilles",
@@ -917,6 +948,10 @@
   "genusCareRetry": "Réessayer",
   "a11yGenusCareExpand": "Développer le guide d'entretien",
   "a11yGenusCareCollapse": "Réduire le guide d'entretien",
+  "familyCareTitle": "À propos de la famille et soins",
+  "familyCareAiBadge": "Guide d'entretien",
+  "a11yFamilyCareExpand": "Développer le guide de la famille",
+  "a11yFamilyCareCollapse": "Réduire le guide de la famille",
   "balconyOn": "Sur le balcon",
   "balconyOff": "À l'intérieur",
   "balconyBandLabel": "Survit jusqu'à {minTemp}°C",

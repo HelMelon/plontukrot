@@ -666,6 +666,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get homeReanimation => 'Rettung';
 
   @override
+  String get homeQuarantine => 'Quarantäne';
+
+  @override
   String get homeArchive => 'Archiv';
 
   @override
@@ -832,6 +835,44 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get plantRegularWatering => 'Regelmäßiges Gießen';
+
+  @override
+  String get plantQuarantine => 'Quarantäne';
+
+  @override
+  String get plantQuarantineHint =>
+      'Isolation für 14 Tage (Kauf oder Umtopfen)';
+
+  @override
+  String get plantQuarantineReasonPurchase => 'Kauf';
+
+  @override
+  String get plantQuarantineReasonRepotting => 'Umtopfen';
+
+  @override
+  String get plantQuarantineBadge => 'Quarantäne';
+
+  @override
+  String get quarantineOn => 'In Quarantäne';
+
+  @override
+  String get quarantineOff => 'Keine Quarantäne';
+
+  @override
+  String quarantineUntilLabel(String date) {
+    return 'Bis $date';
+  }
+
+  @override
+  String get quarantineEndedTitle => 'Quarantäne beendet';
+
+  @override
+  String quarantineEndedBody(String name) {
+    return 'Pflanze „$name“ ist aus der Quarantäne';
+  }
+
+  @override
+  String get a11yPlantQuarantine => 'Pflanze ist in Quarantäne';
 
   @override
   String get plantWateringFrequency => 'Gießhäufigkeit';
@@ -1030,6 +1071,21 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get plantEmptyGenus =>
       'Noch keine Pflanzen dieser Gattung in der Sammlung';
+
+  @override
+  String get plantEmptyFamily =>
+      'Noch keine Pflanzen dieser Familie in der Sammlung';
+
+  @override
+  String get plantFamilyFallback => 'Familie';
+
+  @override
+  String get familyPlantsButton => 'Pflanzen der Familie';
+
+  @override
+  String familyPlantsSheetTitle(String family) {
+    return 'Pflanzen: $family';
+  }
 
   @override
   String get plantNote => 'Notiz';
@@ -2312,6 +2368,18 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get a11yGenusCareCollapse => 'Pflegeanleitung einklappen';
+
+  @override
+  String get familyCareTitle => 'Über Familie & Pflege';
+
+  @override
+  String get familyCareAiBadge => 'Pflegeanleitung';
+
+  @override
+  String get a11yFamilyCareExpand => 'Familien-Pflegeanleitung ausklappen';
+
+  @override
+  String get a11yFamilyCareCollapse => 'Familien-Pflegeanleitung einklappen';
 
   @override
   String get balconyOn => 'Auf dem Balkon';

@@ -660,6 +660,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeReanimation => 'Rescue';
 
   @override
+  String get homeQuarantine => 'Quarantine';
+
+  @override
   String get homeArchive => 'Archive';
 
   @override
@@ -825,6 +828,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plantRegularWatering => 'Regular watering';
+
+  @override
+  String get plantQuarantine => 'Quarantine';
+
+  @override
+  String get plantQuarantineHint =>
+      'Isolation for 14 days (purchase or repotting)';
+
+  @override
+  String get plantQuarantineReasonPurchase => 'Purchase';
+
+  @override
+  String get plantQuarantineReasonRepotting => 'Repotting';
+
+  @override
+  String get plantQuarantineBadge => 'Quarantine';
+
+  @override
+  String get quarantineOn => 'In quarantine';
+
+  @override
+  String get quarantineOff => 'Not in quarantine';
+
+  @override
+  String quarantineUntilLabel(String date) {
+    return 'Until $date';
+  }
+
+  @override
+  String get quarantineEndedTitle => 'Quarantine ended';
+
+  @override
+  String quarantineEndedBody(String name) {
+    return 'Plant “$name” is out of quarantine';
+  }
+
+  @override
+  String get a11yPlantQuarantine => 'Plant is in quarantine';
 
   @override
   String get plantWateringFrequency => 'Watering frequency';
@@ -1021,6 +1062,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plantEmptyGenus => 'No plants of this genus in the collection yet';
+
+  @override
+  String get plantEmptyFamily =>
+      'No plants of this family in the collection yet';
+
+  @override
+  String get plantFamilyFallback => 'Family';
+
+  @override
+  String get familyPlantsButton => 'Family plants';
+
+  @override
+  String familyPlantsSheetTitle(String family) {
+    return 'Plants: $family';
+  }
 
   @override
   String get plantNote => 'Note';
@@ -2299,6 +2355,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get a11yGenusCareCollapse => 'Collapse care guide';
+
+  @override
+  String get familyCareTitle => 'About family & care';
+
+  @override
+  String get familyCareAiBadge => 'Care guide';
+
+  @override
+  String get a11yFamilyCareExpand => 'Expand family care guide';
+
+  @override
+  String get a11yFamilyCareCollapse => 'Collapse family care guide';
 
   @override
   String get balconyOn => 'On the balcony';

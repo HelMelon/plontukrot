@@ -8,6 +8,7 @@ import 'package:plontukrot/models/plant_photo.dart';
 
 import '../../../../core/theme/theme_context.dart';
 import '../../../../core/widgets/focusable_tap.dart';
+import '../common/quarantine_badge.dart';
 
 class PlantImageCard extends StatefulWidget {
   final List<PlantPhoto> photos;
@@ -15,6 +16,7 @@ class PlantImageCard extends StatefulWidget {
   final ValueChanged<PlantPhoto>? onDelete;
   final bool isUploading;
   final double aspectRatio;
+  final bool showQuarantineBadge;
 
   const PlantImageCard({
     super.key,
@@ -23,6 +25,7 @@ class PlantImageCard extends StatefulWidget {
     this.onDelete,
     required this.isUploading,
     this.aspectRatio = 1.0,
+    this.showQuarantineBadge = false,
   });
 
   @override
@@ -213,6 +216,12 @@ class _PlantImageCardState extends State<PlantImageCard> {
                     ],
                   ],
                 ),
+              ),
+            if (widget.showQuarantineBadge)
+              Positioned(
+                top: spacing.sm,
+                left: spacing.sm,
+                child: const QuarantineBadge(),
               ),
             if (widget.isUploading)
               ColoredBox(

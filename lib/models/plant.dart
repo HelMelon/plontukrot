@@ -2,6 +2,8 @@ import 'model_helpers.dart';
 import 'plant_archive_reason.dart';
 import 'plant_member.dart';
 import 'plant_photo.dart';
+import 'quarantine.dart';
+import 'quarantine_reason.dart';
 import 'variegation.dart';
 
 class Plant {
@@ -38,6 +40,8 @@ class Plant {
   final String? giftedToUid;
   final bool onBalcony;
   final int? balconyBand;
+  final DateTime? quarantineUntil;
+  final QuarantineReason? quarantineReason;
 
   const Plant({
     required this.id,
@@ -71,7 +75,13 @@ class Plant {
     this.giftedToUid,
     this.onBalcony = false,
     this.balconyBand,
+    this.quarantineUntil,
+    this.quarantineReason,
   });
+
+  /// Active while [quarantineUntil] is still in the future.
+  bool isInQuarantine([DateTime? now]) =>
+      isPlantInQuarantine(quarantineUntil: quarantineUntil, now: now);
 
   bool get isGroup => members.length >= 2;
 
@@ -211,6 +221,12 @@ class Plant {
           readString(data, 'gifted_to_uid'),
       onBalcony: readBool(data, 'onBalcony') || readBool(data, 'on_balcony'),
       balconyBand: readInt(data, 'balconyBand') ?? readInt(data, 'balcony_band'),
+      quarantineUntil: readDate(data, 'quarantineUntil') ??
+          readDate(data, 'quarantine_until'),
+      quarantineReason: QuarantineReason.tryParse(
+        readString(data, 'quarantineReason') ??
+            readString(data, 'quarantine_reason'),
+      ),
     );
   }
 
@@ -264,6 +280,12 @@ class Plant {
       'on_balcony': onBalcony,
       if (balconyBand != null) 'balconyBand': balconyBand,
       if (balconyBand != null) 'balcony_band': balconyBand,
+      if (quarantineUntil != null)
+        'quarantineUntil': isoOrNull(quarantineUntil),
+      if (quarantineUntil != null)
+        'quarantine_until': isoOrNull(quarantineUntil),
+      if (quarantineReason != null) 'quarantineReason': quarantineReason!.code,
+      if (quarantineReason != null) 'quarantine_reason': quarantineReason!.code,
     };
   }
 }

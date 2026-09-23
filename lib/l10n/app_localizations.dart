@@ -1296,6 +1296,12 @@ abstract class AppLocalizations {
   /// **'Rescue'**
   String get homeReanimation;
 
+  /// No description provided for @homeQuarantine.
+  ///
+  /// In en, this message translates to:
+  /// **'Quarantine'**
+  String get homeQuarantine;
+
   /// No description provided for @homeArchive.
   ///
   /// In en, this message translates to:
@@ -1601,6 +1607,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Regular watering'**
   String get plantRegularWatering;
+
+  /// No description provided for @plantQuarantine.
+  ///
+  /// In en, this message translates to:
+  /// **'Quarantine'**
+  String get plantQuarantine;
+
+  /// No description provided for @plantQuarantineHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Isolation for 14 days (purchase or repotting)'**
+  String get plantQuarantineHint;
+
+  /// No description provided for @plantQuarantineReasonPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase'**
+  String get plantQuarantineReasonPurchase;
+
+  /// No description provided for @plantQuarantineReasonRepotting.
+  ///
+  /// In en, this message translates to:
+  /// **'Repotting'**
+  String get plantQuarantineReasonRepotting;
+
+  /// No description provided for @plantQuarantineBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Quarantine'**
+  String get plantQuarantineBadge;
+
+  /// No description provided for @quarantineOn.
+  ///
+  /// In en, this message translates to:
+  /// **'In quarantine'**
+  String get quarantineOn;
+
+  /// No description provided for @quarantineOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in quarantine'**
+  String get quarantineOff;
+
+  /// No description provided for @quarantineUntilLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Until {date}'**
+  String quarantineUntilLabel(String date);
+
+  /// No description provided for @quarantineEndedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quarantine ended'**
+  String get quarantineEndedTitle;
+
+  /// No description provided for @quarantineEndedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Plant “{name}” is out of quarantine'**
+  String quarantineEndedBody(String name);
+
+  /// No description provided for @a11yPlantQuarantine.
+  ///
+  /// In en, this message translates to:
+  /// **'Plant is in quarantine'**
+  String get a11yPlantQuarantine;
 
   /// No description provided for @plantWateringFrequency.
   ///
@@ -1943,6 +2015,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No plants of this genus in the collection yet'**
   String get plantEmptyGenus;
+
+  /// No description provided for @plantEmptyFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'No plants of this family in the collection yet'**
+  String get plantEmptyFamily;
+
+  /// No description provided for @plantFamilyFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get plantFamilyFallback;
+
+  /// No description provided for @familyPlantsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Family plants'**
+  String get familyPlantsButton;
+
+  /// No description provided for @familyPlantsSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plants: {family}'**
+  String familyPlantsSheetTitle(String family);
 
   /// No description provided for @plantNote.
   ///
@@ -4229,6 +4325,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Collapse care guide'**
   String get a11yGenusCareCollapse;
+
+  /// No description provided for @familyCareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About family & care'**
+  String get familyCareTitle;
+
+  /// No description provided for @familyCareAiBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Care guide'**
+  String get familyCareAiBadge;
+
+  /// No description provided for @a11yFamilyCareExpand.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand family care guide'**
+  String get a11yFamilyCareExpand;
+
+  /// No description provided for @a11yFamilyCareCollapse.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse family care guide'**
+  String get a11yFamilyCareCollapse;
 
   /// No description provided for @balconyOn.
   ///

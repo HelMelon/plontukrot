@@ -33,6 +33,8 @@ _FIELDS = {
     "gifted_to_uid": "gifted_to_uid",
     "on_balcony": "on_balcony",
     "balcony_band": "balcony_band",
+    "quarantine_until": "quarantine_until",
+    "quarantine_reason": "quarantine_reason",
 }
 
 
@@ -51,7 +53,7 @@ def list_plants(user_id: str = Depends(get_current_user_id)):
             "last_fertilized_at, last_repotted_at, last_manipulation_at, "
             "members, archived_at, expires_at, archive_reason, archive_note, "
             "merged_into_plant_id, gifted_to_uid, on_balcony, balcony_band, "
-            "created_at "
+            "quarantine_until, quarantine_reason, created_at "
             "FROM plants WHERE user_id = %s ORDER BY created_at",
             (user_id,),
         ).fetchall()
@@ -111,7 +113,7 @@ def create_plant(payload: PlantCreate, user_id: str = Depends(get_current_user_i
             "last_fertilized_at, last_repotted_at, last_manipulation_at, "
             "members, archived_at, expires_at, archive_reason, archive_note, "
             "merged_into_plant_id, gifted_to_uid, on_balcony, balcony_band, "
-            "created_at "
+            "quarantine_until, quarantine_reason, created_at "
             "FROM plants WHERE id = %s",
             (plant_id,),
         ).fetchone()
@@ -128,7 +130,7 @@ def get_plant(plant_id: str, user_id: str = Depends(get_current_user_id)):
             "last_fertilized_at, last_repotted_at, last_manipulation_at, "
             "members, archived_at, expires_at, archive_reason, archive_note, "
             "merged_into_plant_id, gifted_to_uid, on_balcony, balcony_band, "
-            "created_at "
+            "quarantine_until, quarantine_reason, created_at "
             "FROM plants WHERE id = %s AND user_id = %s",
             (plant_id, user_id),
         ).fetchone()
@@ -180,6 +182,8 @@ def update_plant(
             "archive_note",
             "merged_into_plant_id",
             "gifted_to_uid",
+            "quarantine_until",
+            "quarantine_reason",
         ):
             fields.append(f"{key} = %s")
             values.append(val)
@@ -209,7 +213,7 @@ def update_plant(
             "last_fertilized_at, last_repotted_at, last_manipulation_at, "
             "members, archived_at, expires_at, archive_reason, archive_note, "
             "merged_into_plant_id, gifted_to_uid, on_balcony, balcony_band, "
-            "created_at "
+            "quarantine_until, quarantine_reason, created_at "
             "FROM plants WHERE id = %s",
             (plant_id,),
         ).fetchone()
@@ -268,5 +272,7 @@ def _row_to_plant(row) -> PlantOut:
         gifted_to_uid=row.get("gifted_to_uid"),
         on_balcony=row.get("on_balcony"),
         balcony_band=row.get("balcony_band"),
+        quarantine_until=row.get("quarantine_until"),
+        quarantine_reason=row.get("quarantine_reason"),
         created_at=row["created_at"],
     )

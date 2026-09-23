@@ -1,4 +1,5 @@
 import 'fertilizing_growth_season.dart';
+import 'quarantine.dart';
 
 /// Stored value meaning «do not fertilize».
 const fertilizingFrequencyStop = 0;
@@ -62,17 +63,36 @@ DateTime _dateOnly(DateTime value) =>
 /// Next calendar date when fertilizing is due.
 ///
 /// [anchor] is [lastFertilizedAt] when present, otherwise [createdAt] or [now].
+/// When [quarantineUntil] still constrains the first post-quarantine feed,
+/// that date wins over the normal interval.
 DateTime? nextFertilizingDate({
   required int? frequencyDays,
   DateTime? lastFertilizedAt,
   DateTime? createdAt,
   DateTime? now,
+  DateTime? quarantineUntil,
+  FertilizingGrowthSeason? quarantineSeason,
 }) {
-  if (frequencyDays == null || frequencyDays <= 0) return null;
-  final clock = now ?? DateTime.now();
-  final anchor = lastFertilizedAt ?? createdAt ?? clock;
-  final anchorDay = _dateOnly(anchor);
-  return anchorDay.add(Duration(days: frequencyDays));
+  DateTime? normalNext;
+  if (frequencyDays != null && frequencyDays > 0) {
+    final clock = now ?? DateTime.now();
+    final anchor = lastFertilizedAt ?? createdAt ?? clock;
+    final anchorDay = _dateOnly(anchor);
+    normalNext = anchorDay.add(Duration(days: frequencyDays));
+  }
+
+  final season = quarantineSeason;
+  final afterQuarantine = season == null
+      ? null
+      : firstFertilizingAfterQuarantine(
+          quarantineUntil: quarantineUntil,
+          lastFertilizedAt: lastFertilizedAt,
+          season: season,
+        );
+
+  if (afterQuarantine == null) return normalNext;
+  if (normalNext == null) return afterQuarantine;
+  return afterQuarantine.isAfter(normalNext) ? afterQuarantine : normalNext;
 }
 
 /// Whether fertilizing is due today or past due (until recorded again).
@@ -82,14 +102,17 @@ bool isFertilizingOverdue({
   DateTime? createdAt,
   DateTime? now,
   bool isArchived = false,
+  DateTime? quarantineUntil,
+  FertilizingGrowthSeason? quarantineSeason,
 }) {
   if (isArchived) return false;
-  if (!isFertilizingActive(frequencyDays)) return false;
   final next = nextFertilizingDate(
     frequencyDays: frequencyDays,
     lastFertilizedAt: lastFertilizedAt,
     createdAt: createdAt,
     now: now,
+    quarantineUntil: quarantineUntil,
+    quarantineSeason: quarantineSeason,
   );
   if (next == null) return false;
   final clock = now ?? DateTime.now();
@@ -102,12 +125,16 @@ DateTime? fertilizingEveNotificationAt({
   DateTime? lastFertilizedAt,
   DateTime? createdAt,
   DateTime? now,
+  DateTime? quarantineUntil,
+  FertilizingGrowthSeason? quarantineSeason,
 }) {
   final next = nextFertilizingDate(
     frequencyDays: frequencyDays,
     lastFertilizedAt: lastFertilizedAt,
     createdAt: createdAt,
     now: now,
+    quarantineUntil: quarantineUntil,
+    quarantineSeason: quarantineSeason,
   );
   if (next == null) return null;
   final eve = next.subtract(const Duration(days: 1));
@@ -125,12 +152,16 @@ DateTime? fertilizingDayNotificationAt({
   DateTime? lastFertilizedAt,
   DateTime? createdAt,
   DateTime? now,
+  DateTime? quarantineUntil,
+  FertilizingGrowthSeason? quarantineSeason,
 }) {
   final next = nextFertilizingDate(
     frequencyDays: frequencyDays,
     lastFertilizedAt: lastFertilizedAt,
     createdAt: createdAt,
     now: now,
+    quarantineUntil: quarantineUntil,
+    quarantineSeason: quarantineSeason,
   );
   if (next == null) return null;
   final clock = now ?? DateTime.now();

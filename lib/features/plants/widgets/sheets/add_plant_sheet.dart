@@ -4,6 +4,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/variegation.dart';
+import '../../../../models/quarantine_reason.dart';
 import '../../../../core/season/fertilizing_season_controller.dart';
 import '../../../../models/fertilizing_frequency.dart';
 import '../../../../services/plant_service.dart';
@@ -11,6 +12,7 @@ import '../../../../services/storage_service.dart';
 import '../../../../services/wish_list_service.dart';
 import '../common/pick_and_crop_plant_photo.dart';
 import '../common/plant_pending_photo_control.dart';
+import '../common/plant_quarantine_fields.dart';
 import '../selectors/fertilizing_frequency_field.dart';
 import '../selectors/plant_stage_selector.dart';
 import '../selectors/plant_variegation_selector.dart';
@@ -52,6 +54,8 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
   String? nicknameError;
   bool isHybrid = false;
   bool isRegularWatering = false;
+  bool isQuarantine = false;
+  QuarantineReason? quarantineReason;
   Uint8List? _pendingPhotoBytes;
 
   @override
@@ -243,6 +247,10 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
         wateringFrequency: wateringFrequency,
         fertilizingFrequencyDays: fertilizingFrequencyDays,
         isFertilizingFrequencyCustom: isFertilizingFrequencyCustom,
+        quarantine: isQuarantine,
+        quarantineReason: isQuarantine
+            ? (quarantineReason ?? QuarantineReason.purchase)
+            : null,
       );
 
       Object? photoError;
@@ -513,6 +521,22 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                               ),
                             ),
                           ],
+                          spacing.vMd,
+                          PlantQuarantineFields(
+                            enabled: isQuarantine,
+                            reason: quarantineReason,
+                            onEnabledChanged: (value) {
+                              setState(() {
+                                isQuarantine = value;
+                                if (value && quarantineReason == null) {
+                                  quarantineReason = QuarantineReason.purchase;
+                                }
+                              });
+                            },
+                            onReasonChanged: (value) {
+                              setState(() => quarantineReason = value);
+                            },
+                          ),
                           spacing.vMd,
                           TextField(
                             controller: initialLeafCountController,

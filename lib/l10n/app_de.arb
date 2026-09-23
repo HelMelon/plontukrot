@@ -280,6 +280,7 @@
   "homePropagation": "Vermehrung",
   "homeGroups": "Gruppen",
   "homeReanimation": "Rettung",
+  "homeQuarantine": "Quarantäne",
   "homeArchive": "Archiv",
   "homeMerge": "Zusammenführen",
   "homeMergeNeedCount": "Wählen Sie 2 bis 3 Pflanzen",
@@ -333,6 +334,27 @@
   "plantNickname": "Spitzname",
   "plantNicknameRequired": "Pflanzennamen eingeben",
   "plantRegularWatering": "Regelmäßiges Gießen",
+  "plantQuarantine": "Quarantäne",
+  "plantQuarantineHint": "Isolation für 14 Tage (Kauf oder Umtopfen)",
+  "plantQuarantineReasonPurchase": "Kauf",
+  "plantQuarantineReasonRepotting": "Umtopfen",
+  "plantQuarantineBadge": "Quarantäne",
+  "quarantineOn": "In Quarantäne",
+  "quarantineOff": "Keine Quarantäne",
+  "quarantineUntilLabel": "Bis {date}",
+  "@quarantineUntilLabel": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "quarantineEndedTitle": "Quarantäne beendet",
+  "quarantineEndedBody": "Pflanze „{name}“ ist aus der Quarantäne",
+  "@quarantineEndedBody": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "a11yPlantQuarantine": "Pflanze ist in Quarantäne",
   "plantWateringFrequency": "Gießhäufigkeit",
   "plantGrowthStage": "Wachstumsstadium",
   "plantGenusRequired": "Gattung der Pflanze eingeben",
@@ -410,6 +432,15 @@
   "plantCropLoadFailed": "Bild konnte nicht geöffnet werden",
   "plantEmptyStage": "Noch keine Pflanzen dieses Stadiums in der Sammlung",
   "plantEmptyGenus": "Noch keine Pflanzen dieser Gattung in der Sammlung",
+  "plantEmptyFamily": "Noch keine Pflanzen dieser Familie in der Sammlung",
+  "plantFamilyFallback": "Familie",
+  "familyPlantsButton": "Pflanzen der Familie",
+  "familyPlantsSheetTitle": "Pflanzen: {family}",
+  "@familyPlantsSheetTitle": {
+    "placeholders": {
+      "family": {"type": "String"}
+    }
+  },
   "plantNote": "Notiz",
   "plantPropagation": "Vermehrung",
   "plantInitialLeafCount": "Anfängliche Blattzahl",
@@ -917,6 +948,10 @@
   "genusCareRetry": "Wiederholen",
   "a11yGenusCareExpand": "Pflegeanleitung ausklappen",
   "a11yGenusCareCollapse": "Pflegeanleitung einklappen",
+  "familyCareTitle": "Über Familie & Pflege",
+  "familyCareAiBadge": "Pflegeanleitung",
+  "a11yFamilyCareExpand": "Familien-Pflegeanleitung ausklappen",
+  "a11yFamilyCareCollapse": "Familien-Pflegeanleitung einklappen",
   "balconyOn": "Auf dem Balkon",
   "balconyOff": "Drinnen",
   "balconyBandLabel": "Überlebt bis {minTemp}°C",

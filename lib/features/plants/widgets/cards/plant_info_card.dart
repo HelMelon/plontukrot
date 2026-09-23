@@ -13,6 +13,7 @@ import '../../../../models/plant_archive_reason.dart';
 import '../../../../models/stage_info.dart';
 import '../../../../models/variegation.dart';
 import '../../../../services/manipulation_service.dart';
+import '../../pages/plant_family_details_page.dart';
 import '../../pages/plant_genus_details_page.dart';
 import '../growth/plant_growth_stats_section.dart';
 import '../../../../services/note_service.dart';
@@ -25,6 +26,7 @@ import '../sheets/repotting_history_sheet.dart';
 import '../sheets/watering_history_sheet.dart';
 import 'balcony_toggle.dart';
 import 'info_card.dart';
+import 'quarantine_toggle.dart';
 import 'sensor_binding_toggle.dart';
 import 'package:plontukrot/core/widgets/app_modal.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -179,8 +181,38 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
     final speciesTrimmed = plant.species.trim();
     final cultivarsDisplay = plant.cultivarsDisplay;
     final tradingNameTrimmed = plant.tradingName.trim();
-    final plantFamilyRow =
-        _infoRowIfPresent(l10n.plantFamilyLabel, plant.plantFamily);
+    final familyTrimmed = (plant.plantFamily ?? '').trim();
+    final plantFamilyRow = familyTrimmed.isEmpty
+        ? null
+        : _infoRow(
+            label: l10n.plantFamilyLabel,
+            value: familyTrimmed,
+            valueWidget: Semantics(
+              button: true,
+              label: '${l10n.plantFamilyLabel}: $familyTrimmed',
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PlantFamilyDetailsPage(
+                        family: familyTrimmed,
+                      ),
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(radii.sm),
+                child: Text(
+                  familyTrimmed,
+                  textAlign: TextAlign.end,
+                  style: details.infoRowValueStyle.copyWith(
+                    decoration: TextDecoration.underline,
+                    decorationColor: colors.heading.withValues(alpha: 0.4),
+                  ),
+                ),
+              ),
+            ),
+          );
     final tradingNameRow =
         _infoRowIfPresent(l10n.plantTradingNameLabel, tradingNameTrimmed);
     final variegation = plant.isGroup ? Variegation.none : plant.variegation;
@@ -486,6 +518,8 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
                 .isEnabled(FeatureFlag.soilSensors))
               SensorBindingToggle(plantId: plantId),
           ],
+          spacing.vXs,
+          QuarantineToggle(plant: plant, plantId: plantId),
         ],
       ),
     );

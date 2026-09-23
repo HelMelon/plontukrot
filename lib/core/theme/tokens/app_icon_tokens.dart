@@ -102,6 +102,7 @@ class AppIconTokens {
     required this.pinching,
     required this.rerooting,
     required this.stimulator,
+    required this.quarantine,
     required this.leafCut,
     required this.leafEaten,
     required this.lossDied,
@@ -218,6 +219,7 @@ class AppIconTokens {
     pinching: HugeIcons.strokeRoundedMinimize03,
     rerooting: HugeIcons.strokeRoundedBioEnergy,
     stimulator: HugeIcons.strokeRoundedAiChemistry03,
+    quarantine: Icons.health_and_safety_outlined,
     leafCut: Icons.content_cut,
     leafEaten: Icons.restaurant,
     lossDied: Icons.heart_broken_outlined,
@@ -333,6 +335,7 @@ class AppIconTokens {
   final List<List<dynamic>> pinching;
   final List<List<dynamic>> rerooting;
   final List<List<dynamic>> stimulator;
+  final IconData quarantine;
   final IconData leafCut;
   final IconData leafEaten;
   final IconData lossDied;
@@ -439,6 +442,7 @@ class AppIconTokens {
     List<List<dynamic>>? pinching,
     List<List<dynamic>>? rerooting,
     List<List<dynamic>>? stimulator,
+    IconData? quarantine,
     IconData? leafCut,
     IconData? leafEaten,
     IconData? lossDied,
@@ -543,6 +547,7 @@ class AppIconTokens {
       pinching: pinching ?? this.pinching,
       rerooting: rerooting ?? this.rerooting,
       stimulator: stimulator ?? this.stimulator,
+      quarantine: quarantine ?? this.quarantine,
       leafCut: leafCut ?? this.leafCut,
       leafEaten: leafEaten ?? this.leafEaten,
       lossDied: lossDied ?? this.lossDied,

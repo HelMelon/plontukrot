@@ -6,6 +6,8 @@ import '../models/plant.dart';
 import '../models/plant_archive_reason.dart';
 import '../models/plant_member.dart';
 import '../models/plant_photo.dart';
+import '../models/quarantine.dart';
+import '../models/quarantine_reason.dart';
 import '../models/variegation.dart';
 import 'api_client.dart';
 import 'api_exception.dart';
@@ -13,6 +15,7 @@ import 'auth_service.dart';
 import 'fertilizing_notification_service.dart';
 import 'app_crash_reporting.dart';
 import 'plant_species_service.dart';
+import 'quarantine_notification_service.dart';
 import 'rest_stream.dart';
 import 'storage_service.dart';
 
@@ -38,16 +41,19 @@ class PlantService {
   }
 
   Future<void> _rescheduleNotifications(String plantId) async {
-    if (!FeatureFlagsController.instance
-        .isEnabled(FeatureFlag.fertilizingReminders)) {
-      await FertilizingNotificationService.instance.cancelForPlant(plantId);
-      return;
-    }
     try {
       final plant = await getPlant(plantId);
-      if (plant != null) {
+      if (plant == null) return;
+
+      if (!FeatureFlagsController.instance
+          .isEnabled(FeatureFlag.fertilizingReminders)) {
+        await FertilizingNotificationService.instance.cancelForPlant(plantId);
+    await QuarantineNotificationService.instance.cancelForPlant(plantId);
+      } else {
         await FertilizingNotificationService.instance.rescheduleForPlant(plant);
       }
+
+      await QuarantineNotificationService.instance.rescheduleForPlant(plant);
     } catch (error, stack) {
       try {
         await AppCrashReporting.instance.recordError(
@@ -57,6 +63,45 @@ class PlantService {
         );
       } catch (_) {}
     }
+  }
+
+  /// Enable quarantine for [quarantineDurationDays], or clear it when [enabled]
+  /// is false.
+  ///
+  /// When already active and [startedAt] is omitted, only [reason] is updated
+  /// (timer is not restarted). Pass [startedAt] (e.g. after repotting) to
+  /// restart the 14-day window.
+  Future<void> setQuarantine({
+    required String plantId,
+    required bool enabled,
+    QuarantineReason? reason,
+    DateTime? startedAt,
+  }) async {
+    if (!enabled) {
+      await _patchPlant(plantId, {
+        'quarantine_until': null,
+        'quarantine_reason': null,
+      });
+    } else {
+      final current = await getPlant(plantId);
+      if (current != null &&
+          current.isInQuarantine() &&
+          startedAt == null) {
+        await _patchPlant(plantId, {
+          'quarantine_reason':
+              (reason ?? current.quarantineReason ?? QuarantineReason.purchase)
+                  .code,
+        });
+      } else {
+        final until = quarantineEndDate(startedAt ?? DateTime.now());
+        await _patchPlant(plantId, {
+          'quarantine_until': isoDate(until),
+          'quarantine_reason':
+              (reason ?? QuarantineReason.purchase).code,
+        });
+      }
+    }
+    await _rescheduleNotifications(plantId);
   }
 
   Future<List<PlantPhoto>> _fetchPhotos(String plantId) async {
@@ -168,6 +213,8 @@ class PlantService {
     int? wateringFrequency,
     int? fertilizingFrequencyDays,
     bool isFertilizingFrequencyCustom = false,
+    bool quarantine = false,
+    QuarantineReason? quarantineReason,
   }) async {
     final trimmedGenus = genus.trim();
     final trimmedSpecies = species.trim();
@@ -200,6 +247,11 @@ class PlantService {
         'initial_leaf_count': safeInitialLeafCount,
         if (members.isNotEmpty)
           'members': members.map((m) => m.toMap()).toList(),
+        if (quarantine) ...{
+          'quarantine_until': isoDate(quarantineEndDate(DateTime.now())),
+          'quarantine_reason':
+              (quarantineReason ?? QuarantineReason.purchase).code,
+        },
       }),
     );
     final id = readString(created, 'id') ?? '';
@@ -306,6 +358,7 @@ class PlantService {
       ),
     );
     await FertilizingNotificationService.instance.cancelForPlant(plantId);
+    await QuarantineNotificationService.instance.cancelForPlant(plantId);
   }
 
   Future<String> mergePlants({
@@ -425,6 +478,8 @@ class PlantService {
     List<PlantMember>? members,
     int? fertilizingFrequencyDays,
     bool isFertilizingFrequencyCustom = false,
+    bool? quarantine,
+    QuarantineReason? quarantineReason,
   }) async {
     final trimmedGenus = genus.trim();
     final trimmedSpecies = species.trim();
@@ -438,7 +493,7 @@ class PlantService {
       requestedFrequencyDays: fertilizingFrequencyDays,
     );
 
-    await _patchPlant(plantId, {
+    final body = <String, dynamic>{
       'genus': trimmedGenus,
       'species': trimmedSpecies,
       'cultivar':
@@ -456,7 +511,30 @@ class PlantService {
       'stage': stage,
       if (members != null)
         'members': members.map((m) => m.toMap()).toList(),
-    });
+    };
+
+    if (quarantine != null) {
+      if (quarantine) {
+        final current = await getPlant(plantId);
+        if (current != null && current.isInQuarantine()) {
+          body['quarantine_reason'] =
+              (quarantineReason ??
+                      current.quarantineReason ??
+                      QuarantineReason.purchase)
+                  .code;
+        } else {
+          body['quarantine_until'] =
+              isoDate(quarantineEndDate(DateTime.now()));
+          body['quarantine_reason'] =
+              (quarantineReason ?? QuarantineReason.purchase).code;
+        }
+      } else {
+        body['quarantine_until'] = null;
+        body['quarantine_reason'] = null;
+      }
+    }
+
+    await _patchPlant(plantId, body);
 
     await _plantSpeciesService.ensureSpecies(
       species: trimmedSpecies,
@@ -485,6 +563,7 @@ class PlantService {
       if (!error.isNotFound) rethrow;
     }
     await FertilizingNotificationService.instance.cancelForPlant(plantId);
+    await QuarantineNotificationService.instance.cancelForPlant(plantId);
   }
 
   Future<void> deletePlants(Iterable<String> plantIds) async {

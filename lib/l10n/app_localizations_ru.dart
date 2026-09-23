@@ -662,6 +662,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeReanimation => 'Реанимация';
 
   @override
+  String get homeQuarantine => 'Карантин';
+
+  @override
   String get homeArchive => 'Архив';
 
   @override
@@ -828,6 +831,44 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plantRegularWatering => 'Регулярный полив';
+
+  @override
+  String get plantQuarantine => 'Карантин';
+
+  @override
+  String get plantQuarantineHint =>
+      'Изоляция на 14 дней (покупка или пересадка)';
+
+  @override
+  String get plantQuarantineReasonPurchase => 'Покупка';
+
+  @override
+  String get plantQuarantineReasonRepotting => 'Пересадка';
+
+  @override
+  String get plantQuarantineBadge => 'Карантин';
+
+  @override
+  String get quarantineOn => 'На карантине';
+
+  @override
+  String get quarantineOff => 'Без карантина';
+
+  @override
+  String quarantineUntilLabel(String date) {
+    return 'До $date';
+  }
+
+  @override
+  String get quarantineEndedTitle => 'Карантин завершён';
+
+  @override
+  String quarantineEndedBody(String name) {
+    return 'Растение «$name» снято с карантина';
+  }
+
+  @override
+  String get a11yPlantQuarantine => 'Растение на карантине';
 
   @override
   String get plantWateringFrequency => 'Частота полива';
@@ -1024,6 +1065,21 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plantEmptyGenus => 'Растений этого рода в коллекции пока нет';
+
+  @override
+  String get plantEmptyFamily =>
+      'Растений этого семейства в коллекции пока нет';
+
+  @override
+  String get plantFamilyFallback => 'Семейство';
+
+  @override
+  String get familyPlantsButton => 'Растения семейства';
+
+  @override
+  String familyPlantsSheetTitle(String family) {
+    return 'Растения: $family';
+  }
 
   @override
   String get plantNote => 'Заметка';
@@ -2308,6 +2364,18 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get a11yGenusCareCollapse => 'Свернуть справку по уходу';
+
+  @override
+  String get familyCareTitle => 'О семействе и уходе';
+
+  @override
+  String get familyCareAiBadge => 'Справка';
+
+  @override
+  String get a11yFamilyCareExpand => 'Развернуть справку по семейству';
+
+  @override
+  String get a11yFamilyCareCollapse => 'Свернуть справку по семейству';
 
   @override
   String get balconyOn => 'На балконе';

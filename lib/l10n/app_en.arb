@@ -325,6 +325,7 @@
   "homePropagation": "Propagation",
   "homeGroups": "Groups",
   "homeReanimation": "Rescue",
+  "homeQuarantine": "Quarantine",
   "homeArchive": "Archive",
   "homeMerge": "Merge",
   "homeMergeNeedCount": "Select 2 to 3 plants",
@@ -393,6 +394,27 @@
   "plantNickname": "Nickname",
   "plantNicknameRequired": "Enter the plant name",
   "plantRegularWatering": "Regular watering",
+  "plantQuarantine": "Quarantine",
+  "plantQuarantineHint": "Isolation for 14 days (purchase or repotting)",
+  "plantQuarantineReasonPurchase": "Purchase",
+  "plantQuarantineReasonRepotting": "Repotting",
+  "plantQuarantineBadge": "Quarantine",
+  "quarantineOn": "In quarantine",
+  "quarantineOff": "Not in quarantine",
+  "quarantineUntilLabel": "Until {date}",
+  "@quarantineUntilLabel": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "quarantineEndedTitle": "Quarantine ended",
+  "quarantineEndedBody": "Plant “{name}” is out of quarantine",
+  "@quarantineEndedBody": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "a11yPlantQuarantine": "Plant is in quarantine",
   "plantWateringFrequency": "Watering frequency",
   "plantGrowthStage": "Growth stage",
   "plantGenusRequired": "Enter the plant genus",
@@ -495,6 +517,15 @@
   "plantCropLoadFailed": "could not open the image",
   "plantEmptyStage": "No plants of this stage in the collection yet",
   "plantEmptyGenus": "No plants of this genus in the collection yet",
+  "plantEmptyFamily": "No plants of this family in the collection yet",
+  "plantFamilyFallback": "Family",
+  "familyPlantsButton": "Family plants",
+  "familyPlantsSheetTitle": "Plants: {family}",
+  "@familyPlantsSheetTitle": {
+    "placeholders": {
+      "family": {"type": "String"}
+    }
+  },
   "plantNote": "Note",
   "plantPropagation": "Propagation",
   "plantInitialLeafCount": "Initial leaf count",
@@ -1197,6 +1228,10 @@
   "genusCareRetry": "Retry",
   "a11yGenusCareExpand": "Expand care guide",
   "a11yGenusCareCollapse": "Collapse care guide",
+  "familyCareTitle": "About family & care",
+  "familyCareAiBadge": "Care guide",
+  "a11yFamilyCareExpand": "Expand family care guide",
+  "a11yFamilyCareCollapse": "Collapse family care guide",
   "balconyOn": "On the balcony",
   "balconyOff": "Indoors",
   "balconyBandLabel": "Survives down to {minTemp}°C",

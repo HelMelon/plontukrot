@@ -7,6 +7,9 @@ from ..db import get_pool
 from ..feature_flags import FLAG_PROPAGATIONS, require_feature
 from ..schemas import (
     PropagationCreate,
+    PropagationNoteCreate,
+    PropagationNoteOut,
+    PropagationNoteUpdate,
     PropagationOut,
     StageHistoryCreate,
     StageHistoryOut,
@@ -107,7 +110,7 @@ def delete_propagation(prop_id: str,
 
 
 # ---- Notes ----
-@router.get("/{prop_id}/notes", response_model=list)
+@router.get("/{prop_id}/notes", response_model=list[PropagationNoteOut])
 def list_prop_notes(prop_id: str, user_id: str = Depends(require_feature(FLAG_PROPAGATIONS))):
     with get_pool().connection() as conn:
         _ensure_prop(conn, prop_id, user_id)
@@ -117,7 +120,96 @@ def list_prop_notes(prop_id: str, user_id: str = Depends(require_feature(FLAG_PR
             "ORDER BY created_at",
             (prop_id,),
         ).fetchall()
-    return rows
+    return [PropagationNoteOut(**r) for r in rows]
+
+
+@router.post("/{prop_id}/notes", response_model=PropagationNoteOut, status_code=201)
+def add_prop_note(
+    prop_id: str,
+    payload: PropagationNoteCreate,
+    user_id: str = Depends(require_feature(FLAG_PROPAGATIONS)),
+):
+    text = (payload.text or "").strip()
+    if not text:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Note text must not be empty",
+        )
+    note_id = uuid.uuid4().hex
+    with get_pool().connection() as conn:
+        _ensure_prop(conn, prop_id, user_id)
+        conn.execute(
+            "INSERT INTO propagation_notes (id, propagation_id, text, expires_at) "
+            "VALUES (%s, %s, %s, %s)",
+            (note_id, prop_id, text, payload.expires_at),
+        )
+        row = conn.execute(
+            "SELECT id, propagation_id, text, created_at, updated_at, expires_at "
+            "FROM propagation_notes WHERE id = %s",
+            (note_id,),
+        ).fetchone()
+    return PropagationNoteOut(**row)
+
+
+@router.patch("/{prop_id}/notes/{note_id}", response_model=PropagationNoteOut)
+def update_prop_note(
+    prop_id: str,
+    note_id: str,
+    payload: PropagationNoteUpdate,
+    user_id: str = Depends(require_feature(FLAG_PROPAGATIONS)),
+):
+    with get_pool().connection() as conn:
+        _ensure_prop(conn, prop_id, user_id)
+        existing = conn.execute(
+            "SELECT id FROM propagation_notes "
+            "WHERE id = %s AND propagation_id = %s",
+            (note_id, prop_id),
+        ).fetchone()
+        if existing is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Note not found",
+            )
+
+        if payload.text is not None:
+            text = payload.text.strip()
+            if not text:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Note text must not be empty",
+                )
+            conn.execute(
+                "UPDATE propagation_notes SET text = %s, updated_at = now() "
+                "WHERE id = %s AND propagation_id = %s",
+                (text, note_id, prop_id),
+            )
+        if payload.expires_at is not None:
+            conn.execute(
+                "UPDATE propagation_notes SET expires_at = %s, updated_at = now() "
+                "WHERE id = %s AND propagation_id = %s",
+                (payload.expires_at, note_id, prop_id),
+            )
+
+        row = conn.execute(
+            "SELECT id, propagation_id, text, created_at, updated_at, expires_at "
+            "FROM propagation_notes WHERE id = %s",
+            (note_id,),
+        ).fetchone()
+    return PropagationNoteOut(**row)
+
+
+@router.delete("/{prop_id}/notes/{note_id}", status_code=204)
+def delete_prop_note(
+    prop_id: str,
+    note_id: str,
+    user_id: str = Depends(require_feature(FLAG_PROPAGATIONS)),
+):
+    with get_pool().connection() as conn:
+        _ensure_prop(conn, prop_id, user_id)
+        conn.execute(
+            "DELETE FROM propagation_notes WHERE id = %s AND propagation_id = %s",
+            (note_id, prop_id),
+        )
 
 
 # ---- Stage history ----

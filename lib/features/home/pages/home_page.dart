@@ -1253,6 +1253,21 @@ class _HomePageState extends State<HomePage> {
                                                     clearPresetName: true,
                                                   )),
                                             ),
+                                          if (_filter.quarantineOnly)
+                                            _buildActiveFilterChip(
+                                              label: l10n.homeQuarantine,
+                                              avatar: Icon(
+                                                _icons.quarantine,
+                                                size: dimensions.iconSm,
+                                                color: chips.selectedForeground,
+                                              ),
+                                              onDeleted: () => setState(() =>
+                                                  _filter = _filter.copyWith(
+                                                    quarantineOnly: false,
+                                                    clearPresetId: true,
+                                                    clearPresetName: true,
+                                                  )),
+                                            ),
                                           if (_filter.plantFamily != null &&
                                               _filter.plantFamily!.isNotEmpty)
                                             _buildActiveFilterChip(

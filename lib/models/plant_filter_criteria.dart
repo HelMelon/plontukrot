@@ -4,6 +4,7 @@ class PlantFilterCriteria {
   final bool propagatingOnly;
   final bool groupsOnly;
   final bool rerootingOnly;
+  final bool quarantineOnly;
   final String? plantFamily;
   final String? genus;
   final String? cultivar;
@@ -15,6 +16,7 @@ class PlantFilterCriteria {
     this.propagatingOnly = false,
     this.groupsOnly = false,
     this.rerootingOnly = false,
+    this.quarantineOnly = false,
     this.plantFamily,
     this.genus,
     this.cultivar,
@@ -29,6 +31,7 @@ class PlantFilterCriteria {
       !propagatingOnly &&
       !groupsOnly &&
       !rerootingOnly &&
+      !quarantineOnly &&
       (plantFamily == null || plantFamily!.isEmpty) &&
       (genus == null || genus!.isEmpty) &&
       (cultivar == null || cultivar!.isEmpty) &&
@@ -41,6 +44,7 @@ class PlantFilterCriteria {
     if (propagatingOnly) count++;
     if (groupsOnly) count++;
     if (rerootingOnly) count++;
+    if (quarantineOnly) count++;
     if (plantFamily != null && plantFamily!.isNotEmpty) count++;
     if (genus != null && genus!.isNotEmpty) count++;
     if (cultivar != null && cultivar!.isNotEmpty) count++;
@@ -56,6 +60,7 @@ class PlantFilterCriteria {
     if (propagatingOnly && !isPropagating) return false;
     if (groupsOnly && !plant.isGroup) return false;
     if (rerootingOnly && !isRerooting) return false;
+    if (quarantineOnly && !plant.isInQuarantine()) return false;
     if (plantFamily != null &&
         plantFamily!.isNotEmpty &&
         (plant.plantFamily ?? '').trim() != plantFamily) {
@@ -82,6 +87,7 @@ class PlantFilterCriteria {
     bool? propagatingOnly,
     bool? groupsOnly,
     bool? rerootingOnly,
+    bool? quarantineOnly,
     String? plantFamily,
     bool clearPlantFamily = false,
     String? genus,
@@ -99,6 +105,7 @@ class PlantFilterCriteria {
       propagatingOnly: propagatingOnly ?? this.propagatingOnly,
       groupsOnly: groupsOnly ?? this.groupsOnly,
       rerootingOnly: rerootingOnly ?? this.rerootingOnly,
+      quarantineOnly: quarantineOnly ?? this.quarantineOnly,
       plantFamily: clearPlantFamily ? null : (plantFamily ?? this.plantFamily),
       genus: clearGenus ? null : (genus ?? this.genus),
       cultivar: clearCultivar ? null : (cultivar ?? this.cultivar),
@@ -113,6 +120,7 @@ class PlantFilterCriteria {
       'propagatingOnly': propagatingOnly,
       'groupsOnly': groupsOnly,
       'rerootingOnly': rerootingOnly,
+      'quarantineOnly': quarantineOnly,
       'plantFamily': plantFamily,
       'genus': genus,
       'cultivar': cultivar,
@@ -127,6 +135,7 @@ class PlantFilterCriteria {
       propagatingOnly: map['propagatingOnly'] as bool? ?? false,
       groupsOnly: map['groupsOnly'] as bool? ?? false,
       rerootingOnly: map['rerootingOnly'] as bool? ?? false,
+      quarantineOnly: map['quarantineOnly'] as bool? ?? false,
       plantFamily: map['plantFamily'] as String?,
       genus: map['genus'] as String?,
       cultivar: map['cultivar'] as String?,

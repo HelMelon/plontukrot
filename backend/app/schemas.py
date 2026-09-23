@@ -76,6 +76,8 @@ class PlantCreate(BaseModel):
     gifted_to_uid: Optional[str] = Field(default=None, alias="giftedToUid")
     on_balcony: Optional[bool] = Field(default=None, alias="onBalcony")
     balcony_band: Optional[int] = Field(default=None, alias="balconyBand")
+    quarantine_until: Optional[datetime] = Field(default=None, alias="quarantineUntil")
+    quarantine_reason: Optional[str] = Field(default=None, alias="quarantineReason")
 
 
 class PlantUpdate(BaseModel):
@@ -105,6 +107,8 @@ class PlantUpdate(BaseModel):
     gifted_to_uid: Optional[str] = Field(default=None, alias="giftedToUid")
     on_balcony: Optional[bool] = Field(default=None, alias="onBalcony")
     balcony_band: Optional[int] = Field(default=None, alias="balconyBand")
+    quarantine_until: Optional[datetime] = Field(default=None, alias="quarantineUntil")
+    quarantine_reason: Optional[str] = Field(default=None, alias="quarantineReason")
 
 
 class PlantOut(BaseModel):
@@ -135,6 +139,8 @@ class PlantOut(BaseModel):
     gifted_to_uid: Optional[str] = None
     on_balcony: Optional[bool] = None
     balcony_band: Optional[int] = None
+    quarantine_until: Optional[datetime] = None
+    quarantine_reason: Optional[str] = None
     created_at: datetime
     photos: list[PlantPhotoOut] = []
 
@@ -162,6 +168,25 @@ class PlantNoteCreate(BaseModel):
 class PlantNoteOut(BaseModel):
     id: str
     plant_id: str
+    text: str
+    created_at: datetime
+    updated_at: datetime
+    expires_at: Optional[datetime] = None
+
+
+class PropagationNoteCreate(BaseModel):
+    text: str
+    expires_at: Optional[datetime] = None
+
+
+class PropagationNoteUpdate(BaseModel):
+    text: Optional[str] = None
+    expires_at: Optional[datetime] = None
+
+
+class PropagationNoteOut(BaseModel):
+    id: str
+    propagation_id: str
     text: str
     created_at: datetime
     updated_at: datetime
@@ -501,6 +526,19 @@ class PlantSensorBindingOut(BaseModel):
 # ---- Genus Care Guide ----
 class GenusCareGuideOut(BaseModel):
     genus: str
+    origin: Optional[str] = None
+    light: Optional[str] = None
+    watering: Optional[str] = None
+    fertilizing: Optional[str] = None
+    soil: Optional[str] = None
+    humidity: Optional[str] = None
+    toxicity: Optional[str] = None
+    min_temp_c: Optional[float] = None
+
+
+# ---- Family Care Guide ----
+class FamilyCareGuideOut(BaseModel):
+    family: str
     origin: Optional[str] = None
     light: Optional[str] = None
     watering: Optional[str] = None
