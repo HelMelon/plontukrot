@@ -17,8 +17,11 @@ so `CropStatus` never reaches `ready` and `progressIndicator` stays visible.
 
 ## Decision
 
-1. Before opening `PlantImageCropPage`, re-encode picker bytes to PNG via
-   Flutter's `instantiateImageCodec` (`normalizeImageBytesForCrop`).
+1. Before opening `PlantImageCropPage`, re-encode picker bytes to baseline
+   JPEG (`normalizeImageBytesForCrop`). Flutter's codec decodes the original
+   (including HEIC and EXIF orientation) to straight RGBA; the `image` package
+   then writes JPEG. PNG from `Image.toByteData` is not used: `crop_your_image`
+   keeps the input format, and uploads are stored as `.jpg`.
 2. If normalization fails, show a snackbar and abort — do not open the crop UI.
 3. Push the crop route with `rootNavigator: true` and `fullscreenDialog: true`
    so it is not constrained by the create/edit bottom sheet.
@@ -40,7 +43,8 @@ so `CropStatus` never reaches `ready` and `progressIndicator` stays visible.
 
 ## Consequences
 
-- Extra decode/encode before crop (CPU/memory), capped at ~1280px width.
+- Extra decode/encode before crop (CPU/memory), capped at ~1280px width,
+  then JPEG quality 90.
 - Formats Flutter cannot decode still fail, but with a clear error instead of
   an infinite spinner.
 

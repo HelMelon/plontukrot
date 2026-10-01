@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
@@ -40,9 +41,12 @@ Future<ImageSource?> showPlantImageSourceSheet(BuildContext context) {
   );
 }
 
-/// Re-encodes picker bytes to PNG via the Flutter codec so `crop_your_image`
-/// (package `image`) always receives a format it can parse. Prevents an
-/// infinite loading spinner when the camera/gallery returns HEIC/unknown data.
+/// Re-encodes picker bytes to baseline JPEG via the Flutter codec.
+///
+/// Camera/gallery files are often HEIC or another format `crop_your_image`
+/// cannot parse, which leaves the crop screen on its spinner. Flutter decodes
+/// those files (and applies EXIF orientation). The result is encoded as JPEG
+/// with the `image` package so the cropper and the `.jpg` upload match.
 Future<Uint8List?> normalizeImageBytesForCrop(Uint8List bytes) async {
   if (bytes.isEmpty) return null;
   try {
@@ -53,8 +57,23 @@ Future<Uint8List?> normalizeImageBytesForCrop(Uint8List bytes) async {
     final frame = await codec.getNextFrame();
     final image = frame.image;
     try {
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
+      final byteData = await image.toByteData(
+        format: ui.ImageByteFormat.rawStraightRgba,
+      );
+      if (byteData == null) return null;
+      final pixels = byteData.buffer.asUint8List(
+        byteData.offsetInBytes,
+        byteData.lengthInBytes,
+      );
+      final decoded = img.Image.fromBytes(
+        width: image.width,
+        height: image.height,
+        bytes: pixels.buffer,
+        bytesOffset: pixels.offsetInBytes,
+        numChannels: 4,
+        order: img.ChannelOrder.rgba,
+      );
+      return Uint8List.fromList(img.encodeJpg(decoded, quality: 90));
     } finally {
       image.dispose();
     }
@@ -100,6 +119,10 @@ Future<Uint8List?> pickAndCropPlantPhoto(BuildContext context) async {
     _showCropPrepError(context);
     return null;
   }
+
+  // The image picker activity can leave the navigator locked for a frame.
+  await Future<void>.delayed(Duration.zero);
+  if (!context.mounted) return null;
 
   return Navigator.of(context, rootNavigator: true).push<Uint8List>(
     MaterialPageRoute(
