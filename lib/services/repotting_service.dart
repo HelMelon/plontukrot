@@ -11,6 +11,9 @@ import 'rest_stream.dart';
 class RepottingService {
   final ApiClient _api = ApiClient.instance;
 
+  Future<List<RepottingEntry>> fetchHistory(String plantId) =>
+      _fetchHistory(plantId);
+
   Future<List<RepottingEntry>> _fetchHistory(String plantId) async {
     try {
       final list = jsonMapList(await _api.get('/plants/$plantId/repottings'));

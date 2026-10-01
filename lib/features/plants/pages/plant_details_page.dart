@@ -8,10 +8,17 @@ import '../../../core/features/feature_flags.dart';
 import '../../../models/growth_event.dart';
 import '../../../models/plant.dart';
 import '../../../models/plant_photo.dart';
+import '../../../services/fertilize_service.dart';
 import '../../../services/growth_event_service.dart';
+import '../../../services/manipulation_service.dart';
 import '../../../services/note_service.dart';
 import '../../../services/plant_service.dart';
+import '../../../services/propagation_service.dart';
+import '../../../services/repotting_service.dart';
 import '../../../services/storage_service.dart';
+import '../../../services/watering_service.dart';
+import '../export/plant_export.dart';
+import '../widgets/sheets/export_plant_fields_sheet.dart';
 import '../widgets/common/pick_and_crop_plant_photo.dart';
 import '../widgets/sheets/update_plant_sheet.dart';
 import '../widgets/sheets/add_note_sheet.dart';
@@ -42,6 +49,7 @@ class PlantDetailsPage extends StatefulWidget {
 class _PlantDetailsPageState extends State<PlantDetailsPage> {
   bool isUploading = false;
   bool _growthBusy = false;
+  bool _exportingJournal = false;
   late final PlantService _plantService;
   late final GrowthEventService _growthEventService;
   late final Stream<Plant?> _plantStream;
@@ -129,6 +137,67 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
       );
     } finally {
       if (mounted) setState(() => isUploading = false);
+    }
+  }
+
+  Future<void> _exportJournal(Plant plant) async {
+    if (_exportingJournal) return;
+    final l10n = AppLocalizations.of(context);
+    final format = await showPlantExportFormatSheet(context: context);
+    if (format == null || !mounted) return;
+    setState(() => _exportingJournal = true);
+    try {
+      final plantId = widget.plantId;
+      final wateringsFuture = WateringService().fetchHistory(plantId);
+      final fertilizingsFuture = FertilizeService().fetchHistory(plantId);
+      final repottingsFuture = RepottingService().fetchHistory(plantId);
+      final manipulationsFuture = ManipulationService().fetchHistory(plantId);
+      final notesFuture = NoteService().fetchNotes(NoteParent.plant(plantId));
+      final propagationsFuture =
+          PropagationService().fetchForParentPlant(plantId);
+      final waterings = await wateringsFuture;
+      final fertilizings = await fertilizingsFuture;
+      final repottings = await repottingsFuture;
+      final manipulations = await manipulationsFuture;
+      final notes = await notesFuture;
+      final propagations = await propagationsFuture;
+      if (!mounted) return;
+      final journal = PlantJournalExport(
+        waterings: waterings,
+        fertilizings: fertilizings,
+        repottings: repottings,
+        manipulations: manipulations,
+        notes: notes,
+        propagations: propagations,
+      );
+      final payload = plantJournalPayload(
+        plant: plant,
+        l10n: l10n,
+        journal: journal,
+      );
+      final content = format == PlantExportFormat.json
+          ? jsonExportContent(payload)
+          : plantJournalMarkdown(
+              plant: plant,
+              journal: journal,
+              l10n: l10n,
+            );
+      await shareExportDocument(
+        fileName: exportFileName(
+          baseName: 'plant-journal',
+          date: DateTime.now(),
+          format: format,
+        ),
+        content: content,
+        format: format,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commonError(e.toString()))),
+      );
+    } finally {
+      if (mounted) setState(() => _exportingJournal = false);
     }
   }
 
@@ -509,6 +578,17 @@ class _PlantDetailsPageState extends State<PlantDetailsPage> {
               icon: icons.note,
               color: actionIconColor,
             ),
+          ),
+          IconButton(
+            tooltip: l10n.plantExportJournal,
+            onPressed: _exportingJournal ? null : () => _exportJournal(plant),
+            icon: _exportingJournal
+                ? AccessibleProgressIndicator(
+                    label: l10n.profileExportingPlants,
+                    size: context.dimensions.iconMd,
+                    color: actionIconColor,
+                  )
+                : Icon(icons.share, color: actionIconColor),
           ),
           if (!plant.isArchived) ...[
             if (flags.isEnabled(FeatureFlag.friends))

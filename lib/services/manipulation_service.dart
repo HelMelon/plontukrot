@@ -24,6 +24,9 @@ class ManipulationService {
     }
   }
 
+  Future<List<ManipulationEntry>> fetchHistory(String plantId) =>
+      _fetchHistory(plantId);
+
   Future<List<ManipulationEntry>> _fetchHistory(String plantId) async {
     final list = jsonMapList(await _api.get('/plants/$plantId/manipulations'));
     return list

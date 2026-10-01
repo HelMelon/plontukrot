@@ -178,6 +178,14 @@ class PropagationService {
     });
   }
 
+  Future<List<Propagation>> fetchForParentPlant(String plantId) async {
+    final items = (await _fetchAll())
+        .where((item) => item.parentPlantId == plantId)
+        .toList()
+      ..sort((a, b) => a.startedAt.compareTo(b.startedAt));
+    return items;
+  }
+
   Stream<List<Propagation>> watchPropagationsForPlant(String plantId) {
     return restPollStream(() async {
       final items = (await _fetchAll())

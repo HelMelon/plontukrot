@@ -1,11 +1,8 @@
-import 'dart:convert';
 import 'package:hugeicons/hugeicons.dart';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:plontukrot/core/l10n/app_localizations_x.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/currency/app_currency.dart';
@@ -30,6 +27,8 @@ import '../../../services/fertilizing_notification_service.dart';
 import '../../../services/quarantine_notification_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/propagation_service.dart';
+import '../../plants/export/plant_export.dart';
+import '../../plants/widgets/sheets/export_plant_fields_sheet.dart';
 import '../../friends/pages/friends_page.dart';
 import '../widgets/telegram_link_tile.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
@@ -171,6 +170,9 @@ class _ProfilePageState extends State<ProfilePage>
   Future<void> _exportPlantNames() async {
     if (_busy) return;
     final l10n = AppLocalizations.of(context);
+    final request = await showExportPlantFieldsSheet(context: context);
+    if (request == null || request.fields.isEmpty || !mounted) return;
+
     setState(() {
       _busy = true;
       _busyMessage = l10n.profileExportingPlants;
@@ -185,62 +187,27 @@ class _ProfilePageState extends State<ProfilePage>
         return;
       }
 
-      int comparePlants(Plant a, Plant b) {
-        final speciesCmp =
-            a.species.toLowerCase().compareTo(b.species.toLowerCase());
-        if (speciesCmp != 0) return speciesCmp;
-        return a.nickname.toLowerCase().compareTo(b.nickname.toLowerCase());
-      }
-
-      Map<String, dynamic> plantPayload(Plant plant) => {
-            'genus': plant.genus.trim(),
-            'species': plant.species.trim(),
-            'cultivar': plant.cultivarsDisplay,
-            'nickname': plant.nickname.trim(),
-          };
-
-      final grouped = <int, List<Plant>>{};
-      for (final plant in plants) {
-        grouped.putIfAbsent(plant.stage, () => <Plant>[]).add(plant);
-      }
-      final stageKeys = grouped.keys.toList()..sort();
-
-      final stages = <Map<String, dynamic>>[];
-      for (final stage in stageKeys) {
-        final stagePlants = List<Plant>.from(grouped[stage]!)
-          ..sort(comparePlants);
-        stages.add({
-          'stage': l10n.stageTitle(stage),
-          'count': stagePlants.length,
-          'plants': [for (final plant in stagePlants) plantPayload(plant)],
-        });
-      }
-
-      final payload = <String, dynamic>{
-        'uid': widget.user.uid,
-        'exportedAt': DateTime.now().toUtc().toIso8601String(),
-        'fields': ['cultivar', 'genus', 'nickname', 'species'],
-        'count': plants.length,
-        'stages': stages,
-      };
-
-      final dateStamp = DateFormat('yyyy-MM-dd').format(DateTime.now());
-      final fileName = 'plants-names-$dateStamp.json';
-      final bytes = utf8.encode(
-        const JsonEncoder.withIndent('  ').convert(payload),
+      final payload = plantCatalogPayload(
+        uid: widget.user.uid,
+        plants: plants,
+        l10n: l10n,
+        fields: request.fields,
       );
-
-      await SharePlus.instance.share(
-        ShareParams(
-          files: [
-            XFile.fromData(
-              bytes,
-              mimeType: 'application/json',
-              name: fileName,
-            ),
-          ],
-          fileNameOverrides: [fileName],
+      final content = request.format == PlantExportFormat.json
+          ? jsonExportContent(payload)
+          : plantCatalogMarkdown(
+              plants: plants,
+              l10n: l10n,
+              fields: request.fields,
+            );
+      await shareExportDocument(
+        fileName: exportFileName(
+          baseName: 'plants',
+          date: DateTime.now(),
+          format: request.format,
         ),
+        content: content,
+        format: request.format,
       );
     } catch (e) {
       if (!mounted) return;

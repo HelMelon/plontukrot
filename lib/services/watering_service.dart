@@ -8,6 +8,9 @@ import 'rest_stream.dart';
 class WateringService {
   final ApiClient _api = ApiClient.instance;
 
+  Future<List<WateringEntry>> fetchHistory(String plantId) =>
+      _fetchHistory(plantId);
+
   Future<List<WateringEntry>> _fetchHistory(String plantId) async {
     final list = jsonMapList(await _api.get('/plants/$plantId/waterings'));
     final entries = list

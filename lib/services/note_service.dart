@@ -78,6 +78,13 @@ class NoteService {
     }
   }
 
+  Future<List<Note>> fetchNotes(NoteParent parent) async {
+    final list = jsonMapList(await _api.get(_base(parent)));
+    return list
+        .map((m) => Note.fromMap(readString(m, 'id') ?? '', m))
+        .toList();
+  }
+
   Stream<List<Note>> notesStream(NoteParent parent, {int limit = 20}) {
     return restPollStream(() async {
       final list = jsonMapList(await _api.get(_base(parent)));
