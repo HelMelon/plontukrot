@@ -179,6 +179,103 @@ DateTime? fertilizingDayNotificationAt({
   return scheduled;
 }
 
+/// Groups plants by next fertilizing date for batch local notifications.
+///
+/// - [dueTodayOrOverdue]: next due on or before today
+/// - [dueTomorrow]: next due tomorrow (eve + morning reminders)
+/// - [nextFutureDueDate] / [dueOnNextFutureDate]: earliest due strictly after
+///   tomorrow (scheduled ahead without requiring another app open)
+class FertilizingReminderGroups<T> {
+  const FertilizingReminderGroups({
+    required this.dueTodayOrOverdue,
+    required this.dueTomorrow,
+    this.nextFutureDueDate,
+    this.dueOnNextFutureDate = const [],
+  });
+
+  final List<T> dueTodayOrOverdue;
+  final List<T> dueTomorrow;
+  final DateTime? nextFutureDueDate;
+  final List<T> dueOnNextFutureDate;
+}
+
+FertilizingReminderGroups<T> groupFertilizingReminderTargets<T>({
+  required Iterable<T> items,
+  required DateTime? Function(T item) nextDueDate,
+  DateTime? now,
+}) {
+  final clock = now ?? DateTime.now();
+  final today = _dateOnly(clock);
+  final tomorrow = today.add(const Duration(days: 1));
+
+  final dueTodayOrOverdue = <T>[];
+  final dueTomorrow = <T>[];
+  final futureByDay = <DateTime, List<T>>{};
+
+  for (final item in items) {
+    final next = nextDueDate(item);
+    if (next == null) continue;
+    final day = _dateOnly(next);
+    if (!day.isAfter(today)) {
+      dueTodayOrOverdue.add(item);
+    } else if (day == tomorrow) {
+      dueTomorrow.add(item);
+    } else {
+      futureByDay.putIfAbsent(day, () => <T>[]).add(item);
+    }
+  }
+
+  if (futureByDay.isEmpty) {
+    return FertilizingReminderGroups(
+      dueTodayOrOverdue: dueTodayOrOverdue,
+      dueTomorrow: dueTomorrow,
+    );
+  }
+
+  final sortedDays = futureByDay.keys.toList()..sort();
+  final nextFuture = sortedDays.first;
+  return FertilizingReminderGroups(
+    dueTodayOrOverdue: dueTodayOrOverdue,
+    dueTomorrow: dueTomorrow,
+    nextFutureDueDate: nextFuture,
+    dueOnNextFutureDate: futureByDay[nextFuture] ?? const [],
+  );
+}
+
+/// Local fire time for a feeding-day batch: 08:00 on [dueDay], or soon if
+/// that moment has passed and [dueDay] is today/overdue.
+DateTime? fertilizingBatchDayFireAt({
+  required DateTime dueDay,
+  DateTime? now,
+}) {
+  final clock = now ?? DateTime.now();
+  final today = _dateOnly(clock);
+  final day = _dateOnly(dueDay);
+
+  if (!day.isAfter(today)) {
+    final todayAt8 = DateTime(today.year, today.month, today.day, 8);
+    if (clock.isBefore(todayAt8)) return todayAt8;
+    return clock.add(const Duration(seconds: 5));
+  }
+
+  final scheduled = DateTime(day.year, day.month, day.day, 8);
+  if (!scheduled.isAfter(clock)) return null;
+  return scheduled;
+}
+
+/// Eve fire time (19:00) the calendar day before [dueDay], or null if past.
+DateTime? fertilizingBatchEveFireAt({
+  required DateTime dueDay,
+  DateTime? now,
+}) {
+  final day = _dateOnly(dueDay);
+  final eve = day.subtract(const Duration(days: 1));
+  final scheduled = DateTime(eve.year, eve.month, eve.day, 19);
+  final clock = now ?? DateTime.now();
+  if (!scheduled.isAfter(clock)) return null;
+  return scheduled;
+}
+
 int _normalizeStage(int stage) {
   if (stage <= 0) return 1;
   if (stage > 4) return 4;

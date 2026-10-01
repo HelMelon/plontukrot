@@ -305,4 +305,48 @@ void main() {
       );
     });
   });
+
+  group('batch reminder grouping', () {
+    test('splits today, tomorrow, and next future cohort', () {
+      final now = DateTime(2026, 10, 1, 12);
+      final groups = groupFertilizingReminderTargets<String>(
+        items: const ['overdue', 'today', 'tomorrow', 'later', 'later2'],
+        now: now,
+        nextDueDate: (id) => switch (id) {
+          'overdue' => DateTime(2026, 9, 20),
+          'today' => DateTime(2026, 10, 1),
+          'tomorrow' => DateTime(2026, 10, 2),
+          'later' => DateTime(2026, 10, 8),
+          'later2' => DateTime(2026, 10, 20),
+          _ => null,
+        },
+      );
+
+      expect(groups.dueTodayOrOverdue, ['overdue', 'today']);
+      expect(groups.dueTomorrow, ['tomorrow']);
+      expect(groups.nextFutureDueDate, DateTime(2026, 10, 8));
+      expect(groups.dueOnNextFutureDate, ['later']);
+    });
+
+    test('batch day fire soon when overdue after 08:00', () {
+      final now = DateTime(2026, 10, 1, 11);
+      final fire = fertilizingBatchDayFireAt(
+        dueDay: DateTime(2026, 9, 20),
+        now: now,
+      );
+      expect(fire, isNotNull);
+      expect(fire!.isAfter(now), isTrue);
+      expect(fire.difference(now).inSeconds, lessThanOrEqualTo(5));
+    });
+
+    test('batch eve is 19:00 day before', () {
+      expect(
+        fertilizingBatchEveFireAt(
+          dueDay: DateTime(2026, 10, 2),
+          now: DateTime(2026, 10, 1, 12),
+        ),
+        DateTime(2026, 10, 1, 19),
+      );
+    });
+  });
 }

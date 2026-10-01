@@ -43,17 +43,19 @@ class PlantService {
   Future<void> _rescheduleNotifications(String plantId) async {
     try {
       final plant = await getPlant(plantId);
-      if (plant == null) return;
 
       if (!FeatureFlagsController.instance
           .isEnabled(FeatureFlag.fertilizingReminders)) {
-        await FertilizingNotificationService.instance.cancelForPlant(plantId);
-    await QuarantineNotificationService.instance.cancelForPlant(plantId);
+        await FertilizingNotificationService.instance.cancelAll();
       } else {
-        await FertilizingNotificationService.instance.rescheduleForPlant(plant);
+        await FertilizingNotificationService.instance.rescheduleAllActivePlants();
       }
 
-      await QuarantineNotificationService.instance.rescheduleForPlant(plant);
+      if (plant == null) {
+        await QuarantineNotificationService.instance.cancelForPlant(plantId);
+      } else {
+        await QuarantineNotificationService.instance.rescheduleForPlant(plant);
+      }
     } catch (error, stack) {
       try {
         await AppCrashReporting.instance.recordError(
@@ -62,6 +64,15 @@ class PlantService {
           reason: 'plant_notification_reschedule_failed',
         );
       } catch (_) {}
+    }
+  }
+
+  Future<void> _syncFertilizingNotificationsAfterRemoval() async {
+    if (!FeatureFlagsController.instance
+        .isEnabled(FeatureFlag.fertilizingReminders)) {
+      await FertilizingNotificationService.instance.cancelAll();
+    } else {
+      await FertilizingNotificationService.instance.rescheduleAllActivePlants();
     }
   }
 
@@ -357,7 +368,7 @@ class PlantService {
         giftedToUid: giftedToUid,
       ),
     );
-    await FertilizingNotificationService.instance.cancelForPlant(plantId);
+    await _syncFertilizingNotificationsAfterRemoval();
     await QuarantineNotificationService.instance.cancelForPlant(plantId);
   }
 
@@ -562,7 +573,7 @@ class PlantService {
     } on ApiException catch (error) {
       if (!error.isNotFound) rethrow;
     }
-    await FertilizingNotificationService.instance.cancelForPlant(plantId);
+    await _syncFertilizingNotificationsAfterRemoval();
     await QuarantineNotificationService.instance.cancelForPlant(plantId);
   }
 

@@ -164,9 +164,21 @@
   "profileDeleteAccountError": "Не удалось удалить профиль: {error}",
   "profileDeleteAccountFailed": "Не удалось удалить профиль. Попробуйте ещё раз.",
   "profileFriends": "Друзья",
-  "profileExportPlants": "Экспорт названий растений",
+  "profileExportPlants": "Экспорт растений",
   "profileExportPlantsEmpty": "Нет растений для экспорта",
   "profileExportingPlants": "Экспорт растений…",
+  "exportFieldsTitle": "Поля для экспорта",
+  "exportFieldsRequired": "Выберите хотя бы одно поле",
+  "exportFormatTitle": "Формат",
+  "exportFormatJson": "JSON",
+  "exportFormatMarkdown": "Markdown",
+  "exportPropagationBatchCount": "Партий размножения: {count}",
+  "@exportPropagationBatchCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "plantExportJournal": "Экспорт журнала",
   "profileMyUid": "Ваш ID",
   "profileCopyUid": "Копировать ID",
   "profileUidCopied": "ID скопирован",
@@ -366,15 +378,17 @@
   "plantFertilizingResetAuto": "Сбросить на авто",
   "plantFertilizingFrequencyHint": "Это среднестатистические сроки по стадии и сезону. Для конкретного растения их можно изменить вручную. 0 — не подкармливать.",
   "plantInvalidFertilizingFrequency": "Укажите 1–180 дней или выберите СТОП",
-  "fertilizingStageGenitiveStart": "старта",
-  "fertilizingStageGenitiveBaby": "детки",
-  "fertilizingStageGenitiveJuvenile": "ювенила",
-  "fertilizingStageGenitiveAdult": "взрослого",
-  "fertilizingReminderEveTitle": "Напоминание о подкормке",
-  "fertilizingReminderEveBody": "Завтра подкормка {stage}",
-  "@fertilizingReminderEveBody": {
+  "fertilizingReminderEveTitle": "Завтра подкормка",
+  "fertilizingReminderEveBodyOne": "{name}",
+  "@fertilizingReminderEveBodyOne": {
     "placeholders": {
-      "stage": {"type": "String"}
+      "name": {"type": "String"}
+    }
+  },
+  "fertilizingReminderEveBodyCount": "{count, plural, =1{1 растение} few{{count} растения} many{{count} растений} other{{count} растений}}",
+  "@fertilizingReminderEveBodyCount": {
+    "placeholders": {
+      "count": {"type": "int"}
     }
   },
   "fertilizingReminderDayTitle": "Подкормка: {name}",
@@ -383,13 +397,20 @@
       "name": {"type": "String"}
     }
   },
-  "fertilizingReminderDayTitleStage": "Подкормка {stage}",
-  "@fertilizingReminderDayTitleStage": {
+  "fertilizingReminderDayTitleBatch": "Подкормка сегодня",
+  "fertilizingReminderDayBody": "Нажмите «Принято», когда выполните.",
+  "fertilizingReminderDayBodyCount": "{count, plural, =1{1 растение} few{{count} растения} many{{count} растений} other{{count} растений}}",
+  "@fertilizingReminderDayBodyCount": {
     "placeholders": {
-      "stage": {"type": "String"}
+      "count": {"type": "int"}
     }
   },
-  "fertilizingReminderDayBody": "Сегодня день подкормки. Нажмите «Принято», когда выполните.",
+  "fertilizingReminderDayBodyCountOverdue": "{count, plural, =1{1 растение · есть просроченные} few{{count} растения · есть просроченные} many{{count} растений · есть просроченные} other{{count} растений · есть просроченные}}",
+  "@fertilizingReminderDayBodyCountOverdue": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "fertilizingReminderOverdueBody": "Подкормка просрочена. Нажмите «Принято», когда выполните.",
   "fertilizingReminderAccept": "Принято",
   "settingsFertilizingSeason": "Сезон подкормки",

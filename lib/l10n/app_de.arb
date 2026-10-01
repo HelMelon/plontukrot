@@ -164,9 +164,21 @@
   "profileDeleteAccountError": "Profil konnte nicht gelöscht werden: {error}",
   "profileDeleteAccountFailed": "Profil konnte nicht gelöscht werden. Bitte erneut versuchen.",
   "profileFriends": "Freunde",
-  "profileExportPlants": "Pflanzennamen exportieren",
+  "profileExportPlants": "Pflanzen exportieren",
   "profileExportPlantsEmpty": "Keine Pflanzen zum Exportieren",
   "profileExportingPlants": "Pflanzen werden exportiert…",
+  "exportFieldsTitle": "Felder für den Export",
+  "exportFieldsRequired": "Wählen Sie mindestens ein Feld",
+  "exportFormatTitle": "Format",
+  "exportFormatJson": "JSON",
+  "exportFormatMarkdown": "Markdown",
+  "exportPropagationBatchCount": "Vermehrungschargen: {count}",
+  "@exportPropagationBatchCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "plantExportJournal": "Journal exportieren",
   "profileMyUid": "Deine ID",
   "profileCopyUid": "ID kopieren",
   "profileUidCopied": "ID kopiert",
@@ -366,15 +378,17 @@
   "plantFertilizingResetAuto": "Automatisch zurücksetzen",
   "plantFertilizingFrequencyHint": "Das sind Durchschnittswerte nach Stufe und Saison. Für einzelne Pflanzen können Sie sie anpassen. 0 — nicht düngen.",
   "plantInvalidFertilizingFrequency": "1–180 Tage eingeben oder STOP wählen",
-  "fertilizingStageGenitiveStart": "Start",
-  "fertilizingStageGenitiveBaby": "Baby",
-  "fertilizingStageGenitiveJuvenile": "Juvenil",
-  "fertilizingStageGenitiveAdult": "Erwachsen",
-  "fertilizingReminderEveTitle": "Düngungserinnerung",
-  "fertilizingReminderEveBody": "Morgen: {stage} düngen",
-  "@fertilizingReminderEveBody": {
+  "fertilizingReminderEveTitle": "Morgen düngen",
+  "fertilizingReminderEveBodyOne": "{name}",
+  "@fertilizingReminderEveBodyOne": {
     "placeholders": {
-      "stage": {"type": "String"}
+      "name": {"type": "String"}
+    }
+  },
+  "fertilizingReminderEveBodyCount": "{count, plural, =1{1 Pflanze} other{{count} Pflanzen}}",
+  "@fertilizingReminderEveBodyCount": {
+    "placeholders": {
+      "count": {"type": "int"}
     }
   },
   "fertilizingReminderDayTitle": "Düngen: {name}",
@@ -383,13 +397,20 @@
       "name": {"type": "String"}
     }
   },
-  "fertilizingReminderDayTitleStage": "Düngen: {stage}",
-  "@fertilizingReminderDayTitleStage": {
+  "fertilizingReminderDayTitleBatch": "Heute düngen",
+  "fertilizingReminderDayBody": "Tippen Sie auf «Akzeptiert», wenn erledigt.",
+  "fertilizingReminderDayBodyCount": "{count, plural, =1{1 Pflanze} other{{count} Pflanzen}}",
+  "@fertilizingReminderDayBodyCount": {
     "placeholders": {
-      "stage": {"type": "String"}
+      "count": {"type": "int"}
     }
   },
-  "fertilizingReminderDayBody": "Heute ist Düngungstag. Tippen Sie auf «Akzeptiert», wenn erledigt.",
+  "fertilizingReminderDayBodyCountOverdue": "{count, plural, =1{1 Pflanze · überfällig} other{{count} Pflanzen · überfällig}}",
+  "@fertilizingReminderDayBodyCountOverdue": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "fertilizingReminderOverdueBody": "Düngung überfällig. Tippen Sie auf «Akzeptiert», wenn erledigt.",
   "fertilizingReminderAccept": "Akzeptiert",
   "settingsFertilizingSeason": "Düngungssaison",

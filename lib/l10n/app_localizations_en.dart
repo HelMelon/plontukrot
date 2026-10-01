@@ -367,13 +367,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileFriends => 'Friends';
 
   @override
-  String get profileExportPlants => 'Export plant names';
+  String get profileExportPlants => 'Export plants';
 
   @override
   String get profileExportPlantsEmpty => 'No plants to export';
 
   @override
   String get profileExportingPlants => 'Exporting plants…';
+
+  @override
+  String get exportFieldsTitle => 'Fields to export';
+
+  @override
+  String get exportFieldsRequired => 'Select at least one field';
+
+  @override
+  String get exportFormatTitle => 'Format';
+
+  @override
+  String get exportFormatJson => 'JSON';
+
+  @override
+  String get exportFormatMarkdown => 'Markdown';
+
+  @override
+  String exportPropagationBatchCount(int count) {
+    return 'Propagation batches: $count';
+  }
+
+  @override
+  String get plantExportJournal => 'Export journal';
 
   @override
   String get profileMyUid => 'Your ID';
@@ -903,23 +926,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter 1–180 days or select STOP';
 
   @override
-  String get fertilizingStageGenitiveStart => 'start';
+  String get fertilizingReminderEveTitle => 'Fertilizing tomorrow';
 
   @override
-  String get fertilizingStageGenitiveBaby => 'baby plant';
+  String fertilizingReminderEveBodyOne(String name) {
+    return '$name';
+  }
 
   @override
-  String get fertilizingStageGenitiveJuvenile => 'juvenile';
-
-  @override
-  String get fertilizingStageGenitiveAdult => 'adult';
-
-  @override
-  String get fertilizingReminderEveTitle => 'Fertilizing reminder';
-
-  @override
-  String fertilizingReminderEveBody(String stage) {
-    return 'Tomorrow: fertilize $stage';
+  String fertilizingReminderEveBodyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plants',
+      one: '1 plant',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -928,13 +950,32 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String fertilizingReminderDayTitleStage(String stage) {
-    return 'Fertilize $stage';
+  String get fertilizingReminderDayTitleBatch => 'Fertilize today';
+
+  @override
+  String get fertilizingReminderDayBody => 'Tap Accept when done.';
+
+  @override
+  String fertilizingReminderDayBodyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plants',
+      one: '1 plant',
+    );
+    return '$_temp0';
   }
 
   @override
-  String get fertilizingReminderDayBody =>
-      'Time to fertilize. Tap Accept when done.';
+  String fertilizingReminderDayBodyCountOverdue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plants · some overdue',
+      one: '1 plant · some overdue',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get fertilizingReminderOverdueBody =>

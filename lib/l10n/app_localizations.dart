@@ -747,7 +747,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileExportPlants.
   ///
   /// In en, this message translates to:
-  /// **'Export plant names'**
+  /// **'Export plants'**
   String get profileExportPlants;
 
   /// No description provided for @profileExportPlantsEmpty.
@@ -761,6 +761,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Exporting plants…'**
   String get profileExportingPlants;
+
+  /// No description provided for @exportFieldsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fields to export'**
+  String get exportFieldsTitle;
+
+  /// No description provided for @exportFieldsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one field'**
+  String get exportFieldsRequired;
+
+  /// No description provided for @exportFormatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Format'**
+  String get exportFormatTitle;
+
+  /// No description provided for @exportFormatJson.
+  ///
+  /// In en, this message translates to:
+  /// **'JSON'**
+  String get exportFormatJson;
+
+  /// No description provided for @exportFormatMarkdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Markdown'**
+  String get exportFormatMarkdown;
+
+  /// No description provided for @exportPropagationBatchCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Propagation batches: {count}'**
+  String exportPropagationBatchCount(int count);
+
+  /// No description provided for @plantExportJournal.
+  ///
+  /// In en, this message translates to:
+  /// **'Export journal'**
+  String get plantExportJournal;
 
   /// No description provided for @profileMyUid.
   ///
@@ -1740,41 +1782,23 @@ abstract class AppLocalizations {
   /// **'Enter 1–180 days or select STOP'**
   String get plantInvalidFertilizingFrequency;
 
-  /// No description provided for @fertilizingStageGenitiveStart.
-  ///
-  /// In en, this message translates to:
-  /// **'start'**
-  String get fertilizingStageGenitiveStart;
-
-  /// No description provided for @fertilizingStageGenitiveBaby.
-  ///
-  /// In en, this message translates to:
-  /// **'baby plant'**
-  String get fertilizingStageGenitiveBaby;
-
-  /// No description provided for @fertilizingStageGenitiveJuvenile.
-  ///
-  /// In en, this message translates to:
-  /// **'juvenile'**
-  String get fertilizingStageGenitiveJuvenile;
-
-  /// No description provided for @fertilizingStageGenitiveAdult.
-  ///
-  /// In en, this message translates to:
-  /// **'adult'**
-  String get fertilizingStageGenitiveAdult;
-
   /// No description provided for @fertilizingReminderEveTitle.
   ///
   /// In en, this message translates to:
-  /// **'Fertilizing reminder'**
+  /// **'Fertilizing tomorrow'**
   String get fertilizingReminderEveTitle;
 
-  /// No description provided for @fertilizingReminderEveBody.
+  /// No description provided for @fertilizingReminderEveBodyOne.
   ///
   /// In en, this message translates to:
-  /// **'Tomorrow: fertilize {stage}'**
-  String fertilizingReminderEveBody(String stage);
+  /// **'{name}'**
+  String fertilizingReminderEveBodyOne(String name);
+
+  /// No description provided for @fertilizingReminderEveBodyCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 plant} other{{count} plants}}'**
+  String fertilizingReminderEveBodyCount(int count);
 
   /// No description provided for @fertilizingReminderDayTitle.
   ///
@@ -1782,17 +1806,29 @@ abstract class AppLocalizations {
   /// **'Fertilize {name}'**
   String fertilizingReminderDayTitle(String name);
 
-  /// No description provided for @fertilizingReminderDayTitleStage.
+  /// No description provided for @fertilizingReminderDayTitleBatch.
   ///
   /// In en, this message translates to:
-  /// **'Fertilize {stage}'**
-  String fertilizingReminderDayTitleStage(String stage);
+  /// **'Fertilize today'**
+  String get fertilizingReminderDayTitleBatch;
 
   /// No description provided for @fertilizingReminderDayBody.
   ///
   /// In en, this message translates to:
-  /// **'Time to fertilize. Tap Accept when done.'**
+  /// **'Tap Accept when done.'**
   String get fertilizingReminderDayBody;
+
+  /// No description provided for @fertilizingReminderDayBodyCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 plant} other{{count} plants}}'**
+  String fertilizingReminderDayBodyCount(int count);
+
+  /// No description provided for @fertilizingReminderDayBodyCountOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 plant · some overdue} other{{count} plants · some overdue}}'**
+  String fertilizingReminderDayBodyCountOverdue(int count);
 
   /// No description provided for @fertilizingReminderOverdueBody.
   ///

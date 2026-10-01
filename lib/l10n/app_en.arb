@@ -189,9 +189,21 @@
   },
   "profileDeleteAccountFailed": "Could not delete profile. Please try again.",
   "profileFriends": "Friends",
-  "profileExportPlants": "Export plant names",
+  "profileExportPlants": "Export plants",
   "profileExportPlantsEmpty": "No plants to export",
   "profileExportingPlants": "Exporting plants…",
+  "exportFieldsTitle": "Fields to export",
+  "exportFieldsRequired": "Select at least one field",
+  "exportFormatTitle": "Format",
+  "exportFormatJson": "JSON",
+  "exportFormatMarkdown": "Markdown",
+  "exportPropagationBatchCount": "Propagation batches: {count}",
+  "@exportPropagationBatchCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "plantExportJournal": "Export journal",
   "profileMyUid": "Your ID",
   "profileCopyUid": "Copy ID",
   "profileUidCopied": "ID copied",
@@ -426,15 +438,17 @@
   "plantFertilizingResetAuto": "Reset to automatic",
   "plantFertilizingFrequencyHint": "These are average intervals by stage and season. You can adjust them for a specific plant. Enter 0 to skip fertilizing.",
   "plantInvalidFertilizingFrequency": "Enter 1–180 days or select STOP",
-  "fertilizingStageGenitiveStart": "start",
-  "fertilizingStageGenitiveBaby": "baby plant",
-  "fertilizingStageGenitiveJuvenile": "juvenile",
-  "fertilizingStageGenitiveAdult": "adult",
-  "fertilizingReminderEveTitle": "Fertilizing reminder",
-  "fertilizingReminderEveBody": "Tomorrow: fertilize {stage}",
-  "@fertilizingReminderEveBody": {
+  "fertilizingReminderEveTitle": "Fertilizing tomorrow",
+  "fertilizingReminderEveBodyOne": "{name}",
+  "@fertilizingReminderEveBodyOne": {
     "placeholders": {
-      "stage": {"type": "String"}
+      "name": {"type": "String"}
+    }
+  },
+  "fertilizingReminderEveBodyCount": "{count, plural, =1{1 plant} other{{count} plants}}",
+  "@fertilizingReminderEveBodyCount": {
+    "placeholders": {
+      "count": {"type": "int"}
     }
   },
   "fertilizingReminderDayTitle": "Fertilize {name}",
@@ -443,13 +457,20 @@
       "name": {"type": "String"}
     }
   },
-  "fertilizingReminderDayTitleStage": "Fertilize {stage}",
-  "@fertilizingReminderDayTitleStage": {
+  "fertilizingReminderDayTitleBatch": "Fertilize today",
+  "fertilizingReminderDayBody": "Tap Accept when done.",
+  "fertilizingReminderDayBodyCount": "{count, plural, =1{1 plant} other{{count} plants}}",
+  "@fertilizingReminderDayBodyCount": {
     "placeholders": {
-      "stage": {"type": "String"}
+      "count": {"type": "int"}
     }
   },
-  "fertilizingReminderDayBody": "Time to fertilize. Tap Accept when done.",
+  "fertilizingReminderDayBodyCountOverdue": "{count, plural, =1{1 plant · some overdue} other{{count} plants · some overdue}}",
+  "@fertilizingReminderDayBodyCountOverdue": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "fertilizingReminderOverdueBody": "Fertilizing is overdue. Tap Accept when done.",
   "fertilizingReminderAccept": "Accepted",
   "settingsFertilizingSeason": "Fertilizing season",

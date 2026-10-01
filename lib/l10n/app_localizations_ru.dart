@@ -369,13 +369,36 @@ class AppLocalizationsRu extends AppLocalizations {
   String get profileFriends => 'Друзья';
 
   @override
-  String get profileExportPlants => 'Экспорт названий растений';
+  String get profileExportPlants => 'Экспорт растений';
 
   @override
   String get profileExportPlantsEmpty => 'Нет растений для экспорта';
 
   @override
   String get profileExportingPlants => 'Экспорт растений…';
+
+  @override
+  String get exportFieldsTitle => 'Поля для экспорта';
+
+  @override
+  String get exportFieldsRequired => 'Выберите хотя бы одно поле';
+
+  @override
+  String get exportFormatTitle => 'Формат';
+
+  @override
+  String get exportFormatJson => 'JSON';
+
+  @override
+  String get exportFormatMarkdown => 'Markdown';
+
+  @override
+  String exportPropagationBatchCount(int count) {
+    return 'Партий размножения: $count';
+  }
+
+  @override
+  String get plantExportJournal => 'Экспорт журнала';
 
   @override
   String get profileMyUid => 'Ваш ID';
@@ -906,23 +929,24 @@ class AppLocalizationsRu extends AppLocalizations {
       'Укажите 1–180 дней или выберите СТОП';
 
   @override
-  String get fertilizingStageGenitiveStart => 'старта';
+  String get fertilizingReminderEveTitle => 'Завтра подкормка';
 
   @override
-  String get fertilizingStageGenitiveBaby => 'детки';
+  String fertilizingReminderEveBodyOne(String name) {
+    return '$name';
+  }
 
   @override
-  String get fertilizingStageGenitiveJuvenile => 'ювенила';
-
-  @override
-  String get fertilizingStageGenitiveAdult => 'взрослого';
-
-  @override
-  String get fertilizingReminderEveTitle => 'Напоминание о подкормке';
-
-  @override
-  String fertilizingReminderEveBody(String stage) {
-    return 'Завтра подкормка $stage';
+  String fertilizingReminderEveBodyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count растений',
+      many: '$count растений',
+      few: '$count растения',
+      one: '1 растение',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -931,13 +955,37 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String fertilizingReminderDayTitleStage(String stage) {
-    return 'Подкормка $stage';
-  }
+  String get fertilizingReminderDayTitleBatch => 'Подкормка сегодня';
 
   @override
   String get fertilizingReminderDayBody =>
-      'Сегодня день подкормки. Нажмите «Принято», когда выполните.';
+      'Нажмите «Принято», когда выполните.';
+
+  @override
+  String fertilizingReminderDayBodyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count растений',
+      many: '$count растений',
+      few: '$count растения',
+      one: '1 растение',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fertilizingReminderDayBodyCountOverdue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count растений · есть просроченные',
+      many: '$count растений · есть просроченные',
+      few: '$count растения · есть просроченные',
+      one: '1 растение · есть просроченные',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get fertilizingReminderOverdueBody =>

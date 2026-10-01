@@ -8,7 +8,6 @@ import 'api_client.dart';
 import 'api_exception.dart';
 import 'growth_event_service.dart';
 import 'fertilizing_notification_service.dart';
-import 'plant_service.dart';
 import 'rest_stream.dart';
 import 'watering_service.dart';
 
@@ -165,6 +164,9 @@ class FertilizeService {
     return null;
   }
 
+  Future<List<FertilizingEntry>> fetchHistory(String plantId) =>
+      _fetchHistory(plantId);
+
   Future<List<FertilizingEntry>> _fetchHistory(String plantId) async {
     final list = jsonMapList(await _api.get('/plants/$plantId/fertilizings'));
     final entries = list.map((data) {
@@ -216,10 +218,7 @@ class FertilizeService {
       skipPlantFetch: skipPlantFetch || lastWateredAt != null,
     );
 
-    final plant = await PlantService().getPlant(plantId);
-    if (plant != null) {
-      await FertilizingNotificationService.instance.rescheduleForPlant(plant);
-    }
+    await FertilizingNotificationService.instance.rescheduleAllActivePlants();
   }
 
   Future<void> addFertilizings({

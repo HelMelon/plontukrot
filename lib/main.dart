@@ -396,15 +396,13 @@ class _AuthenticatedShellState extends State<_AuthenticatedShell> {
     if (remindersOn) {
       unawaited(FertilizingNotificationService.instance.requestPermission());
     }
-    // Backfill auto frequency for legacy plants (null in Firestore) and
-    // re-sync any that drifted from the current season.
-    unawaited(PlantService().recalculateAutoFertilizingFrequencies());
+    // Backfill auto frequency first, then schedule reminders — otherwise
+    // seasonal STOP (e.g. Start in autumn) can still fire with a stale interval.
+    await PlantService().recalculateAutoFertilizingFrequencies();
     if (remindersOn) {
-      unawaited(
-        FertilizingNotificationService.instance.rescheduleAllActivePlants(),
-      );
+      await FertilizingNotificationService.instance.rescheduleAllActivePlants();
     } else {
-      unawaited(FertilizingNotificationService.instance.cancelAll());
+      await FertilizingNotificationService.instance.cancelAll();
     }
     unawaited(
       QuarantineNotificationService.instance.rescheduleAllActivePlants(),
