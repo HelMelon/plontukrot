@@ -65,7 +65,10 @@ class FeatureFlagsController extends ChangeNotifier {
       return;
     }
     try {
-      final raw = await _api.get('/features');
+      final raw = await _api.get(
+        '/features',
+        endSessionOnUnauthorized: false,
+      );
       if (raw is! Map) {
         clear();
         return;

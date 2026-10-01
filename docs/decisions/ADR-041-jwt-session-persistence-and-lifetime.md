@@ -20,7 +20,10 @@ Users experienced frequent unexpected sign-outs while using the app:
    - Clear all cached profile keys alongside the access token upon sign-out or account deletion.
 3. **Resilient Session Restoration:**
    - In `AuthService.restoreSession()`, load and immediately emit `TokenStore.instance.cachedUser` if available.
-   - Retain the active session on network or timeout errors during `/auth/me` background verification, emitting `null` only when no cached session exists or when the server explicitly returns HTTP 401 Unauthorized or HTTP 404 Not Found.
+   - Retain the active session on network or timeout errors during `/auth/me` background verification, emitting `null` only when no cached session exists or when the server explicitly returns HTTP 401 Unauthorized.
+   - HTTP 404 clears the session only when the body says the user was not found. A generic 404 (route missing on an older server during an app update) keeps the cached session.
+   - Background reads after startup (`GET /features`, profile sync, outgoing gifts) do not clear the token on 401. Only a 401 that was sent with a bearer token and is marked as session-ending does.
+   - The access token is loaded before the rest of startup, and Android Auto Backup includes `FlutterSharedPreferences` so a reinstall can restore the session.
 
 ## Implementation
 

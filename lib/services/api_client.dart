@@ -54,8 +54,14 @@ class ApiClient {
   Future<dynamic> get(
     String path, {
     Map<String, String>? query,
+    bool endSessionOnUnauthorized = true,
   }) {
-    return request('GET', path, query: query);
+    return request(
+      'GET',
+      path,
+      query: query,
+      endSessionOnUnauthorized: endSessionOnUnauthorized,
+    );
   }
 
   Future<dynamic> post(
@@ -146,10 +152,12 @@ class ApiClient {
     Object? body,
     Map<String, String>? query,
     bool pingOnSuccess = false,
+    bool endSessionOnUnauthorized = true,
   }) async {
     final uri = _uri(path, query);
     final encoded = body == null ? null : jsonEncode(body);
     final headers = _headers(jsonBody: encoded != null);
+    final sentToken = headers.containsKey('Authorization');
 
     http.Response response;
     try {
@@ -190,7 +198,9 @@ class ApiClient {
     if (response.statusCode == 401) {
       final isAuthForm = path.startsWith('/auth/login') ||
           path.startsWith('/auth/register');
-      if (!isAuthForm) {
+      // A 401 without a bearer token, or from a background read, must not
+      // wipe a session that was just restored after an app update/install.
+      if (!isAuthForm && sentToken && endSessionOnUnauthorized) {
         await TokenStore.instance.clear();
         final callback = onUnauthorized;
         if (callback != null) {

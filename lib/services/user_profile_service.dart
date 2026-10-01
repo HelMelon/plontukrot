@@ -48,7 +48,9 @@ class UserProfileService {
   String get uid => AuthService().requireUid;
 
   Future<Map<String, dynamic>> fetchMe() async {
-    return jsonMap(await _api.get('/auth/me'));
+    return jsonMap(
+      await _api.get('/auth/me', endSessionOnUnauthorized: false),
+    );
   }
 
   /// Ensures profile extras after login/register. User row already exists.

@@ -37,6 +37,7 @@ import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SemanticsBinding.instance.ensureSemantics();
+  await TokenStore.instance.load();
   // Prefetch Amatic SC so login/consent don't flash a system fallback font.
   await GoogleFonts.pendingFonts([GoogleFonts.amaticSc()]);
   await AppLocaleController.instance.load();

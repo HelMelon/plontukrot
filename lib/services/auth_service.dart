@@ -99,11 +99,16 @@ class AuthService {
     try {
       await _loadMe();
     } on ApiException catch (error) {
-      if (error.isUnauthorized || error.isNotFound) {
+      final missingUser = error.isNotFound &&
+          error.message.toLowerCase().contains('user not found');
+      if (error.isUnauthorized || missingUser) {
         await _clearSession();
         return;
       }
-      rethrow;
+      if (_user == null) {
+        _emit(null);
+      }
+      return;
     } catch (_) {
       // Keep the JWT and cached session if the backend is temporarily unreachable.
       if (_user == null) {

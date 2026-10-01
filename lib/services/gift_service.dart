@@ -87,7 +87,9 @@ class GiftService {
   }
 
   Future<void> processAcceptedOutgoingGifts() async {
-    final list = jsonMapList(await _api.get('/gifts/outgoing'));
+    final list = jsonMapList(
+      await _api.get('/gifts/outgoing', endSessionOnUnauthorized: false),
+    );
     for (final map in list) {
       final gift = OutgoingGift.fromMap(readString(map, 'id') ?? '', map);
       if (gift.status != GiftStatus.accepted) continue;

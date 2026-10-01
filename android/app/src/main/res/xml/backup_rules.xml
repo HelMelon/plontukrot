@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- JWT and profile live in Flutter shared_preferences. Keep them across reinstall. -->
+    <include domain="sharedpref" path="FlutterSharedPreferences.xml"/>
+    <include domain="file" path="datastore/FlutterSharedPreferences.preferences_pb"/>
+</full-backup-content>
