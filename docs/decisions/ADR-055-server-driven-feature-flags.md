@@ -37,11 +37,22 @@ Resolution order on the server:
 1. Code defaults (hubs on; IoT off)
 2. Global env `FEATURE_FLAGS` JSON
 3. Legacy owner IoT allowlist for unset IoT flags
-4. Per-user env `FEATURE_FLAG_USER_OVERRIDES` JSON (highest priority)
+4. Per-user env `FEATURE_FLAG_USER_OVERRIDES` JSON
+5. Per-user overrides in DB `user_feature_flag_overrides` (highest priority)
+
+Priority 5 is written by the external admin panel (`admin.iam.by`, see
+`F:\development\admin-panel`), which owns per-user flag edits. It is applied
+last on purpose: an explicit admin override beats the legacy owner IoT
+allowlist, so the owner account can be switched off from the panel.
 
 Routers for gated domains return 403 when the flag is off for the caller.
 Shared balcony hardware monitoring still attributes readings to the owner
 account when the `balcony` flag is enabled for that account.
+
+Moderation (`user_bans` / `user_deletions`) is authoritative too: `login()`
+and `get_current_user_id()` call `raise_if_banned` / `raise_if_deleted` and
+answer 403 `{"code": "user_banned" | "user_deleted", "reason": ...}`. The
+admin panel writes those rows directly.
 
 ## Implementation
 
@@ -60,13 +71,15 @@ account when the `balcony` flag is enabled for that account.
 
 ## Consequences
 
-- Changing flags requires a server env update (or a later admin API)
+- Flags can be changed from the admin panel per user (DB) or globally via env
 - Clients that skip `GET /features` fall back to enum defaults (IoT off)
-- ADR-054 allowlist behavior is preserved inside flag resolution unless
-  a higher-priority env override sets the IoT flag explicitly
+- ADR-054 allowlist behavior is preserved inside flag resolution unless a
+  higher-priority env or DB override sets the IoT flag explicitly
 
 ## Verification
 
 - `flutter analyze` on touched Dart files
 - Python AST parse of touched backend modules
-- Manual multi-account UI check not run in this session
+- End-to-end against prod (2026-10-01): admin panel `PATCH` flips the value
+  returned by `GET /features`; panel `ban` makes `GET /features` answer 403
+  `user_banned`, `unban` restores 200

@@ -167,7 +167,94 @@ def auto_migrate() -> None:
                     ADD COLUMN IF NOT EXISTS locale TEXT NOT NULL DEFAULT 'ru';
 
                 ALTER TABLE users ADD COLUMN IF NOT EXISTS photo_url TEXT;
+
+                CREATE TABLE IF NOT EXISTS experiments (
+                    id TEXT PRIMARY KEY,
+                    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                    title TEXT NOT NULL,
+                    hypothesis TEXT,
+                    note TEXT,
+                    started_at TIMESTAMPTZ,
+                    conclusion TEXT,
+                    completed_at TIMESTAMPTZ,
+                    archived_at TIMESTAMPTZ,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                );
+                CREATE INDEX IF NOT EXISTS idx_experiments_user
+                    ON experiments (user_id, created_at DESC);
+
+                CREATE TABLE IF NOT EXISTS experiment_variants (
+                    id TEXT PRIMARY KEY,
+                    experiment_id TEXT NOT NULL
+                        REFERENCES experiments(id) ON DELETE CASCADE,
+                    label TEXT NOT NULL,
+                    description TEXT,
+                    position INT NOT NULL DEFAULT 0,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                );
+                CREATE INDEX IF NOT EXISTS idx_experiment_variants_exp
+                    ON experiment_variants (experiment_id, position);
+
+                CREATE TABLE IF NOT EXISTS experiment_subjects (
+                    id TEXT PRIMARY KEY,
+                    variant_id TEXT NOT NULL
+                        REFERENCES experiment_variants(id) ON DELETE CASCADE,
+                    subject_type TEXT NOT NULL,
+                    subject_id TEXT NOT NULL,
+                    subject_name TEXT,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                );
+                CREATE INDEX IF NOT EXISTS idx_experiment_subjects_variant
+                    ON experiment_subjects (variant_id);
+                CREATE INDEX IF NOT EXISTS idx_experiment_subjects_target
+                    ON experiment_subjects (subject_type, subject_id);
+
+                CREATE TABLE IF NOT EXISTS experiment_observations (
+                    id TEXT PRIMARY KEY,
+                    subject_id TEXT NOT NULL
+                        REFERENCES experiment_subjects(id) ON DELETE CASCADE,
+                    observed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                    note TEXT,
+                    image_url TEXT,
+                    height_cm DOUBLE PRECISION,
+                    leaf_count INT,
+                    moisture DOUBLE PRECISION,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                );
+                CREATE INDEX IF NOT EXISTS idx_experiment_observations_subject
+                    ON experiment_observations (subject_id, observed_at);
             """)
+            # Feature-flag / ban tables: run separately so a failure here
+            # does not roll back unrelated migrations above.
+            for stmt in (
+                """
+                CREATE TABLE IF NOT EXISTS user_feature_flag_overrides (
+                    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+                    flags JSONB NOT NULL DEFAULT '{}',
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                )
+                """,
+                """
+                CREATE TABLE IF NOT EXISTS user_bans (
+                    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+                    reason TEXT NOT NULL,
+                    banned_by UUID REFERENCES users(id) ON DELETE SET NULL,
+                    banned_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                )
+                """,
+                """
+                CREATE TABLE IF NOT EXISTS user_deletions (
+                    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+                    reason TEXT NOT NULL,
+                    deleted_by UUID REFERENCES users(id) ON DELETE SET NULL,
+                    deleted_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                )
+                """,
+            ):
+                try:
+                    conn.execute(stmt)
+                except Exception:
+                    pass
             conn.execute("""
                 DO $genus_care_locale_pk$
                 BEGIN

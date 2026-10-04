@@ -14,6 +14,7 @@ from .routers import (
     auth,
     balcony,
     catalogs,
+    experiments,
     families,
     features,
     genera,
@@ -83,6 +84,9 @@ app.include_router(sensor_bindings.router)
 app.include_router(plants.router)
 app.include_router(plant_care.router)
 app.include_router(propagations.router)
+# experiments owns its whole nested tree; include before the catch-all-ish
+# plants router for symmetry with the other static-prefix routers.
+app.include_router(experiments.router)
 app.include_router(catalogs.router)
 app.include_router(social.router)
 app.include_router(species.router)
