@@ -17,7 +17,8 @@ enum FeatureFlag {
   telegramAlerts('telegram_alerts', defaultEnabled: false),
   balcony('balcony', defaultEnabled: false),
   fertilizingReminders('fertilizing_reminders', defaultEnabled: true),
-  bulkActions('bulk_actions', defaultEnabled: true);
+  bulkActions('bulk_actions', defaultEnabled: true),
+  experiments('experiments', defaultEnabled: false);
 
   const FeatureFlag(this.key, {required this.defaultEnabled});
 

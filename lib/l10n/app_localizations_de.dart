@@ -2518,4 +2518,228 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get balconyHistoryNoData => 'Keine Daten';
+
+  @override
+  String get experimentsTitle => 'Experimente';
+
+  @override
+  String get experimentsNone => 'Noch keine Experimente';
+
+  @override
+  String get experimentsNoneHint =>
+      'Starte einen Versuch: pflanze dieselbe Sorte in verschiedene Substrate.';
+
+  @override
+  String get experimentsAdd => 'Neues Experiment';
+
+  @override
+  String get experimentsCreateTitle => 'Neues Experiment';
+
+  @override
+  String get experimentsEditTitle => 'Experiment bearbeiten';
+
+  @override
+  String get experimentsFieldTitle => 'Titel';
+
+  @override
+  String get experimentsTitleHint => 'Kokos gegen Erde';
+
+  @override
+  String get experimentsFieldHypothesis => 'Hypothese (optional)';
+
+  @override
+  String get experimentsHypothesisHint => 'In Kokos wurzelt es schneller';
+
+  @override
+  String get experimentsFieldNote => 'Notiz (optional)';
+
+  @override
+  String get experimentsStartDate => 'Startdatum';
+
+  @override
+  String get experimentsVariantsSection => 'Varianten';
+
+  @override
+  String get experimentsVariantsHint =>
+      'Varianten sind das, worin sich die Gruppen unterscheiden.';
+
+  @override
+  String get experimentsVariantLabel => 'Variantenname';
+
+  @override
+  String get experimentsVariantLabelHint => 'in Kokos';
+
+  @override
+  String get experimentsVariantDescription =>
+      'Variantenbeschreibung (optional)';
+
+  @override
+  String get experimentsAddVariant => 'Variante hinzufuegen';
+
+  @override
+  String get experimentsRemoveVariant => 'Variante entfernen';
+
+  @override
+  String get experimentsTitleRequired => 'Gib dem Experiment einen Titel';
+
+  @override
+  String get experimentsVariantRequired => 'Jede Variante braucht einen Namen';
+
+  @override
+  String experimentsVariantCount(int count) {
+    return 'Varianten: $count';
+  }
+
+  @override
+  String experimentsObservationCount(int count) {
+    return 'Beobachtungen: $count';
+  }
+
+  @override
+  String get experimentsOpen => 'Experimente';
+
+  @override
+  String get experimentsEmpty => 'Noch nichts hier';
+
+  @override
+  String get experimentsDetailSubjects => 'Teilnehmer';
+
+  @override
+  String get experimentsAddSubjects => 'Teilnehmer hinzufuegen';
+
+  @override
+  String get experimentsSubjectsHint =>
+      'Waehle Pflanzen oder Vermehrungschargen fuer diese Variante.';
+
+  @override
+  String get experimentsAddObservation => 'Beobachtung hinzufuegen';
+
+  @override
+  String get experimentsObservationTitle => 'Beobachtung';
+
+  @override
+  String get experimentsObservationNote => 'Notiz';
+
+  @override
+  String get experimentsObservationHeight => 'Hoehe, cm';
+
+  @override
+  String get experimentsObservationLeaves => 'Blattzahl';
+
+  @override
+  String get experimentsObservationMoisture => 'Feuchtigkeit, %';
+
+  @override
+  String get experimentsObservationPhoto => 'Foto';
+
+  @override
+  String get experimentsObservationDate => 'Beobachtungsdatum';
+
+  @override
+  String get experimentsNoObservations => 'Noch keine Beobachtungen';
+
+  @override
+  String get experimentsNoSubjects => 'Noch keine Teilnehmer';
+
+  @override
+  String get experimentsCompare => 'Vergleichen';
+
+  @override
+  String get experimentsCompareHint => 'Letzte Messwerte nebeneinander';
+
+  @override
+  String get experimentsConclusion => 'Fazit';
+
+  @override
+  String get experimentsConclusionHint => 'Was hat der Versuch gezeigt?';
+
+  @override
+  String get experimentsComplete => 'Abschliessen';
+
+  @override
+  String get experimentsCompleteDate => 'Enddatum';
+
+  @override
+  String get experimentsReopen => 'Wieder oeffnen';
+
+  @override
+  String get experimentsStatusActive => 'Laeuft';
+
+  @override
+  String get experimentsStatusDone => 'Abgeschlossen';
+
+  @override
+  String get experimentsCreated => 'Experiment erstellt';
+
+  @override
+  String get experimentsSaved => 'Experiment gespeichert';
+
+  @override
+  String get experimentsDeleted => 'Experiment geloescht';
+
+  @override
+  String get experimentsDeletedVariant => 'Variante geloescht';
+
+  @override
+  String get experimentsDeletedSubject => 'Teilnehmer entfernt';
+
+  @override
+  String get experimentsDeletedObservation => 'Beobachtung geloescht';
+
+  @override
+  String get experimentsNoMetrics => 'Keine Zahlenwerte';
+
+  @override
+  String get experimentsMetricHeight => 'Hoehe, cm';
+
+  @override
+  String get experimentsMetricLeaves => 'Blaetter';
+
+  @override
+  String get experimentsMetricMoisture => 'Feuchtigkeit, %';
+
+  @override
+  String experimentsDays(int day) {
+    return 'Tag $day';
+  }
+
+  @override
+  String get experimentsStartedAt => 'Start';
+
+  @override
+  String get experimentsFilterSubjectPlant => 'Pflanzen';
+
+  @override
+  String get experimentsFilterSubjectPropagation => 'Vermehrungschargen';
+
+  @override
+  String get experimentsSearchSubject => 'Suche';
+
+  @override
+  String get experimentsAddSubjectTitle => 'Teilnehmer hinzufuegen';
+
+  @override
+  String get experimentsLatest => 'Neuestes';
+
+  @override
+  String get experimentsEditVariant => 'Variante bearbeiten';
+
+  @override
+  String get experimentsDeleteConfirm =>
+      'Experiment mit allen Beobachtungen loeschen?';
+
+  @override
+  String get experimentsAddHypothesis => 'Hypothese';
+
+  @override
+  String get experimentsSubjectPlant => 'Pflanze';
+
+  @override
+  String get experimentsSubjectPropagation => 'Charge';
+
+  @override
+  String get experimentsVariantEmpty => 'Variante hat keine Teilnehmer';
+
+  @override
+  String get homeExperiments => 'Experimente';
 }

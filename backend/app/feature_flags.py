@@ -28,6 +28,7 @@ FLAG_TELEGRAM_ALERTS = "telegram_alerts"
 FLAG_BALCONY = "balcony"
 FLAG_FERTILIZING_REMINDERS = "fertilizing_reminders"
 FLAG_BULK_ACTIONS = "bulk_actions"
+FLAG_EXPERIMENTS = "experiments"
 
 ALL_FLAGS: tuple[str, ...] = (
     FLAG_FRIENDS,
@@ -41,6 +42,7 @@ ALL_FLAGS: tuple[str, ...] = (
     FLAG_BALCONY,
     FLAG_FERTILIZING_REMINDERS,
     FLAG_BULK_ACTIONS,
+    FLAG_EXPERIMENTS,
 )
 
 # Product hubs on by default; IoT off until allowlisted / overridden.
@@ -56,6 +58,7 @@ _DEFAULTS: dict[str, bool] = {
     FLAG_BALCONY: False,
     FLAG_FERTILIZING_REMINDERS: True,
     FLAG_BULK_ACTIONS: True,
+    FLAG_EXPERIMENTS: False,
 }
 
 _IOT_FLAGS: frozenset[str] = frozenset(
@@ -215,6 +218,7 @@ __all__ = [
     "FLAG_ARCHIVE",
     "FLAG_BALCONY",
     "FLAG_BULK_ACTIONS",
+    "FLAG_EXPERIMENTS",
     "FLAG_FERTILIZING_REMINDERS",
     "FLAG_FINANCES",
     "FLAG_FRIENDS",

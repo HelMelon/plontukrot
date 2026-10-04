@@ -4553,6 +4553,432 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No data'**
   String get balconyHistoryNoData;
+
+  /// No description provided for @experimentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Experiments'**
+  String get experimentsTitle;
+
+  /// No description provided for @experimentsNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No experiments yet'**
+  String get experimentsNone;
+
+  /// No description provided for @experimentsNoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a trial: plant the same cultivar in different substrates and watch what happens.'**
+  String get experimentsNoneHint;
+
+  /// No description provided for @experimentsAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'New experiment'**
+  String get experimentsAdd;
+
+  /// No description provided for @experimentsCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New experiment'**
+  String get experimentsCreateTitle;
+
+  /// No description provided for @experimentsEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit experiment'**
+  String get experimentsEditTitle;
+
+  /// No description provided for @experimentsFieldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get experimentsFieldTitle;
+
+  /// No description provided for @experimentsTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Coconut vs soil'**
+  String get experimentsTitleHint;
+
+  /// No description provided for @experimentsFieldHypothesis.
+  ///
+  /// In en, this message translates to:
+  /// **'Hypothesis (optional)'**
+  String get experimentsFieldHypothesis;
+
+  /// No description provided for @experimentsHypothesisHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Coconut will root faster'**
+  String get experimentsHypothesisHint;
+
+  /// No description provided for @experimentsFieldNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get experimentsFieldNote;
+
+  /// No description provided for @experimentsStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date'**
+  String get experimentsStartDate;
+
+  /// No description provided for @experimentsVariantsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Variants'**
+  String get experimentsVariantsSection;
+
+  /// No description provided for @experimentsVariantsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Variants are what differs between the trial groups.'**
+  String get experimentsVariantsHint;
+
+  /// No description provided for @experimentsVariantLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Variant name'**
+  String get experimentsVariantLabel;
+
+  /// No description provided for @experimentsVariantLabelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'in coconut'**
+  String get experimentsVariantLabelHint;
+
+  /// No description provided for @experimentsVariantDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Variant description (optional)'**
+  String get experimentsVariantDescription;
+
+  /// No description provided for @experimentsAddVariant.
+  ///
+  /// In en, this message translates to:
+  /// **'Add variant'**
+  String get experimentsAddVariant;
+
+  /// No description provided for @experimentsRemoveVariant.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove variant'**
+  String get experimentsRemoveVariant;
+
+  /// No description provided for @experimentsTitleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Give the experiment a title'**
+  String get experimentsTitleRequired;
+
+  /// No description provided for @experimentsVariantRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Each variant needs a name'**
+  String get experimentsVariantRequired;
+
+  /// No description provided for @experimentsVariantCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} variants'**
+  String experimentsVariantCount(int count);
+
+  /// No description provided for @experimentsObservationCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Observations: {count}'**
+  String experimentsObservationCount(int count);
+
+  /// No description provided for @experimentsOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Experiments'**
+  String get experimentsOpen;
+
+  /// No description provided for @experimentsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here yet'**
+  String get experimentsEmpty;
+
+  /// No description provided for @experimentsDetailSubjects.
+  ///
+  /// In en, this message translates to:
+  /// **'Participants'**
+  String get experimentsDetailSubjects;
+
+  /// No description provided for @experimentsAddSubjects.
+  ///
+  /// In en, this message translates to:
+  /// **'Add participants'**
+  String get experimentsAddSubjects;
+
+  /// No description provided for @experimentsSubjectsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick plants or propagation batches for this variant.'**
+  String get experimentsSubjectsHint;
+
+  /// No description provided for @experimentsAddObservation.
+  ///
+  /// In en, this message translates to:
+  /// **'Add observation'**
+  String get experimentsAddObservation;
+
+  /// No description provided for @experimentsObservationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Observation'**
+  String get experimentsObservationTitle;
+
+  /// No description provided for @experimentsObservationNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get experimentsObservationNote;
+
+  /// No description provided for @experimentsObservationHeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Height, cm'**
+  String get experimentsObservationHeight;
+
+  /// No description provided for @experimentsObservationLeaves.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaf count'**
+  String get experimentsObservationLeaves;
+
+  /// No description provided for @experimentsObservationMoisture.
+  ///
+  /// In en, this message translates to:
+  /// **'Moisture, %'**
+  String get experimentsObservationMoisture;
+
+  /// No description provided for @experimentsObservationPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get experimentsObservationPhoto;
+
+  /// No description provided for @experimentsObservationDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Observation date'**
+  String get experimentsObservationDate;
+
+  /// No description provided for @experimentsNoObservations.
+  ///
+  /// In en, this message translates to:
+  /// **'No observations yet'**
+  String get experimentsNoObservations;
+
+  /// No description provided for @experimentsNoSubjects.
+  ///
+  /// In en, this message translates to:
+  /// **'No participants yet'**
+  String get experimentsNoSubjects;
+
+  /// No description provided for @experimentsCompare.
+  ///
+  /// In en, this message translates to:
+  /// **'Compare'**
+  String get experimentsCompare;
+
+  /// No description provided for @experimentsCompareHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest readings side by side'**
+  String get experimentsCompareHint;
+
+  /// No description provided for @experimentsConclusion.
+  ///
+  /// In en, this message translates to:
+  /// **'Conclusion'**
+  String get experimentsConclusion;
+
+  /// No description provided for @experimentsConclusionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What did the experiment show?'**
+  String get experimentsConclusionHint;
+
+  /// No description provided for @experimentsComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark finished'**
+  String get experimentsComplete;
+
+  /// No description provided for @experimentsCompleteDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish date'**
+  String get experimentsCompleteDate;
+
+  /// No description provided for @experimentsReopen.
+  ///
+  /// In en, this message translates to:
+  /// **'Reopen experiment'**
+  String get experimentsReopen;
+
+  /// No description provided for @experimentsStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get experimentsStatusActive;
+
+  /// No description provided for @experimentsStatusDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Finished'**
+  String get experimentsStatusDone;
+
+  /// No description provided for @experimentsCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment created'**
+  String get experimentsCreated;
+
+  /// No description provided for @experimentsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment saved'**
+  String get experimentsSaved;
+
+  /// No description provided for @experimentsDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment deleted'**
+  String get experimentsDeleted;
+
+  /// No description provided for @experimentsDeletedVariant.
+  ///
+  /// In en, this message translates to:
+  /// **'Variant deleted'**
+  String get experimentsDeletedVariant;
+
+  /// No description provided for @experimentsDeletedSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Participant removed'**
+  String get experimentsDeletedSubject;
+
+  /// No description provided for @experimentsDeletedObservation.
+  ///
+  /// In en, this message translates to:
+  /// **'Observation deleted'**
+  String get experimentsDeletedObservation;
+
+  /// No description provided for @experimentsNoMetrics.
+  ///
+  /// In en, this message translates to:
+  /// **'No numeric readings'**
+  String get experimentsNoMetrics;
+
+  /// No description provided for @experimentsMetricHeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Height, cm'**
+  String get experimentsMetricHeight;
+
+  /// No description provided for @experimentsMetricLeaves.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaves'**
+  String get experimentsMetricLeaves;
+
+  /// No description provided for @experimentsMetricMoisture.
+  ///
+  /// In en, this message translates to:
+  /// **'Moisture, %'**
+  String get experimentsMetricMoisture;
+
+  /// No description provided for @experimentsDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}'**
+  String experimentsDays(int day);
+
+  /// No description provided for @experimentsStartedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Started'**
+  String get experimentsStartedAt;
+
+  /// No description provided for @experimentsFilterSubjectPlant.
+  ///
+  /// In en, this message translates to:
+  /// **'Plants'**
+  String get experimentsFilterSubjectPlant;
+
+  /// No description provided for @experimentsFilterSubjectPropagation.
+  ///
+  /// In en, this message translates to:
+  /// **'Propagation batches'**
+  String get experimentsFilterSubjectPropagation;
+
+  /// No description provided for @experimentsSearchSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get experimentsSearchSubject;
+
+  /// No description provided for @experimentsAddSubjectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add participant'**
+  String get experimentsAddSubjectTitle;
+
+  /// No description provided for @experimentsLatest.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest'**
+  String get experimentsLatest;
+
+  /// No description provided for @experimentsEditVariant.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit variant'**
+  String get experimentsEditVariant;
+
+  /// No description provided for @experimentsDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this experiment and all its observations?'**
+  String get experimentsDeleteConfirm;
+
+  /// No description provided for @experimentsAddHypothesis.
+  ///
+  /// In en, this message translates to:
+  /// **'Hypothesis'**
+  String get experimentsAddHypothesis;
+
+  /// No description provided for @experimentsSubjectPlant.
+  ///
+  /// In en, this message translates to:
+  /// **'Plant'**
+  String get experimentsSubjectPlant;
+
+  /// No description provided for @experimentsSubjectPropagation.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch'**
+  String get experimentsSubjectPropagation;
+
+  /// No description provided for @experimentsVariantEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Variant has no participants'**
+  String get experimentsVariantEmpty;
+
+  /// No description provided for @homeExperiments.
+  ///
+  /// In en, this message translates to:
+  /// **'Experiments'**
+  String get homeExperiments;
 }
 
 class _AppLocalizationsDelegate

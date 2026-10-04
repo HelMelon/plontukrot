@@ -45,6 +45,7 @@ class AppIconTokens {
     required this.propagations,
     required this.wishlist,
     required this.finances,
+    required this.experiments,
     required this.archive,
     required this.archiveAction,
     required this.gift,
@@ -162,6 +163,7 @@ class AppIconTokens {
     propagations: HugeIcons.strokeRoundedEcoLab01,
     wishlist: HugeIcons.strokeRoundedBookHeart,
     finances: HugeIcons.strokeRoundedCoins01,
+    experiments: HugeIcons.strokeRoundedTestTube01,
     archive: Icons.inventory_2_outlined,
     archiveAction: Icons.archive_outlined,
     gift: Icons.card_giftcard_outlined,
@@ -278,6 +280,7 @@ class AppIconTokens {
   final List<List<dynamic>> propagations;
   final List<List<dynamic>> wishlist;
   final List<List<dynamic>> finances;
+  final List<List<dynamic>> experiments;
   final List<List<dynamic>> personalData;
   final IconData archive;
   final IconData archiveAction;
@@ -389,6 +392,7 @@ class AppIconTokens {
     List<List<dynamic>>? propagations,
     List<List<dynamic>>? wishlist,
     List<List<dynamic>>? finances,
+    List<List<dynamic>>? experiments,
     List<List<dynamic>>? personalData,
     IconData? archive,
     IconData? archiveAction,
@@ -494,6 +498,7 @@ class AppIconTokens {
       propagations: propagations ?? this.propagations,
       wishlist: wishlist ?? this.wishlist,
       finances: finances ?? this.finances,
+      experiments: experiments ?? this.experiments,
       personalData: personalData ?? this.personalData,
       archive: archive ?? this.archive,
       archiveAction: archiveAction ?? this.archiveAction,

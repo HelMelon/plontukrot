@@ -2520,4 +2520,229 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get balconyHistoryNoData => 'Нет данных';
+
+  @override
+  String get experimentsTitle => 'Эксперименты';
+
+  @override
+  String get experimentsNone => 'Пока нет экспериментов';
+
+  @override
+  String get experimentsNoneHint =>
+      'Поставь опыт: посади один сорт в разные субстраты и смотри, что выйдет.';
+
+  @override
+  String get experimentsAdd => 'Новый эксперимент';
+
+  @override
+  String get experimentsCreateTitle => 'Новый эксперимент';
+
+  @override
+  String get experimentsEditTitle => 'Редактировать эксперимент';
+
+  @override
+  String get experimentsFieldTitle => 'Название';
+
+  @override
+  String get experimentsTitleHint => 'Кокос против грунта';
+
+  @override
+  String get experimentsFieldHypothesis => 'Гипотеза (необязательно)';
+
+  @override
+  String get experimentsHypothesisHint => 'В кокосе быстрее даст корни';
+
+  @override
+  String get experimentsFieldNote => 'Заметка (необязательно)';
+
+  @override
+  String get experimentsStartDate => 'Дата старта';
+
+  @override
+  String get experimentsVariantsSection => 'Варианты';
+
+  @override
+  String get experimentsVariantsHint =>
+      'Варианты — это то, чем группы опыта отличаются.';
+
+  @override
+  String get experimentsVariantLabel => 'Название варианта';
+
+  @override
+  String get experimentsVariantLabelHint => 'в кокосе';
+
+  @override
+  String get experimentsVariantDescription =>
+      'Описание варианта (необязательно)';
+
+  @override
+  String get experimentsAddVariant => 'Добавить вариант';
+
+  @override
+  String get experimentsRemoveVariant => 'Убрать вариант';
+
+  @override
+  String get experimentsTitleRequired => 'Дай эксперименту название';
+
+  @override
+  String get experimentsVariantRequired =>
+      'У каждого варианта должно быть название';
+
+  @override
+  String experimentsVariantCount(int count) {
+    return 'Вариантов: $count';
+  }
+
+  @override
+  String experimentsObservationCount(int count) {
+    return 'Наблюдений: $count';
+  }
+
+  @override
+  String get experimentsOpen => 'Эксперименты';
+
+  @override
+  String get experimentsEmpty => 'Пока пусто';
+
+  @override
+  String get experimentsDetailSubjects => 'Участники';
+
+  @override
+  String get experimentsAddSubjects => 'Добавить участников';
+
+  @override
+  String get experimentsSubjectsHint =>
+      'Выбери растения или партии размножения для этого варианта.';
+
+  @override
+  String get experimentsAddObservation => 'Добавить наблюдение';
+
+  @override
+  String get experimentsObservationTitle => 'Наблюдение';
+
+  @override
+  String get experimentsObservationNote => 'Заметка';
+
+  @override
+  String get experimentsObservationHeight => 'Высота, см';
+
+  @override
+  String get experimentsObservationLeaves => 'Кол-во листьев';
+
+  @override
+  String get experimentsObservationMoisture => 'Влажность, %';
+
+  @override
+  String get experimentsObservationPhoto => 'Фото';
+
+  @override
+  String get experimentsObservationDate => 'Дата наблюдения';
+
+  @override
+  String get experimentsNoObservations => 'Пока нет наблюдений';
+
+  @override
+  String get experimentsNoSubjects => 'Пока нет участников';
+
+  @override
+  String get experimentsCompare => 'Сравнить';
+
+  @override
+  String get experimentsCompareHint => 'Последние замеры рядом';
+
+  @override
+  String get experimentsConclusion => 'Вывод';
+
+  @override
+  String get experimentsConclusionHint => 'Что показал опыт?';
+
+  @override
+  String get experimentsComplete => 'Завершить';
+
+  @override
+  String get experimentsCompleteDate => 'Дата завершения';
+
+  @override
+  String get experimentsReopen => 'Вернуть в работу';
+
+  @override
+  String get experimentsStatusActive => 'Идёт';
+
+  @override
+  String get experimentsStatusDone => 'Завершён';
+
+  @override
+  String get experimentsCreated => 'Эксперимент создан';
+
+  @override
+  String get experimentsSaved => 'Эксперимент сохранён';
+
+  @override
+  String get experimentsDeleted => 'Эксперимент удалён';
+
+  @override
+  String get experimentsDeletedVariant => 'Вариант удалён';
+
+  @override
+  String get experimentsDeletedSubject => 'Участник убран';
+
+  @override
+  String get experimentsDeletedObservation => 'Наблюдение удалено';
+
+  @override
+  String get experimentsNoMetrics => 'Нет числовых замеров';
+
+  @override
+  String get experimentsMetricHeight => 'Высота, см';
+
+  @override
+  String get experimentsMetricLeaves => 'Листья';
+
+  @override
+  String get experimentsMetricMoisture => 'Влажность, %';
+
+  @override
+  String experimentsDays(int day) {
+    return 'День $day';
+  }
+
+  @override
+  String get experimentsStartedAt => 'Старт';
+
+  @override
+  String get experimentsFilterSubjectPlant => 'Растения';
+
+  @override
+  String get experimentsFilterSubjectPropagation => 'Партии размножения';
+
+  @override
+  String get experimentsSearchSubject => 'Поиск';
+
+  @override
+  String get experimentsAddSubjectTitle => 'Добавить участника';
+
+  @override
+  String get experimentsLatest => 'Последнее';
+
+  @override
+  String get experimentsEditVariant => 'Редактировать вариант';
+
+  @override
+  String get experimentsDeleteConfirm =>
+      'Удалить эксперимент и все его наблюдения?';
+
+  @override
+  String get experimentsAddHypothesis => 'Гипотеза';
+
+  @override
+  String get experimentsSubjectPlant => 'Растение';
+
+  @override
+  String get experimentsSubjectPropagation => 'Партия';
+
+  @override
+  String get experimentsVariantEmpty => 'В варианте нет участников';
+
+  @override
+  String get homeExperiments => 'Эксперименты';
 }

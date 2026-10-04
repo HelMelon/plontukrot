@@ -549,5 +549,119 @@ class FamilyCareGuideOut(BaseModel):
     min_temp_c: Optional[float] = None
 
 
+# ---- Experiments (comparative trials) ----
+# An experiment groups several variants ("в кокосе" / "в грунте") that differ by
+# the user's own free-text description. Each variant holds subjects — either a
+# real plant or a propagation batch — and every subject carries its own
+# observation log (note, photo, height, leaf count, moisture).
+
+SUBJECT_TYPE_PLANT = "plant"
+SUBJECT_TYPE_PROPAGATION = "propagation"
+_SUBJECT_TYPES = {SUBJECT_TYPE_PLANT, SUBJECT_TYPE_PROPAGATION}
+
+
+class ExperimentSubjectIn(BaseModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    subject_type: str = Field(alias="subjectType")
+    subject_id: str = Field(alias="subjectId")
+    subject_name: Optional[str] = Field(default=None, alias="subjectName")
+
+
+class ExperimentSubjectOut(BaseModel):
+    id: str
+    subject_type: str
+    subject_id: str
+    subject_name: Optional[str] = None
+
+
+class ExperimentObservationCreate(BaseModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    observed_at: Optional[datetime] = Field(default=None, alias="observedAt")
+    note: Optional[str] = None
+    image_url: Optional[str] = Field(default=None, alias="imageUrl")
+    height_cm: Optional[float] = Field(default=None, alias="heightCm")
+    leaf_count: Optional[int] = Field(default=None, alias="leafCount")
+    moisture: Optional[float] = None
+
+
+class ExperimentObservationOut(BaseModel):
+    id: str
+    subject_id: str
+    observed_at: datetime
+    note: Optional[str] = None
+    image_url: Optional[str] = None
+    height_cm: Optional[float] = None
+    leaf_count: Optional[int] = None
+    moisture: Optional[float] = None
+    created_at: datetime
+
+
+class ExperimentVariantCreate(BaseModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    label: str
+    description: Optional[str] = None
+    position: Optional[int] = None
+    subjects: list[ExperimentSubjectIn] = []
+
+
+class ExperimentVariantUpdate(BaseModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    label: Optional[str] = None
+    description: Optional[str] = None
+    position: Optional[int] = None
+
+
+class ExperimentVariantOut(BaseModel):
+    id: str
+    label: str
+    description: Optional[str] = None
+    position: int
+    subjects: list[ExperimentSubjectOut] = []
+    observations: list[ExperimentObservationOut] = []
+    observation_count: int = 0
+    latest_observed_at: Optional[datetime] = None
+
+
+class ExperimentCreate(BaseModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    title: str
+    hypothesis: Optional[str] = None
+    note: Optional[str] = None
+    started_at: Optional[datetime] = Field(default=None, alias="startedAt")
+    conclusion: Optional[str] = None
+    completed_at: Optional[datetime] = Field(default=None, alias="completedAt")
+    variants: list[ExperimentVariantCreate] = []
+
+
+class ExperimentUpdate(BaseModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    title: Optional[str] = None
+    hypothesis: Optional[str] = None
+    note: Optional[str] = None
+    started_at: Optional[datetime] = Field(default=None, alias="startedAt")
+    conclusion: Optional[str] = None
+    completed_at: Optional[datetime] = Field(default=None, alias="completedAt")
+    archived_at: Optional[datetime] = Field(default=None, alias="archivedAt")
+
+
+class ExperimentOut(BaseModel):
+    id: str
+    title: str
+    hypothesis: Optional[str] = None
+    note: Optional[str] = None
+    started_at: Optional[datetime] = None
+    conclusion: Optional[str] = None
+    completed_at: Optional[datetime] = None
+    archived_at: Optional[datetime] = None
+    variants: list[ExperimentVariantOut] = []
+    created_at: datetime
+
+
 
 

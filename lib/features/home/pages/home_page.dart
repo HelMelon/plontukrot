@@ -33,6 +33,7 @@ import '../../../services/propagation_service.dart';
 import '../../../services/startup_warmup_service.dart';
 import '../../../services/watering_service.dart';
 import '../../plants/pages/plant_archive_page.dart';
+import '../../experiments/pages/experiments_page.dart';
 import '../../plants/widgets/cards/plant_card.dart';
 import '../../finances/pages/finances_page.dart';
 import '../../propagations/pages/propagations_page.dart';
@@ -823,6 +824,18 @@ class _HomePageState extends State<HomePage> {
             );
           },
           icon: Icon(_icons.archive, color: colors.icon),
+        ),
+      if (flags.isEnabled(FeatureFlag.experiments))
+        IconButton(
+          tooltip: l10n.homeExperiments,
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const ExperimentsPage(),
+              ),
+            );
+          },
+          icon: HugeIcon(icon: _icons.experiments, color: colors.icon),
         ),
       if (flags.isEnabled(FeatureFlag.wishList))
         IconButton(
