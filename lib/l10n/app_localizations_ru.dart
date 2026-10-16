@@ -1072,6 +1072,25 @@ class AppLocalizationsRu extends AppLocalizations {
   String get plantBotanicalData => 'Ботанические данные';
 
   @override
+  String get botanicalPrefillButton => 'Заполнить ИИ';
+
+  @override
+  String get botanicalPrefillTitle => 'Найти растение по названию';
+
+  @override
+  String get botanicalPrefillLabel => 'Вид, сорт или торговое название';
+
+  @override
+  String get botanicalPrefillHint => 'напр. Philodendron Pink Princess';
+
+  @override
+  String get botanicalPrefillSuccess => 'Поля заполнены';
+
+  @override
+  String get botanicalPrefillEmpty =>
+      'Не удалось распознать растение. Попробуйте ввести полное название, например Platycerium bifurcatum';
+
+  @override
   String get plantDateAddedLabel => 'Дата добавления';
 
   @override

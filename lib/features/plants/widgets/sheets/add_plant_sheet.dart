@@ -1,18 +1,26 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
+import '../../../../core/features/feature_flags.dart';
 import '../../../../core/theme/theme_context.dart';
+import '../../../../models/botanical_prefill_result.dart';
 import '../../../../models/variegation.dart';
 import '../../../../models/quarantine_reason.dart';
 import '../../../../core/season/fertilizing_season_controller.dart';
 import '../../../../models/fertilizing_frequency.dart';
+import '../../../../services/app_crash_reporting.dart';
+import '../../../../services/botanical_prefill_service.dart';
 import '../../../../services/plant_service.dart';
 import '../../../../services/storage_service.dart';
 import '../../../../services/wish_list_service.dart';
 import '../common/pick_and_crop_plant_photo.dart';
 import '../common/plant_pending_photo_control.dart';
 import '../common/plant_quarantine_fields.dart';
+import '../dialogs/botanical_prefill_dialog.dart';
 import '../selectors/fertilizing_frequency_field.dart';
 import '../selectors/plant_stage_selector.dart';
 import '../selectors/plant_variegation_selector.dart';
@@ -156,6 +164,92 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
         strokeWidth: 1.5,
       ),
     );
+  }
+
+  Future<void> _prefillFromAi() async {
+    final l10n = AppLocalizations.of(context);
+    final phrase = await showBotanicalPrefillDialog(context);
+    if (phrase == null || phrase.trim().isEmpty || !mounted) return;
+
+    setState(() => isLoading = true);
+    try {
+      final result = await BotanicalPrefillService().prefill(
+        phrase: phrase.trim(),
+        locale: Localizations.localeOf(context).languageCode,
+      );
+      if (!mounted) return;
+      if (_isPrefillEmpty(result)) {
+        if (kDebugMode) {
+          debugPrint('[AddPlantSheet] prefill returned empty for "$phrase"');
+        }
+        unawaited(AppCrashReporting.instance.log(
+          'botanical_prefill_empty: "$phrase"',
+        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.botanicalPrefillEmpty)),
+        );
+        return;
+      }
+      if (kDebugMode) {
+        debugPrint('[AddPlantSheet] prefill applied for "$phrase"');
+      }
+      unawaited(AppCrashReporting.instance.log(
+        'botanical_prefill_applied: "$phrase" -> genus=${result.genus} species=${result.species}',
+      ));
+      _applyPrefill(result);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.botanicalPrefillSuccess)),
+      );
+    } catch (e, stack) {
+      if (!mounted) return;
+      BotanicalPrefillService.reportError(e, stack, phrase: phrase);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commonError(e.toString()))),
+      );
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
+  }
+
+  bool _isPrefillEmpty(BotanicalPrefillResult result) {
+    return (result.genus?.trim().isEmpty ?? true) &&
+        (result.species?.trim().isEmpty ?? true) &&
+        (result.cultivar?.trim().isEmpty ?? true) &&
+        (result.plantFamily?.trim().isEmpty ?? true);
+  }
+
+  void _applyPrefill(BotanicalPrefillResult result) {
+    if (result.genus case final genus?) {
+      genusController.text = genus;
+    }
+    if (result.isHybrid) {
+      if (!isHybrid) {
+        setState(() => isHybrid = true);
+      }
+      if (result.species case final species?) {
+        final parts = species.split('×').map((s) => s.trim()).toList();
+        if (parts.length >= 2) {
+          hybridParent1Controller.text = parts[0];
+          hybridParent2Controller.text = parts.sublist(1).join(' × ');
+        } else {
+          hybridParent1Controller.text = species;
+        }
+      }
+    } else {
+      if (result.species case final species?) {
+        speciesController.text = species;
+      }
+    }
+    if (result.cultivar case final cultivar?) {
+      cultivarController.text = cultivar;
+    }
+    if (result.plantFamily case final family?) {
+      plantFamilyController.text = family;
+    }
+    if (result.tradingName case final tradingName?) {
+      tradingNameController.text = tradingName;
+    }
+    setState(() => selectedVariegation = result.variegation);
   }
 
   Future<void> addPlant() async {
@@ -413,6 +507,27 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                               setState(() => selectedVariegation = value);
                             },
                           ),
+                          if (FeatureFlagsController.instance
+                              .isEnabled(FeatureFlag.aiBotanicalPrefill)) ...[
+                            spacing.vSm,
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextButton.icon(
+                                onPressed: isLoading ? null : _prefillFromAi,
+                                icon: Icon(
+                                  context.icons.aiCare,
+                                  size: context.dimensions.iconMd,
+                                ),
+                                label: Text(l10n.botanicalPrefillButton),
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: spacing.sm,
+                                    vertical: spacing.xs,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                           spacing.vMd,
                           TextField(
                             controller: tradingNameController,

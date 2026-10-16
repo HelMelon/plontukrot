@@ -160,6 +160,21 @@ def auto_migrate() -> None:
                     PRIMARY KEY (family, locale)
                 );
 
+                CREATE TABLE IF NOT EXISTS botanical_prefill_cache (
+                    phrase TEXT NOT NULL,
+                    locale TEXT NOT NULL DEFAULT 'ru',
+                    genus TEXT,
+                    species TEXT,
+                    cultivar TEXT,
+                    plant_family TEXT,
+                    trading_name TEXT,
+                    is_hybrid BOOLEAN NOT NULL DEFAULT false,
+                    variegation TEXT,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                    PRIMARY KEY (phrase, locale)
+                );
+
                 ALTER TABLE genus_care_guides
                     ADD COLUMN IF NOT EXISTS min_temp_c DOUBLE PRECISION;
 

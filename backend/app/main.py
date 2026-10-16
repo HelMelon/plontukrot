@@ -13,6 +13,7 @@ from .db import auto_migrate, get_pool
 from .routers import (
     auth,
     balcony,
+    botanical,
     catalogs,
     experiments,
     families,
@@ -92,6 +93,7 @@ app.include_router(social.router)
 app.include_router(species.router)
 app.include_router(genera.router)
 app.include_router(families.router)
+app.include_router(botanical.router)
 app.include_router(manipulations.router)
 app.include_router(sensor.router)
 app.include_router(smart_home.router)

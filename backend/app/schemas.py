@@ -549,6 +549,28 @@ class FamilyCareGuideOut(BaseModel):
     min_temp_c: Optional[float] = None
 
 
+# ---- Botanical AI Prefill ----
+class BotanicalPrefillIn(BaseModel):
+    phrase: str
+    locale: str = "ru"
+
+
+class BotanicalPrefillOut(BaseModel):
+    # The router builds this model with the field names (plant_family=...).
+    # Without populate_by_name, Pydantic v2 only accepts the ALIAS for aliased
+    # fields, so plantFamily/tradingName/isHybrid were silently dropped to null
+    # on every response. Response serialization still uses the aliases.
+    model_config = ConfigDict(populate_by_name=True)
+
+    genus: Optional[str] = None
+    species: Optional[str] = None
+    cultivar: Optional[str] = None
+    plant_family: Optional[str] = Field(default=None, alias="plantFamily")
+    trading_name: Optional[str] = Field(default=None, alias="tradingName")
+    is_hybrid: bool = Field(default=False, alias="isHybrid")
+    variegation: Optional[str] = None
+
+
 # ---- Experiments (comparative trials) ----
 # An experiment groups several variants ("в кокосе" / "в грунте") that differ by
 # the user's own free-text description. Each variant holds subjects — either a

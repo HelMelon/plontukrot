@@ -1070,6 +1070,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get plantBotanicalData => 'Botanische Daten';
 
   @override
+  String get botanicalPrefillButton => 'Mit KI ausfüllen';
+
+  @override
+  String get botanicalPrefillTitle => 'Pflanze anhand des Namens finden';
+
+  @override
+  String get botanicalPrefillLabel => 'Art, Sorte oder Handelsname';
+
+  @override
+  String get botanicalPrefillHint => 'z. B. Philodendron Pink Princess';
+
+  @override
+  String get botanicalPrefillSuccess => 'Felder ausgefüllt';
+
+  @override
+  String get botanicalPrefillEmpty =>
+      'Pflanze konnte nicht erkannt werden. Versuchen Sie den vollständigen Namen, z. B. Platycerium bifurcatum';
+
+  @override
   String get plantDateAddedLabel => 'Hinzufügungsdatum';
 
   @override

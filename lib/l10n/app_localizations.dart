@@ -1974,6 +1974,42 @@ abstract class AppLocalizations {
   /// **'Botanical data'**
   String get plantBotanicalData;
 
+  /// No description provided for @botanicalPrefillButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill with AI'**
+  String get botanicalPrefillButton;
+
+  /// No description provided for @botanicalPrefillTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find plant by name'**
+  String get botanicalPrefillTitle;
+
+  /// No description provided for @botanicalPrefillLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Species, cultivar or trading name'**
+  String get botanicalPrefillLabel;
+
+  /// No description provided for @botanicalPrefillHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Philodendron Pink Princess'**
+  String get botanicalPrefillHint;
+
+  /// No description provided for @botanicalPrefillSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Fields filled'**
+  String get botanicalPrefillSuccess;
+
+  /// No description provided for @botanicalPrefillEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not recognize the plant. Try entering the full name, e.g. Platycerium bifurcatum'**
+  String get botanicalPrefillEmpty;
+
   /// No description provided for @plantDateAddedLabel.
   ///
   /// In en, this message translates to:

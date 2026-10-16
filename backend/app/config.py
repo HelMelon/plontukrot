@@ -81,7 +81,7 @@ class Settings:
         # OpenRouter (free-tier models) — preferred over DeepSeek when set.
         self.openrouter_api_key: str = os.environ.get("OPENROUTER_API_KEY", "")
         self.openrouter_model: str = os.environ.get(
-            "OPENROUTER_MODEL", "nvidia/nemotron-3-ultra-550b-a55b:free"
+            "OPENROUTER_MODEL", "nvidia/nemotron-3-super-120b-a12b:free"
         )
         # Yandex Smart Home skill credentials (filled after registering).
         self.yandex_client_id: str = os.environ.get("YANDEX_CLIENT_ID", "")

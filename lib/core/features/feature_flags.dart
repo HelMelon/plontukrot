@@ -18,7 +18,8 @@ enum FeatureFlag {
   balcony('balcony', defaultEnabled: false),
   fertilizingReminders('fertilizing_reminders', defaultEnabled: true),
   bulkActions('bulk_actions', defaultEnabled: true),
-  experiments('experiments', defaultEnabled: false);
+  experiments('experiments', defaultEnabled: false),
+  aiBotanicalPrefill('ai_botanical_prefill', defaultEnabled: false);
 
   const FeatureFlag(this.key, {required this.defaultEnabled});
 

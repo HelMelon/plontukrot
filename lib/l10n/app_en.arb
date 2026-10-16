@@ -515,6 +515,12 @@
     }
   },
   "plantBotanicalData": "Botanical data",
+  "botanicalPrefillButton": "Fill with AI",
+  "botanicalPrefillTitle": "Find plant by name",
+  "botanicalPrefillLabel": "Species, cultivar or trading name",
+  "botanicalPrefillHint": "e.g. Philodendron Pink Princess",
+  "botanicalPrefillSuccess": "Fields filled",
+  "botanicalPrefillEmpty": "Could not recognize the plant. Try entering the full name, e.g. Platycerium bifurcatum",
   "plantDateAddedLabel": "Date added",
   "plantJournal": "Journal",
   "plantGallery": "Gallery",
