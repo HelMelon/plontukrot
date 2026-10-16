@@ -132,17 +132,18 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     initialLeafCountController.text = widget.plant.initialLeafCount.toString();
     selectedStage = widget.plant.stage;
     isFertilizingFrequencyCustom = widget.plant.isFertilizingFrequencyCustom;
-    // Legacy plants predate the frequency field (null in Firestore). For
-    // non-custom plants, resolve the auto value from the current season/stage
-    // instead of showing a bare STOP.
-    fertilizingFrequencyDays = isFertilizingFrequencyCustom
-        ? widget.plant.fertilizingFrequencyDays
-        : resolveFertilizingFrequencyDays(
-            stage: selectedStage,
-            seasonSettings: FertilizingSeasonController.instance.settings,
-            isCustom: false,
-            currentFrequencyDays: null,
-          );
+    // On the balcony fertilizing is stopped. Indoors, non-custom plants show
+    // the season/stage interval (legacy plants stored null).
+    fertilizingFrequencyDays = widget.plant.isOnBalconyLocation
+        ? fertilizingFrequencyStop
+        : (isFertilizingFrequencyCustom
+            ? widget.plant.fertilizingFrequencyDays
+            : resolveFertilizingFrequencyDays(
+                stage: selectedStage,
+                seasonSettings: FertilizingSeasonController.instance.settings,
+                isCustom: false,
+                currentFrequencyDays: null,
+              ));
     selectedVariegation = widget.plant.variegation;
 
     _members = widget.plant.members.map((member) {
@@ -712,7 +713,8 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             onChanged: (value) {
                               setState(() {
                                 selectedStage = value;
-                                if (!isFertilizingFrequencyCustom) {
+                                if (!widget.plant.isOnBalconyLocation &&
+                                    !isFertilizingFrequencyCustom) {
                                   fertilizingFrequencyDays =
                                       resolveFertilizingFrequencyDays(
                                     stage: value,

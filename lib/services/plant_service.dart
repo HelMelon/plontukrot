@@ -184,13 +184,26 @@ class PlantService {
     required String plantId,
     required bool onBalcony,
     int? band,
+    bool reschedule = true,
     String? roomId,
   }) async {
+    final inside = onBalcony ? null : await getPlant(plantId);
+    final frequency = onBalcony
+        ? fertilizingFrequencyStop
+        : (inside == null
+            ? null
+            : _resolveFertilizingFrequency(
+                stage: inside.stage,
+                isCustom: false,
+                requestedFrequencyDays: null,
+              ));
     await _patchPlant(plantId, {
       'on_balcony': onBalcony,
       if (band != null) 'balcony_band': band,
+      if (frequency != null) 'fertilizing_frequency_days': frequency,
       'room_id': onBalcony ? Room.balconyId : roomId,
     });
+    if (reschedule) await _rescheduleNotifications(plantId);
   }
 
   /// Puts the plant in [roomId]. `null` clears the room. The balcony id also
@@ -234,7 +247,17 @@ class PlantService {
   Future<void> recalculateAutoFertilizingFrequencies() async {
     final plants = await _fetchAllPlants();
     for (final plant in plants) {
-      if (plant.isArchived || plant.isFertilizingFrequencyCustom) continue;
+      if (plant.isArchived) continue;
+      // Balcony plants stay at STOP until they are brought inside.
+      if (plant.isOnBalconyLocation) {
+        if (plant.fertilizingFrequencyDays != fertilizingFrequencyStop) {
+          await _patchPlant(plant.id, {
+            'fertilizing_frequency_days': fertilizingFrequencyStop,
+          });
+        }
+        continue;
+      }
+      if (plant.isFertilizingFrequencyCustom) continue;
       final resolved = _resolveFertilizingFrequency(
         stage: plant.stage,
         isCustom: false,
@@ -540,11 +563,14 @@ class PlantService {
     final trimmedFamily = plantFamily?.trim();
     final trimmedTradingName = tradingName.trim();
     final safeInitialLeafCount = initialLeafCount < 0 ? 0 : initialLeafCount;
-    final resolvedFrequency = _resolveFertilizingFrequency(
-      stage: stage,
-      isCustom: isFertilizingFrequencyCustom,
-      requestedFrequencyDays: fertilizingFrequencyDays,
-    );
+    final current = await getPlant(plantId);
+    final resolvedFrequency = current?.isOnBalconyLocation == true
+        ? fertilizingFrequencyStop
+        : _resolveFertilizingFrequency(
+            stage: stage,
+            isCustom: isFertilizingFrequencyCustom,
+            requestedFrequencyDays: fertilizingFrequencyDays,
+          );
 
     final body = <String, dynamic>{
       'genus': trimmedGenus,
