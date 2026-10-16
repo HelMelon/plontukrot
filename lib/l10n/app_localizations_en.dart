@@ -857,7 +857,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plantQuarantineHint =>
-      'Isolation for 14 days (purchase or repotting)';
+      '14 days from the selected date (purchase or repotting)';
+
+  @override
+  String get plantQuarantineStartDate => 'Start date';
 
   @override
   String get plantQuarantineReasonPurchase => 'Purchase';

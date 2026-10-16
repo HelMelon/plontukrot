@@ -10,6 +10,7 @@ import '../../../../core/theme/theme_context.dart';
 import '../../../../models/botanical_prefill_result.dart';
 import '../../../../models/plant.dart';
 import '../../../../models/plant_member.dart';
+import '../../../../models/quarantine.dart';
 import '../../../../models/quarantine_reason.dart';
 import '../../../../models/variegation.dart';
 import '../../../../core/season/fertilizing_season_controller.dart';
@@ -80,8 +81,10 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
   bool isRegularWatering = false;
   bool isQuarantine = false;
   QuarantineReason? quarantineReason;
+  late DateTime quarantineStartedAt;
   late final bool _initialQuarantine;
   late final QuarantineReason? _initialQuarantineReason;
+  late final DateTime _initialQuarantineStartedAt;
   Uint8List? _pendingPhotoBytes;
 
   bool get _isGroup => widget.plant.isGroup;
@@ -119,8 +122,13 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     isQuarantine = widget.plant.isInQuarantine();
     quarantineReason = widget.plant.quarantineReason ??
         (isQuarantine ? QuarantineReason.purchase : null);
+    final until = widget.plant.quarantineUntil;
+    quarantineStartedAt = (isQuarantine && until != null)
+        ? quarantineStartDate(until)
+        : DateTime.now();
     _initialQuarantine = isQuarantine;
     _initialQuarantineReason = quarantineReason;
+    _initialQuarantineStartedAt = quarantineStartedAt;
     initialLeafCountController.text = widget.plant.initialLeafCount.toString();
     selectedStage = widget.plant.stage;
     isFertilizingFrequencyCustom = widget.plant.isFertilizingFrequencyCustom;
@@ -408,14 +416,21 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
     try {
       bool? quarantineArg;
       QuarantineReason? quarantineReasonArg;
+      DateTime? quarantineStartedAtArg;
+      final startChanged = !isSameQuarantineDay(
+        quarantineStartedAt,
+        _initialQuarantineStartedAt,
+      );
       if (isQuarantine != _initialQuarantine) {
         quarantineArg = isQuarantine;
         quarantineReasonArg =
             isQuarantine ? (quarantineReason ?? QuarantineReason.purchase) : null;
+        if (isQuarantine) quarantineStartedAtArg = quarantineStartedAt;
       } else if (isQuarantine &&
-          quarantineReason != _initialQuarantineReason) {
+          (quarantineReason != _initialQuarantineReason || startChanged)) {
         quarantineArg = true;
         quarantineReasonArg = quarantineReason;
+        if (startChanged) quarantineStartedAtArg = quarantineStartedAt;
       }
 
       await PlantService().updatePlant(
@@ -435,6 +450,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
         isFertilizingFrequencyCustom: isFertilizingFrequencyCustom,
         quarantine: quarantineArg,
         quarantineReason: quarantineReasonArg,
+        quarantineStartedAt: quarantineStartedAtArg,
       );
 
       Object? photoError;
@@ -755,6 +771,7 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                           PlantQuarantineFields(
                             enabled: isQuarantine,
                             reason: quarantineReason,
+                            startedAt: quarantineStartedAt,
                             onEnabledChanged: (value) {
                               setState(() {
                                 isQuarantine = value;
@@ -765,6 +782,9 @@ class _UpdatePlantSheetState extends State<UpdatePlantSheet> {
                             },
                             onReasonChanged: (value) {
                               setState(() => quarantineReason = value);
+                            },
+                            onStartedAtChanged: (value) {
+                              setState(() => quarantineStartedAt = value);
                             },
                           ),
                           spacing.vMd,

@@ -12,10 +12,31 @@ int quarantineFertilizingDelayDays(FertilizingGrowthSeason season) {
   };
 }
 
+/// Calendar day of [value] in local time.
+DateTime quarantineCalendarDay(DateTime value) =>
+    DateTime(value.year, value.month, value.day);
+
 DateTime quarantineEndDate(DateTime startedAt) {
-  final day = DateTime(startedAt.year, startedAt.month, startedAt.day);
-  return day.add(const Duration(days: quarantineDurationDays));
+  return quarantineCalendarDay(startedAt)
+      .add(const Duration(days: quarantineDurationDays));
 }
+
+/// Start day implied by a stored end (`until` minus 14 days).
+DateTime quarantineStartDate(DateTime until) => quarantineCalendarDay(until)
+    .subtract(const Duration(days: quarantineDurationDays));
+
+bool isSameQuarantineDay(DateTime a, DateTime b) =>
+    quarantineCalendarDay(a) == quarantineCalendarDay(b);
+
+/// Today. A future start is not stored separately: only `quarantine_until`
+/// exists, so a start after today would already look active.
+DateTime latestQuarantineStart(DateTime now) => quarantineCalendarDay(now);
+
+/// Earliest start that is still inside the 14-day window at [now].
+DateTime earliestActiveQuarantineStart(DateTime now) =>
+    latestQuarantineStart(now).subtract(
+      const Duration(days: quarantineDurationDays - 1),
+    );
 
 bool isPlantInQuarantine({
   DateTime? quarantineUntil,

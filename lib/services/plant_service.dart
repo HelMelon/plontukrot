@@ -80,8 +80,8 @@ class PlantService {
   /// is false.
   ///
   /// When already active and [startedAt] is omitted, only [reason] is updated
-  /// (timer is not restarted). Pass [startedAt] (e.g. after repotting) to
-  /// restart the 14-day window.
+  /// (timer is not restarted). Pass [startedAt] (purchase date, a chosen start,
+  /// or the repotting day) to set the 14-day window from that calendar day.
   Future<void> setQuarantine({
     required String plantId,
     required bool enabled,
@@ -226,6 +226,7 @@ class PlantService {
     bool isFertilizingFrequencyCustom = false,
     bool quarantine = false,
     QuarantineReason? quarantineReason,
+    DateTime? quarantineStartedAt,
   }) async {
     final trimmedGenus = genus.trim();
     final trimmedSpecies = species.trim();
@@ -259,7 +260,9 @@ class PlantService {
         if (members.isNotEmpty)
           'members': members.map((m) => m.toMap()).toList(),
         if (quarantine) ...{
-          'quarantine_until': isoDate(quarantineEndDate(DateTime.now())),
+          'quarantine_until': isoDate(
+            quarantineEndDate(quarantineStartedAt ?? DateTime.now()),
+          ),
           'quarantine_reason':
               (quarantineReason ?? QuarantineReason.purchase).code,
         },
@@ -491,6 +494,7 @@ class PlantService {
     bool isFertilizingFrequencyCustom = false,
     bool? quarantine,
     QuarantineReason? quarantineReason,
+    DateTime? quarantineStartedAt,
   }) async {
     final trimmedGenus = genus.trim();
     final trimmedSpecies = species.trim();
@@ -526,16 +530,18 @@ class PlantService {
 
     if (quarantine != null) {
       if (quarantine) {
-        final current = await getPlant(plantId);
-        if (current != null && current.isInQuarantine()) {
+        if (current != null &&
+            current.isInQuarantine() &&
+            quarantineStartedAt == null) {
           body['quarantine_reason'] =
               (quarantineReason ??
                       current.quarantineReason ??
                       QuarantineReason.purchase)
                   .code;
         } else {
-          body['quarantine_until'] =
-              isoDate(quarantineEndDate(DateTime.now()));
+          body['quarantine_until'] = isoDate(
+            quarantineEndDate(quarantineStartedAt ?? DateTime.now()),
+          );
           body['quarantine_reason'] =
               (quarantineReason ?? QuarantineReason.purchase).code;
         }

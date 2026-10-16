@@ -860,7 +860,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plantQuarantineHint =>
-      'Изоляция на 14 дней (покупка или пересадка)';
+      '14 дней с выбранной даты (покупка или пересадка)';
+
+  @override
+  String get plantQuarantineStartDate => 'Дата начала';
 
   @override
   String get plantQuarantineReasonPurchase => 'Покупка';

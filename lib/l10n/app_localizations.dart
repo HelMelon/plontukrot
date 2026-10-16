@@ -1659,8 +1659,14 @@ abstract class AppLocalizations {
   /// No description provided for @plantQuarantineHint.
   ///
   /// In en, this message translates to:
-  /// **'Isolation for 14 days (purchase or repotting)'**
+  /// **'14 days from the selected date (purchase or repotting)'**
   String get plantQuarantineHint;
+
+  /// No description provided for @plantQuarantineStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date'**
+  String get plantQuarantineStartDate;
 
   /// No description provided for @plantQuarantineReasonPurchase.
   ///

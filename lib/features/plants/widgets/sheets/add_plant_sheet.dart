@@ -64,6 +64,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
   bool isRegularWatering = false;
   bool isQuarantine = false;
   QuarantineReason? quarantineReason;
+  DateTime quarantineStartedAt = DateTime.now();
   Uint8List? _pendingPhotoBytes;
 
   @override
@@ -345,6 +346,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
         quarantineReason: isQuarantine
             ? (quarantineReason ?? QuarantineReason.purchase)
             : null,
+        quarantineStartedAt: isQuarantine ? quarantineStartedAt : null,
       );
 
       Object? photoError;
@@ -640,6 +642,7 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                           PlantQuarantineFields(
                             enabled: isQuarantine,
                             reason: quarantineReason,
+                            startedAt: quarantineStartedAt,
                             onEnabledChanged: (value) {
                               setState(() {
                                 isQuarantine = value;
@@ -650,6 +653,9 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
                             },
                             onReasonChanged: (value) {
                               setState(() => quarantineReason = value);
+                            },
+                            onStartedAtChanged: (value) {
+                              setState(() => quarantineStartedAt = value);
                             },
                           ),
                           spacing.vMd,

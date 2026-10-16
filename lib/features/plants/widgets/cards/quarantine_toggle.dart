@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:plontukrot/core/theme/theme_context.dart';
+import 'package:plontukrot/core/widgets/focusable_tap.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 import 'package:plontukrot/models/plant.dart';
+import 'package:plontukrot/models/quarantine.dart';
 import 'package:plontukrot/models/quarantine_reason.dart';
 import 'package:plontukrot/services/plant_service.dart';
+
+import '../common/plant_quarantine_fields.dart';
 
 /// Toggle quarantine on the plant details page (separate from reanimation).
 class QuarantineToggle extends StatefulWidget {
@@ -24,16 +28,19 @@ class QuarantineToggle extends StatefulWidget {
 class _QuarantineToggleState extends State<QuarantineToggle> {
   bool _busy = false;
 
-  Future<void> _toggle(bool on) async {
+  Future<void> _apply({
+    required bool enabled,
+    QuarantineReason? reason,
+    DateTime? startedAt,
+  }) async {
     if (_busy) return;
     setState(() => _busy = true);
     try {
       await PlantService().setQuarantine(
         plantId: widget.plantId,
-        enabled: on,
-        reason: on
-            ? (widget.plant.quarantineReason ?? QuarantineReason.purchase)
-            : null,
+        enabled: enabled,
+        reason: reason,
+        startedAt: startedAt,
       );
     } catch (_) {
       if (mounted) {
@@ -46,24 +53,49 @@ class _QuarantineToggleState extends State<QuarantineToggle> {
     }
   }
 
+  Future<void> _toggle(bool on) async {
+    if (_busy) return;
+    if (!on) {
+      await _apply(enabled: false);
+      return;
+    }
+    setState(() => _busy = true);
+    final picked = await showQuarantineStartDatePicker(
+      context,
+      initialDate: DateTime.now(),
+    );
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (picked == null) return;
+    await _apply(
+      enabled: true,
+      reason: widget.plant.quarantineReason ?? QuarantineReason.purchase,
+      startedAt: picked,
+    );
+  }
+
+  Future<void> _changeStart() async {
+    if (_busy || !widget.plant.isInQuarantine()) return;
+    final until = widget.plant.quarantineUntil;
+    final initial = until == null ? DateTime.now() : quarantineStartDate(until);
+    setState(() => _busy = true);
+    final picked = await showQuarantineStartDatePicker(
+      context,
+      initialDate: initial,
+    );
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (picked == null || isSameQuarantineDay(picked, initial)) return;
+    await _apply(
+      enabled: true,
+      reason: widget.plant.quarantineReason ?? QuarantineReason.purchase,
+      startedAt: picked,
+    );
+  }
+
   Future<void> _setReason(QuarantineReason reason) async {
     if (_busy || !widget.plant.isInQuarantine()) return;
-    setState(() => _busy = true);
-    try {
-      await PlantService().setQuarantine(
-        plantId: widget.plantId,
-        enabled: true,
-        reason: reason,
-      );
-    } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context).commonError(''))),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
+    await _apply(enabled: true, reason: reason);
   }
 
   @override
@@ -81,6 +113,12 @@ class _QuarantineToggleState extends State<QuarantineToggle> {
         : l10n.quarantineUntilLabel(
             DateFormat('d.MM.yyyy', dateLocale).format(until),
           );
+    final startLabel = until == null
+        ? null
+        : DateFormat(
+            'd.MM.yyyy',
+            dateLocale,
+          ).format(quarantineStartDate(until));
 
     return Container(
       width: double.infinity,
@@ -151,6 +189,54 @@ class _QuarantineToggleState extends State<QuarantineToggle> {
                 ),
               ],
             ),
+            if (startLabel != null) ...[
+              spacing.vXs,
+              Semantics(
+                button: true,
+                label: l10n.a11ySelectDate(
+                  untilLabel == null ? startLabel : '$startLabel, $untilLabel',
+                ),
+                child: FocusableTap(
+                  enabled: !_busy,
+                  onTap: _busy ? null : _changeStart,
+                  borderRadius: BorderRadius.circular(context.radii.sm),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: spacing.xs),
+                    child: Row(
+                      children: [
+                        ExcludeSemantics(
+                          child: Icon(
+                            context.icons.calendar,
+                            size: context.dimensions.iconSm,
+                            color: colors.icon,
+                          ),
+                        ),
+                        spacing.hSm,
+                        Expanded(
+                          child: Text(
+                            l10n.plantQuarantineStartDate,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: typography.bodyMedium,
+                          ),
+                        ),
+                        spacing.hSm,
+                        Flexible(
+                          child: Text(
+                            startLabel,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ],
         ],
       ),

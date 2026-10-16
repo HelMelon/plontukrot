@@ -13,6 +13,24 @@ void main() {
       expect(quarantineEndDate(start), DateTime(2026, 3, 15));
     });
 
+    test('start window stays inside an active 14-day quarantine', () {
+      final now = DateTime(2026, 10, 12, 15);
+      final earliest = earliestActiveQuarantineStart(now);
+      expect(earliest, DateTime(2026, 9, 29));
+      expect(latestQuarantineStart(now), DateTime(2026, 10, 12));
+      expect(quarantineEndDate(earliest).isAfter(now), isTrue);
+      expect(
+        quarantineEndDate(earliest.subtract(const Duration(days: 1)))
+            .isAfter(now),
+        isFalse,
+      );
+      expect(quarantineStartDate(DateTime(2026, 10, 26, 9)), DateTime(2026, 10, 12));
+      expect(
+        isSameQuarantineDay(DateTime(2026, 10, 12, 1), DateTime(2026, 10, 12, 23)),
+        isTrue,
+      );
+    });
+
     test('isPlantInQuarantine respects until boundary', () {
       final until = DateTime(2026, 3, 15, 9);
       expect(
