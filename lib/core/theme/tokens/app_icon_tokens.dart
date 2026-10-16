@@ -104,6 +104,9 @@ class AppIconTokens {
     required this.rerooting,
     required this.stimulator,
     required this.quarantine,
+    required this.balcony,
+    required this.room,
+    required this.sensor,
     required this.leafCut,
     required this.leafEaten,
     required this.lossDied,
@@ -222,6 +225,9 @@ class AppIconTokens {
     rerooting: HugeIcons.strokeRoundedBioEnergy,
     stimulator: HugeIcons.strokeRoundedAiChemistry03,
     quarantine: Icons.health_and_safety_outlined,
+    balcony: Icons.landscape,
+    room: Icons.meeting_room_outlined,
+    sensor: Icons.sensors,
     leafCut: Icons.content_cut,
     leafEaten: Icons.restaurant,
     lossDied: Icons.heart_broken_outlined,
@@ -339,6 +345,9 @@ class AppIconTokens {
   final List<List<dynamic>> rerooting;
   final List<List<dynamic>> stimulator;
   final IconData quarantine;
+  final IconData balcony;
+  final IconData room;
+  final IconData sensor;
   final IconData leafCut;
   final IconData leafEaten;
   final IconData lossDied;
@@ -447,6 +456,9 @@ class AppIconTokens {
     List<List<dynamic>>? rerooting,
     List<List<dynamic>>? stimulator,
     IconData? quarantine,
+    IconData? balcony,
+    IconData? room,
+    IconData? sensor,
     IconData? leafCut,
     IconData? leafEaten,
     IconData? lossDied,
@@ -553,6 +565,9 @@ class AppIconTokens {
       rerooting: rerooting ?? this.rerooting,
       stimulator: stimulator ?? this.stimulator,
       quarantine: quarantine ?? this.quarantine,
+      balcony: balcony ?? this.balcony,
+      room: room ?? this.room,
+      sensor: sensor ?? this.sensor,
       leafCut: leafCut ?? this.leafCut,
       leafEaten: leafEaten ?? this.leafEaten,
       lossDied: lossDied ?? this.lossDied,

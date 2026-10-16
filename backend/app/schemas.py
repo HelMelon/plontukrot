@@ -76,6 +76,7 @@ class PlantCreate(BaseModel):
     gifted_to_uid: Optional[str] = Field(default=None, alias="giftedToUid")
     on_balcony: Optional[bool] = Field(default=None, alias="onBalcony")
     balcony_band: Optional[int] = Field(default=None, alias="balconyBand")
+    room_id: Optional[str] = Field(default=None, alias="roomId")
     quarantine_until: Optional[datetime] = Field(default=None, alias="quarantineUntil")
     quarantine_reason: Optional[str] = Field(default=None, alias="quarantineReason")
 
@@ -107,6 +108,7 @@ class PlantUpdate(BaseModel):
     gifted_to_uid: Optional[str] = Field(default=None, alias="giftedToUid")
     on_balcony: Optional[bool] = Field(default=None, alias="onBalcony")
     balcony_band: Optional[int] = Field(default=None, alias="balconyBand")
+    room_id: Optional[str] = Field(default=None, alias="roomId")
     quarantine_until: Optional[datetime] = Field(default=None, alias="quarantineUntil")
     quarantine_reason: Optional[str] = Field(default=None, alias="quarantineReason")
 
@@ -139,6 +141,7 @@ class PlantOut(BaseModel):
     gifted_to_uid: Optional[str] = None
     on_balcony: Optional[bool] = None
     balcony_band: Optional[int] = None
+    room_id: Optional[str] = None
     quarantine_until: Optional[datetime] = None
     quarantine_reason: Optional[str] = None
     created_at: datetime

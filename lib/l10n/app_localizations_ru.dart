@@ -625,6 +625,40 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeFilterStage => 'Стадия';
 
   @override
+  String get homeFilterRoom => 'Помещение';
+
+  @override
+  String get roomsTitle => 'Помещения';
+
+  @override
+  String get roomBalcony => 'Балкон';
+
+  @override
+  String get roomNone => 'Не выбрано';
+
+  @override
+  String get roomAddTitle => 'Новое помещение';
+
+  @override
+  String get roomEditTitle => 'Название помещения';
+
+  @override
+  String get roomDeleteTitle => 'Удалить помещение';
+
+  @override
+  String get roomNameHint => 'Например: Гостиная';
+
+  @override
+  String get manageRoomsHint =>
+      'Свои помещения можно добавлять, переименовывать и удалять.';
+
+  @override
+  String get a11yManageRooms => 'Управление помещениями';
+
+  @override
+  String get a11yPlantRoom => 'Помещение';
+
+  @override
   String get homeFilterStatuses => 'Статусы';
 
   @override
@@ -759,16 +793,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeNotes => 'Заметки';
 
   @override
-  String get homeUpdateFamily => 'Изменить семейство';
-
-  @override
-  String get homeUpdateFamilyTitle => 'Изменить семейство';
-
-  @override
-  String get homeFamilyLabel => 'Семейство';
+  String get homeMoveToRoom => 'В помещение';
 
   @override
   String get homeFertilizeSelectedTitle => 'Подкормить выбранные растения';
+
+  @override
   String get homeFertilizingFrequencyMixed =>
       'У выбранных растений разный интервал';
 

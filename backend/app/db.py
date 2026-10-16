@@ -67,6 +67,38 @@ def auto_migrate() -> None:
                 ALTER TABLE plants ADD COLUMN IF NOT EXISTS balcony_band INT;
                 ALTER TABLE plants ADD COLUMN IF NOT EXISTS quarantine_until TIMESTAMPTZ;
                 ALTER TABLE plants ADD COLUMN IF NOT EXISTS quarantine_reason TEXT;
+                ALTER TABLE plants ADD COLUMN IF NOT EXISTS room_id TEXT;
+
+                CREATE TABLE IF NOT EXISTS rooms (
+                    id TEXT PRIMARY KEY,
+                    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                    name TEXT NOT NULL,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                );
+                CREATE TABLE IF NOT EXISTS room_sensors (
+                    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                    room_id TEXT NOT NULL,
+                    device_id TEXT NOT NULL,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                    PRIMARY KEY (user_id, room_id)
+                );
+                CREATE TABLE IF NOT EXISTS removed_system_rooms (
+                    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                    room_id TEXT NOT NULL,
+                    PRIMARY KEY (user_id, room_id)
+                );
+                DO $$
+                BEGIN
+                  IF EXISTS (
+                    SELECT 1 FROM pg_constraint
+                    WHERE conname = 'rooms_pkey'
+                      AND conrelid = 'rooms'::regclass
+                      AND array_length(conkey, 1) = 1
+                  ) THEN
+                    ALTER TABLE rooms DROP CONSTRAINT rooms_pkey;
+                    ALTER TABLE rooms ADD PRIMARY KEY (user_id, id);
+                  END IF;
+                END $$;
 
                 ALTER TABLE plant_manipulations ADD COLUMN IF NOT EXISTS ended_at TIMESTAMPTZ;
                 ALTER TABLE plant_manipulations ADD COLUMN IF NOT EXISTS reanimation_tags JSONB;

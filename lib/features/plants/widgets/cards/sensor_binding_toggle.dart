@@ -6,7 +6,7 @@ import 'package:plontukrot/models/plant_sensor_binding.dart';
 import 'package:plontukrot/services/plant_sensor_service.dart';
 
 /// Lets the user bind a soil-moisture pot (1..N) to this plant and shows the
-/// latest moisture reading. Mirrors the BalconyToggle card style.
+/// latest moisture reading.
 class SensorBindingToggle extends StatefulWidget {
   final String plantId;
 

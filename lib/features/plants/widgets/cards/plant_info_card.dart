@@ -24,7 +24,7 @@ import '../sheets/fertilizing_history_sheet.dart';
 import '../sheets/manipulations_history_sheet.dart';
 import '../sheets/repotting_history_sheet.dart';
 import '../sheets/watering_history_sheet.dart';
-import 'balcony_toggle.dart';
+import 'plant_room_field.dart';
 import 'info_card.dart';
 import 'quarantine_toggle.dart';
 import 'sensor_binding_toggle.dart';
@@ -501,22 +501,12 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
               ),
             ),
           ],
+          spacing.vXs,
+          PlantRoomField(plant: plant),
           if (FeatureFlagsController.instance
-                  .isEnabled(FeatureFlag.balcony) ||
-              FeatureFlagsController.instance
-                  .isEnabled(FeatureFlag.soilSensors)) ...[
+              .isEnabled(FeatureFlag.soilSensors)) ...[
             spacing.vXs,
-            if (FeatureFlagsController.instance
-                .isEnabled(FeatureFlag.balcony))
-              BalconyToggle(plant: plant, plantId: plantId),
-            if (FeatureFlagsController.instance
-                    .isEnabled(FeatureFlag.balcony) &&
-                FeatureFlagsController.instance
-                    .isEnabled(FeatureFlag.soilSensors))
-              spacing.vXs,
-            if (FeatureFlagsController.instance
-                .isEnabled(FeatureFlag.soilSensors))
-              SensorBindingToggle(plantId: plantId),
+            SensorBindingToggle(plantId: plantId),
           ],
           spacing.vXs,
           QuarantineToggle(plant: plant, plantId: plantId),

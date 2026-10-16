@@ -1230,6 +1230,72 @@ abstract class AppLocalizations {
   /// **'Stage'**
   String get homeFilterStage;
 
+  /// No description provided for @homeFilterRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Room'**
+  String get homeFilterRoom;
+
+  /// No description provided for @roomsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooms'**
+  String get roomsTitle;
+
+  /// No description provided for @roomBalcony.
+  ///
+  /// In en, this message translates to:
+  /// **'Balcony'**
+  String get roomBalcony;
+
+  /// No description provided for @roomNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get roomNone;
+
+  /// No description provided for @roomAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New room'**
+  String get roomAddTitle;
+
+  /// No description provided for @roomEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Room name'**
+  String get roomEditTitle;
+
+  /// No description provided for @roomDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete room'**
+  String get roomDeleteTitle;
+
+  /// No description provided for @roomNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For example: Living room'**
+  String get roomNameHint;
+
+  /// No description provided for @manageRoomsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your rooms can be added, renamed, and deleted.'**
+  String get manageRoomsHint;
+
+  /// No description provided for @a11yManageRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage rooms'**
+  String get a11yManageRooms;
+
+  /// No description provided for @a11yPlantRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Room'**
+  String get a11yPlantRoom;
+
   /// No description provided for @homeFilterStatuses.
   ///
   /// In en, this message translates to:
@@ -1482,23 +1548,11 @@ abstract class AppLocalizations {
   /// **'Notes'**
   String get homeNotes;
 
-  /// No description provided for @homeUpdateFamily.
+  /// No description provided for @homeMoveToRoom.
   ///
   /// In en, this message translates to:
-  /// **'Update family'**
-  String get homeUpdateFamily;
-
-  /// No description provided for @homeUpdateFamilyTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Update family'**
-  String get homeUpdateFamilyTitle;
-
-  /// No description provided for @homeFamilyLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Family'**
-  String get homeFamilyLabel;
+  /// **'Move to a room'**
+  String get homeMoveToRoom;
 
   /// No description provided for @homeFertilizeSelectedTitle.
   ///

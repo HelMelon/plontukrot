@@ -6,7 +6,9 @@ import '../models/plant.dart';
 import '../models/plant_archive_reason.dart';
 import '../models/plant_member.dart';
 import '../models/plant_photo.dart';
+import '../models/balcony_band.dart';
 import '../models/quarantine.dart';
+import '../models/room.dart';
 import '../models/quarantine_reason.dart';
 import '../models/variegation.dart';
 import 'api_client.dart';
@@ -174,15 +176,51 @@ class PlantService {
   /// [band] is the cold-tolerance band (0..4) used by the balcony monitor to
   /// decide when the plant must be brought inside. Pass null to keep the
   /// current band when only toggling [onBalcony].
+  ///
+  /// While the plant is outside, fertilizing stops (`0`). Bringing it inside
+  /// writes the automatic stage-and-season interval again. The room becomes
+  /// the balcony, or [roomId] when the plant comes inside (`null` clears it).
   Future<void> setOnBalcony({
     required String plantId,
     required bool onBalcony,
     int? band,
+    String? roomId,
   }) async {
     await _patchPlant(plantId, {
       'on_balcony': onBalcony,
       if (band != null) 'balcony_band': band,
+      'room_id': onBalcony ? Room.balconyId : roomId,
     });
+  }
+
+  /// Puts the plant in [roomId]. `null` clears the room. The balcony id also
+  /// marks the plant for the temperature sensor and stops fertilizing.
+  /// Leaving the balcony restores the automatic fertilizing interval.
+  Future<void> setPlantRoom({
+    required String plantId,
+    String? roomId,
+  }) async {
+    if (roomId == Room.balconyId) {
+      final plant = await getPlant(plantId);
+      if (plant == null) return;
+      final band = await BalconyBandResolver.resolve(plant);
+      await setOnBalcony(
+        plantId: plantId,
+        onBalcony: true,
+        band: band.value,
+      );
+      return;
+    }
+    final plant = await getPlant(plantId);
+    if (plant != null && plant.isOnBalconyLocation) {
+      await setOnBalcony(
+        plantId: plantId,
+        onBalcony: false,
+        roomId: roomId,
+      );
+      return;
+    }
+    await _patchPlant(plantId, {'room_id': roomId});
   }
 
   Future<void> _patchPlant(String plantId, Map<String, dynamic> body) async {

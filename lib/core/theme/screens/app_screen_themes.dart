@@ -91,7 +91,7 @@ class HomeScreenTheme {
       brandStyle: typography.brand,
       emptyStatePadding: EdgeInsets.all(spacing.xxl + 2),
       emptyStateRadius: radii.xl,
-      filterChipFontSize: typography.bodySmall.fontSize ?? 13,
+      filterChipFontSize: typography.captionSmall.fontSize ?? 15,
       avatarSize: 40,
     );
   }

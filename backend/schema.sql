@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS plants (
     gifted_to_uid            TEXT,
     on_balcony               BOOLEAN NOT NULL DEFAULT false,
     balcony_band             INT,
+    room_id                  TEXT,
     quarantine_until         TIMESTAMPTZ,
     quarantine_reason        TEXT,
     created_at               TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -259,6 +260,31 @@ CREATE TABLE IF NOT EXISTS components (
     user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name        TEXT NOT NULL,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- User rooms. The balcony is a normal row (id "balcony") until the user deletes it.
+CREATE TABLE IF NOT EXISTS rooms (
+    user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    id          TEXT NOT NULL,
+    name        TEXT NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, id)
+);
+
+-- System room ids the user removed, so they are not created again.
+CREATE TABLE IF NOT EXISTS removed_system_rooms (
+    user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    room_id     TEXT NOT NULL,
+    PRIMARY KEY (user_id, room_id)
+);
+
+-- Yandex device id for a room, including the system room id "balcony".
+CREATE TABLE IF NOT EXISTS room_sensors (
+    user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    room_id     TEXT NOT NULL,
+    device_id   TEXT NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, room_id)
 );
 
 CREATE TABLE IF NOT EXISTS wish_list_items (

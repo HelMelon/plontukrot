@@ -10,7 +10,6 @@ import 'package:plontukrot/core/theme/theme_context.dart';
 import 'package:plontukrot/core/theme/screens/app_screen_themes.dart';
 import '../../../core/features/feature_flags.dart';
 import '../../../core/widgets/app_bar_chrome_actions.dart';
-import '../../../core/widgets/prompt_text_dialog.dart';
 import '../../../models/app_user.dart';
 import '../../../models/plant.dart';
 import '../../../models/plant_filter_criteria.dart';
@@ -25,12 +24,14 @@ import '../../plants/widgets/sheets/add_manipulation_sheet.dart';
 import '../../plants/widgets/sheets/add_note_sheet.dart';
 import '../../plants/widgets/sheets/add_repotting_sheet.dart';
 import '../../plants/widgets/sheets/merge_plant_sheet.dart';
+import '../../plants/widgets/sheets/select_plant_room_sheet.dart';
 import '../../../services/api_refresh.dart';
 import '../../../services/manipulation_service.dart';
 import '../../../services/note_service.dart';
 import '../../../services/plant_service.dart';
 import '../../../services/plant_sensor_service.dart';
 import '../../../services/propagation_service.dart';
+import '../../../services/room_service.dart';
 import '../../../services/startup_warmup_service.dart';
 import '../../../services/watering_service.dart';
 import '../../plants/pages/plant_archive_page.dart';
@@ -85,7 +86,9 @@ class _HomePageState extends State<HomePage> {
   _PlantSortField _sortField = _PlantSortField.createdAt;
   bool _sortAscending = false;
   PlantFilterCriteria _filter = PlantFilterCriteria.empty;
+  Map<String, String> _roomNames = const {};
   bool _firstContentReadySignaled = false;
+  bool _roomBusy = false;
 
   bool get _coverLoadingUi => widget.onFirstContentReady != null;
 
@@ -110,6 +113,17 @@ class _HomePageState extends State<HomePage> {
     _rerootingPlantIdsStream =
         ManipulationService().watchActiveRerootingPlantIds();
     _syncSensorBindingsStream();
+    unawaited(_loadRoomNames());
+  }
+
+  Future<void> _loadRoomNames() async {
+    try {
+      final rooms = await RoomService().fetchRooms();
+      if (!mounted) return;
+      setState(() {
+        _roomNames = {for (final room in rooms) room.id: room.name};
+      });
+    } catch (_) {}
   }
 
   void _syncSensorBindingsStream() {
@@ -477,6 +491,7 @@ class _HomePageState extends State<HomePage> {
     );
     if (newFilter != null && mounted) {
       setState(() => _filter = newFilter);
+      unawaited(_loadRoomNames());
     }
   }
 
@@ -538,24 +553,6 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-  }
-
-  Future<void> _updateFamily() async {
-    final l10n = AppLocalizations.of(context);
-    final family = await showPromptTextDialog(
-      context: context,
-      title: l10n.homeUpdateFamilyTitle,
-      labelText: l10n.homeFamilyLabel,
-      allowEmpty: true,
-    );
-
-    if (family == null) return;
-
-    await PlantService().updatePlantsPlantFamily(
-      plantIds: _selectedPlantIds,
-      plantFamily: family,
-    );
-    if (mounted) _exitSelectionMode();
   }
 
   Future<void> _addWatering() async {
@@ -669,6 +666,38 @@ class _HomePageState extends State<HomePage> {
     if (added == true && mounted) _exitSelectionMode();
   }
 
+  Future<void> _moveToRoom() async {
+    if (_roomBusy) return;
+    final selectedPlants = _latestPlants
+        .where((plant) => _selectedPlantIds.contains(plant.id))
+        .toList();
+    if (selectedPlants.isEmpty) return;
+    final pick = await showSelectPlantRoomSheet(
+      context: context,
+      currentRoomId: null,
+      indicateCurrent: false,
+    );
+    if (pick == null || !mounted) return;
+    setState(() => _roomBusy = true);
+    try {
+      for (final plant in selectedPlants) {
+        await PlantService().setPlantRoom(
+          plantId: plant.id,
+          roomId: pick.roomId,
+        );
+      }
+      if (mounted) _exitSelectionMode();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).commonError(''))),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _roomBusy = false);
+    }
+  }
+
   Future<void> _deletePlants() async {
     final l10n = AppLocalizations.of(context);
     final count = _selectedPlantIds.length;
@@ -771,9 +800,9 @@ class _HomePageState extends State<HomePage> {
         icon: Icon(_icons.noteAction),
       ),
       IconButton(
-        tooltip: l10n.homeUpdateFamily,
-        onPressed: _updateFamily,
-        icon: Icon(_icons.genus),
+        tooltip: l10n.homeMoveToRoom,
+        onPressed: _roomBusy ? null : _moveToRoom,
+        icon: Icon(_icons.room),
       ),
       IconButton(
         tooltip: l10n.homeMerge,
@@ -804,10 +833,9 @@ class _HomePageState extends State<HomePage> {
           ? null
           : PreferredSize(
               preferredSize: Size.fromHeight(_spacing.xxxl + _spacing.md),
-              child: Row(
-                children: [
-                  for (final button in actionButtons) Expanded(child: button),
-                ],
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(children: actionButtons),
               ),
             ),
     );
@@ -1336,6 +1364,18 @@ class _HomePageState extends State<HomePage> {
                                               onDeleted: () => setState(() =>
                                                   _filter = _filter.copyWith(
                                                     clearCultivar: true,
+                                                    clearPresetId: true,
+                                                    clearPresetName: true,
+                                                  )),
+                                            ),
+                                          if (_filter.roomId != null &&
+                                              _filter.roomId!.isNotEmpty)
+                                            _buildActiveFilterChip(
+                                              label:
+                                                  '${l10n.homeFilterRoom}: ${_roomNames[_filter.roomId] ?? l10n.roomsTitle}',
+                                              onDeleted: () => setState(() =>
+                                                  _filter = _filter.copyWith(
+                                                    clearRoomId: true,
                                                     clearPresetId: true,
                                                     clearPresetName: true,
                                                   )),

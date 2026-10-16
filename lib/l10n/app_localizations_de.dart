@@ -629,6 +629,40 @@ class AppLocalizationsDe extends AppLocalizations {
   String get homeFilterStage => 'Stufe';
 
   @override
+  String get homeFilterRoom => 'Raum';
+
+  @override
+  String get roomsTitle => 'Räume';
+
+  @override
+  String get roomBalcony => 'Balkon';
+
+  @override
+  String get roomNone => 'Nicht gewählt';
+
+  @override
+  String get roomAddTitle => 'Neuer Raum';
+
+  @override
+  String get roomEditTitle => 'Raumname';
+
+  @override
+  String get roomDeleteTitle => 'Raum löschen';
+
+  @override
+  String get roomNameHint => 'Zum Beispiel: Wohnzimmer';
+
+  @override
+  String get manageRoomsHint =>
+      'Eigene Räume können angelegt, umbenannt und gelöscht werden.';
+
+  @override
+  String get a11yManageRooms => 'Räume verwalten';
+
+  @override
+  String get a11yPlantRoom => 'Raum';
+
+  @override
   String get homeFilterStatuses => 'Status';
 
   @override
@@ -764,16 +798,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get homeNotes => 'Notizen';
 
   @override
-  String get homeUpdateFamily => 'Familie ändern';
-
-  @override
-  String get homeUpdateFamilyTitle => 'Familie ändern';
-
-  @override
-  String get homeFamilyLabel => 'Familie';
+  String get homeMoveToRoom => 'In einen Raum';
 
   @override
   String get homeFertilizeSelectedTitle => 'Ausgewählte Pflanzen düngen';
+
+  @override
   String get homeFertilizingFrequencyMixed =>
       'Ausgewählte Pflanzen haben unterschiedliche Intervalle';
 

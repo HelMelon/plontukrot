@@ -1,4 +1,5 @@
 import 'model_helpers.dart';
+import 'room.dart';
 import 'plant_archive_reason.dart';
 import 'plant_member.dart';
 import 'plant_photo.dart';
@@ -40,6 +41,7 @@ class Plant {
   final String? giftedToUid;
   final bool onBalcony;
   final int? balconyBand;
+  final String? roomId;
   final DateTime? quarantineUntil;
   final QuarantineReason? quarantineReason;
 
@@ -75,6 +77,7 @@ class Plant {
     this.giftedToUid,
     this.onBalcony = false,
     this.balconyBand,
+    this.roomId,
     this.quarantineUntil,
     this.quarantineReason,
   });
@@ -88,6 +91,14 @@ class Plant {
   bool get isHybrid => species.contains('×');
 
   bool get isArchived => archivedAt != null;
+
+  /// Balcony as a place: the sensor flag or the reserved room id.
+  bool get isOnBalconyLocation =>
+      onBalcony || roomId == Room.balconyId;
+
+  /// Room shown in filters. Balcony wins over any other stored id.
+  String? get effectiveRoomId =>
+      isOnBalconyLocation ? Room.balconyId : roomId;
 
   bool get isArchiveVisible {
     if (!isArchived) return false;
@@ -221,6 +232,9 @@ class Plant {
           readString(data, 'gifted_to_uid'),
       onBalcony: readBool(data, 'onBalcony') || readBool(data, 'on_balcony'),
       balconyBand: readInt(data, 'balconyBand') ?? readInt(data, 'balcony_band'),
+      roomId: _nullableTrimmed(
+        readString(data, 'roomId') ?? readString(data, 'room_id'),
+      ),
       quarantineUntil: readDate(data, 'quarantineUntil') ??
           readDate(data, 'quarantine_until'),
       quarantineReason: QuarantineReason.tryParse(
@@ -278,6 +292,8 @@ class Plant {
       if (giftedToUid != null) 'giftedToUid': giftedToUid,
       'onBalcony': onBalcony,
       'on_balcony': onBalcony,
+      if (roomId != null) 'roomId': roomId,
+      if (roomId != null) 'room_id': roomId,
       if (balconyBand != null) 'balconyBand': balconyBand,
       if (balconyBand != null) 'balcony_band': balconyBand,
       if (quarantineUntil != null)

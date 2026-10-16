@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from ..db import get_pool, jsonb
 from ..feature_flags import FLAG_BALCONY, is_feature_enabled
 from ..routers.auth import get_current_user_id
+from ..routers.catalogs import restore_balcony_room
 from ..schemas import PlantCreate, PlantOut, PlantPhotoOut, PlantUpdate
 
 router = APIRouter(prefix="/plants", tags=["plants"])
@@ -33,6 +34,7 @@ _FIELDS = {
     "gifted_to_uid": "gifted_to_uid",
     "on_balcony": "on_balcony",
     "balcony_band": "balcony_band",
+    "room_id": "room_id",
     "quarantine_until": "quarantine_until",
     "quarantine_reason": "quarantine_reason",
 }
@@ -53,7 +55,7 @@ def list_plants(user_id: str = Depends(get_current_user_id)):
             "last_fertilized_at, last_repotted_at, last_manipulation_at, "
             "members, archived_at, expires_at, archive_reason, archive_note, "
             "merged_into_plant_id, gifted_to_uid, on_balcony, balcony_band, "
-            "quarantine_until, quarantine_reason, created_at "
+            "quarantine_until, quarantine_reason, room_id, created_at "
             "FROM plants WHERE user_id = %s ORDER BY created_at",
             (user_id,),
         ).fetchall()
@@ -102,6 +104,8 @@ def create_plant(payload: PlantCreate, user_id: str = Depends(get_current_user_i
     columns = ", ".join(values.keys())
     placeholders = ", ".join(["%s"] * len(values))
     with get_pool().connection() as conn:
+        if values.get("on_balcony") is True or values.get("room_id") == "balcony":
+            restore_balcony_room(conn, user_id)
         conn.execute(
             f"INSERT INTO plants ({columns}) VALUES ({placeholders})",
             tuple(values.values()),
@@ -113,7 +117,7 @@ def create_plant(payload: PlantCreate, user_id: str = Depends(get_current_user_i
             "last_fertilized_at, last_repotted_at, last_manipulation_at, "
             "members, archived_at, expires_at, archive_reason, archive_note, "
             "merged_into_plant_id, gifted_to_uid, on_balcony, balcony_band, "
-            "quarantine_until, quarantine_reason, created_at "
+            "quarantine_until, quarantine_reason, room_id, created_at "
             "FROM plants WHERE id = %s",
             (plant_id,),
         ).fetchone()
@@ -130,7 +134,7 @@ def get_plant(plant_id: str, user_id: str = Depends(get_current_user_id)):
             "last_fertilized_at, last_repotted_at, last_manipulation_at, "
             "members, archived_at, expires_at, archive_reason, archive_note, "
             "merged_into_plant_id, gifted_to_uid, on_balcony, balcony_band, "
-            "quarantine_until, quarantine_reason, created_at "
+            "quarantine_until, quarantine_reason, room_id, created_at "
             "FROM plants WHERE id = %s AND user_id = %s",
             (plant_id, user_id),
         ).fetchone()
@@ -159,9 +163,6 @@ def update_plant(
     user_id: str = Depends(get_current_user_id),
 ):
     data = payload.model_dump(exclude_unset=True)
-    if not is_feature_enabled(user_id, FLAG_BALCONY):
-        data.pop("on_balcony", None)
-        data.pop("balcony_band", None)
     fields = []
     values = []
     for key, val in data.items():
@@ -213,7 +214,7 @@ def update_plant(
             "last_fertilized_at, last_repotted_at, last_manipulation_at, "
             "members, archived_at, expires_at, archive_reason, archive_note, "
             "merged_into_plant_id, gifted_to_uid, on_balcony, balcony_band, "
-            "quarantine_until, quarantine_reason, created_at "
+            "quarantine_until, quarantine_reason, room_id, created_at "
             "FROM plants WHERE id = %s",
             (plant_id,),
         ).fetchone()
@@ -272,6 +273,7 @@ def _row_to_plant(row) -> PlantOut:
         gifted_to_uid=row.get("gifted_to_uid"),
         on_balcony=row.get("on_balcony"),
         balcony_band=row.get("balcony_band"),
+        room_id=row.get("room_id"),
         quarantine_until=row.get("quarantine_until"),
         quarantine_reason=row.get("quarantine_reason"),
         created_at=row["created_at"],

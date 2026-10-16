@@ -9,6 +9,7 @@ class PlantFilterCriteria {
   final String? genus;
   final String? cultivar;
   final int? stage;
+  final String? roomId;
   final String? presetId;
   final String? presetName;
 
@@ -21,6 +22,7 @@ class PlantFilterCriteria {
     this.genus,
     this.cultivar,
     this.stage,
+    this.roomId,
     this.presetId,
     this.presetName,
   });
@@ -35,7 +37,8 @@ class PlantFilterCriteria {
       (plantFamily == null || plantFamily!.isEmpty) &&
       (genus == null || genus!.isEmpty) &&
       (cultivar == null || cultivar!.isEmpty) &&
-      stage == null;
+      stage == null &&
+      (roomId == null || roomId!.isEmpty);
 
   bool get isActive => !isEmpty;
 
@@ -49,6 +52,7 @@ class PlantFilterCriteria {
     if (genus != null && genus!.isNotEmpty) count++;
     if (cultivar != null && cultivar!.isNotEmpty) count++;
     if (stage != null) count++;
+    if (roomId != null && roomId!.isNotEmpty) count++;
     return count;
   }
 
@@ -80,6 +84,11 @@ class PlantFilterCriteria {
     if (stage != null && plant.stage != stage) {
       return false;
     }
+    if (roomId != null &&
+        roomId!.isNotEmpty &&
+        plant.effectiveRoomId != roomId) {
+      return false;
+    }
     return true;
   }
 
@@ -96,6 +105,8 @@ class PlantFilterCriteria {
     bool clearCultivar = false,
     int? stage,
     bool clearStage = false,
+    String? roomId,
+    bool clearRoomId = false,
     String? presetId,
     bool clearPresetId = false,
     String? presetName,
@@ -110,6 +121,7 @@ class PlantFilterCriteria {
       genus: clearGenus ? null : (genus ?? this.genus),
       cultivar: clearCultivar ? null : (cultivar ?? this.cultivar),
       stage: clearStage ? null : (stage ?? this.stage),
+      roomId: clearRoomId ? null : (roomId ?? this.roomId),
       presetId: clearPresetId ? null : (presetId ?? this.presetId),
       presetName: clearPresetName ? null : (presetName ?? this.presetName),
     );
@@ -125,6 +137,7 @@ class PlantFilterCriteria {
       'genus': genus,
       'cultivar': cultivar,
       'stage': stage,
+      'roomId': roomId,
       'presetId': presetId,
       'presetName': presetName,
     };
@@ -140,6 +153,7 @@ class PlantFilterCriteria {
       genus: map['genus'] as String?,
       cultivar: map['cultivar'] as String?,
       stage: map['stage'] as int?,
+      roomId: map['roomId'] as String?,
       presetId: map['presetId'] as String?,
       presetName: map['presetName'] as String?,
     );

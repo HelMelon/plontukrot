@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plontukrot/models/plant.dart';
 import 'package:plontukrot/models/plant_filter_criteria.dart';
+import 'package:plontukrot/models/room.dart';
 
 void main() {
   group('PlantFilterCriteria', () {
@@ -135,6 +136,47 @@ void main() {
       expect(restored.criteria.genus, 'Monstera');
       expect(restored.criteria.propagatingOnly, isTrue);
       expect(restored.createdAt, preset.createdAt);
+    });
+
+    test('room filter matches the balcony and a custom room', () {
+      final balcony = Plant(
+        id: 'b',
+        genus: 'Ficus',
+        species: 'elastica',
+        nickname: 'Balcony ficus',
+        stage: 2,
+        onBalcony: true,
+      );
+      final kitchen = Plant(
+        id: 'k',
+        genus: 'Ficus',
+        species: 'elastica',
+        nickname: 'Kitchen ficus',
+        stage: 2,
+        roomId: 'kitchen',
+      );
+
+      const balconyFilter = PlantFilterCriteria(roomId: Room.balconyId);
+      const kitchenFilter = PlantFilterCriteria(roomId: 'kitchen');
+
+      expect(
+        balconyFilter.matches(balcony, isPropagating: false, isRerooting: false),
+        isTrue,
+      );
+      expect(
+        balconyFilter.matches(kitchen, isPropagating: false, isRerooting: false),
+        isFalse,
+      );
+      expect(
+        kitchenFilter.matches(kitchen, isPropagating: false, isRerooting: false),
+        isTrue,
+      );
+      expect(balconyFilter.isActive, isTrue);
+      expect(balconyFilter.activeCount, 1);
+      expect(
+        PlantFilterCriteria.fromMap(balconyFilter.toMap()).roomId,
+        Room.balconyId,
+      );
     });
   });
 }

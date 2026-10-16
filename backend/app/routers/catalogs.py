@@ -158,6 +158,124 @@ def delete_component(component_id: str,
                      (component_id, user_id))
 
 
+# ---- Rooms ----
+# The balcony starts as a normal catalog row (id "balcony") so it can be
+# renamed or deleted like any other room. Plants still use that id for the
+# wintering sensor until the row is removed.
+
+def _ensure_balcony_room(conn, user_id: str) -> None:
+    gone = conn.execute(
+        "SELECT 1 FROM removed_system_rooms "
+        "WHERE user_id = %s AND room_id = %s",
+        (user_id, "balcony"),
+    ).fetchone()
+    if gone is not None:
+        return
+    exists = conn.execute(
+        "SELECT 1 FROM rooms WHERE user_id = %s AND id = %s",
+        (user_id, "balcony"),
+    ).fetchone()
+    if exists is not None:
+        return
+    conn.execute(
+        "INSERT INTO rooms (id, user_id, name) VALUES (%s, %s, %s) "
+        "ON CONFLICT (user_id, id) DO NOTHING",
+        ("balcony", user_id, "Балкон"),
+    )
+
+
+def restore_balcony_room(conn, user_id: str) -> None:
+    """Bring the balcony catalog row back after a plant is sent outside."""
+    conn.execute(
+        "DELETE FROM removed_system_rooms WHERE user_id = %s AND room_id = %s",
+        (user_id, "balcony"),
+    )
+    _ensure_balcony_room(conn, user_id)
+
+
+@router.get("/rooms", response_model=list[ComponentOut])
+def list_rooms(user_id: str = Depends(get_current_user_id)):
+    with get_pool().connection() as conn:
+        _ensure_balcony_room(conn, user_id)
+        rows = conn.execute(
+            "SELECT id, name, created_at FROM rooms "
+            "WHERE user_id = %s ORDER BY lower(name), created_at",
+            (user_id,),
+        ).fetchall()
+    return [ComponentOut(**r) for r in rows]
+
+
+@router.post("/rooms", response_model=ComponentOut, status_code=201)
+def create_room(payload: ComponentCreate,
+                user_id: str = Depends(get_current_user_id)):
+    name = payload.name.strip()
+    if not name:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Name is required")
+    room_id = _make_id()
+    with get_pool().connection() as conn:
+        conn.execute(
+            "INSERT INTO rooms (id, user_id, name) VALUES (%s, %s, %s)",
+            (room_id, user_id, name),
+        )
+        row = conn.execute(
+            "SELECT id, name, created_at FROM rooms "
+            "WHERE id = %s AND user_id = %s",
+            (room_id, user_id),
+        ).fetchone()
+    return ComponentOut(**row)
+
+
+@router.patch("/rooms/{room_id}", response_model=ComponentOut)
+def update_room(room_id: str, payload: ComponentCreate,
+                user_id: str = Depends(get_current_user_id)):
+    name = payload.name.strip()
+    if not name:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Name is required")
+    with get_pool().connection() as conn:
+        row = conn.execute(
+            "UPDATE rooms SET name = %s "
+            "WHERE id = %s AND user_id = %s "
+            "RETURNING id, name, created_at",
+            (name, room_id, user_id),
+        ).fetchone()
+        if row is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Room not found")
+    return ComponentOut(**row)
+
+
+@router.delete("/rooms/{room_id}", status_code=204)
+def delete_room(room_id: str, user_id: str = Depends(get_current_user_id)):
+    with get_pool().connection() as conn:
+        if room_id == "balcony":
+            conn.execute(
+                "UPDATE plants SET room_id = NULL, on_balcony = false "
+                "WHERE user_id = %s AND (room_id = %s OR on_balcony = true)",
+                (user_id, room_id),
+            )
+            conn.execute(
+                "INSERT INTO removed_system_rooms (user_id, room_id) "
+                "VALUES (%s, %s) ON CONFLICT DO NOTHING",
+                (user_id, room_id),
+            )
+        else:
+            conn.execute(
+                "UPDATE plants SET room_id = NULL "
+                "WHERE user_id = %s AND room_id = %s",
+                (user_id, room_id),
+            )
+        conn.execute(
+            "DELETE FROM room_sensors WHERE user_id = %s AND room_id = %s",
+            (user_id, room_id),
+        )
+        conn.execute(
+            "DELETE FROM rooms WHERE id = %s AND user_id = %s",
+            (room_id, user_id),
+        )
+
+
 # ---- Fertilizer ingredients ----
 @router.get("/fertilizer-components", response_model=list[ComponentOut])
 def list_fertilizer_components(user_id: str = Depends(get_current_user_id)):

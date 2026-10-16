@@ -9,8 +9,11 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../models/plant.dart';
 import '../../../../models/plant_filter_criteria.dart';
+import '../../../../models/room.dart';
 import '../../../../models/stage_info.dart';
 import '../../../../services/plant_filter_preset_service.dart';
+import '../../../../services/room_service.dart';
+import '../../../plants/widgets/sheets/manage_rooms_sheet.dart';
 
 Future<PlantFilterCriteria?> showPlantFilterSheet({
   required BuildContext context,
@@ -54,12 +57,38 @@ class PlantFilterSheet extends StatefulWidget {
 class _PlantFilterSheetState extends State<PlantFilterSheet> {
   late PlantFilterCriteria _criteria;
   List<PlantFilterPreset> _presets = const [];
+  List<Room> _rooms = const [];
 
   @override
   void initState() {
     super.initState();
     _criteria = widget.initial;
     _loadPresets();
+    _loadRooms();
+  }
+
+  Future<void> _loadRooms() async {
+    try {
+      final rooms = await RoomService().fetchRooms();
+      if (!mounted) return;
+      setState(() => _rooms = rooms);
+    } catch (_) {}
+  }
+
+  Future<void> _manageRooms() async {
+    await showManageRoomsSheet(context);
+    await _loadRooms();
+    if (!mounted) return;
+    final id = _criteria.roomId;
+    if (id != null && !_rooms.any((room) => room.id == id)) {
+      setState(() {
+        _criteria = _criteria.copyWith(
+          clearRoomId: true,
+          clearPresetId: true,
+          clearPresetName: true,
+        );
+      });
+    }
   }
 
   Future<void> _loadPresets() async {
@@ -205,6 +234,7 @@ class _PlantFilterSheetState extends State<PlantFilterSheet> {
     final labelStyle = chips.labelStyle.copyWith(
       color: selected ? chips.selectedForeground : chips.unselectedForeground,
       height: 1.15,
+      fontSize: context.screens.home.filterChipFontSize,
     );
 
     return Padding(
@@ -253,13 +283,12 @@ class _PlantFilterSheetState extends State<PlantFilterSheet> {
     );
   }
 
-  Widget _buildHorizontalChipRow(List<Widget> children) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: children,
-      ),
+  Widget _buildChipWrap(List<Widget> children) {
+    final spacing = context.spacing;
+    return Wrap(
+      spacing: spacing.xs,
+      runSpacing: spacing.xs,
+      children: children,
     );
   }
 
@@ -387,7 +416,7 @@ class _PlantFilterSheetState extends State<PlantFilterSheet> {
                                   : null,
                             ),
                             if (_presets.isNotEmpty) ...[
-                              _buildHorizontalChipRow([
+                              _buildChipWrap([
                                 for (final preset in _presets)
                                   _buildChip(
                                     label: preset.name,
@@ -509,10 +538,41 @@ class _PlantFilterSheetState extends State<PlantFilterSheet> {
                           ),
                           spacing.vSm,
 
+                          _buildSectionHeader(
+                            l10n.homeFilterRoom,
+                            trailing: IconButton(
+                              tooltip: l10n.a11yManageRooms,
+                              visualDensity: VisualDensity.compact,
+                              onPressed: _manageRooms,
+                              icon: Icon(
+                                icons.editOutlined,
+                                size: dimensions.iconSm,
+                              ),
+                            ),
+                          ),
+                          _buildChipWrap([
+                            for (final room in _rooms)
+                              _buildChip(
+                                label: room.name,
+                                selected: _criteria.roomId == room.id,
+                                onSelected: (selected) {
+                                  setState(() {
+                                    _criteria = _criteria.copyWith(
+                                      roomId: selected ? room.id : null,
+                                      clearRoomId: !selected,
+                                      clearPresetId: true,
+                                      clearPresetName: true,
+                                    );
+                                  });
+                                },
+                              ),
+                          ]),
+                          spacing.vSm,
+
                           // 3. Botany - Family
                           if (families.isNotEmpty) ...[
                             _buildSectionHeader(l10n.homeFilterFamily),
-                            _buildHorizontalChipRow([
+                            _buildChipWrap([
                               _buildChip(
                                 label: l10n.homeAllFamilies,
                                 selected: _criteria.plantFamily == null,
@@ -552,7 +612,7 @@ class _PlantFilterSheetState extends State<PlantFilterSheet> {
                           // 4. Botany - Genus
                           if (genera.isNotEmpty) ...[
                             _buildSectionHeader(l10n.homeFilterGenus),
-                            _buildHorizontalChipRow([
+                            _buildChipWrap([
                               _buildChip(
                                 label: l10n.homeFilterAllGenera,
                                 selected: _criteria.genus == null,
@@ -590,7 +650,7 @@ class _PlantFilterSheetState extends State<PlantFilterSheet> {
                           // 5. Botany - Cultivar
                           if (cultivars.isNotEmpty) ...[
                             _buildSectionHeader(l10n.homeFilterCultivar),
-                            _buildHorizontalChipRow([
+                            _buildChipWrap([
                               _buildChip(
                                 label: l10n.homeFilterAllCultivars,
                                 selected: _criteria.cultivar == null,
@@ -626,7 +686,7 @@ class _PlantFilterSheetState extends State<PlantFilterSheet> {
                           // 6. Botany - Stage
                           if (stages.isNotEmpty) ...[
                             _buildSectionHeader(l10n.homeFilterStage),
-                            _buildHorizontalChipRow([
+                            _buildChipWrap([
                               _buildChip(
                                 label: l10n.homeAllStages,
                                 selected: _criteria.stage == null,

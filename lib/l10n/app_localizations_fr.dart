@@ -629,6 +629,40 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeFilterStage => 'Stade';
 
   @override
+  String get homeFilterRoom => 'Pièce';
+
+  @override
+  String get roomsTitle => 'Pièces';
+
+  @override
+  String get roomBalcony => 'Balcon';
+
+  @override
+  String get roomNone => 'Non choisi';
+
+  @override
+  String get roomAddTitle => 'Nouvelle pièce';
+
+  @override
+  String get roomEditTitle => 'Nom de la pièce';
+
+  @override
+  String get roomDeleteTitle => 'Supprimer la pièce';
+
+  @override
+  String get roomNameHint => 'Par exemple : Salon';
+
+  @override
+  String get manageRoomsHint =>
+      'Vos pièces peuvent être ajoutées, renommées et supprimées.';
+
+  @override
+  String get a11yManageRooms => 'Gérer les pièces';
+
+  @override
+  String get a11yPlantRoom => 'Pièce';
+
+  @override
   String get homeFilterStatuses => 'Statuts';
 
   @override
@@ -764,13 +798,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeNotes => 'Notes';
 
   @override
-  String get homeUpdateFamily => 'Modifier la famille';
-
-  @override
-  String get homeUpdateFamilyTitle => 'Modifier la famille';
-
-  @override
-  String get homeFamilyLabel => 'Famille';
+  String get homeMoveToRoom => 'Dans une pièce';
 
   @override
   String get homeFertilizeSelectedTitle =>
