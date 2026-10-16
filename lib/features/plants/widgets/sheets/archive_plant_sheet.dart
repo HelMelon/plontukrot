@@ -37,6 +37,7 @@ class _ArchivePlantSheetState extends State<ArchivePlantSheet> {
   bool _saving = false;
   String? _deathNoteError;
   String? _amountError;
+  String? _saveError;
 
   @override
   void dispose() {
@@ -92,6 +93,7 @@ class _ArchivePlantSheetState extends State<ArchivePlantSheet> {
       _saving = true;
       _deathNoteError = null;
       _amountError = null;
+      _saveError = null;
     });
 
     try {
@@ -135,10 +137,10 @@ class _ArchivePlantSheetState extends State<ArchivePlantSheet> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _saving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.commonError(e.toString()))),
-        );
+        setState(() {
+          _saving = false;
+          _saveError = l10n.commonError(e.toString());
+        });
       }
     }
   }
@@ -321,23 +323,43 @@ class _ArchivePlantSheetState extends State<ArchivePlantSheet> {
                       sheets.contentPadding.right,
                       spacing.md,
                     ),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: dimensions.buttonHeight,
-                      child: ElevatedButton(
-                        onPressed: _saving ? null : _save,
-                        child: _saving
-                            ? SizedBox(
-                                width: dimensions.iconXl,
-                                height: dimensions.iconXl,
-                                child: AccessibleProgressIndicator(strokeWidth: 2, color: colors.onPrimary),
-                              )
-                            : Text(
-                                l10n.plantDisposeConfirm,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_saveError != null) ...[
+                          Text(
+                            _saveError!,
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.error,
+                            ),
+                            maxLines: 4,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          spacing.vSm,
+                        ],
+                        SizedBox(
+                          width: double.infinity,
+                          height: dimensions.buttonHeight,
+                          child: ElevatedButton(
+                            onPressed: _saving ? null : _save,
+                            child: _saving
+                                ? SizedBox(
+                                    width: dimensions.iconXl,
+                                    height: dimensions.iconXl,
+                                    child: AccessibleProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: colors.onPrimary,
+                                    ),
+                                  )
+                                : Text(
+                                    l10n.plantDisposeConfirm,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
