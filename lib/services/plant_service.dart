@@ -432,8 +432,9 @@ class PlantService {
         giftedToUid: giftedToUid,
       ),
     );
-    await _syncFertilizingNotificationsAfterRemoval();
-    await QuarantineNotificationService.instance.cancelForPlant(plantId);
+    // Reminders are a side effect. A plugin failure (exact alarms, timezone)
+    // must not report the archive itself as failed.
+    await _rescheduleNotifications(plantId);
   }
 
   Future<String> mergePlants({
