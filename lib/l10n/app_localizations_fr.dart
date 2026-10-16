@@ -777,6 +777,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Fertiliser les plantes sélectionnées';
 
   @override
+  String get homeFertilizingFrequencyMixed =>
+      'Les plantes sélectionnées ont des intervalles différents';
+
+  @override
   String get homeRepotSelectedTitle => 'Rempoter les plantes sélectionnées';
 
   @override

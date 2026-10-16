@@ -320,6 +320,7 @@
   "homeUpdateFamilyTitle": "Familie ändern",
   "homeFamilyLabel": "Familie",
   "homeFertilizeSelectedTitle": "Ausgewählte Pflanzen düngen",
+  "homeFertilizingFrequencyMixed": "Ausgewählte Pflanzen haben unterschiedliche Intervalle",
   "homeRepotSelectedTitle": "Ausgewählte Pflanzen umtopfen",
   "homeNotesSelectedTitle": "Notiz zu ausgewählten Pflanzen hinzufügen",
   "homeManipulations": "Manipulationen",

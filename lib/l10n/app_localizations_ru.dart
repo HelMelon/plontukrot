@@ -769,6 +769,8 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get homeFertilizeSelectedTitle => 'Подкормить выбранные растения';
+  String get homeFertilizingFrequencyMixed =>
+      'У выбранных растений разный интервал';
 
   @override
   String get homeRepotSelectedTitle => 'Пересадить выбранные растения';

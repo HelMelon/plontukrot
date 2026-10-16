@@ -774,6 +774,8 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get homeFertilizeSelectedTitle => 'Ausgewählte Pflanzen düngen';
+  String get homeFertilizingFrequencyMixed =>
+      'Ausgewählte Pflanzen haben unterschiedliche Intervalle';
 
   @override
   String get homeRepotSelectedTitle => 'Ausgewählte Pflanzen umtopfen';

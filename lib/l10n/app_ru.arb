@@ -320,6 +320,7 @@
   "homeUpdateFamilyTitle": "Изменить семейство",
   "homeFamilyLabel": "Семейство",
   "homeFertilizeSelectedTitle": "Подкормить выбранные растения",
+  "homeFertilizingFrequencyMixed": "У выбранных растений разный интервал",
   "homeRepotSelectedTitle": "Пересадить выбранные растения",
   "homeNotesSelectedTitle": "Заметка для выбранных растений",
   "homeManipulations": "Манипуляции",

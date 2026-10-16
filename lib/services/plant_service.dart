@@ -562,14 +562,29 @@ class PlantService {
     await _rescheduleNotifications(plantId);
   }
 
-  Future<void> updatePlantsPlantFamily({
-    required Iterable<String> plantIds,
-    required String plantFamily,
+  /// Sets the same manual interval on every plant, or restores the automatic
+  /// interval from each plant's own stage when [isCustom] is false.
+  /// Plants currently on the balcony are left at STOP.
+  Future<void> updatePlantsFertilizingFrequency({
+    required List<Plant> plants,
+    required bool isCustom,
+    int? frequencyDays,
   }) async {
-    final trimmed = plantFamily.trim();
-    final value = trimmed.isEmpty ? null : trimmed;
-    for (final plantId in plantIds) {
-      await _patchPlant(plantId, {'plant_family': value});
+    var changed = false;
+    for (final plant in plants) {
+      if (plant.isOnBalconyLocation) continue;
+      final resolved = _resolveFertilizingFrequency(
+        stage: plant.stage,
+        isCustom: isCustom,
+        requestedFrequencyDays: frequencyDays,
+      );
+      await _patchPlant(plant.id, {
+        'fertilizing_frequency_days': resolved,
+      });
+      changed = true;
+    }
+    if (changed) {
+      await _rescheduleNotifications(plants.first.id);
     }
   }
 

@@ -1506,6 +1506,12 @@ abstract class AppLocalizations {
   /// **'Fertilize selected plants'**
   String get homeFertilizeSelectedTitle;
 
+  /// No description provided for @homeFertilizingFrequencyMixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected plants use different intervals'**
+  String get homeFertilizingFrequencyMixed;
+
   /// No description provided for @homeRepotSelectedTitle.
   ///
   /// In en, this message translates to:

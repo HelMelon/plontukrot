@@ -768,6 +768,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeFertilizeSelectedTitle => 'Fertilize selected plants';
+  String get homeFertilizingFrequencyMixed =>
+      'Selected plants use different intervals';
 
   @override
   String get homeRepotSelectedTitle => 'Repot selected plants';

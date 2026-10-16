@@ -19,6 +19,7 @@ import '../../../models/stage_info.dart';
 import '../widgets/sheets/plant_filter_sheet.dart';
 import '../widgets/balcony_alert_banner.dart';
 import '../../plants/widgets/sheets/add_plant_sheet.dart';
+import '../../plants/widgets/sheets/bulk_fertilizing_frequency_sheet.dart';
 import '../../plants/widgets/sheets/add_fertilizing_sheet.dart';
 import '../../plants/widgets/sheets/add_manipulation_sheet.dart';
 import '../../plants/widgets/sheets/add_note_sheet.dart';
@@ -602,6 +603,20 @@ class _HomePageState extends State<HomePage> {
     if (applied == true && mounted) _exitSelectionMode();
   }
 
+  Future<void> _showFertilizingFrequencySheet() async {
+    final selectedPlants = _latestPlants
+        .where((plant) => _selectedPlantIds.contains(plant.id))
+        .toList();
+    if (selectedPlants.isEmpty) return;
+    final applied = await showAppModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => BulkFertilizingFrequencySheet(plants: selectedPlants),
+    );
+    if (applied == true && mounted) _exitSelectionMode();
+  }
+
   Future<void> _showRepottingSheet() async {
     final l10n = AppLocalizations.of(context);
     final selectedPlants = _latestPlants
@@ -734,6 +749,11 @@ class _HomePageState extends State<HomePage> {
         tooltip: l10n.homeFertilizing,
         onPressed: _showFertilizingSheet,
         icon: Icon(_icons.fertilizing),
+      ),
+      IconButton(
+        tooltip: l10n.plantFertilizingFrequency,
+        onPressed: _showFertilizingFrequencySheet,
+        icon: Icon(_icons.fertilizingEco),
       ),
       IconButton(
         tooltip: l10n.homeRepotting,
