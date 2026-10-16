@@ -935,6 +935,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get a11yPlantQuarantine => 'Plante en quarantaine';
 
   @override
+  String get a11yPlantReanimation => 'Plante en réanimation';
+
+  @override
   String get plantWateringFrequency => 'Fréquence d\'arrosage';
 
   @override

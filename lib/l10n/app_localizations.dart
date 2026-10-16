@@ -1782,6 +1782,12 @@ abstract class AppLocalizations {
   /// **'Plant is in quarantine'**
   String get a11yPlantQuarantine;
 
+  /// No description provided for @a11yPlantReanimation.
+  ///
+  /// In en, this message translates to:
+  /// **'Plant is in reanimation'**
+  String get a11yPlantReanimation;
+
   /// No description provided for @plantWateringFrequency.
   ///
   /// In en, this message translates to:

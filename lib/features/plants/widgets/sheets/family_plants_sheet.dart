@@ -7,6 +7,7 @@ import 'package:plontukrot/core/widgets/app_modal.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 import '../../../../models/plant.dart';
+import '../../../../services/manipulation_service.dart';
 import '../../../../services/plant_service.dart';
 import '../cards/plant_card.dart';
 
@@ -50,11 +51,13 @@ class FamilyPlantsSheet extends StatefulWidget {
 
 class _FamilyPlantsSheetState extends State<FamilyPlantsSheet> {
   late final Stream<List<Plant>> _plantsStream;
+  late final Stream<Set<String>> _rerootingIds;
 
   @override
   void initState() {
     super.initState();
     _plantsStream = widget.plantsStream ?? PlantService().getPlants();
+    _rerootingIds = ManipulationService().watchActiveRerootingPlantIds();
   }
 
   int _crossAxisCount(double width) {
@@ -133,7 +136,12 @@ class _FamilyPlantsSheetState extends State<FamilyPlantsSheet> {
                     );
                   }
 
-                  return LayoutBuilder(
+                  return StreamBuilder<Set<String>>(
+                    stream: _rerootingIds,
+                    builder: (context, rerootingSnapshot) {
+                      final rerootingIds =
+                          rerootingSnapshot.data ?? const <String>{};
+                      return LayoutBuilder(
                     builder: (context, constraints) {
                       final crossAxisCount =
                           _crossAxisCount(constraints.maxWidth);
@@ -166,9 +174,15 @@ class _FamilyPlantsSheetState extends State<FamilyPlantsSheet> {
                         ),
                         itemCount: plants.length,
                         itemBuilder: (context, index) {
-                          return PlantCard(plant: plants[index]);
+                          return PlantCard(
+                            plant: plants[index],
+                            inReanimation:
+                                rerootingIds.contains(plants[index].id),
+                          );
                         },
                       );
+                    },
+                  );
                     },
                   );
                 },

@@ -29,6 +29,7 @@ class PlantCard extends StatelessWidget {
   final bool preferSpeciesAsTitle;
   final int propagationBatchCount;
   final double? moisture;
+  final bool inReanimation;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
@@ -39,6 +40,7 @@ class PlantCard extends StatelessWidget {
     this.preferSpeciesAsTitle = false,
     this.propagationBatchCount = 0,
     this.moisture,
+    this.inReanimation = false,
     this.onTap,
     this.onLongPress,
   });
@@ -445,19 +447,44 @@ class PlantCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (fertilizingOverdue)
+              if (fertilizingOverdue || inReanimation)
                 Positioned(
                   top: isSelected ? null : spacing.xs,
                   bottom: isSelected ? spacing.xs : null,
                   right: spacing.xs,
-                  child: ExcludeSemantics(
-                    child: _FertilizingOverdueBadge(
-                      tooltip: fertilizingDueAt != null
-                          ? l10n.a11yFertilizingDue(
-                              _dateLabel(fertilizingDueAt, emptyDate),
-                            )
-                          : l10n.a11yFertilizingOverdue,
-                    ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (inReanimation)
+                        Tooltip(
+                          message: l10n.a11yPlantReanimation,
+                          child: Container(
+                            padding: EdgeInsets.all(spacing.xxs),
+                            decoration: BoxDecoration(
+                              color: colors.error,
+                              shape: BoxShape.circle,
+                              boxShadow: context.shadows.card,
+                            ),
+                            child: Icon(
+                              context.icons.bandage,
+                              size: dimensions.iconMd,
+                              color: colors.onPrimary,
+                            ),
+                          ),
+                        ),
+                      if (inReanimation && fertilizingOverdue)
+                        SizedBox(height: spacing.xxs),
+                      if (fertilizingOverdue)
+                        ExcludeSemantics(
+                          child: _FertilizingOverdueBadge(
+                            tooltip: fertilizingDueAt != null
+                                ? l10n.a11yFertilizingDue(
+                                    _dateLabel(fertilizingDueAt, emptyDate),
+                                  )
+                                : l10n.a11yFertilizingOverdue,
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               if (isSelected)

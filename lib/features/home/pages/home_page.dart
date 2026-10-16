@@ -360,6 +360,7 @@ class _HomePageState extends State<HomePage> {
     required String Function(String key) titleForKey,
     required Map<String, int> batchCounts,
     required Map<String, PlantSensorBinding> bindings,
+    required Set<String> rerootingIds,
   }) {
     final colors = _colors;
     final spacing = _spacing;
@@ -419,6 +420,7 @@ class _HomePageState extends State<HomePage> {
                   crossAxisCount,
                   batchCounts: batchCounts,
                   bindings: bindings,
+                  rerootingIds: rerootingIds,
                 ),
             ],
           ),
@@ -432,6 +434,7 @@ class _HomePageState extends State<HomePage> {
     int crossAxisCount, {
     required Map<String, int> batchCounts,
     required Map<String, PlantSensorBinding> bindings,
+    required Set<String> rerootingIds,
   }) {
     final preferSpeciesAsTitle = _sortField == _PlantSortField.species ||
         _sortField == _PlantSortField.plantFamily;
@@ -466,6 +469,7 @@ class _HomePageState extends State<HomePage> {
           preferSpeciesAsTitle: preferSpeciesAsTitle,
           propagationBatchCount: batchCounts[plant.id] ?? 0,
           moisture: bindings[plant.id]?.moisture,
+          inReanimation: rerootingIds.contains(plant.id),
           onTap:
               _isSelectionMode ? () => _togglePlantSelection(plant.id) : null,
           onLongPress: FeatureFlagsController.instance
@@ -1488,6 +1492,7 @@ class _HomePageState extends State<HomePage> {
                                         titleForKey: (key) => key,
                                         batchCounts: batchCounts,
                                         bindings: bindings,
+                                        rerootingIds: rerootingIds,
                                       );
                                     },
                                   )
@@ -1504,6 +1509,7 @@ class _HomePageState extends State<HomePage> {
                                         titleForKey: groupTitle,
                                         batchCounts: batchCounts,
                                         bindings: bindings,
+                                        rerootingIds: rerootingIds,
                                       );
                                     },
                                   )
@@ -1524,6 +1530,7 @@ class _HomePageState extends State<HomePage> {
                                         titleForKey: (key) => key,
                                         batchCounts: batchCounts,
                                         bindings: bindings,
+                                        rerootingIds: rerootingIds,
                                       );
                                     },
                                   )
@@ -1545,6 +1552,7 @@ class _HomePageState extends State<HomePage> {
                                         titleForKey: (key) => key,
                                         batchCounts: batchCounts,
                                         bindings: bindings,
+                                        rerootingIds: rerootingIds,
                                       );
                                     },
                                   )
@@ -1559,6 +1567,7 @@ class _HomePageState extends State<HomePage> {
                                         crossAxisCount,
                                         batchCounts: batchCounts,
                                         bindings: bindings,
+                                        rerootingIds: rerootingIds,
                                       );
                                     },
                                   ),

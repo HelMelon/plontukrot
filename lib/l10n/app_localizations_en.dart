@@ -926,6 +926,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get a11yPlantQuarantine => 'Plant is in quarantine';
 
   @override
+  String get a11yPlantReanimation => 'Plant is in reanimation';
+
+  @override
   String get plantWateringFrequency => 'Watering frequency';
 
   @override

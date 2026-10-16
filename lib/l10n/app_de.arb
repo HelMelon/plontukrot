@@ -378,6 +378,7 @@
     }
   },
   "a11yPlantQuarantine": "Pflanze ist in Quarantäne",
+  "a11yPlantReanimation": "Pflanze wird reanimiert",
   "plantWateringFrequency": "Gießhäufigkeit",
   "plantGrowthStage": "Wachstumsstadium",
   "plantGenusRequired": "Gattung der Pflanze eingeben",

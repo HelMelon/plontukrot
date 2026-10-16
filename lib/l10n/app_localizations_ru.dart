@@ -929,6 +929,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get a11yPlantQuarantine => 'Растение на карантине';
 
   @override
+  String get a11yPlantReanimation => 'Растение на реанимации';
+
+  @override
   String get plantWateringFrequency => 'Частота полива';
 
   @override

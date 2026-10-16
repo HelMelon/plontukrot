@@ -378,6 +378,7 @@
     }
   },
   "a11yPlantQuarantine": "Растение на карантине",
+  "a11yPlantReanimation": "Растение на реанимации",
   "plantWateringFrequency": "Частота полива",
   "plantGrowthStage": "Стадия роста",
   "plantGenusRequired": "Укажите род растения",

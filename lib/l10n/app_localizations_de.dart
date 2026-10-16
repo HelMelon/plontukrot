@@ -933,6 +933,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get a11yPlantQuarantine => 'Pflanze ist in Quarantäne';
 
   @override
+  String get a11yPlantReanimation => 'Pflanze wird reanimiert';
+
+  @override
   String get plantWateringFrequency => 'Gießhäufigkeit';
 
   @override

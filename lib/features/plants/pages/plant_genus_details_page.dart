@@ -7,6 +7,7 @@ import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
 import 'package:plontukrot/core/widgets/app_bar_chrome_actions.dart';
 
 import '../../../models/plant.dart';
+import '../../../services/manipulation_service.dart';
 import '../../../services/plant_service.dart';
 import '../widgets/cards/genus_care_guide_card.dart';
 import '../widgets/cards/plant_card.dart';
@@ -27,11 +28,13 @@ class PlantGenusDetailsPage extends StatefulWidget {
 
 class _PlantGenusDetailsPageState extends State<PlantGenusDetailsPage> {
   late final Stream<List<Plant>> _plantsStream;
+  late final Stream<Set<String>> _rerootingIds;
 
   @override
   void initState() {
     super.initState();
     _plantsStream = widget.plantsStream ?? PlantService().getPlants();
+    _rerootingIds = ManipulationService().watchActiveRerootingPlantIds();
   }
 
   int _crossAxisCount(double width) {
@@ -91,7 +94,12 @@ class _PlantGenusDetailsPageState extends State<PlantGenusDetailsPage> {
                 compactGrid: isMobile,
               );
 
-              return CustomScrollView(
+              return StreamBuilder<Set<String>>(
+                stream: _rerootingIds,
+                builder: (context, rerootingSnapshot) {
+                  final rerootingIds =
+                      rerootingSnapshot.data ?? const <String>{};
+                  return CustomScrollView(
                 slivers: [
                   if (genus.isNotEmpty &&
                       FeatureFlagsController.instance
@@ -138,13 +146,19 @@ class _PlantGenusDetailsPageState extends State<PlantGenusDetailsPage> {
                         ),
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
-                            return PlantCard(plant: plants[index]);
+                            return PlantCard(
+                              plant: plants[index],
+                              inReanimation:
+                                  rerootingIds.contains(plants[index].id),
+                            );
                           },
                           childCount: plants.length,
                         ),
                       ),
                     ),
                 ],
+                  );
+                },
               );
             },
           );

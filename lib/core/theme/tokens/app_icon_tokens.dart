@@ -104,6 +104,7 @@ class AppIconTokens {
     required this.rerooting,
     required this.stimulator,
     required this.quarantine,
+    required this.bandage,
     required this.balcony,
     required this.room,
     required this.sensor,
@@ -225,6 +226,7 @@ class AppIconTokens {
     rerooting: HugeIcons.strokeRoundedBioEnergy,
     stimulator: HugeIcons.strokeRoundedAiChemistry03,
     quarantine: Icons.health_and_safety_outlined,
+    bandage: Icons.healing,
     balcony: Icons.landscape,
     room: Icons.meeting_room_outlined,
     sensor: Icons.sensors,
@@ -345,6 +347,7 @@ class AppIconTokens {
   final List<List<dynamic>> rerooting;
   final List<List<dynamic>> stimulator;
   final IconData quarantine;
+  final IconData bandage;
   final IconData balcony;
   final IconData room;
   final IconData sensor;
@@ -456,6 +459,7 @@ class AppIconTokens {
     List<List<dynamic>>? rerooting,
     List<List<dynamic>>? stimulator,
     IconData? quarantine,
+    IconData? bandage,
     IconData? balcony,
     IconData? room,
     IconData? sensor,
@@ -565,6 +569,7 @@ class AppIconTokens {
       rerooting: rerooting ?? this.rerooting,
       stimulator: stimulator ?? this.stimulator,
       quarantine: quarantine ?? this.quarantine,
+      bandage: bandage ?? this.bandage,
       balcony: balcony ?? this.balcony,
       room: room ?? this.room,
       sensor: sensor ?? this.sensor,
