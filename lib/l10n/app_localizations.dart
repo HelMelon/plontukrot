@@ -1284,6 +1284,54 @@ abstract class AppLocalizations {
   /// **'Your rooms can be added, renamed, and deleted.'**
   String get manageRoomsHint;
 
+  /// No description provided for @roomSensorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensor'**
+  String get roomSensorTitle;
+
+  /// No description provided for @roomSensorIdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensor id'**
+  String get roomSensorIdLabel;
+
+  /// No description provided for @roomSensorIdHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Yandex device UUID. Clear the field to remove the sensor'**
+  String get roomSensorIdHint;
+
+  /// No description provided for @a11yRoomSensor.
+  ///
+  /// In en, this message translates to:
+  /// **'Room sensor'**
+  String get a11yRoomSensor;
+
+  /// No description provided for @roomSensorTemperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get roomSensorTemperature;
+
+  /// No description provided for @roomSensorHumidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity'**
+  String get roomSensorHumidity;
+
+  /// No description provided for @roomSensorNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No data'**
+  String get roomSensorNoData;
+
+  /// No description provided for @roomSensorUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensor is not responding'**
+  String get roomSensorUnavailable;
+
   /// No description provided for @a11yManageRooms.
   ///
   /// In en, this message translates to:

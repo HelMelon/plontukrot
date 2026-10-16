@@ -15,7 +15,6 @@ enum FeatureFlag {
   genusCare('genus_care', defaultEnabled: true),
   soilSensors('soil_sensors', defaultEnabled: false),
   telegramAlerts('telegram_alerts', defaultEnabled: false),
-  balcony('balcony', defaultEnabled: false),
   fertilizingReminders('fertilizing_reminders', defaultEnabled: true),
   bulkActions('bulk_actions', defaultEnabled: true),
   experiments('experiments', defaultEnabled: false),
@@ -47,6 +46,11 @@ class FeatureFlagsController extends ChangeNotifier {
     return flag.defaultEnabled;
   }
 
+  /// Sensor flag for one room. Off until the server reports the key.
+  bool isRoomSensorEnabled(String roomId) {
+    return _flags['room_sensor_$roomId'] ?? false;
+  }
+
   void _applyMap(Map<dynamic, dynamic> raw) {
     _flags
       ..clear()
@@ -57,6 +61,14 @@ class FeatureFlagsController extends ChangeNotifier {
           return MapEntry(flag.key, enabled);
         }),
       );
+    for (final entry in raw.entries) {
+      final key = entry.key;
+      if (key is String &&
+          key.startsWith('room_sensor_') &&
+          entry.value is bool) {
+        _flags[key] = entry.value as bool;
+      }
+    }
     _loaded = true;
   }
 

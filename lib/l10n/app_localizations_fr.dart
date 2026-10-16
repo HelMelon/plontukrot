@@ -657,6 +657,31 @@ class AppLocalizationsFr extends AppLocalizations {
       'Vos pièces peuvent être ajoutées, renommées et supprimées.';
 
   @override
+  String get roomSensorTitle => 'Capteur';
+
+  @override
+  String get roomSensorIdLabel => 'Identifiant du capteur';
+
+  @override
+  String get roomSensorIdHint =>
+      'UUID de l\'appareil Yandex. Videz le champ pour retirer le capteur';
+
+  @override
+  String get a11yRoomSensor => 'Capteur de la pièce';
+
+  @override
+  String get roomSensorTemperature => 'Température';
+
+  @override
+  String get roomSensorHumidity => 'Humidité';
+
+  @override
+  String get roomSensorNoData => 'Aucune donnée';
+
+  @override
+  String get roomSensorUnavailable => 'Le capteur ne répond pas';
+
+  @override
   String get a11yManageRooms => 'Gérer les pièces';
 
   @override

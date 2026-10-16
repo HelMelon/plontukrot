@@ -1125,9 +1125,7 @@ class _HomePageState extends State<HomePage> {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (FeatureFlagsController.instance
-                                    .isEnabled(FeatureFlag.balcony))
-                                  const BalconyAlertBanner(),
+                                const BalconyAlertBanner(),
                                 if (!_isSelectionMode) ...[
                                   Row(
                                     children: [

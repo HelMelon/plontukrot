@@ -418,6 +418,15 @@ class ComponentCreate(BaseModel):
     name: str
 
 
+class RoomSensorUpsert(BaseModel):
+    device_id: str
+
+
+class RoomSensorOut(BaseModel):
+    room_id: str
+    device_id: str
+
+
 class ComponentOut(BaseModel):
     id: str
     name: str

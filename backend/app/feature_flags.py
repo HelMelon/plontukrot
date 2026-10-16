@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from typing import Callable
 
 from fastapi import Depends, HTTPException, status
@@ -25,7 +26,6 @@ FLAG_ARCHIVE = "archive"
 FLAG_GENUS_CARE = "genus_care"
 FLAG_SOIL_SENSORS = "soil_sensors"
 FLAG_TELEGRAM_ALERTS = "telegram_alerts"
-FLAG_BALCONY = "balcony"
 FLAG_FERTILIZING_REMINDERS = "fertilizing_reminders"
 FLAG_BULK_ACTIONS = "bulk_actions"
 FLAG_EXPERIMENTS = "experiments"
@@ -40,7 +40,6 @@ ALL_FLAGS: tuple[str, ...] = (
     FLAG_GENUS_CARE,
     FLAG_SOIL_SENSORS,
     FLAG_TELEGRAM_ALERTS,
-    FLAG_BALCONY,
     FLAG_FERTILIZING_REMINDERS,
     FLAG_BULK_ACTIONS,
     FLAG_EXPERIMENTS,
@@ -57,7 +56,6 @@ _DEFAULTS: dict[str, bool] = {
     FLAG_GENUS_CARE: True,
     FLAG_SOIL_SENSORS: False,
     FLAG_TELEGRAM_ALERTS: False,
-    FLAG_BALCONY: False,
     FLAG_FERTILIZING_REMINDERS: True,
     FLAG_BULK_ACTIONS: True,
     FLAG_EXPERIMENTS: False,
@@ -65,8 +63,104 @@ _DEFAULTS: dict[str, bool] = {
 }
 
 _IOT_FLAGS: frozenset[str] = frozenset(
-    {FLAG_SOIL_SENSORS, FLAG_TELEGRAM_ALERTS, FLAG_BALCONY}
+    {FLAG_SOIL_SENSORS, FLAG_TELEGRAM_ALERTS}
 )
+
+# One flag per room that has a Yandex device id. Not part of ALL_FLAGS:
+# the key and the Russian label exist only while that sensor is stored.
+ROOM_SENSOR_FLAG_PREFIX = "room_sensor_"
+_ROOM_SENSOR_KEY = re.compile(r"^room_sensor_(balcony|[0-9a-fA-F]{8,64})$")
+BALCONY_ROOM_ID = "balcony"
+BALCONY_ROOM_LABEL = "Балкон"
+
+
+def is_room_sensor_flag(key: str) -> bool:
+    return _ROOM_SENSOR_KEY.fullmatch(key) is not None
+
+
+def room_sensor_flag_key(room_id: str) -> str:
+    return f"{ROOM_SENSOR_FLAG_PREFIX}{room_id}"
+
+
+def room_sensor_flag_label(room_name: str) -> str:
+    return f"Помещение с датчиком: {room_name}"
+
+
+def _keep_flag(key: str) -> bool:
+    return key in ALL_FLAGS or is_room_sensor_flag(key)
+
+
+def list_room_sensor_flags(user_id: str) -> list[dict]:
+    """Flags for rooms that currently have a sensor device id."""
+    try:
+        with get_pool().connection() as conn:
+            rows = conn.execute(
+                "SELECT s.room_id, s.device_id, r.name "
+                "FROM room_sensors s "
+                "LEFT JOIN rooms r "
+                "ON r.id = s.room_id AND r.user_id = s.user_id "
+                "WHERE s.user_id = %s "
+                "ORDER BY s.created_at",
+                (user_id,),
+            ).fetchall()
+    except Exception:
+        return []
+    out: list[dict] = []
+    for row in rows:
+        room_id = row["room_id"]
+        name = (row.get("name") or "").strip()
+        if room_id == BALCONY_ROOM_ID and not name:
+            name = BALCONY_ROOM_LABEL
+        if not name:
+            continue
+        key = room_sensor_flag_key(room_id)
+        if not is_room_sensor_flag(key):
+            continue
+        out.append({
+            "key": key,
+            "label": room_sensor_flag_label(name),
+            "room_name": name,
+            "group": "room",
+            "default": True,
+            "room_id": room_id,
+            "device_id": row["device_id"],
+        })
+    if not any(item["room_id"] == BALCONY_ROOM_ID for item in out):
+        balcony_name = _balcony_catalog_name(user_id)
+        if balcony_name:
+            out.insert(0, {
+                "key": room_sensor_flag_key(BALCONY_ROOM_ID),
+                "label": room_sensor_flag_label(balcony_name),
+                "room_name": balcony_name,
+                "group": "room",
+                "default": True,
+                "room_id": BALCONY_ROOM_ID,
+                "device_id": None,
+            })
+    return out
+
+
+def _balcony_catalog_name(user_id: str) -> str | None:
+    """Current balcony room name, or None once the user has deleted it."""
+    try:
+        with get_pool().connection() as conn:
+            gone = conn.execute(
+                "SELECT 1 FROM removed_system_rooms "
+                "WHERE user_id = %s AND room_id = %s",
+                (user_id, BALCONY_ROOM_ID),
+            ).fetchone()
+            if gone is not None:
+                return None
+            row = conn.execute(
+                "SELECT name FROM rooms WHERE user_id = %s AND id = %s",
+                (user_id, BALCONY_ROOM_ID),
+            ).fetchone()
+    except Exception:
+        return BALCONY_ROOM_LABEL
+    if row is None:
+        return BALCONY_ROOM_LABEL
+    name = (row.get("name") or "").strip()
+    return name or BALCONY_ROOM_LABEL
 
 
 def _parse_bool_map(raw: str | None) -> dict[str, bool]:
@@ -80,7 +174,7 @@ def _parse_bool_map(raw: str | None) -> dict[str, bool]:
         return {}
     out: dict[str, bool] = {}
     for key, value in data.items():
-        if key in ALL_FLAGS:
+        if _keep_flag(key):
             out[key] = bool(value)
     return out
 
@@ -101,7 +195,7 @@ def _parse_user_overrides(raw: str | None) -> dict[str, dict[str, bool]]:
         parsed = {
             key: bool(value)
             for key, value in flags.items()
-            if key in ALL_FLAGS
+            if _keep_flag(key)
         }
         if parsed:
             out[user_id] = parsed
@@ -113,7 +207,7 @@ def _normalize_flag_map(data: object) -> dict[str, bool]:
         return {}
     out: dict[str, bool] = {}
     for key, value in data.items():
-        if key in ALL_FLAGS:
+        if _keep_flag(key):
             out[key] = bool(value)
     return out
 
@@ -182,6 +276,9 @@ def resolve_feature_flags(user_id: str) -> dict[str, bool]:
     db_overrides = get_db_overrides(user_id)
 
     result = dict(_DEFAULTS)
+    room_sensor_keys = [row["key"] for row in list_room_sensor_flags(user_id)]
+    for key in room_sensor_keys:
+        result[key] = True
     result.update(global_env)
 
     explicit = set(global_env) | set(user_env) | set(db_overrides)
@@ -192,13 +289,14 @@ def resolve_feature_flags(user_id: str) -> dict[str, bool]:
 
     result.update(user_env)
     result.update(db_overrides)
-    return {key: bool(result[key]) for key in ALL_FLAGS}
+    ordered = list(ALL_FLAGS) + room_sensor_keys
+    return {key: bool(result[key]) for key in ordered if key in result}
 
 
 def is_feature_enabled(user_id: str | None, flag: str) -> bool:
-    if user_id is None or flag not in ALL_FLAGS:
+    if user_id is None or not _keep_flag(flag):
         return False
-    return resolve_feature_flags(user_id)[flag]
+    return resolve_feature_flags(user_id).get(flag, False)
 
 
 def require_feature(flag: str) -> Callable:
@@ -219,7 +317,6 @@ def require_feature(flag: str) -> Callable:
 __all__ = [
     "ALL_FLAGS",
     "FLAG_ARCHIVE",
-    "FLAG_BALCONY",
     "FLAG_BULK_ACTIONS",
     "FLAG_EXPERIMENTS",
     "FLAG_AI_BOTANICAL_PREFILL",

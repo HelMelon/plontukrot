@@ -651,6 +651,31 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your rooms can be added, renamed, and deleted.';
 
   @override
+  String get roomSensorTitle => 'Sensor';
+
+  @override
+  String get roomSensorIdLabel => 'Sensor id';
+
+  @override
+  String get roomSensorIdHint =>
+      'Yandex device UUID. Clear the field to remove the sensor';
+
+  @override
+  String get a11yRoomSensor => 'Room sensor';
+
+  @override
+  String get roomSensorTemperature => 'Temperature';
+
+  @override
+  String get roomSensorHumidity => 'Humidity';
+
+  @override
+  String get roomSensorNoData => 'No data';
+
+  @override
+  String get roomSensorUnavailable => 'Sensor is not responding';
+
+  @override
   String get a11yManageRooms => 'Manage rooms';
 
   @override

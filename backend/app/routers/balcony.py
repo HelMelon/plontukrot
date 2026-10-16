@@ -20,16 +20,15 @@ import urllib.request
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends
-from fastapi.responses import JSONResponse
 
 from ..config import settings
 from ..db import get_pool
 from ..feature_flags import (
-    FLAG_BALCONY,
     OWNER_IOT_USER_ID,
     is_feature_enabled,
-    require_feature,
+    room_sensor_flag_key,
 )
+from ..routers.auth import get_current_user_id
 from ..routers.telegram import send_telegram_alert
 
 log = logging.getLogger(__name__)
@@ -57,14 +56,29 @@ def _in_season(now: datetime | None = None) -> bool:
     return m >= SEASON_START_MONTH or m <= SEASON_END_MONTH
 
 
-def _read_balcony_temp() -> float | None:
-    """Fetch the current balcony temperature from the Yandex IOT API.
+def device_id_matches(stored: str, actual: str) -> bool:
+    """True when both ids are the same Yandex device.
 
-    Returns None if the token is missing or the sensor can't be read.
+    A stored UUID matches a device id that also carries a ``:suffix``.
+    """
+    stored = (stored or "").strip()
+    actual = (actual or "").strip()
+    if not stored or not actual:
+        return False
+    if stored == actual:
+        return True
+    return stored.split(":", 1)[0] == actual.split(":", 1)[0]
+
+
+def read_device_properties(device_id: str) -> list[dict] | None:
+    """Climate properties of one Yandex device.
+
+    None when the token is missing or the request fails. An empty list
+    means the device was not found.
     """
     token = settings.yandex_iot_token
     if not token:
-        log.warning("YANDEX_IOT_TOKEN not set; cannot read balcony temp")
+        log.warning("YANDEX_IOT_TOKEN not set; cannot read room sensor")
         return None
     url = "https://api.iot.yandex.net/v1.0/user/info"
     req = urllib.request.Request(
@@ -76,25 +90,97 @@ def _read_balcony_temp() -> float | None:
     except Exception as exc:
         log.warning("Failed to read Yandex IOT: %s", exc)
         return None
+    device = None
     for dev in data.get("devices", []):
-        if dev.get("id") != settings.balcony_sensor_id:
+        if device_id_matches(device_id, str(dev.get("id") or "")):
+            device = dev
+            break
+    if device is None:
+        return []
+    properties = []
+    for prop in device.get("properties") or []:
+        params = prop.get("parameters") or {}
+        state = prop.get("state") or {}
+        instance = params.get("instance") or state.get("instance")
+        value = state.get("value")
+        if not instance or value is None:
             continue
-        for prop in dev.get("properties", []):
-            if prop.get("parameters", {}).get("instance") == "temperature":
-                state = prop.get("state") or {}
-                return state.get("value")
+        properties.append({
+            "instance": instance,
+            "value": value,
+            "unit": params.get("unit"),
+        })
+    return properties
+
+
+def read_device_temperature(device_id: str) -> float | None:
+    properties = read_device_properties(device_id)
+    if not properties:
+        return None
+    for prop in properties:
+        if prop.get("instance") == "temperature" and isinstance(
+            prop.get("value"), (int, float)
+        ):
+            return float(prop["value"])
     return None
 
 
-def _plants_on_balcony():
-    """Return (id, nickname, species, band) for the owner's balcony plants."""
+def _sensor_targets(user_id: str) -> list[dict]:
+    """Rooms that have a device id, plus the env balcony sensor as a fallback."""
+    try:
+        with get_pool().connection() as conn:
+            rows = conn.execute(
+                "SELECT s.room_id, s.device_id, COALESCE(r.name, '') AS name "
+                "FROM room_sensors s "
+                "LEFT JOIN rooms r "
+                "ON r.user_id = s.user_id AND r.id = s.room_id "
+                "WHERE s.user_id = %s",
+                (user_id,),
+            ).fetchall()
+    except Exception as exc:
+        log.warning("Failed to list room sensors: %s", exc)
+        rows = []
+    targets = []
+    for row in rows:
+        device_id = (row["device_id"] or "").strip()
+        if not device_id:
+            continue
+        if not is_feature_enabled(user_id, room_sensor_flag_key(row["room_id"])):
+            continue
+        name = (row["name"] or "").strip() or row["room_id"]
+        targets.append({
+            "room_id": row["room_id"],
+            "device_id": device_id,
+            "name": name,
+        })
+    if (
+        settings.balcony_sensor_id
+        and not any(item["room_id"] == "balcony" for item in targets)
+        and is_feature_enabled(user_id, room_sensor_flag_key("balcony"))
+    ):
+        targets.append({
+            "room_id": "balcony",
+            "device_id": settings.balcony_sensor_id,
+            "name": "Балкон",
+        })
+    return targets
+
+
+def _plants_in_room(user_id: str, room_id: str):
     with get_pool().connection() as conn:
-        rows = conn.execute(
-            "SELECT id, nickname, species, balcony_band FROM plants "
-            "WHERE on_balcony = true AND archived_at IS NULL "
-            "AND user_id = %s",
-            (OWNER_IOT_USER_ID,),
-        ).fetchall()
+        if room_id == "balcony":
+            rows = conn.execute(
+                "SELECT id, nickname, species, balcony_band FROM plants "
+                "WHERE archived_at IS NULL AND user_id = %s "
+                "AND (room_id = %s OR on_balcony = true)",
+                (user_id, room_id),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT id, nickname, species, balcony_band FROM plants "
+                "WHERE archived_at IS NULL AND user_id = %s AND room_id = %s",
+                (user_id, room_id),
+            ).fetchall()
     return rows
 
 
@@ -125,9 +211,8 @@ def _needs_inside(rows, temp: float) -> list[dict]:
     return result
 
 
-@router.get("/status")
-def balcony_status(user_id: str = Depends(require_feature(FLAG_BALCONY))):
-    """Current balcony temperature + which plants need bringing inside."""
+def climate_scan(user_id: str, *, record: bool) -> dict:
+    """Read every enabled room sensor and list plants below their cold band."""
     if not _in_season():
         return {
             "active": False,
@@ -135,26 +220,50 @@ def balcony_status(user_id: str = Depends(require_feature(FLAG_BALCONY))):
             "temperature": None,
             "needs_inside": [],
         }
-    temp = _read_balcony_temp()
-    if temp is None:
-        return JSONResponse(
-            status_code=503,
-            content={
-                "active": True,
-                "reason": "sensor_unavailable",
-                "temperature": None,
-                "needs_inside": [],
-            },
-        )
-    _record_temp(user_id, temp)
-    rows = _plants_on_balcony()
-    needs = _needs_inside(rows, temp)
+    targets = _sensor_targets(user_id)
+    if not targets:
+        return {
+            "active": False,
+            "reason": "no_sensor",
+            "temperature": None,
+            "needs_inside": [],
+        }
+    needs = []
+    temps = []
+    for target in targets:
+        temp = read_device_temperature(target["device_id"])
+        if temp is None:
+            continue
+        temps.append(temp)
+        if record and target["room_id"] == "balcony":
+            _record_temp(user_id, temp)
+        for item in _needs_inside(_plants_in_room(user_id, target["room_id"]), temp):
+            item["room_name"] = target["name"]
+            item["temperature"] = temp
+            needs.append(item)
+    if not temps:
+        return {
+            "active": True,
+            "reason": "sensor_unavailable",
+            "temperature": None,
+            "needs_inside": [],
+        }
+    alert_temps = [
+        item["temperature"] for item in needs
+        if isinstance(item.get("temperature"), (int, float))
+    ]
     return {
         "active": True,
         "reason": "ok",
-        "temperature": temp,
+        "temperature": min(alert_temps) if alert_temps else temps[0],
         "needs_inside": needs,
     }
+
+
+@router.get("/status")
+def balcony_status(user_id: str = Depends(get_current_user_id)):
+    """Which plants are colder than their band, across rooms with a sensor."""
+    return climate_scan(user_id, record=True)
 
 
 def _record_temp(user_id: str, temp: float) -> None:
@@ -171,7 +280,7 @@ def _record_temp(user_id: str, temp: float) -> None:
 
 
 @router.get("/history")
-def balcony_history(user_id: str = Depends(require_feature(FLAG_BALCONY))):
+def balcony_history(user_id: str = Depends(get_current_user_id)):
     """Per-day balcony temperature summary for the last 3 days.
 
     Day average: 08:00–21:00 (local, Europe/Minsk) on that calendar day.
@@ -278,52 +387,32 @@ def check_and_alert() -> dict:
     temperature into the history for the primary user so the day/night
     averages accumulate automatically.
     """
-    if not _in_season():
-        return {"active": False, "alerted": False, "needs_inside": []}
-    if not is_feature_enabled(OWNER_IOT_USER_ID, FLAG_BALCONY):
+    scan = climate_scan(OWNER_IOT_USER_ID, record=True)
+    if not scan.get("active"):
         return {"active": False, "alerted": False, "needs_inside": [],
-                "reason": "feature_disabled"}
-    temp = _read_balcony_temp()
-    if temp is None:
-        return {"active": True, "alerted": False, "needs_inside": [],
-                "error": "sensor_unavailable"}
-    _record_temp_for_primary(temp)
-    rows = _plants_on_balcony()
-    needs = _needs_inside(rows, temp)
-    alerted = _maybe_alert(needs, temp)
+                "reason": scan.get("reason")}
+    needs = scan["needs_inside"]
+    alerted = _maybe_alert(needs)
     return {"active": True, "alerted": alerted, "needs_inside": needs,
-            "temperature": temp}
+            "temperature": scan.get("temperature"),
+            "reason": scan.get("reason")}
 
 
-def _record_temp_for_primary(temp: float) -> None:
-    """Record a balcony temperature reading for the owner IoT account.
-
-    The background monitor has no per-user JWT context, so it attributes
-    readings to the allowlisted owner account.
-    """
-    try:
-        with get_pool().connection() as conn:
-            conn.execute(
-                "INSERT INTO balcony_temp_readings (user_id, temp_c, read_at) "
-                "VALUES (%s, %s, now())",
-                (OWNER_IOT_USER_ID, temp),
-            )
-    except Exception as exc:
-        log.warning("Failed to record balcony temp (monitor): %s", exc)
-
-
-def _maybe_alert(needs: list[dict], temp: float) -> bool:
-    """Send a Telegram alert if there are plants to bring in and we haven't
-    already alerted for this cold spell. Returns True if a message was sent.
-    """
+def _maybe_alert(needs: list[dict]) -> bool:
+    """Send a Telegram alert listing plants that are below their cold band."""
     if not needs:
         return False
     if not settings.telegram_token:
-        log.warning("Telegram not configured; skipping balcony alert")
+        log.warning("Telegram not configured; skipping climate alert")
         return False
-    names = ", ".join(n["name"] for n in needs)
-    text = (
-        f"❄️ На балконе {temp:.1f}°C — пора занести:\n{names}\n\n"
-        f"Проверь plontukrot."
-    )
+    lines = []
+    for item in needs:
+        room = (item.get("room_name") or "").strip()
+        temp = item.get("temperature")
+        temp_bit = (
+            f" {temp:.1f}°C" if isinstance(temp, (int, float)) else ""
+        )
+        prefix = f"{room}{temp_bit}: " if room else ""
+        lines.append(f"{prefix}{item['name']}")
+    text = "❄️ Пора занести:\n" + "\n".join(lines) + "\n\nПроверь plontukrot."
     return send_telegram_alert(text)

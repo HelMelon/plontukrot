@@ -10,6 +10,8 @@ from ..routers.auth import get_current_user_id
 from ..schemas import (
     ComponentCreate,
     ComponentOut,
+    RoomSensorOut,
+    RoomSensorUpsert,
     FertilizerCreate,
     FertilizerOut,
     FinanceEntryCreate,
@@ -273,6 +275,82 @@ def delete_room(room_id: str, user_id: str = Depends(get_current_user_id)):
         conn.execute(
             "DELETE FROM rooms WHERE id = %s AND user_id = %s",
             (room_id, user_id),
+        )
+
+
+def _room_exists(user_id: str, room_id: str) -> bool:
+    with get_pool().connection() as conn:
+        row = conn.execute(
+            "SELECT 1 FROM rooms WHERE id = %s AND user_id = %s",
+            (room_id, user_id),
+        ).fetchone()
+    return row is not None
+
+
+@router.get("/room-sensors", response_model=list[RoomSensorOut])
+def list_room_sensors(user_id: str = Depends(get_current_user_id)):
+    with get_pool().connection() as conn:
+        rows = conn.execute(
+            "SELECT room_id, device_id FROM room_sensors "
+            "WHERE user_id = %s ORDER BY created_at",
+            (user_id,),
+        ).fetchall()
+    return [RoomSensorOut(**r) for r in rows]
+
+
+@router.get("/room-sensors/{room_id}/reading")
+def read_room_sensor(room_id: str, user_id: str = Depends(get_current_user_id)):
+    """Current Yandex properties for the device saved on this room."""
+    from ..feature_flags import is_feature_enabled, room_sensor_flag_key
+    from ..routers.balcony import read_device_properties
+
+    with get_pool().connection() as conn:
+        row = conn.execute(
+            "SELECT device_id FROM room_sensors "
+            "WHERE user_id = %s AND room_id = %s",
+            (user_id, room_id),
+        ).fetchone()
+    device_id = (row["device_id"] if row else "") or ""
+    if not device_id.strip():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Sensor not found")
+    if not is_feature_enabled(user_id, room_sensor_flag_key(room_id)):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Feature not available")
+    properties = read_device_properties(device_id.strip())
+    if properties is None:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                            detail="Sensor unavailable")
+    return {"room_id": room_id, "properties": properties}
+
+
+@router.put("/room-sensors/{room_id}", response_model=RoomSensorOut)
+def upsert_room_sensor(room_id: str, payload: RoomSensorUpsert,
+                       user_id: str = Depends(get_current_user_id)):
+    device_id = payload.device_id.strip()
+    if not device_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Device id is required")
+    if not _room_exists(user_id, room_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Room not found")
+    with get_pool().connection() as conn:
+        conn.execute(
+            "INSERT INTO room_sensors (user_id, room_id, device_id) "
+            "VALUES (%s, %s, %s) "
+            "ON CONFLICT (user_id, room_id) DO UPDATE SET device_id = EXCLUDED.device_id",
+            (user_id, room_id, device_id),
+        )
+    return RoomSensorOut(room_id=room_id, device_id=device_id)
+
+
+@router.delete("/room-sensors/{room_id}", status_code=204)
+def delete_room_sensor(room_id: str,
+                       user_id: str = Depends(get_current_user_id)):
+    with get_pool().connection() as conn:
+        conn.execute(
+            "DELETE FROM room_sensors WHERE user_id = %s AND room_id = %s",
+            (user_id, room_id),
         )
 
 

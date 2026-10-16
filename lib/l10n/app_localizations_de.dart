@@ -657,6 +657,31 @@ class AppLocalizationsDe extends AppLocalizations {
       'Eigene Räume können angelegt, umbenannt und gelöscht werden.';
 
   @override
+  String get roomSensorTitle => 'Sensor';
+
+  @override
+  String get roomSensorIdLabel => 'Sensor-ID';
+
+  @override
+  String get roomSensorIdHint =>
+      'Yandex-Geräte-UUID. Leeres Feld entfernt den Sensor';
+
+  @override
+  String get a11yRoomSensor => 'Raumsensor';
+
+  @override
+  String get roomSensorTemperature => 'Temperatur';
+
+  @override
+  String get roomSensorHumidity => 'Luftfeuchtigkeit';
+
+  @override
+  String get roomSensorNoData => 'Keine Daten';
+
+  @override
+  String get roomSensorUnavailable => 'Sensor antwortet nicht';
+
+  @override
   String get a11yManageRooms => 'Räume verwalten';
 
   @override

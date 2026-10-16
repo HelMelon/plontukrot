@@ -4,7 +4,6 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..db import get_pool, jsonb
-from ..feature_flags import FLAG_BALCONY, is_feature_enabled
 from ..routers.auth import get_current_user_id
 from ..routers.catalogs import restore_balcony_room
 from ..schemas import PlantCreate, PlantOut, PlantPhotoOut, PlantUpdate
@@ -86,10 +85,6 @@ def create_plant(payload: PlantCreate, user_id: str = Depends(get_current_user_i
         "user_id": user_id,
     }
     for schema_field, column in _FIELDS.items():
-        if column in ("on_balcony", "balcony_band") and not is_feature_enabled(
-            user_id, FLAG_BALCONY
-        ):
-            continue
         val = getattr(payload, schema_field, None)
         if val is not None:
             if column == "members":
@@ -199,6 +194,8 @@ def update_plant(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Plant not found",
             )
+        if data.get("on_balcony") is True or data.get("room_id") == "balcony":
+            restore_balcony_room(conn, user_id)
 
         if fields:
             values.extend([plant_id, user_id])

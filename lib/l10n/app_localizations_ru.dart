@@ -653,6 +653,31 @@ class AppLocalizationsRu extends AppLocalizations {
       'Свои помещения можно добавлять, переименовывать и удалять.';
 
   @override
+  String get roomSensorTitle => 'Датчик';
+
+  @override
+  String get roomSensorIdLabel => 'Идентификатор датчика';
+
+  @override
+  String get roomSensorIdHint =>
+      'UUID устройства Яндекса. Пустое поле убирает датчик';
+
+  @override
+  String get a11yRoomSensor => 'Датчик помещения';
+
+  @override
+  String get roomSensorTemperature => 'Температура';
+
+  @override
+  String get roomSensorHumidity => 'Влажность';
+
+  @override
+  String get roomSensorNoData => 'Нет данных';
+
+  @override
+  String get roomSensorUnavailable => 'Датчик не отвечает';
+
+  @override
   String get a11yManageRooms => 'Управление помещениями';
 
   @override
