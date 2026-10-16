@@ -31,6 +31,8 @@ Flag keys:
 - `balcony`
 - `fertilizing_reminders`
 - `bulk_actions`
+- `experiments`
+- `ai_botanical_prefill`
 
 Resolution order on the server:
 
