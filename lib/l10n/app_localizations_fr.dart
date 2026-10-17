@@ -751,6 +751,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeQuarantine => 'Quarantaine';
 
   @override
+  String get homeNeedsFertilizing => 'À fertiliser';
+
+  @override
   String get homeArchive => 'Archives';
 
   @override
@@ -2388,6 +2391,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String get plantMergeMembersRequired => 'Indiquez au moins deux cultivars';
 
   @override
+  String get plantMergeTransferPropagationsTitle =>
+      'Transférer les multiplications ?';
+
+  @override
+  String get plantMergeTransferPropagationsBody =>
+      'Les plantes fusionnées ont des multiplications. Les transférer vers le nouveau groupe ?';
+
+  @override
+  String get plantMergeTransferPropagationsYes => 'Transférer';
+
+  @override
+  String get plantMergeTransferPropagationsNo => 'Ne pas transférer';
+
+  @override
   String get plantGroupMembers => 'Cultivars du groupe';
 
   @override
@@ -2666,6 +2683,21 @@ class AppLocalizationsFr extends AppLocalizations {
       'Description de la variante (facultatif)';
 
   @override
+  String get experimentsVariantPhoto => 'Photo de la variante';
+
+  @override
+  String get experimentsVariantAddPhoto => 'Ajouter une photo de la variante';
+
+  @override
+  String get experimentsVariantReplacePhoto =>
+      'Remplacer la photo de la variante';
+
+  @override
+  String experimentsVariantPhotoOf(String label) {
+    return 'Photo de la variante $label';
+  }
+
+  @override
   String get experimentsAddVariant => 'Ajouter une variante';
 
   @override
@@ -2833,5 +2865,26 @@ class AppLocalizationsFr extends AppLocalizations {
   String get experimentsVariantEmpty => 'La variante n\'a pas de participants';
 
   @override
+  String experimentsParticipantVariant(String label) {
+    return 'Variante : $label';
+  }
+
+  @override
   String get homeExperiments => 'Experiences';
+
+  @override
+  String get experimentObservationReminderTitle =>
+      'Observations d\'expériences';
+
+  @override
+  String get experimentObservationReminderBody =>
+      'Enregistre les observations de tes expériences';
+
+  @override
+  String get experimentObservationReminderChannelName =>
+      'Observations d\'expériences';
+
+  @override
+  String get experimentObservationReminderChannelDescription =>
+      'Rappel d\'enregistrer les observations des expériences';
 }

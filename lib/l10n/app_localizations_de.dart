@@ -751,6 +751,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get homeQuarantine => 'Quarantäne';
 
   @override
+  String get homeNeedsFertilizing => 'Düngung fällig';
+
+  @override
   String get homeArchive => 'Archiv';
 
   @override
@@ -2379,6 +2382,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String get plantMergeMembersRequired => 'Geben Sie mindestens zwei Sorten an';
 
   @override
+  String get plantMergeTransferPropagationsTitle => 'Vermehrungen übertragen?';
+
+  @override
+  String get plantMergeTransferPropagationsBody =>
+      'Die zusammengeführten Pflanzen haben Vermehrungen. Auf die neue Gruppe übertragen?';
+
+  @override
+  String get plantMergeTransferPropagationsYes => 'Übertragen';
+
+  @override
+  String get plantMergeTransferPropagationsNo => 'Nicht übertragen';
+
+  @override
   String get plantGroupMembers => 'Sorten in der Gruppe';
 
   @override
@@ -2656,6 +2672,20 @@ class AppLocalizationsDe extends AppLocalizations {
       'Variantenbeschreibung (optional)';
 
   @override
+  String get experimentsVariantPhoto => 'Foto der Variante';
+
+  @override
+  String get experimentsVariantAddPhoto => 'Foto der Variante hinzufuegen';
+
+  @override
+  String get experimentsVariantReplacePhoto => 'Foto der Variante ersetzen';
+
+  @override
+  String experimentsVariantPhotoOf(String label) {
+    return 'Foto der Variante $label';
+  }
+
+  @override
   String get experimentsAddVariant => 'Variante hinzufuegen';
 
   @override
@@ -2823,5 +2853,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get experimentsVariantEmpty => 'Variante hat keine Teilnehmer';
 
   @override
+  String experimentsParticipantVariant(String label) {
+    return 'Variante: $label';
+  }
+
+  @override
   String get homeExperiments => 'Experimente';
+
+  @override
+  String get experimentObservationReminderTitle => 'Versuchsbeobachtungen';
+
+  @override
+  String get experimentObservationReminderBody =>
+      'Trag Beobachtungen zu deinen Experimenten ein';
+
+  @override
+  String get experimentObservationReminderChannelName =>
+      'Versuchsbeobachtungen';
+
+  @override
+  String get experimentObservationReminderChannelDescription =>
+      'Erinnerung, Beobachtungen zu Experimenten einzutragen';
 }

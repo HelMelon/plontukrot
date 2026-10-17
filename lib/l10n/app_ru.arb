@@ -307,6 +307,7 @@
   "homeGroups": "Группы",
   "homeReanimation": "Реанимация",
   "homeQuarantine": "Карантин",
+  "homeNeedsFertilizing": "Требуют подкормки",
   "homeArchive": "Архив",
   "homeMerge": "Объединить",
   "homeMergeNeedCount": "Выберите от 2 до 3 растений",
@@ -957,6 +958,10 @@
     }
   },
   "plantMergeMembersRequired": "Укажите хотя бы два сорта",
+  "plantMergeTransferPropagationsTitle": "Перенести размножения?",
+  "plantMergeTransferPropagationsBody": "У объединяемых растений есть размножения. Перенести их на новую группу?",
+  "plantMergeTransferPropagationsYes": "Перенести",
+  "plantMergeTransferPropagationsNo": "Не переносить",
   "plantGroupMembers": "Сорта в группе",
   "plantCultivarsLabel": "Сорта: {cultivars}",
   "@plantCultivarsLabel": {
@@ -1085,6 +1090,15 @@
   "experimentsVariantLabel": "Название варианта",
   "experimentsVariantLabelHint": "в кокосе",
   "experimentsVariantDescription": "Описание варианта (необязательно)",
+  "experimentsVariantPhoto": "Фото варианта",
+  "experimentsVariantAddPhoto": "Добавить фото варианта",
+  "experimentsVariantReplacePhoto": "Заменить фото варианта",
+  "experimentsVariantPhotoOf": "Фото варианта {label}",
+  "@experimentsVariantPhotoOf": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
   "experimentsAddVariant": "Добавить вариант",
   "experimentsRemoveVariant": "Убрать вариант",
   "experimentsTitleRequired": "Дай эксперименту название",
@@ -1138,5 +1152,10 @@
   "experimentsSubjectPlant": "Растение",
   "experimentsSubjectPropagation": "Партия",
   "experimentsVariantEmpty": "В варианте нет участников",
-  "homeExperiments": "Эксперименты"
+  "experimentsParticipantVariant": "Вариант: {label}",
+  "homeExperiments": "Эксперименты",
+  "experimentObservationReminderTitle": "Наблюдения по экспериментам",
+  "experimentObservationReminderBody": "Запиши наблюдения по своим экспериментам",
+  "experimentObservationReminderChannelName": "Наблюдения экспериментов",
+  "experimentObservationReminderChannelDescription": "Напоминание записывать наблюдения по экспериментам"
 }

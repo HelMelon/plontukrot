@@ -357,6 +357,7 @@
   "homeGroups": "Groups",
   "homeReanimation": "Rescue",
   "homeQuarantine": "Quarantine",
+  "homeNeedsFertilizing": "Needs fertilizing",
   "homeArchive": "Archive",
   "homeMerge": "Merge",
   "homeMergeNeedCount": "Select 2 to 3 plants",
@@ -1221,6 +1222,10 @@
     }
   },
   "plantMergeMembersRequired": "Enter at least two cultivars",
+  "plantMergeTransferPropagationsTitle": "Transfer propagations?",
+  "plantMergeTransferPropagationsBody": "The plants being merged have propagation batches. Transfer them to the new group?",
+  "plantMergeTransferPropagationsYes": "Transfer",
+  "plantMergeTransferPropagationsNo": "Don't transfer",
   "plantGroupMembers": "Group cultivars",
   "plantCultivarsLabel": "Cultivars: {cultivars}",
   "@plantCultivarsLabel": {
@@ -1349,6 +1354,15 @@
   "experimentsVariantLabel": "Variant name",
   "experimentsVariantLabelHint": "in coconut",
   "experimentsVariantDescription": "Variant description (optional)",
+  "experimentsVariantPhoto": "Variant photo",
+  "experimentsVariantAddPhoto": "Add a variant photo",
+  "experimentsVariantReplacePhoto": "Replace variant photo",
+  "experimentsVariantPhotoOf": "Photo of variant {label}",
+  "@experimentsVariantPhotoOf": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
   "experimentsAddVariant": "Add variant",
   "experimentsRemoveVariant": "Remove variant",
   "experimentsTitleRequired": "Give the experiment a title",
@@ -1417,5 +1431,15 @@
   "experimentsSubjectPlant": "Plant",
   "experimentsSubjectPropagation": "Batch",
   "experimentsVariantEmpty": "Variant has no participants",
-  "homeExperiments": "Experiments"
+  "experimentsParticipantVariant": "Variant: {label}",
+  "@experimentsParticipantVariant": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+  "homeExperiments": "Experiments",
+  "experimentObservationReminderTitle": "Experiment observations",
+  "experimentObservationReminderBody": "Record observations for your experiments",
+  "experimentObservationReminderChannelName": "Experiment observations",
+  "experimentObservationReminderChannelDescription": "Reminder to record observations for your experiments"
 }

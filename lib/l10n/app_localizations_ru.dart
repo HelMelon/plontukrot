@@ -747,6 +747,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeQuarantine => 'Карантин';
 
   @override
+  String get homeNeedsFertilizing => 'Требуют подкормки';
+
+  @override
   String get homeArchive => 'Архив';
 
   @override
@@ -2382,6 +2385,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get plantMergeMembersRequired => 'Укажите хотя бы два сорта';
 
   @override
+  String get plantMergeTransferPropagationsTitle => 'Перенести размножения?';
+
+  @override
+  String get plantMergeTransferPropagationsBody =>
+      'У объединяемых растений есть размножения. Перенести их на новую группу?';
+
+  @override
+  String get plantMergeTransferPropagationsYes => 'Перенести';
+
+  @override
+  String get plantMergeTransferPropagationsNo => 'Не переносить';
+
+  @override
   String get plantGroupMembers => 'Сорта в группе';
 
   @override
@@ -2658,6 +2674,20 @@ class AppLocalizationsRu extends AppLocalizations {
       'Описание варианта (необязательно)';
 
   @override
+  String get experimentsVariantPhoto => 'Фото варианта';
+
+  @override
+  String get experimentsVariantAddPhoto => 'Добавить фото варианта';
+
+  @override
+  String get experimentsVariantReplacePhoto => 'Заменить фото варианта';
+
+  @override
+  String experimentsVariantPhotoOf(String label) {
+    return 'Фото варианта $label';
+  }
+
+  @override
   String get experimentsAddVariant => 'Добавить вариант';
 
   @override
@@ -2826,5 +2856,26 @@ class AppLocalizationsRu extends AppLocalizations {
   String get experimentsVariantEmpty => 'В варианте нет участников';
 
   @override
+  String experimentsParticipantVariant(String label) {
+    return 'Вариант: $label';
+  }
+
+  @override
   String get homeExperiments => 'Эксперименты';
+
+  @override
+  String get experimentObservationReminderTitle =>
+      'Наблюдения по экспериментам';
+
+  @override
+  String get experimentObservationReminderBody =>
+      'Запиши наблюдения по своим экспериментам';
+
+  @override
+  String get experimentObservationReminderChannelName =>
+      'Наблюдения экспериментов';
+
+  @override
+  String get experimentObservationReminderChannelDescription =>
+      'Напоминание записывать наблюдения по экспериментам';
 }

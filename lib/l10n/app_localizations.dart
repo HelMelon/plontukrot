@@ -1458,6 +1458,12 @@ abstract class AppLocalizations {
   /// **'Quarantine'**
   String get homeQuarantine;
 
+  /// No description provided for @homeNeedsFertilizing.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs fertilizing'**
+  String get homeNeedsFertilizing;
+
   /// No description provided for @homeArchive.
   ///
   /// In en, this message translates to:
@@ -4302,6 +4308,30 @@ abstract class AppLocalizations {
   /// **'Enter at least two cultivars'**
   String get plantMergeMembersRequired;
 
+  /// No description provided for @plantMergeTransferPropagationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer propagations?'**
+  String get plantMergeTransferPropagationsTitle;
+
+  /// No description provided for @plantMergeTransferPropagationsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The plants being merged have propagation batches. Transfer them to the new group?'**
+  String get plantMergeTransferPropagationsBody;
+
+  /// No description provided for @plantMergeTransferPropagationsYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer'**
+  String get plantMergeTransferPropagationsYes;
+
+  /// No description provided for @plantMergeTransferPropagationsNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t transfer'**
+  String get plantMergeTransferPropagationsNo;
+
   /// No description provided for @plantGroupMembers.
   ///
   /// In en, this message translates to:
@@ -4812,6 +4842,30 @@ abstract class AppLocalizations {
   /// **'Variant description (optional)'**
   String get experimentsVariantDescription;
 
+  /// No description provided for @experimentsVariantPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Variant photo'**
+  String get experimentsVariantPhoto;
+
+  /// No description provided for @experimentsVariantAddPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a variant photo'**
+  String get experimentsVariantAddPhoto;
+
+  /// No description provided for @experimentsVariantReplacePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace variant photo'**
+  String get experimentsVariantReplacePhoto;
+
+  /// No description provided for @experimentsVariantPhotoOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo of variant {label}'**
+  String experimentsVariantPhotoOf(String label);
+
   /// No description provided for @experimentsAddVariant.
   ///
   /// In en, this message translates to:
@@ -5130,11 +5184,41 @@ abstract class AppLocalizations {
   /// **'Variant has no participants'**
   String get experimentsVariantEmpty;
 
+  /// No description provided for @experimentsParticipantVariant.
+  ///
+  /// In en, this message translates to:
+  /// **'Variant: {label}'**
+  String experimentsParticipantVariant(String label);
+
   /// No description provided for @homeExperiments.
   ///
   /// In en, this message translates to:
   /// **'Experiments'**
   String get homeExperiments;
+
+  /// No description provided for @experimentObservationReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment observations'**
+  String get experimentObservationReminderTitle;
+
+  /// No description provided for @experimentObservationReminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Record observations for your experiments'**
+  String get experimentObservationReminderBody;
+
+  /// No description provided for @experimentObservationReminderChannelName.
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment observations'**
+  String get experimentObservationReminderChannelName;
+
+  /// No description provided for @experimentObservationReminderChannelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder to record observations for your experiments'**
+  String get experimentObservationReminderChannelDescription;
 }
 
 class _AppLocalizationsDelegate

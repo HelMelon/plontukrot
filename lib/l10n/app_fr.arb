@@ -312,6 +312,7 @@
   "homeGroups": "Groupes",
   "homeReanimation": "Sauvetage",
   "homeQuarantine": "Quarantaine",
+  "homeNeedsFertilizing": "À fertiliser",
   "homeArchive": "Archives",
   "homeMerge": "Fusionner",
   "homeMergeNeedCount": "Sélectionnez 2 à 3 plantes",
@@ -941,6 +942,10 @@
     }
   },
   "plantMergeMembersRequired": "Indiquez au moins deux cultivars",
+  "plantMergeTransferPropagationsTitle": "Transférer les multiplications ?",
+  "plantMergeTransferPropagationsBody": "Les plantes fusionnées ont des multiplications. Les transférer vers le nouveau groupe ?",
+  "plantMergeTransferPropagationsYes": "Transférer",
+  "plantMergeTransferPropagationsNo": "Ne pas transférer",
   "plantGroupMembers": "Cultivars du groupe",
   "plantCultivarsLabel": "Cultivars : {cultivars}",
   "@plantCultivarsLabel": {
@@ -1069,6 +1074,15 @@
   "experimentsVariantLabel": "Nom de la variante",
   "experimentsVariantLabelHint": "en coco",
   "experimentsVariantDescription": "Description de la variante (facultatif)",
+  "experimentsVariantPhoto": "Photo de la variante",
+  "experimentsVariantAddPhoto": "Ajouter une photo de la variante",
+  "experimentsVariantReplacePhoto": "Remplacer la photo de la variante",
+  "experimentsVariantPhotoOf": "Photo de la variante {label}",
+  "@experimentsVariantPhotoOf": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
   "experimentsAddVariant": "Ajouter une variante",
   "experimentsRemoveVariant": "Retirer la variante",
   "experimentsTitleRequired": "Donne un titre a l'experience",
@@ -1122,5 +1136,10 @@
   "experimentsSubjectPlant": "Plante",
   "experimentsSubjectPropagation": "Lot",
   "experimentsVariantEmpty": "La variante n'a pas de participants",
-  "homeExperiments": "Experiences"
+  "experimentsParticipantVariant": "Variante : {label}",
+  "homeExperiments": "Experiences",
+  "experimentObservationReminderTitle": "Observations d'expériences",
+  "experimentObservationReminderBody": "Enregistre les observations de tes expériences",
+  "experimentObservationReminderChannelName": "Observations d'expériences",
+  "experimentObservationReminderChannelDescription": "Rappel d'enregistrer les observations des expériences"
 }
