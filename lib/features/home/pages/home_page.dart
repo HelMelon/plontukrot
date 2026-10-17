@@ -470,6 +470,7 @@ class _HomePageState extends State<HomePage> {
           propagationBatchCount: batchCounts[plant.id] ?? 0,
           moisture: bindings[plant.id]?.moisture,
           inReanimation: rerootingIds.contains(plant.id),
+          iconOnlyQuarantineBadge: true,
           onTap:
               _isSelectionMode ? () => _togglePlantSelection(plant.id) : null,
           onLongPress: FeatureFlagsController.instance

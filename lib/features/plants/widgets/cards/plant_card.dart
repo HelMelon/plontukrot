@@ -30,6 +30,7 @@ class PlantCard extends StatelessWidget {
   final int propagationBatchCount;
   final double? moisture;
   final bool inReanimation;
+  final bool iconOnlyQuarantineBadge;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
@@ -41,6 +42,7 @@ class PlantCard extends StatelessWidget {
     this.propagationBatchCount = 0,
     this.moisture,
     this.inReanimation = false,
+    this.iconOnlyQuarantineBadge = false,
     this.onTap,
     this.onLongPress,
   });
@@ -517,7 +519,8 @@ class PlantCard extends StatelessWidget {
                         ),
                       if (moisture != null && plant.isInQuarantine())
                         SizedBox(height: spacing.xs),
-                      if (plant.isInQuarantine()) const QuarantineBadge(),
+                      if (plant.isInQuarantine())
+                        QuarantineBadge(iconOnly: iconOnlyQuarantineBadge),
                     ],
                   ),
                 ),

@@ -40,6 +40,7 @@ class AppIconTokens {
     required this.error,
     required this.calendar,
     required this.calendarOutlined,
+    required this.clock,
 
     // Navigation & Main Features
     required this.propagations,
@@ -162,6 +163,7 @@ class AppIconTokens {
     error: Icons.error_outline,
     calendar: Icons.calendar_today,
     calendarOutlined: Icons.calendar_today_outlined,
+    clock: Icons.access_time_outlined,
 
     // Navigation & Main Features
     propagations: HugeIcons.strokeRoundedEcoLab01,
@@ -283,6 +285,7 @@ class AppIconTokens {
   final IconData error;
   final IconData calendar;
   final IconData calendarOutlined;
+  final IconData clock;
 
   // Navigation & Main Features
   final List<List<dynamic>> propagations;
@@ -401,6 +404,7 @@ class AppIconTokens {
     IconData? error,
     IconData? calendar,
     IconData? calendarOutlined,
+    IconData? clock,
     List<List<dynamic>>? propagations,
     List<List<dynamic>>? wishlist,
     List<List<dynamic>>? finances,
@@ -511,6 +515,7 @@ class AppIconTokens {
       error: error ?? this.error,
       calendar: calendar ?? this.calendar,
       calendarOutlined: calendarOutlined ?? this.calendarOutlined,
+      clock: clock ?? this.clock,
       propagations: propagations ?? this.propagations,
       wishlist: wishlist ?? this.wishlist,
       finances: finances ?? this.finances,
