@@ -27,6 +27,7 @@ import 'services/auth_service.dart';
 import 'services/family_care_service.dart';
 import 'services/genus_care_service.dart';
 import 'services/token_store.dart';
+import 'services/experiment_observation_notification_service.dart';
 import 'services/fertilizing_notification_service.dart';
 import 'services/quarantine_notification_service.dart';
 import 'services/gift_service.dart';
@@ -83,8 +84,8 @@ class MyApp extends StatelessWidget {
                   data: AppTheme.themeForWidth(width),
                   child: AppKeyboardScope(
                     child: AppPageShell(
-                    child: child ?? const SizedBox.shrink(),
-                  ),
+                      child: child ?? const SizedBox.shrink(),
+                    ),
                   ),
                 );
               },
@@ -394,8 +395,27 @@ class _AuthenticatedShellState extends State<_AuthenticatedShell> {
     await FertilizingNotificationService.instance.initialize();
     final remindersOn = FeatureFlagsController.instance
         .isEnabled(FeatureFlag.fertilizingReminders);
-    if (remindersOn) {
-      unawaited(FertilizingNotificationService.instance.requestPermission());
+    final experimentRemindersOn =
+        FeatureFlagsController.instance.isEnabled(FeatureFlag.experiments);
+    if (remindersOn || experimentRemindersOn) {
+      unawaited(() async {
+        try {
+          final granted =
+              await FertilizingNotificationService.instance.requestPermission();
+          if (granted && experimentRemindersOn) {
+            await ExperimentObservationNotificationService.instance
+                .reschedule();
+          }
+        } catch (error, stack) {
+          try {
+            await AppCrashReporting.instance.recordError(
+              error,
+              stack,
+              reason: 'experiment_observation_reminder_permission_failed',
+            );
+          } catch (_) {}
+        }
+      }());
     }
     // Backfill auto frequency first, then schedule reminders — otherwise
     // seasonal STOP (e.g. Start in autumn) can still fire with a stale interval.
@@ -407,6 +427,9 @@ class _AuthenticatedShellState extends State<_AuthenticatedShell> {
     }
     unawaited(
       QuarantineNotificationService.instance.rescheduleAllActivePlants(),
+    );
+    unawaited(
+      ExperimentObservationNotificationService.instance.reschedule(),
     );
   }
 

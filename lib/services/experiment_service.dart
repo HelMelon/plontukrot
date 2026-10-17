@@ -5,6 +5,7 @@ import '../models/experiment_subject.dart';
 import '../models/model_helpers.dart';
 import 'api_client.dart';
 import 'api_exception.dart';
+import 'experiment_observation_notification_service.dart';
 import 'rest_stream.dart';
 
 /// REST access to the experiments feature: trials, variants, subjects and the
@@ -22,6 +23,9 @@ class ExperimentService {
   Future<List<Experiment>> _fetchAll() async {
     return _parseList(await _api.get('/experiments'));
   }
+
+  /// One-shot list used to decide whether the observation reminder should fire.
+  Future<List<Experiment>> fetchExperiments() => _fetchAll();
 
   Future<Experiment?> fetch(String experimentId) async {
     for (final experiment in await _fetchAll()) {
@@ -65,6 +69,9 @@ class ExperimentService {
       if (startedAt != null) 'started_at': isoDate(startedAt),
       'variants': variants,
     }));
+    // Fire-and-forget: the reschedule refetches the trials and writes ten
+    // alarms. It handles its own failures, so a save must not wait on it.
+    unawaited(ExperimentObservationNotificationService.instance.reschedule());
     return readString(created, 'id') ?? '';
   }
 
@@ -87,6 +94,9 @@ class ExperimentService {
       if (clearCompletedAt) 'completed_at': null,
       if (completedAt != null) 'completed_at': isoDate(completedAt),
     });
+    if (completedAt != null || clearCompletedAt) {
+      unawaited(ExperimentObservationNotificationService.instance.reschedule());
+    }
   }
 
   Future<void> deleteExperiment(String experimentId) async {
@@ -95,6 +105,7 @@ class ExperimentService {
     } on ApiException catch (error) {
       if (!error.isNotFound) rethrow;
     }
+    unawaited(ExperimentObservationNotificationService.instance.reschedule());
   }
 
   Future<String> addVariant({
