@@ -12,6 +12,7 @@ import '../../../models/experiment_observation.dart';
 import '../../../models/experiment_subject.dart';
 import '../../../models/experiment_variant.dart';
 import '../../../services/experiment_service.dart';
+import '../../plants/widgets/common/plant_image.dart';
 import '../widgets/sheets/add_observation_sheet.dart';
 import '../widgets/sheets/add_subjects_sheet.dart';
 import '../widgets/sheets/experiment_compare_sheet.dart';
@@ -466,6 +467,33 @@ class _VariantCard extends StatelessWidget {
               ),
             ],
           ),
+          if ((variant.imageUrl ?? '').trim().isNotEmpty) ...[
+            spacing.vSm,
+            ClipRRect(
+              borderRadius: context.radii.mdAll,
+              child: PlantImage(
+                imageUrl: variant.imageUrl,
+                width: double.infinity,
+                height: context.dimensions.photoPreview,
+                fit: BoxFit.cover,
+                semanticLabel: l10n.experimentsVariantPhotoOf(variant.label),
+                placeholder: SizedBox(
+                  width: double.infinity,
+                  height: context.dimensions.photoPreview,
+                  child: Center(
+                    child: Icon(
+                      context.icons.image,
+                      color: colors.textSecondary,
+                    ),
+                  ),
+                ),
+                errorWidget: Icon(
+                  context.icons.image,
+                  color: colors.textSecondary,
+                ),
+              ),
+            ),
+          ],
           if ((variant.description ?? '').trim().isNotEmpty) ...[
             spacing.vXs,
             Text(

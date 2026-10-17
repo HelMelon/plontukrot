@@ -638,6 +638,7 @@ class ExperimentVariantCreate(BaseModel):
     label: str
     description: Optional[str] = None
     position: Optional[int] = None
+    image_url: Optional[str] = Field(default=None, alias="imageUrl")
     subjects: list[ExperimentSubjectIn] = []
 
 
@@ -647,6 +648,7 @@ class ExperimentVariantUpdate(BaseModel):
     label: Optional[str] = None
     description: Optional[str] = None
     position: Optional[int] = None
+    image_url: Optional[str] = Field(default=None, alias="imageUrl")
 
 
 class ExperimentVariantOut(BaseModel):
@@ -654,6 +656,7 @@ class ExperimentVariantOut(BaseModel):
     label: str
     description: Optional[str] = None
     position: int
+    image_url: Optional[str] = None
     subjects: list[ExperimentSubjectOut] = []
     observations: list[ExperimentObservationOut] = []
     observation_count: int = 0

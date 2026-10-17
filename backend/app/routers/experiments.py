@@ -33,8 +33,37 @@ router = APIRouter(tags=["experiments"])
 _IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
 
 
+def _store_uploaded_photo(file: UploadFile, *path_parts: str) -> str:
+    """Stream an uploaded image into photos_dir/<path_parts> and return its name.
+
+    Shared by the observation and variant uploads so the extension check,
+    chunked write, and generated file name cannot drift apart.
+    """
+    ext = os.path.splitext(file.filename or "")[1] or ".jpg"
+    if ext.lower() not in _IMAGE_EXTENSIONS:
+        raise HTTPException(status_code=400, detail="Unsupported image type")
+    photo_dir = os.path.join(settings.photos_dir, *path_parts)
+    os.makedirs(photo_dir, exist_ok=True)
+    filename = f"{_new_id()}{ext}"
+    with open(os.path.join(photo_dir, filename), "wb") as out:
+        while True:
+            chunk = file.file.read(1024 * 1024)
+            if not chunk:
+                break
+            out.write(chunk)
+    return filename
+
+
 def _new_id() -> str:
     return uuid.uuid4().hex
+
+
+def _clean_image_url(value: str | None) -> str | None:
+    """Blank photo URLs are stored as NULL so a cleared photo stays cleared."""
+    if value is None:
+        return None
+    trimmed = value.strip()
+    return trimmed or None
 
 
 def _ensure_exp(conn, experiment_id: str, user_id: str) -> None:
@@ -118,8 +147,8 @@ def _load_experiments(
     exp_ids = [r["id"] for r in exp_rows]
 
     variant_rows = conn.execute(
-        "SELECT id, experiment_id, label, description, position, created_at "
-        "FROM experiment_variants WHERE experiment_id = ANY(%s) "
+        "SELECT id, experiment_id, label, description, image_url, position, "
+        "created_at FROM experiment_variants WHERE experiment_id = ANY(%s) "
         "ORDER BY position, created_at",
         (exp_ids,),
     ).fetchall()
@@ -163,6 +192,7 @@ def _load_experiments(
             id=row["id"],
             label=row["label"],
             description=row["description"],
+            image_url=row["image_url"],
             position=row["position"],
             subjects=[ExperimentSubjectOut(**s) for s in subjects],
             observations=[ExperimentObservationOut(**o) for o in observations],
@@ -227,10 +257,12 @@ def create_experiment(
             variant_id = _new_id()
             conn.execute(
                 "INSERT INTO experiment_variants (id, experiment_id, label, "
-                "description, position) VALUES (%s, %s, %s, %s, %s)",
+                "description, position, image_url) "
+                "VALUES (%s, %s, %s, %s, %s, %s)",
                 (variant_id, exp_id, (variant.label or "").strip(),
                  variant.description,
-                 variant.position if variant.position is not None else index),
+                 variant.position if variant.position is not None else index,
+                 _clean_image_url(variant.image_url)),
             )
             _insert_subjects(conn, variant_id, variant.subjects)
         return _get_experiment(conn, user_id, exp_id)
@@ -297,18 +329,20 @@ def add_variant(
             position = row["next_position"]
         conn.execute(
             "INSERT INTO experiment_variants (id, experiment_id, label, "
-            "description, position) VALUES (%s, %s, %s, %s, %s)",
-            (variant_id, experiment_id, label, payload.description, position),
+            "description, position, image_url) "
+            "VALUES (%s, %s, %s, %s, %s, %s)",
+            (variant_id, experiment_id, label, payload.description, position,
+             _clean_image_url(payload.image_url)),
         )
         _insert_subjects(conn, variant_id, payload.subjects)
         row = conn.execute(
-            "SELECT id, experiment_id, label, description, position "
+            "SELECT id, experiment_id, label, description, image_url, position "
             "FROM experiment_variants WHERE id = %s",
             (variant_id,),
         ).fetchone()
     return ExperimentVariantOut(
         id=row["id"], label=row["label"], description=row["description"],
-        position=row["position"],
+        image_url=row["image_url"], position=row["position"],
         subjects=[
             ExperimentSubjectOut(**s) for s in _variant_subjects(
                 experiment_id, variant_id)
@@ -336,10 +370,13 @@ def update_variant(
     data = payload.model_dump(exclude_unset=True)
     fields = []
     values: list[Any] = []
-    for key in ("label", "description", "position"):
+    for key in ("label", "description", "position", "image_url"):
         if key in data:
+            value = data[key]
+            if key == "image_url":
+                value = _clean_image_url(value)
             fields.append(f"{key} = %s")
-            values.append(data[key])
+            values.append(value)
     with get_pool().connection() as conn:
         _ensure_variant(conn, variant_id, user_id)
         if fields:
@@ -350,8 +387,8 @@ def update_variant(
                 tuple(values),
             )
         row = conn.execute(
-            "SELECT id, label, description, position FROM experiment_variants "
-            "WHERE id = %s",
+            "SELECT id, label, description, image_url, position "
+            "FROM experiment_variants WHERE id = %s",
             (variant_id,),
         ).fetchone()
         subjects = conn.execute(
@@ -361,7 +398,7 @@ def update_variant(
         ).fetchall()
     return ExperimentVariantOut(
         id=row["id"], label=row["label"], description=row["description"],
-        position=row["position"],
+        image_url=row["image_url"], position=row["position"],
         subjects=[ExperimentSubjectOut(**dict(s)) for s in subjects],
     )
 
@@ -500,20 +537,27 @@ def upload_observation_photo(
             (variant_id,),
         ).fetchone()
     experiment_id = row["experiment_id"]
-    photo_id = _new_id()
-    ext = os.path.splitext(file.filename or "")[1] or ".jpg"
-    if ext.lower() not in _IMAGE_EXTENSIONS:
-        raise HTTPException(status_code=400, detail="Unsupported image type")
-    exp_dir = os.path.join(settings.photos_dir, "experiments", experiment_id)
-    os.makedirs(exp_dir, exist_ok=True)
-    filename = f"{photo_id}{ext}"
-    dest = os.path.join(exp_dir, filename)
-    with open(dest, "wb") as out:
-        while True:
-            chunk = file.file.read(1024 * 1024)
-            if not chunk:
-                break
-            out.write(chunk)
+    filename = _store_uploaded_photo(file, "experiments", experiment_id)
     image_url = (f"{settings.public_base_url}/photos/experiments/"
                  f"{experiment_id}/{filename}")
+    return {"image_url": image_url}
+
+
+# ---- Variant photo upload ----
+@router.post("/experiments/variants/photo")
+def upload_variant_photo(
+    file: UploadFile = File(...),
+    user_id: str = Depends(require_feature(FLAG_EXPERIMENTS)),
+):
+    """Store a variant photo and return its URL.
+
+    A variant drafted on POST /experiments does not have an id yet, so the
+    file is stored under the caller (not under a variant id). The client then
+    sends this `image_url` on variant create or update, matching the
+    observation photo flow: one upload, then the URL is saved on the row.
+    """
+    filename = _store_uploaded_photo(
+        file, "experiments", "variants", user_id)
+    image_url = (f"{settings.public_base_url}/photos/experiments/variants/"
+                 f"{user_id}/{filename}")
     return {"image_url": image_url}

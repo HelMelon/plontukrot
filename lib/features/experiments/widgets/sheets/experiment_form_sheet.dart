@@ -75,10 +75,59 @@ class _ExperimentFormSheetState extends State<ExperimentFormSheet> {
   }
 
   void _addVariant() {
+    // Commit the focused field before the list rebuilds. The first variant is
+    // the one on screen when the user taps "add", and that rebuild was
+    // dropping its description while later rows (typed after the rebuild)
+    // kept theirs.
+    _commitFocusedField();
+    final snapshots = _snapshotVariantText();
     setState(() {
       _variants.add(VariantDraft.empty());
       _variantError = null;
     });
+    _restoreVariantText(snapshots);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _restoreVariantText(snapshots);
+    });
+  }
+
+  /// Unfocus so the IME writes into the controller, then put back any text
+  /// that unfocus itself cleared.
+  void _commitFocusedField() {
+    final title = _titleController.text;
+    final hypothesis = _hypothesisController.text;
+    final note = _noteController.text;
+    final variants = _snapshotVariantText();
+    FocusManager.instance.primaryFocus?.unfocus();
+    if (title.isNotEmpty && _titleController.text.isEmpty) {
+      _titleController.text = title;
+    }
+    if (hypothesis.isNotEmpty && _hypothesisController.text.isEmpty) {
+      _hypothesisController.text = hypothesis;
+    }
+    if (note.isNotEmpty && _noteController.text.isEmpty) {
+      _noteController.text = note;
+    }
+    _restoreVariantText(variants);
+  }
+
+  List<({String label, String description})> _snapshotVariantText() {
+    return [
+      for (final variant in _variants)
+        (label: variant.label.text, description: variant.description.text),
+    ];
+  }
+
+  void _restoreVariantText(
+    List<({String label, String description})> snapshots,
+  ) {
+    for (var i = 0; i < snapshots.length && i < _variants.length; i++) {
+      _variants[i].restoreIfCleared(
+        label: snapshots[i].label,
+        description: snapshots[i].description,
+      );
+    }
   }
 
   void _removeVariant(int index) {
@@ -110,6 +159,7 @@ class _ExperimentFormSheetState extends State<ExperimentFormSheet> {
   }
 
   Future<void> _save() async {
+    _commitFocusedField();
     final l10n = AppLocalizations.of(context);
     final title = _titleController.text.trim();
     final filledVariants = _variants
@@ -135,14 +185,24 @@ class _ExperimentFormSheetState extends State<ExperimentFormSheet> {
       if (_isEditing) {
         await _updateExisting(title, filledVariants);
       } else {
+        final payloads = <Map<String, dynamic>>[];
+        for (final variant in filledVariants) {
+          // Read the text before the photo upload. The await can rebuild the
+          // sheet and wipe the focused field — that was dropping the first
+          // variant's description.
+          final payload = variant.toCreatePayload();
+          final imageUrl = await _imageUrlForSave(variant);
+          if (imageUrl != null && imageUrl.trim().isNotEmpty) {
+            payload['image_url'] = imageUrl.trim();
+          }
+          payloads.add(payload);
+        }
         await _service.createExperiment(
           title: title,
           hypothesis: _trimmedOrNull(_hypothesisController.text),
           note: _trimmedOrNull(_noteController.text),
           startedAt: _startedAt,
-          variants: filledVariants
-              .map((variant) => variant.toCreatePayload())
-              .toList(),
+          variants: payloads,
         );
       }
       if (mounted) Navigator.pop(context, true);
@@ -158,6 +218,14 @@ class _ExperimentFormSheetState extends State<ExperimentFormSheet> {
   /// Persist edits: header + per-variant create/update/delete diffing.
   Future<void> _updateExisting(String title, List<VariantDraft> filled) async {
     final experiment = widget.experiment!;
+    final captured = [
+      for (final variant in filled)
+        (
+          variant: variant,
+          label: variant.label.text.trim(),
+          description: variant.description.text.trim(),
+        ),
+    ];
     await _service.updateExperiment(
       experimentId: experiment.id,
       title: title,
@@ -166,18 +234,26 @@ class _ExperimentFormSheetState extends State<ExperimentFormSheet> {
       startedAt: _startedAt,
     );
     final keptIds = filled.map((variant) => variant.id).toSet();
-    for (final variant in filled) {
+    for (final item in captured) {
+      final variant = item.variant;
+      final imageUrl = await _imageUrlForSave(variant);
       if (variant.id == null) {
         await _service.addVariant(
           experimentId: experiment.id,
-          label: variant.label.text.trim(),
-          description: variant.description.text.trim(),
+          label: item.label,
+          description: item.description,
+          imageUrl: imageUrl,
         );
       } else {
         await _service.updateVariant(
           variantId: variant.id!,
-          label: variant.label.text.trim(),
-          description: variant.description.text.trim(),
+          label: item.label,
+          description: item.description,
+          imageUrl: imageUrl,
+          // Only touch image_url when this form changed it. Sending it on
+          // every edit would overwrite a photo saved from another device
+          // while this form was open.
+          updateImage: variant.pickedBytes != null || variant.imageCleared,
         );
       }
     }
@@ -193,6 +269,18 @@ class _ExperimentFormSheetState extends State<ExperimentFormSheet> {
     return trimmed.isEmpty ? null : trimmed;
   }
 
+  /// Upload a newly picked photo, then return the URL that should be stored.
+  /// A cleared photo returns null so the variant row drops `image_url`.
+  Future<String?> _imageUrlForSave(VariantDraft variant) async {
+    String? uploaded;
+    if (variant.pickedBytes != null) {
+      uploaded = await _service.uploadVariantPhoto(
+        imageBytes: variant.pickedBytes!,
+      );
+    }
+    return variant.imageUrlForSave(uploaded);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -204,7 +292,8 @@ class _ExperimentFormSheetState extends State<ExperimentFormSheet> {
     final dimensions = context.dimensions;
     final media = MediaQuery.of(context);
     final keyboard = media.viewInsets.bottom;
-    final sheetHeight = (media.size.height - media.padding.top - keyboard) * 0.94;
+    final sheetHeight =
+        (media.size.height - media.padding.top - keyboard) * 0.94;
     final dateLabel = DateFormat('d MMM y').format(_startedAt);
 
     return Padding(
@@ -274,14 +363,17 @@ class _ExperimentFormSheetState extends State<ExperimentFormSheet> {
                     Semantics(
                       button: true,
                       label: l10n.a11ySelectDate(dateLabel),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: ExcludeSemantics(
-                          child: Icon(context.icons.calendar),
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: ExcludeSemantics(
+                            child: Icon(context.icons.calendar),
+                          ),
+                          title: Text(l10n.experimentsStartDate),
+                          subtitle: Text(dateLabel),
+                          onTap: _pickStartDate,
                         ),
-                        title: Text(l10n.experimentsStartDate),
-                        subtitle: Text(dateLabel),
-                        onTap: _pickStartDate,
                       ),
                     ),
                     spacing.vLg,
@@ -299,9 +391,9 @@ class _ExperimentFormSheetState extends State<ExperimentFormSheet> {
                     spacing.vMd,
                     for (var i = 0; i < _variants.length; i++)
                       Padding(
+                        key: ObjectKey(_variants[i]),
                         padding: EdgeInsets.only(bottom: spacing.md),
                         child: VariantDraftRow(
-                          key: ObjectKey(_variants[i]),
                           draft: _variants[i],
                           index: i,
                           canRemove: _variants.length > 1,

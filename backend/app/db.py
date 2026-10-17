@@ -237,10 +237,13 @@ def auto_migrate() -> None:
                     label TEXT NOT NULL,
                     description TEXT,
                     position INT NOT NULL DEFAULT 0,
+                    image_url TEXT,
                     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
                 );
                 CREATE INDEX IF NOT EXISTS idx_experiment_variants_exp
                     ON experiment_variants (experiment_id, position);
+                ALTER TABLE experiment_variants
+                    ADD COLUMN IF NOT EXISTS image_url TEXT;
 
                 CREATE TABLE IF NOT EXISTS experiment_subjects (
                     id TEXT PRIMARY KEY,

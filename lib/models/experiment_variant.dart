@@ -10,6 +10,7 @@ class ExperimentVariant {
   final String id;
   final String label;
   final String? description;
+  final String? imageUrl;
   final int position;
   final List<ExperimentSubject> subjects;
   final List<ExperimentObservation> observations;
@@ -20,6 +21,7 @@ class ExperimentVariant {
     required this.id,
     required this.label,
     this.description,
+    this.imageUrl,
     required this.position,
     this.subjects = const [],
     this.observations = const [],
@@ -45,6 +47,7 @@ class ExperimentVariant {
       id: id,
       label: readString(data, 'label') ?? '',
       description: readString(data, 'description'),
+      imageUrl: readString(data, 'imageUrl'),
       position: readInt(data, 'position') ?? 0,
       subjects: rawSubjects is List
           ? rawSubjects
@@ -72,6 +75,7 @@ class ExperimentVariant {
   Map<String, dynamic> toMap() => {
         'label': label,
         if (description != null) 'description': description,
+        if (imageUrl != null) 'image_url': imageUrl,
         'position': position,
       };
 }

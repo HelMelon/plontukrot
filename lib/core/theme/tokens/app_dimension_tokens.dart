@@ -10,6 +10,7 @@ class AppDimensionTokens {
     required this.iconXl,
     required this.avatar,
     required this.photoPlaceholder,
+    required this.photoPreview,
     required this.dragHandleWidth,
     required this.dragHandleHeight,
     required this.minTapTarget,
@@ -24,6 +25,7 @@ class AppDimensionTokens {
     iconXl: 22,
     avatar: 40,
     photoPlaceholder: 40,
+    photoPreview: 96,
     dragHandleWidth: 40,
     dragHandleHeight: 4,
     minTapTarget: 40,
@@ -37,6 +39,7 @@ class AppDimensionTokens {
   final double iconXl;
   final double avatar;
   final double photoPlaceholder;
+  final double photoPreview;
   final double dragHandleWidth;
   final double dragHandleHeight;
   final double minTapTarget;
@@ -56,6 +59,7 @@ class AppDimensionTokens {
       iconXl: l(iconXl, other.iconXl),
       avatar: l(avatar, other.avatar),
       photoPlaceholder: l(photoPlaceholder, other.photoPlaceholder),
+      photoPreview: l(photoPreview, other.photoPreview),
       dragHandleWidth: l(dragHandleWidth, other.dragHandleWidth),
       dragHandleHeight: l(dragHandleHeight, other.dragHandleHeight),
       minTapTarget: l(minTapTarget, other.minTapTarget),

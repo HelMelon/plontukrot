@@ -101,12 +101,15 @@ class ExperimentService {
     required String experimentId,
     required String label,
     String? description,
+    String? imageUrl,
   }) async {
     final created = jsonMap(await _api.post(
       '/experiments/$experimentId/variants',
       body: {
         'label': label,
         if (description != null) 'description': description,
+        if (imageUrl != null && imageUrl.trim().isNotEmpty)
+          'image_url': imageUrl.trim(),
       },
     ));
     return readString(created, 'id') ?? '';
@@ -117,11 +120,14 @@ class ExperimentService {
     String? label,
     String? description,
     int? position,
+    String? imageUrl,
+    bool updateImage = false,
   }) async {
     await _api.patch('/variants/$variantId', body: {
       if (label != null) 'label': label,
       if (description != null) 'description': description,
       if (position != null) 'position': position,
+      if (updateImage) 'image_url': imageUrl,
     });
   }
 
@@ -191,6 +197,30 @@ class ExperimentService {
   }) async {
     final response = await _api.postMultipart(
       '/subjects/$subjectId/observations/upload',
+      fileField: 'file',
+      filename: filename,
+      fileBytes: imageBytes,
+    );
+    final json = jsonMap(response);
+    final url = readString(json, 'imageUrl')?.trim() ??
+        readString(json, 'image_url')?.trim() ??
+        '';
+    if (url.isEmpty) {
+      throw StateError('Upload succeeded but no image URL returned');
+    }
+    return url;
+  }
+
+  /// Upload a variant photo and return its public URL.
+  ///
+  /// The variant row does not need to exist yet: the file is stored under the
+  /// signed-in user, and the caller saves [imageUrl] on create or update.
+  Future<String> uploadVariantPhoto({
+    required List<int> imageBytes,
+    String filename = 'variant.jpg',
+  }) async {
+    final response = await _api.postMultipart(
+      '/experiments/variants/photo',
       fileField: 'file',
       filename: filename,
       fileBytes: imageBytes,

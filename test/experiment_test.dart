@@ -157,6 +157,27 @@ void main() {
     });
   });
 
+  group('ExperimentVariant image', () {
+    test('reads snake_case image_url and keeps a missing photo null', () {
+      final withPhoto = ExperimentVariant.fromMap('v1', {
+        'label': 'подвесной горшок сетчатый',
+        'position': 0,
+        'image_url': 'https://example.test/photos/experiments/variants/u/a.jpg',
+      });
+      expect(withPhoto.imageUrl,
+          'https://example.test/photos/experiments/variants/u/a.jpg');
+      expect(withPhoto.toMap()['image_url'], withPhoto.imageUrl);
+
+      final withoutPhoto = ExperimentVariant.fromMap('v2', {
+        'label': 'в грунте',
+        'imageUrl': null,
+        'position': 1,
+      });
+      expect(withoutPhoto.imageUrl, isNull);
+      expect(withoutPhoto.toMap().containsKey('image_url'), isFalse);
+    });
+  });
+
   group('ExperimentVariant.latestWithMetrics', () {
     test('picks the newest observation that has numbers', () {
       final variant = ExperimentVariant.fromMap('v1', {
