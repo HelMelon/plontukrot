@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../models/merge_propagation_transfer.dart';
 import '../models/model_helpers.dart';
 import '../models/propagation.dart';
 import '../models/propagation_initial_stage.dart';
@@ -179,11 +180,68 @@ class PropagationService {
   }
 
   Future<List<Propagation>> fetchForParentPlant(String plantId) async {
-    final items = (await _fetchAll())
-        .where((item) => item.parentPlantId == plantId)
-        .toList()
-      ..sort((a, b) => a.startedAt.compareTo(b.startedAt));
+    return fetchForParentPlants([plantId]);
+  }
+
+  Future<List<Propagation>> fetchForParentPlants(
+    Iterable<String> plantIds,
+  ) async {
+    final items = propagationBatchesOnSourcePlants(
+      batches: await _fetchAll(),
+      sourcePlantIds: plantIds,
+    );
+    items.sort((a, b) => a.startedAt.compareTo(b.startedAt));
     return items;
+  }
+
+  /// Points a batch at another plant using the same parent fields as create.
+  Future<void> reassignParentPlant({
+    required String propagationId,
+    required String parentPlantId,
+    required String parentPlantName,
+    required String parentPlantFamily,
+  }) async {
+    final current = await _get(propagationId);
+    if (current == null) return;
+    await _patch(
+      Propagation(
+        id: current.id,
+        parentPlantId: parentPlantId,
+        parentPlantName: parentPlantName,
+        parentPlantFamily: parentPlantFamily,
+        method: current.method,
+        quantity: current.quantity,
+        quantityAlive: current.quantityAlive,
+        soldQuantity: current.soldQuantity,
+        giftedQuantity: current.giftedQuantity,
+        tradedQuantity: current.tradedQuantity,
+        lostQuantity: current.lostQuantity,
+        stage: current.stage,
+        status: current.status,
+        startedAt: current.startedAt,
+        soldAt: current.soldAt,
+        archivedAt: current.archivedAt,
+        expiresAt: current.expiresAt,
+        createdAt: current.createdAt,
+      ),
+    );
+  }
+
+  Future<void> reassignParentPlants({
+    required Iterable<String> propagationIds,
+    required String parentPlantId,
+    required String parentPlantName,
+    required String parentPlantFamily,
+  }) async {
+    for (final propagationId in propagationIds) {
+      if (propagationId.isEmpty) continue;
+      await reassignParentPlant(
+        propagationId: propagationId,
+        parentPlantId: parentPlantId,
+        parentPlantName: parentPlantName,
+        parentPlantFamily: parentPlantFamily,
+      );
+    }
   }
 
   Stream<List<Propagation>> watchPropagationsForPlant(String plantId) {

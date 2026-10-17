@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:plontukrot/l10n/app_localizations.dart';
 
+import '../../../../core/features/feature_flags.dart';
 import '../../../../core/theme/theme_context.dart';
+import '../../../../models/merge_propagation_transfer.dart';
 import '../../../../models/plant.dart';
+import '../../../../models/propagation.dart';
 import '../../../../models/plant_member.dart';
 import '../../../../models/variegation.dart';
+import '../../../../services/api_exception.dart';
 import '../../../../services/plant_service.dart';
+import '../../../../services/propagation_service.dart';
 import '../selectors/plant_stage_selector.dart';
 import '../selectors/plant_variegation_selector.dart';
 import 'package:plontukrot/core/widgets/accessible_progress_indicator.dart';
+import 'package:plontukrot/core/widgets/app_modal.dart';
 import 'package:plontukrot/core/widgets/sheet_drag_handle.dart';
 
 class MergePlantSheet extends StatefulWidget {
@@ -46,6 +52,11 @@ class _MergePlantSheetState extends State<MergePlantSheet> {
   int selectedStage = 0;
   String? genusError;
   String? speciesError;
+
+  /// Null until the user has answered, or until there is nothing to ask.
+  /// Empty means merge without moving batches.
+  List<String>? _propagationIdsToTransfer;
+  String? _mergedGroupId;
 
   @override
   void initState() {
@@ -154,16 +165,38 @@ class _MergePlantSheetState extends State<MergePlantSheet> {
     });
 
     try {
-      await PlantService().mergePlants(
-        sources: widget.sources,
-        genus: genus,
-        species: species,
-        plantFamily: plantFamily.isEmpty ? null : plantFamily,
-        members: members,
-        tradingName: tradingName,
-        nickname: nickname,
-        stage: selectedStage,
-      );
+      if (_propagationIdsToTransfer == null) {
+        final ids = await _propagationIdsForMerge();
+        if (!mounted) return;
+        if (ids == null) {
+          setState(() => isLoading = false);
+          return;
+        }
+        _propagationIdsToTransfer = ids;
+      }
+
+      final groupId = _mergedGroupId ??
+          await PlantService().mergePlants(
+            sources: widget.sources,
+            genus: genus,
+            species: species,
+            plantFamily: plantFamily.isEmpty ? null : plantFamily,
+            members: members,
+            tradingName: tradingName,
+            nickname: nickname,
+            stage: selectedStage,
+          );
+      _mergedGroupId = groupId;
+
+      final idsToTransfer = _propagationIdsToTransfer ?? const <String>[];
+      if (idsToTransfer.isNotEmpty) {
+        await PropagationService().reassignParentPlants(
+          propagationIds: idsToTransfer,
+          parentPlantId: groupId,
+          parentPlantName: species,
+          parentPlantFamily: plantFamily,
+        );
+      }
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
       if (mounted) {
@@ -173,6 +206,54 @@ class _MergePlantSheetState extends State<MergePlantSheet> {
         );
       }
     }
+  }
+
+  /// `null` aborts the merge (the dialog was dismissed).
+  /// An empty list merges and leaves propagation parents unchanged.
+  Future<List<String>?> _propagationIdsForMerge() async {
+    if (!FeatureFlagsController.instance.isEnabled(FeatureFlag.propagations)) {
+      return const [];
+    }
+
+    final sourceIds = widget.sources.map((plant) => plant.id);
+    final List<Propagation> owned;
+    try {
+      owned = await PropagationService().fetchForParentPlants(sourceIds);
+    } on ApiException catch (error) {
+      if (error.isForbidden) return const [];
+      rethrow;
+    }
+    if (!shouldAskToTransferPropagations(owned)) return const [];
+    if (!mounted) return null;
+
+    final l10n = AppLocalizations.of(context);
+    final transfer = await showAppDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        scrollable: true,
+        title: Text(l10n.plantMergeTransferPropagationsTitle),
+        content: Text(l10n.plantMergeTransferPropagationsBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.plantMergeTransferPropagationsNo),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.plantMergeTransferPropagationsYes),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || transfer == null) return null;
+    return [
+      for (final batch in propagationBatchesToTransferOnMerge(
+        batches: owned,
+        sourcePlantIds: sourceIds,
+        transfer: transfer,
+      ))
+        batch.id,
+    ];
   }
 
   @override
