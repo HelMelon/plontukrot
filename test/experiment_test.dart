@@ -207,4 +207,133 @@ void main() {
       expect(variant.latestWithMetrics?.heightCm, 15);
     });
   });
+
+  group('membershipsForSubject', () {
+    ExperimentSubject subject(ExperimentSubjectType type, String id) {
+      return ExperimentSubject(
+        id: 'row-$type-$id',
+        subjectType: type,
+        subjectId: id,
+      );
+    }
+
+    ExperimentVariant arm(
+      String id,
+      String label,
+      List<ExperimentSubject> subjects,
+    ) {
+      return ExperimentVariant(
+        id: id,
+        label: label,
+        position: 0,
+        subjects: subjects,
+      );
+    }
+
+    Experiment trial(
+      String id, {
+      List<ExperimentVariant> variants = const [],
+      DateTime? completedAt,
+      DateTime? archivedAt,
+    }) {
+      return Experiment(
+        id: id,
+        title: id,
+        variants: variants,
+        completedAt: completedAt,
+        archivedAt: archivedAt,
+      );
+    }
+
+    test('returns each experiment that includes the subject, in input order', () {
+      final plant = subject(ExperimentSubjectType.plant, 'p1');
+      final other = subject(ExperimentSubjectType.plant, 'p2');
+      final experiments = [
+        trial('newer', variants: [
+          arm('v1', 'в кокосе', [plant]),
+        ]),
+        trial('older', variants: [
+          arm('v2', 'в грунте', [other]),
+        ]),
+        trial('also', variants: [
+          arm('v3', 'на балконе', [plant]),
+        ]),
+      ];
+
+      final memberships = membershipsForSubject(
+        experiments,
+        subjectType: ExperimentSubjectType.plant,
+        subjectId: 'p1',
+      );
+
+      expect(memberships.map((item) => item.experiment.id), ['newer', 'also']);
+      expect(memberships.first.variantLabels, ['в кокосе']);
+      expect(memberships.last.variantLabels, ['на балконе']);
+    });
+
+    test('lists every variant of one experiment and ignores the other type', () {
+      final plant = subject(ExperimentSubjectType.plant, 'same');
+      final batch = subject(ExperimentSubjectType.propagation, 'same');
+      final experiments = [
+        trial('e1', variants: [
+          arm('v1', 'в кокосе', [plant]),
+          arm('v2', '  ', [plant]),
+          arm('v3', 'в кокосе', [plant]),
+          arm('v4', 'в грунте', [batch]),
+        ]),
+      ];
+
+      final plantMemberships = membershipsForSubject(
+        experiments,
+        subjectType: ExperimentSubjectType.plant,
+        subjectId: 'same',
+      );
+      final batchMemberships = membershipsForSubject(
+        experiments,
+        subjectType: ExperimentSubjectType.propagation,
+        subjectId: 'same',
+      );
+
+      expect(plantMemberships, hasLength(1));
+      expect(plantMemberships.single.variantLabels, ['в кокосе']);
+      expect(batchMemberships.single.variantLabels, ['в грунте']);
+    });
+
+    test('keeps finished and archived experiments and skips an empty id', () {
+      final plant = subject(ExperimentSubjectType.plant, 'p1');
+      final experiments = [
+        trial(
+          'done',
+          variants: [arm('v1', 'горшок', [plant])],
+          completedAt: DateTime(2026, 10, 1),
+          archivedAt: DateTime(2026, 10, 2),
+        ),
+      ];
+
+      expect(
+        membershipsForSubject(
+          experiments,
+          subjectType: ExperimentSubjectType.plant,
+          subjectId: 'p1',
+        ).single.experiment.id,
+        'done',
+      );
+      expect(
+        membershipsForSubject(
+          experiments,
+          subjectType: ExperimentSubjectType.plant,
+          subjectId: '  ',
+        ),
+        isEmpty,
+      );
+      expect(
+        membershipsForSubject(
+          experiments,
+          subjectType: ExperimentSubjectType.plant,
+          subjectId: 'missing',
+        ),
+        isEmpty,
+      );
+    });
+  });
 }

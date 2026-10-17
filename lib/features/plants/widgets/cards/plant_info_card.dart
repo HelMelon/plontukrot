@@ -5,6 +5,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/features/feature_flags.dart';
 import '../../../../core/theme/theme_context.dart';
+import '../../../../models/experiment_subject.dart';
 import '../../../../models/growth_event.dart';
 import '../../../../models/manipulation_entry.dart';
 import '../../../../models/manipulation_type.dart';
@@ -15,6 +16,7 @@ import '../../../../models/variegation.dart';
 import '../../../../services/manipulation_service.dart';
 import '../../pages/plant_family_details_page.dart';
 import '../../pages/plant_genus_details_page.dart';
+import '../../../experiments/widgets/subject_experiments_section.dart';
 import '../growth/plant_growth_stats_section.dart';
 import '../../../../services/note_service.dart';
 import '../notes/plant_notes_section.dart';
@@ -687,6 +689,10 @@ class _PlantInfoCardState extends State<PlantInfoCard> {
           SizedBox(height: _sectionGap),
           propagation,
         ],
+        SubjectExperimentsSection(
+          subjectType: ExperimentSubjectType.plant,
+          subjectId: plantId,
+        ),
         SizedBox(height: _sectionGap),
         journal,
         if (botanical != null) ...[

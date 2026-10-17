@@ -1,3 +1,4 @@
+import 'experiment_subject.dart';
 import 'experiment_variant.dart';
 import 'model_helpers.dart';
 
@@ -87,4 +88,55 @@ class Experiment {
         if (completedAt != null) 'completed_at': isoOrNull(completedAt),
         if (archivedAt != null) 'archived_at': isoOrNull(archivedAt),
       };
+}
+
+/// An experiment that includes one participant, plus the variant labels that
+/// participant sits in. A subject may belong to more than one variant of the
+/// same trial; duplicate checks on the picker are per variant.
+class ExperimentSubjectMembership {
+  final Experiment experiment;
+  final List<String> variantLabels;
+
+  const ExperimentSubjectMembership({
+    required this.experiment,
+    required this.variantLabels,
+  });
+}
+
+/// Experiments that include [subjectId] of [subjectType], in [experiments]
+/// order. Finished and archived trials stay in the list: the participant is
+/// still recorded there. An empty [subjectId] matches nothing.
+List<ExperimentSubjectMembership> membershipsForSubject(
+  Iterable<Experiment> experiments, {
+  required ExperimentSubjectType subjectType,
+  required String subjectId,
+}) {
+  final id = subjectId.trim();
+  if (id.isEmpty) return const [];
+
+  final memberships = <ExperimentSubjectMembership>[];
+  for (final experiment in experiments) {
+    final labels = <String>[];
+    var matched = false;
+    for (final variant in experiment.variants) {
+      final hit = variant.subjects.any(
+        (subject) =>
+            subject.subjectType == subjectType && subject.subjectId == id,
+      );
+      if (!hit) continue;
+      matched = true;
+      final label = variant.label.trim();
+      if (label.isNotEmpty && !labels.contains(label)) {
+        labels.add(label);
+      }
+    }
+    if (!matched) continue;
+    memberships.add(
+      ExperimentSubjectMembership(
+        experiment: experiment,
+        variantLabels: labels,
+      ),
+    );
+  }
+  return memberships;
 }

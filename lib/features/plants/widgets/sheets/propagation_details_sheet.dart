@@ -5,6 +5,7 @@ import 'package:plontukrot/l10n/app_localizations.dart';
 
 import '../../../../core/theme/theme_context.dart';
 import '../../../../core/widgets/accessible_progress_indicator.dart';
+import '../../../../models/experiment_subject.dart';
 import '../../../../models/propagation.dart';
 import '../../../../models/propagation_outcome.dart';
 import '../../../../models/propagation_stage_entry.dart';
@@ -13,6 +14,7 @@ import '../../../../models/wish_list_item.dart';
 import '../../../../services/note_service.dart';
 import '../../../../services/propagation_service.dart';
 import '../../../wish_list/widgets/sheets/select_wish_list_item_sheet.dart';
+import '../../../experiments/widgets/subject_experiments_section.dart';
 import '../notes/plant_notes_section.dart';
 import 'add_note_sheet.dart';
 import 'add_plant_sheet.dart';
@@ -309,6 +311,10 @@ class PropagationDetailsSheet extends StatelessWidget {
                             ),
                           ),
                         ],
+                        SubjectExperimentsSection(
+                          subjectType: ExperimentSubjectType.propagation,
+                          subjectId: shown.id,
+                        ),
                         spacing.vXl,
                         Text(
                           l10n.propagationTimeline,
