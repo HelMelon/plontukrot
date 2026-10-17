@@ -534,6 +534,26 @@ class _PlantFilterSheetState extends State<PlantFilterSheet> {
                                   });
                                 },
                               ),
+                              _buildChip(
+                                label: l10n.homeNeedsFertilizing,
+                                selected: _criteria.fertilizingDueOnly,
+                                avatar: Icon(
+                                  icons.fertilizing,
+                                  size: dimensions.iconSm,
+                                  color: _criteria.fertilizingDueOnly
+                                      ? context.components.chips.selectedForeground
+                                      : colors.icon,
+                                ),
+                                onSelected: (selected) {
+                                  setState(() {
+                                    _criteria = _criteria.copyWith(
+                                      fertilizingDueOnly: selected,
+                                      clearPresetId: true,
+                                      clearPresetName: true,
+                                    );
+                                  });
+                                },
+                              ),
                             ],
                           ),
                           spacing.vSm,

@@ -1331,6 +1331,21 @@ class _HomePageState extends State<HomePage> {
                                                     clearPresetName: true,
                                                   )),
                                             ),
+                                          if (_filter.fertilizingDueOnly)
+                                            _buildActiveFilterChip(
+                                              label: l10n.homeNeedsFertilizing,
+                                              avatar: Icon(
+                                                _icons.fertilizing,
+                                                size: dimensions.iconSm,
+                                                color: chips.selectedForeground,
+                                              ),
+                                              onDeleted: () => setState(() =>
+                                                  _filter = _filter.copyWith(
+                                                    fertilizingDueOnly: false,
+                                                    clearPresetId: true,
+                                                    clearPresetName: true,
+                                                  )),
+                                            ),
                                           if (_filter.plantFamily != null &&
                                               _filter.plantFamily!.isNotEmpty)
                                             _buildActiveFilterChip(

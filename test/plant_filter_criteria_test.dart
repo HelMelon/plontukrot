@@ -178,5 +178,74 @@ void main() {
         Room.balconyId,
       );
     });
+
+    test('fertilizingDueOnly matches plants due today or overdue', () {
+      final now = DateTime(2026, 10, 16, 12);
+      final due = Plant(
+        id: 'due',
+        genus: 'Hoya',
+        species: 'carnosa',
+        nickname: 'Due',
+        stage: 2,
+        fertilizingFrequencyDays: 14,
+        lastFertilizedAt: now.subtract(const Duration(days: 14)),
+        createdAt: now.subtract(const Duration(days: 40)),
+      );
+      final waiting = Plant(
+        id: 'wait',
+        genus: 'Hoya',
+        species: 'carnosa',
+        nickname: 'Wait',
+        stage: 2,
+        fertilizingFrequencyDays: 14,
+        lastFertilizedAt: now.subtract(const Duration(days: 2)),
+        createdAt: now.subtract(const Duration(days: 40)),
+      );
+      final stopped = Plant(
+        id: 'stop',
+        genus: 'Hoya',
+        species: 'carnosa',
+        nickname: 'Stop',
+        stage: 2,
+        fertilizingFrequencyDays: 0,
+        lastFertilizedAt: now.subtract(const Duration(days: 40)),
+        createdAt: now.subtract(const Duration(days: 40)),
+      );
+
+      const criteria = PlantFilterCriteria(fertilizingDueOnly: true);
+      expect(criteria.isActive, isTrue);
+      expect(criteria.activeCount, 1);
+      expect(
+        criteria.matches(
+          due,
+          isPropagating: false,
+          isRerooting: false,
+          now: now,
+        ),
+        isTrue,
+      );
+      expect(
+        criteria.matches(
+          waiting,
+          isPropagating: false,
+          isRerooting: false,
+          now: now,
+        ),
+        isFalse,
+      );
+      expect(
+        criteria.matches(
+          stopped,
+          isPropagating: false,
+          isRerooting: false,
+          now: now,
+        ),
+        isFalse,
+      );
+      expect(
+        PlantFilterCriteria.fromMap(criteria.toMap()).fertilizingDueOnly,
+        isTrue,
+      );
+    });
   });
 }

@@ -1,3 +1,5 @@
+import '../core/season/fertilizing_season_controller.dart';
+import 'fertilizing_frequency.dart';
 import 'plant.dart';
 
 class PlantFilterCriteria {
@@ -5,6 +7,7 @@ class PlantFilterCriteria {
   final bool groupsOnly;
   final bool rerootingOnly;
   final bool quarantineOnly;
+  final bool fertilizingDueOnly;
   final String? plantFamily;
   final String? genus;
   final String? cultivar;
@@ -18,6 +21,7 @@ class PlantFilterCriteria {
     this.groupsOnly = false,
     this.rerootingOnly = false,
     this.quarantineOnly = false,
+    this.fertilizingDueOnly = false,
     this.plantFamily,
     this.genus,
     this.cultivar,
@@ -34,6 +38,7 @@ class PlantFilterCriteria {
       !groupsOnly &&
       !rerootingOnly &&
       !quarantineOnly &&
+      !fertilizingDueOnly &&
       (plantFamily == null || plantFamily!.isEmpty) &&
       (genus == null || genus!.isEmpty) &&
       (cultivar == null || cultivar!.isEmpty) &&
@@ -48,6 +53,7 @@ class PlantFilterCriteria {
     if (groupsOnly) count++;
     if (rerootingOnly) count++;
     if (quarantineOnly) count++;
+    if (fertilizingDueOnly) count++;
     if (plantFamily != null && plantFamily!.isNotEmpty) count++;
     if (genus != null && genus!.isNotEmpty) count++;
     if (cultivar != null && cultivar!.isNotEmpty) count++;
@@ -60,11 +66,15 @@ class PlantFilterCriteria {
     Plant plant, {
     required bool isPropagating,
     required bool isRerooting,
+    DateTime? now,
   }) {
     if (propagatingOnly && !isPropagating) return false;
     if (groupsOnly && !plant.isGroup) return false;
     if (rerootingOnly && !isRerooting) return false;
     if (quarantineOnly && !plant.isInQuarantine()) return false;
+    if (fertilizingDueOnly && !plantNeedsFertilizing(plant, now: now)) {
+      return false;
+    }
     if (plantFamily != null &&
         plantFamily!.isNotEmpty &&
         (plant.plantFamily ?? '').trim() != plantFamily) {
@@ -97,6 +107,7 @@ class PlantFilterCriteria {
     bool? groupsOnly,
     bool? rerootingOnly,
     bool? quarantineOnly,
+    bool? fertilizingDueOnly,
     String? plantFamily,
     bool clearPlantFamily = false,
     String? genus,
@@ -117,6 +128,7 @@ class PlantFilterCriteria {
       groupsOnly: groupsOnly ?? this.groupsOnly,
       rerootingOnly: rerootingOnly ?? this.rerootingOnly,
       quarantineOnly: quarantineOnly ?? this.quarantineOnly,
+      fertilizingDueOnly: fertilizingDueOnly ?? this.fertilizingDueOnly,
       plantFamily: clearPlantFamily ? null : (plantFamily ?? this.plantFamily),
       genus: clearGenus ? null : (genus ?? this.genus),
       cultivar: clearCultivar ? null : (cultivar ?? this.cultivar),
@@ -133,6 +145,7 @@ class PlantFilterCriteria {
       'groupsOnly': groupsOnly,
       'rerootingOnly': rerootingOnly,
       'quarantineOnly': quarantineOnly,
+      'fertilizingDueOnly': fertilizingDueOnly,
       'plantFamily': plantFamily,
       'genus': genus,
       'cultivar': cultivar,
@@ -149,6 +162,7 @@ class PlantFilterCriteria {
       groupsOnly: map['groupsOnly'] as bool? ?? false,
       rerootingOnly: map['rerootingOnly'] as bool? ?? false,
       quarantineOnly: map['quarantineOnly'] as bool? ?? false,
+      fertilizingDueOnly: map['fertilizingDueOnly'] as bool? ?? false,
       plantFamily: map['plantFamily'] as String?,
       genus: map['genus'] as String?,
       cultivar: map['cultivar'] as String?,
@@ -158,6 +172,23 @@ class PlantFilterCriteria {
       presetName: map['presetName'] as String?,
     );
   }
+}
+
+/// Same rule as the red fertilizing date on the plant card: due today or overdue.
+bool plantNeedsFertilizing(Plant plant, {DateTime? now}) {
+  final settings = FertilizingSeasonController.instance.settings;
+  final quarantineSeason = plant.quarantineUntil == null
+      ? null
+      : settings.growthSeasonForDate(plant.quarantineUntil!);
+  return isFertilizingOverdue(
+    frequencyDays: plant.fertilizingFrequencyDays,
+    lastFertilizedAt: plant.lastFertilizedAt,
+    createdAt: plant.createdAt,
+    now: now,
+    isArchived: plant.isArchived,
+    quarantineUntil: plant.quarantineUntil,
+    quarantineSeason: quarantineSeason,
+  );
 }
 
 class PlantFilterPreset {
