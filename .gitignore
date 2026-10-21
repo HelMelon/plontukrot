@@ -45,3 +45,8 @@ __pycache__/
 
 ios/Podfile.lock
 tools/export_plants.dart
+# build / run artifacts
+*.log
+hs_err_pid*
+replay_pid*
+.kotlin/
